@@ -1,0 +1,1914 @@
+{
+  "StyleName":"default",
+  "StyleResPath":"default",
+  "TextColors":  
+  [
+    -1,
+    -1761607681  
+  ],
+  "Form":  
+  {
+    "Color":    -15525083,
+    "Gradient":    
+    {
+      "Colors":      
+      [
+        -16777216,
+        -1      
+      ],
+      "Style":      0,
+      "StartPos":      
+      {
+        "X":0,
+        "Y":0      
+      },
+      "StopPos":      
+      {
+        "X":0,
+        "Y":0      
+      }    
+    },
+    "Kind":    1  
+  },
+  "Topbar":  
+  {
+    "Color":    -1,
+    "Gradient":    
+    {
+      "Colors":      
+      [
+        -15064773,
+        -15059629      
+      ],
+      "Style":      0,
+      "StartPos":      
+      {
+        "X":0,
+        "Y":0.500000059604645      
+      },
+      "StopPos":      
+      {
+        "X":1,
+        "Y":0.499999970197678      
+      }    
+    },
+    "Kind":    2  
+  },
+  "Multiview":  
+  {
+    "Color":    -1,
+    "Gradient":    
+    {
+      "Colors":      
+      [
+        -16180178,
+        -16642029      
+      ],
+      "Style":      0,
+      "StartPos":      
+      {
+        "X":0,
+        "Y":0      
+      },
+      "StopPos":      
+      {
+        "X":0,
+        "Y":0      
+      }    
+    },
+    "Kind":    2  
+  },
+  "Button":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":8,
+      "Top":8,
+      "Right":8,
+      "Bottom":8    
+    },
+    "Fill2":    
+    {
+      "Color":      838860800,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "XRadius":15,
+    "YRadius":15,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "Button2":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":6,
+      "Top":6,
+      "Right":6,
+      "Bottom":6    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1768490241,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "XRadius":15,
+    "YRadius":15,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  },
+  "ButtonIcon":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":14,
+      "Top":14,
+      "Right":14,
+      "Bottom":14    
+    },
+    "Fill2":    
+    {
+      "Color":      838860800,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "XRadius":30,
+    "YRadius":30,
+    "Fill":    
+    {
+      "Color":      -15059629,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "ButtonIcon2":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":14,
+      "Top":14,
+      "Right":14,
+      "Bottom":14    
+    },
+    "Fill2":    
+    {
+      "Color":      838860800,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "XRadius":0,
+    "YRadius":0,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "ButtonIcon3":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":8,
+      "Top":8,
+      "Right":8,
+      "Bottom":8    
+    },
+    "Fill2":    
+    {
+      "Color":      838860800,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "XRadius":0,
+    "YRadius":0,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "Edit":  
+  {
+    "FontName":"Roboto",
+    "FontSize":11,
+    "FontColor":    -1,
+    "XRadius":15,
+    "YRadius":15,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  },
+  "Tab":  
+  {
+    "Item":    
+    {
+      "ImageFilename":"tab-close.png",
+      "ImageMargins":      
+      {
+        "Left":14,
+        "Top":14,
+        "Right":0,
+        "Bottom":14      
+      },
+      "Fill2":      
+      {
+        "Color":        838860800,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        1      
+      },
+      "Stroke2":      
+      {
+        "Thickness":2,
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      },
+      "XRadius":15,
+      "YRadius":15,
+      "Fill":      
+      {
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      },
+      "Stroke":      
+      {
+        "Thickness":2,
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      }    
+    },
+    "ImageFilename":"current-tab.png",
+    "ImageMargins":    
+    {
+      "Left":14,
+      "Top":14,
+      "Right":14,
+      "Bottom":14    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":0.300000011920929,
+      "Color":      -1768490241,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "XRadius":15,
+    "YRadius":15,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.300000011920929,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  },
+  "Checkbox":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":0,
+      "Top":0,
+      "Right":0,
+      "Bottom":0    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":0.300000011920929,
+      "Color":      -1768490241,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "XRadius":0,
+    "YRadius":0,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.300000011920929,
+      "Color":      -15054486,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  },
+  "CheckButton":  
+  {
+    "Item":    
+    {
+      "ImageFilename":"",
+      "ImageMargins":      
+      {
+        "Left":0,
+        "Top":0,
+        "Right":0,
+        "Bottom":0      
+      },
+      "Fill2":      
+      {
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      },
+      "Stroke2":      
+      {
+        "Thickness":0.300000011920929,
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        1      
+      },
+      "XRadius":30,
+      "YRadius":30,
+      "Fill":      
+      {
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        1      
+      },
+      "Stroke":      
+      {
+        "Thickness":2,
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      }    
+    },
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":14,
+      "Top":14,
+      "Right":14,
+      "Bottom":14    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1768490241,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "XRadius":15,
+    "YRadius":15,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  },
+  "SettingsRect":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":0,
+      "Top":0,
+      "Right":0,
+      "Bottom":0    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      2    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      2    
+    },
+    "XRadius":10,
+    "YRadius":10,
+    "Fill":    
+    {
+      "Color":      -15788514,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "CheckButtonSettings":  
+  {
+    "Item":    
+    {
+      "ImageFilename":"",
+      "ImageMargins":      
+      {
+        "Left":0,
+        "Top":0,
+        "Right":0,
+        "Bottom":0      
+      },
+      "Fill2":      
+      {
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      },
+      "Stroke2":      
+      {
+        "Thickness":0.300000011920929,
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        1      
+      },
+      "XRadius":30,
+      "YRadius":30,
+      "Fill":      
+      {
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        1      
+      },
+      "Stroke":      
+      {
+        "Thickness":2,
+        "Color":        -1,
+        "Gradient":        
+        {
+          "Colors":          
+          [
+            -16777216,
+            -1          
+          ],
+          "Style":          0,
+          "StartPos":          
+          {
+            "X":0,
+            "Y":0          
+          },
+          "StopPos":          
+          {
+            "X":0,
+            "Y":0          
+          }        
+        },
+        "Kind":        0      
+      }    
+    },
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":14,
+      "Top":14,
+      "Right":14,
+      "Bottom":14    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "XRadius":0,
+    "YRadius":0,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "Memo":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":6,
+      "Top":6,
+      "Right":6,
+      "Bottom":6    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1768490241,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "XRadius":15,
+    "YRadius":15,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.360000014305115,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  },
+  "ItemCard":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":0,
+      "Top":0,
+      "Right":0,
+      "Bottom":0    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -1777200622,
+          -16119286        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0.500000059604645        
+        },
+        "StopPos":        
+        {
+          "X":1,
+          "Y":0.499999970197678        
+        }      
+      },
+      "Kind":      2    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      2    
+    },
+    "XRadius":0,
+    "YRadius":0,
+    "Fill":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      2    
+    },
+    "Stroke":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    }  
+  },
+  "ItemCardRequest":  
+  {
+    "ImageFilename":"",
+    "ImageMargins":    
+    {
+      "Left":0,
+      "Top":0,
+      "Right":0,
+      "Bottom":0    
+    },
+    "Fill2":    
+    {
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      0    
+    },
+    "Stroke2":    
+    {
+      "Thickness":2,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      2    
+    },
+    "XRadius":10,
+    "YRadius":10,
+    "Fill":    
+    {
+      "Color":      -15788514,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    },
+    "Stroke":    
+    {
+      "Thickness":0.300000011920929,
+      "Color":      -1,
+      "Gradient":      
+      {
+        "Colors":        
+        [
+          -16777216,
+          -1        
+        ],
+        "Style":        0,
+        "StartPos":        
+        {
+          "X":0,
+          "Y":0        
+        },
+        "StopPos":        
+        {
+          "X":0,
+          "Y":0        
+        }      
+      },
+      "Kind":      1    
+    }  
+  }
+}

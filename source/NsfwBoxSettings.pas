@@ -1,0 +1,102 @@
+﻿//♡2022 by Kisspeace. https://github.com/kisspeace
+unit NsfwBoxSettings;
+
+interface
+uses
+  Classes, XSuperObject, system.Generics.Collections;
+
+Const
+
+  ACTION_OPEN_MENU          = 0;
+  ACTION_DOWNLOAD           = 1;
+  ACTION_PLAY_EXTERNALY     = 2;
+  ACTION_ADD_BOOKMARK       = 3;
+  ACTION_DELETE_BOOKMARK    = 4;
+  ACTION_LOG_URLS           = 5;
+  ACTION_COPY_CONTENT_URLS  = 6;
+  ACTION_COPY_THUMB_URL     = 7;
+  ACTION_OPEN_RELATED       = 8;
+  ACTION_OPEN_AUTHOR        = 9;
+  ACTION_SHARE_CONTENT      = 10;
+  ACTION_BROWSE             = 11;
+  ACTION_DELETE_CARD        = 12;
+  ACTION_SHOW_TAGS          = 13;
+
+
+type
+
+  TNBoxItemInteraction = NativeInt;
+
+  TNBoxItemInteractions = TArray<TNBoxItemInteraction>;
+
+  TNsfwBoxSettings = class
+    Version: integer;
+    DefaultUseragent: string;
+    AllowCookies: boolean;
+    DefDownloadPath: string;
+    StyleName: string;
+    ThreadsCount: integer;
+    ContentLayoutsCount: integer;
+    ItemIndent: single;
+    Language: string;
+    Fullscreen: boolean;
+    AutoSaveSession: boolean;
+    SaveSearchHistory: boolean;
+    SaveDownloadHistory: boolean;
+    SaveTapHistory: boolean;
+    HighlightsDownloaded: boolean;
+    ShowCaptions: boolean;
+    AutoRenameExistsFile: boolean;
+    DownloadDuplicates: boolean;
+    MaxDownloadThreads: integer;
+    AutoStartBrowse: boolean;
+    AllowDuplicateTabs: boolean;
+    AutoCloseItemMenu: boolean;
+    ItemInteractions: TNBoxItemInteractions;
+    FilenameLogUrls: string;
+    DevMode: boolean;
+    procedure Assign(ASource: TNsfwBoxSettings);
+    constructor Create;
+  end;
+
+
+implementation
+
+
+{ TNsfwBoxSettings }
+
+procedure TNsfwBoxSettings.Assign(ASource: TNsfwBoxSettings);
+begin
+  Self.AssignFromJSON(ASource.AsJSONObject);
+end;
+
+constructor TNsfwBoxSettings.Create;
+begin
+  Version                := 1;
+  DevMode                := false;
+  DefDownloadPath        := '';
+  DefaultUserAgent       := '';
+  FilenameLogUrls        := '';
+  StyleName              := 'default.json';
+  AllowCookies           := false;
+  ThreadsCount           := 6;
+  ContentLayoutsCount    := 2;
+  MaxDownloadThreads     := 4;
+  ItemIndent             := 2;
+  Language               := 'EN';
+  AutoSaveSession        := true;
+  SaveSearchHistory      := true;
+  SaveDownloadHistory    := true;
+  SaveTapHistory         := false;
+  Fullscreen             := true;
+  HighlightsDownloaded   := false;
+  ShowCaptions           := true;
+  AutoRenameExistsFile   := false;
+  DownloadDuplicates     := false;
+  AutoStartBrowse        := false;
+  AllowDuplicateTabs     := true;
+  AutoCloseItemMenu      := true;
+  ItemInteractions       := [ ACTION_OPEN_MENU ];
+end;
+
+end.
