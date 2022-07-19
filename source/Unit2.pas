@@ -13,7 +13,8 @@ uses
   NsfwBoxInterfaces, NsfwBoxContentScraper, NsfwBoxOriginPseudo,
   NsfwBoxOriginNsfwXxx, NsfwBoxGraphics, NsfwBoxOriginConst,
   NsfwBoxGraphics.Rectangle, NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi,
-  NsfwBoxStyling, NsfwBoxOriginBookmarks, NsfwBoxHelper;
+  NsfwBoxOriginGivemepornClub, NsfwBoxStyling, NsfwBoxOriginBookmarks,
+  NsfwBoxHelper;
 
 type
 
@@ -48,6 +49,7 @@ type
       BtnOriginNsfwXxx: TRectButton;
       BtnOriginR34App: TRectButton;
       BtnOriginR34JsonApi: TRectButton;
+      BtnOriginGivemepornClub: TRectButton;
       BtnOriginPseudo: TRectButton;
       BtnOriginBookmarks: TRectButton;
       constructor Create(AOwner: TComponent);
@@ -76,6 +78,7 @@ type
       procedure OnOriginChanged(Sender: TObject);
       procedure OnNsfwXxxSortChanged(Sender: TObject);
       procedure OnNsfwXxxSearchTypeChanged(Sender: TObject);
+      procedure OnGmpClubSearchTypeChanged(Sender: TObject);
       procedure BtnSelectMenuOnTap(Sender: TObject; const Point: TPointF);
       procedure SetRequest(const value: INBoxSearchRequest);
       function GetRequest: INBoxSearchRequest;
@@ -86,6 +89,7 @@ type
       OriginSetMenu: TNBoxOriginSetMenu;
       NsfwXxxSortMenu: TNBoxSelectMenu;
       NsfwXxxSearchTypeMenu: TNBoxSelectMenu;
+      GmpClubSearchTypeMenu: TNBoxSelectMenu;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -104,6 +108,8 @@ type
           CheckCartoons,
           CheckGay
           : TNBoxCheckButton;
+        GmpClubMenu: TNBoxSearchSubMenuBase;
+          BtnGmpChangeSearchType: TRectButton;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -154,6 +160,7 @@ begin
   BtnOriginNsfwxxx    := NewBtn(OriginToStr(ORIGIN_NSFWXXX), ORIGIN_NSFWXXX);
   BtnOriginR34App     := NewBtn(OriginToStr(ORIGIN_R34APP), ORIGIN_R34APP);
   BtnOriginR34JsonApi := NewBtn(OriginToStr(ORIGIN_R34JSONAPI), ORIGIN_R34JSONAPI);
+  BtnOriginGivemepornClub := NewBtn(OriginToStr(ORIGIN_GIVEMEPORNCLUB), ORIGIN_GIVEMEPORNCLUB);
   BtnOriginBookmarks  := NewBtn(OriginToStr(ORIGIN_BOOKMARKS), ORIGIN_BOOKMARKS);
   BtnOriginPseudo     := NewBtn(OriginToStr(ORIGIN_PSEUDO), ORIGIN_PSEUDO);
 end;
@@ -162,7 +169,8 @@ destructor TNBoxOriginSetMenu.Destroy;
 begin
   BtnOriginNsfwxxx.Free;
   BtnOriginR34App.Free;
-  BtnOriginR34JsonApi.free;
+  BtnOriginR34JsonApi.Free;
+  BtnOriginGivemepornClub.Free;
   BtnOriginPseudo.Free;
   inherited;
 end;
@@ -226,6 +234,16 @@ var
       Result.Parent := AParent;
   end;
 
+  function NewSelectMenu: TNBoxSelectMenu;
+  begin
+    Result := TNBoxSelectMenu.Create(Self);
+    with Result do begin
+      Parent := Self;
+      Visible := false;
+      Align := TAlignlayout.Client;
+    end;
+  end;
+
 begin
   inherited;
   M := TRectF.Create(10, 10, 10, 0);
@@ -283,24 +301,16 @@ begin
 
     IconPath :=  Form1.AppStyle.GetImagePath(ICON_TAG);
 
-    NsfwXxxSortMenu := TNBoxSelectMenu.Create(self);
+    NsfwXxxSortMenu := NewSelectMenu;
     with NsfwXxxSortMenu do begin
-      parent := Self;
-      visible := false;
-      Align := TAlignlayout.Client;
-
       Addbtn('Newest', Ord(Newest), IconPath);
       Addbtn('Popular', Ord(Popular), IconPath);
       Addbtn('Recommended', Ord(Recommended), IconPath);
       OnSelected := OnNsfwXxxSortChanged;
     end;
 
-    NsfwXxxSearchTypeMenu:= TNBoxSelectMenu.Create(self);
+    NsfwXxxSearchTypeMenu := NewSelectMenu;
     with NsfwXxxSearchTypeMenu do begin
-      parent := Self;
-      visible := false;
-      Align := TAlignlayout.Client;
-
       Addbtn('Text request', Ord(TNsfwUrlType.Default), IconPath);
       Addbtn('User name', Ord(TNsfwUrlType.User), IconPath);
       Addbtn('Category', Ord(TNsfwUrlType.Category), IconPath);
@@ -308,11 +318,20 @@ begin
       OnSelected := OnNsfwXxxSearchTypeChanged;
     end;
 
+    GmpClubSearchTypeMenu := NewSelectMenu;
+    with GmpClubSearchTypeMenu do begin
+      Addbtn('Default navigate', Ord(TGmpclubSearchType.Empty), IconPath);
+      Addbtn('Search by tag', Ord(TGmpclubSearchType.Tag), IconPath);
+      Addbtn('Search by category', Ord(TGmpclubSearchType.Category), IconPath);
+      Addbtn('Random content', Ord(TGmpclubSearchType.Random), IconPath);
+      OnSelected := OnGmpClubSearchTypeChanged;
+    end;
+
     NsfwXxxMenu := TNBoxSearchSubMenuBase.Create(Self);
     with NsfwXxxMenu do begin
-      Parent := mainmenu;
+      Parent := MainMenu;
       Align := TAlignlayout.Top;
-      Visible := false;
+      Visible := False;
 
       CheckGallery  := NewCheck(ICON_IMAGE, 'Gallery (set of images)', NsfwXxxMenu);
       with CheckGallery do begin
@@ -370,11 +389,29 @@ begin
       DoAutoSize;
     end;
 
+    GmpClubMenu := TNBoxSearchSubMenuBase.Create(self);
+    with GmpClubMenu do begin
+      Parent := MainMenu;
+      Align := TAlignlayout.Top;
+      Visible := false;
+
+      BtnGmpChangeSearchType := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
+      With BtnGmpChangeSearchType do begin
+        Parent := GmpClubMenu;
+        Align := TAlignlayout.top;
+        Margins.Rect := M;
+        Text.Text := 'Change search type';
+        TagObject := GmpClubSearchTypeMenu; // linking button with menu
+        OnTap := BtnSelectMenuOnTap;
+        Image.FileName := IconPath;
+      end;
+
+    end;
   end;
 
   Self.NsfwXxxSortMenu.Selected := Ord(Recommended);
   Self.NsfwXxxSearchTypeMenu.Selected := Ord(TNsfwUrlType.Default);
-
+  Self.GmpClubSearchTypeMenu.Selected := Ord(TGmpclubSearchType.Empty);
 end;
 
 destructor TNBoxSearchMenu.Destroy;
@@ -392,10 +429,10 @@ var
   O, tmp: Integer;
 begin
   O := OriginSetMenu.Selected;
+  Result := CreateReqByOrigin(O);
 
-  if O = ORIGIN_NSFWXXX then begin
+  if ( O = ORIGIN_NSFWXXX ) then begin
 
-    Result := TNBoxSearchReqNsfwXxx.Create;
     with Result as TNBoxSearchReqNsfwXxx do begin
 
       var LTypes: TNsfwItemTypes := [];
@@ -423,20 +460,21 @@ begin
       SearchType := TNsfwUrlType(NsfwXxxSearchTypeMenu.Selected);
     end;
 
-  end else if (O = ORIGIN_R34APP) then begin
-    Result := TNBoxSearchReqR34app.Create;
-  end else if O = ORIGIN_R34JsonApi then begin
-    Result := TNBoxSearchReqR34JsonApi.Create;
-  end else if O = ORIGIN_PSEUDO then begin
-    Result := TNBoxSearchReqPseudo.Create;
-  end else if O = ORIGIN_BOOKMARKS then begin
-    Result := TNBoxSearchReqBookmarks.Create;
+  end else if ( O = ORIGIN_GIVEMEPORNCLUB ) then begin
+
+    with Result as TNBoxSearchReqGmpClub do begin
+      SearchType := TGmpClubSearchType(GmpClubSearchTypeMenu.Selected);
+    end;
+
   end;
 
   with Result do begin
+
     Request := EditRequest.Edit.Text;
+
     if TryStrToInt(EditPageId.Edit.Text, tmp) then
       Pageid := tmp;
+
   end;
 end;
 
@@ -446,11 +484,27 @@ begin
   OriginSetMenu.Visible := false;
   NsfwXxxSortMenu.Visible := false;
   NsfwXxxSearchTypeMenu.Visible := false;
+  GmpClubSearchTypeMenu.Visible := false;
 end;
 
 procedure TNBoxSearchMenu.HideOriginMenus;
 begin
-  NsfwXxxMenu.Visible := false;
+  NsfwXxxMenu.Visible := False;
+  GmpClubMenu.Visible := False;
+end;
+
+procedure TNBoxSearchMenu.OnGmpClubSearchTypeChanged(Sender: TObject);
+var
+  Selected: TGmpClubSearchType;
+begin
+  ShowMainMenu;
+  Selected := TGmpclubSearchType(Self.GmpClubSearchTypeMenu.Selected);
+  case Selected of
+    TGmpclubSearchType.Empty:    BtnGmpChangeSearchType.Text.Text := 'Default navigate';
+    TGmpclubSearchType.Tag:      BtnGmpChangeSearchType.Text.Text := 'Search by tag';
+    TGmpclubSearchType.Category: BtnGmpChangeSearchType.Text.Text := 'Search by category';
+    TGmpclubSearchType.Random:   BtnGmpChangeSearchType.Text.Text := 'Random content';
+  end;
 end;
 
 procedure TNBoxSearchMenu.OnNsfwXxxSearchTypeChanged(Sender: TObject);
@@ -460,10 +514,10 @@ begin
   ShowMainMenu;
   SelectedType := TNsfwUrlType(Self.NsfwXxxSearchTypeMenu.Selected);
   case SelectedType of
-    TNsfwUrlType.Default: BtnChangeUrlType.Text.Text := 'Text request';
-    User:                 BtnChangeUrlType.Text.Text := 'User name';
-    Category:             BtnChangeUrlType.Text.Text := 'Category';
-    Related:              BtnChangeUrlType.Text.Text := 'Related posts';
+    TNsfwUrlType.Default:  BtnChangeUrlType.Text.Text := 'Text request';
+    TNsfwUrlType.User:     BtnChangeUrlType.Text.Text := 'User name';
+    TNsfwUrlType.Category: BtnChangeUrlType.Text.Text := 'Category';
+    TNsfwUrlType.Related:  BtnChangeUrlType.Text.Text := 'Related posts';
   end;
 end;
 
@@ -484,11 +538,16 @@ procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
 begin
   BtnChangeOrigin.Image.FileName := form1.AppStyle.GetImagePath(OriginSetMenu.Selected);
   BtnChangeOrigin.Text.Text := '( ' + OriginToStr(OriginSetMenu.Selected) + ' ) Change content provider';
-  OriginSetMenu.Visible := false;
-  MainMenu.Visible := true;
+  self.HideMenus;
+  //OriginSetMenu.Visible := False;
+  MainMenu.Visible := True;
   self.HideOriginMenus;
+
+
   if OriginSetMenu.Selected = ORIGIN_NSFWXXX then
-    NsfwXxxMenu.Visible := true;
+    NsfwXxxMenu.Visible := True
+  else if ( OriginSetMenu.Selected = ORIGIN_GIVEMEPORNCLUB ) then
+    GmpClubMenu.Visible := True;
 end;
 
 procedure TNBoxSearchMenu.SetRequest(const value: INBoxSearchRequest);
@@ -509,6 +568,7 @@ begin
       CheckCartoons.IsChecked := ( Cartoons in Oris );
     end;
   end;
+
 end;
 
 procedure TNBoxSearchMenu.ShowMainMenu;

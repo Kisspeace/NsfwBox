@@ -7,9 +7,11 @@ uses
   System.SysUtils, System.Generics.Collections,
   NetHttp.R34AppApi, R34App.Types,
   Nethttp.R34JsonApi, R34JsonAPi.Types, NetHttp.Scraper.NsfwXxx,
-  NsfwXxx.Types, Net.HttpClientComponent,
+  NsfwXxx.Types, givemeporn.club.types, givemeporn.club.scraper,
+  Net.HttpClientComponent,
   NsfwBoxInterfaces, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginPseudo, NsfwBoxOriginR34App,
+  NsfwBoxOriginGivemepornClub,
   NsfwBoxOriginConst, NsfwBoxBookmarks, NsfwBoxOriginBookmarks,
   IoUtils, NsfwBoxFilesystem, System.Classes, system.SyncObjs,
   System.Threading, NsfwBoxThreading;
@@ -30,11 +32,14 @@ type
       function GetContentNsfwXxx(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer; Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris ): boolean;
       function GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
       function GetContentR34App(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
+      function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ABookmarksListId: int64; APageId: integer = 1): boolean;
     public
       BookmarksDb: TNBoxBookmarksDb;
       procedure FetchContentUrls(var APost: INBoxItem);
+      procedure FetchTags(var APost: INBoxItem);
       function TryFetchContentUrls(var APost: INBoxItem): boolean;
+      function TryFetchTags(var APost: INBoxItem): boolean;
       function GetContent(ARequest: INBoxSearchRequest; AList: INBoxHasOriginList): boolean;
       property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
       constructor Create;
@@ -74,17 +79,41 @@ end;
 procedure TNBoxScraper.FetchContentUrls(var APost: INBoxItem);
 begin
   if ( APost is TNBoxNsfwXxxItem ) then begin
+
     var Client: TNsfwXxxScraper;
     var Item: TNBoxNsfwXxxitem;
-    item := ( APost as TNBoxNsfwXxxitem );
+
+    Item := ( APost as TNBoxNsfwXxxitem );
     Client := TNsfwXxxScraper.Create;
     SyncWebClientSet(Client.WebClient, APost.Origin);
+
     try
       Item.Page := Client.GetPage(Item.Item.PostUrl);
     finally
       Client.Free;
     end;
+
+  end else if ( APost is TNBoxGmpClubItem ) then begin
+
+    var Client: TGmpClubScraper;
+    var Item: TNBoxGmpClubItem;
+
+    Item := ( APost as TNBoxGmpClubItem );
+    Client := TGmpClubScraper.Create;
+    SyncWebClientSet(Client.WebClient, APost.Origin);
+
+    try
+      Item.Page := Client.GetPage(Item.Item.GetUrl);
+    finally
+      Client.Free;
+    end;
+
   end;
+end;
+
+procedure TNBoxScraper.FetchTags(var APost: INBoxItem);
+begin
+  self.FetchContentUrls(APost);
 end;
 
 function TNBoxScraper.GetContent(ARequest: INBoxSearchRequest;
@@ -128,6 +157,17 @@ begin
         ARequest.PageId );
     end;
 
+    ORIGIN_GIVEMEPORNCLUB:
+    begin
+      with ( ARequest As TNBoxSearchReqGmpClub ) do begin
+      Result := Self.GetContentGmpClub
+        ( AList,
+          Request,
+          SearchType,
+          PageId );
+      end;
+    end;
+
     ORIGIN_PSEUDO:
     begin
       Result := Self.GetContentPseudo(AList, ARequest.Request);
@@ -138,6 +178,55 @@ begin
       Result := Self.GetContentBookmarks(Alist, RequestAsInt, ARequest.PageId);
     end;
 
+  end;
+end;
+
+function TNBoxScraper.GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string;
+  ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
+var
+  Client: TGmpclubScraper;
+  i: integer;
+  Content: TGmpclubItemAr;
+begin
+  Result := false;
+  Client := TGmpclubScraper.create;
+  try
+    SyncWebClientSet(Client.WebClient, ORIGIN_GIVEMEPORNCLUB);
+
+    case ASearchType of
+
+      TGmpClubSearchType.Empty:
+      begin
+        Content := Client.GetItems(APageNum);
+      end;
+
+      TGmpClubSearchType.Random:
+      begin
+        Content := Client.GetRandomItems;
+      end;
+
+      TGmpClubSearchType.Tag:
+      begin
+        Content := Client.GetItemsByTag(AReqParam, APageNum);
+      end;
+
+      TGmpClubSearchType.Category:
+      begin
+        Content := Client.GetItemsByCategory(AReqParam, APageNum);
+      end;
+
+    end;
+
+    Result := (length(Content) > 0);
+    for i := 0 to high(Content) do begin
+      var Item: TNBoxGmpClubItem;
+      Item := TNBoxGmpClubItem.Create;
+      Item.Item := Content[I];
+      AList.Add(Item);
+    end;
+
+  finally
+    Client.Free;
   end;
 end;
 
@@ -243,6 +332,11 @@ begin
   except
     Result := false;
   end;
+end;
+
+function TNBoxScraper.TryFetchTags(var APost: INBoxItem): boolean;
+begin
+  Self.TryFetchContentUrls(APost);
 end;
 
 function TNBoxScraper.GetContentR34App(AList: INBoxHasOriginList; ATags: string;

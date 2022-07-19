@@ -27,7 +27,8 @@ uses
   NsfwBoxFileSystem in 'source\NsfwBoxFileSystem.pas',
   FMX.Color in 'source\FMX.Color.pas',
   SimpleClipboard in 'source\SimpleClipboard.pas',
-  NsfwBoxThreading in 'source\NsfwBoxThreading.pas';
+  NsfwBoxThreading in 'source\NsfwBoxThreading.pas',
+  NsfwBoxOriginGivemepornClub in 'source\NsfwBoxOriginGivemepornClub.pas';
 
 {$R *.res}
 
