@@ -18,6 +18,7 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="https://nsfw.xxx/favicon.ico" width="24" align="left">[nsfw.xxx](https://nsfw.xxx)
 * <img src="https://r34.app/_nuxt/icons/icon_512x512.307d7e.png" width="24" align="left">[r34.app](https://r34.app)
 * <img src="http://rule34.xxx/favicon.ico" width="24" align="left">[Rule34 Json API](https://github.com/KuroZen/r34-json-api)
+* <img src="https://givemeporn.club/static/images/favicon.png?v=1" width="24" align="left">[givemeporn.club](https://givemeporn.club/)
 
 #### Dependencies:
 * [Alcinoe](https://github.com/Zeus64/alcinoe)
@@ -29,4 +30,4 @@ Developed on RAD Studio 11 Alexandria.
 * [delphi-nsfw.xxx-scraper](https://github.com/Kisspeace/delphi-nsfw.xxx-scraper)
 
 #### Download last release APK:
-## [DOWNLOAD](https://github.com/Kisspeace/NsfwBox/releases/download/v1.0.0/Kisspeace.NsfwBox.apk)
+## [DOWNLOAD](https://github.com/Kisspeace/NsfwBox/releases/download/v1.0.1/Kisspeace.NsfwBox.1.0.1.apk)
