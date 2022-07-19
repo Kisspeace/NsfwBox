@@ -69,6 +69,14 @@ type
     property ContentFetched: boolean read GetContentFetched;
   end;
 
+  IFetchableTags = interface
+    ['{E90EDD2F-348D-4765-9F8F-C6748AF555BF}']
+    //--Setters and Getters--//
+    function GetTagsFetched: boolean;
+    //--Properties--//
+    property TagsFetched: boolean read GetTagsFetched;
+  end;
+
   INBoxItem = interface(IHasOrigin)
     ['{8AB3F5DB-4DD1-4CD7-BD1C-EE6D35F98270}']
     //--Setters and Getters--//
