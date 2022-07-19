@@ -28,6 +28,7 @@ Developed on RAD Studio 11 Alexandria.
 * [delphi-r34.app-api-wrapper](https://github.com/Kisspeace/delphi-r34.app-api-wrapper)
 * [delphi-r34-json-api-wrapper](https://github.com/Kisspeace/delphi-r34-json-api-wrapper)
 * [delphi-nsfw.xxx-scraper](https://github.com/Kisspeace/delphi-nsfw.xxx-scraper)
+* [delphi-givemeporn.club-scraper](https://github.com/Kisspeace/delphi-givemeporn.club-scraper)
 
 #### Download last release APK:
 ## [DOWNLOAD](https://github.com/Kisspeace/NsfwBox/releases/download/v1.0.1/Kisspeace.NsfwBox.1.0.1.apk)
