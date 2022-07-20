@@ -13,6 +13,7 @@ uses
   function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
   function CreateRelatedReq(APost: INBoxItem): INBoxSearchRequest;
   function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
+  function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
 
   function OriginToStr(AOrigin: integer): string;
 
@@ -67,6 +68,19 @@ begin
   end else begin
     Result := nil;
   end;
+end;
+
+function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
+begin
+  Result := CreateReqByOrigin(AOrigin);
+  Result.Request := ATag;
+  case AOrigin of
+    ORIGIN_NSFWXXX:
+      ( Result as TNBoxSearchReqNsfwXxx ).SearchType := TNsfwUrlType.Category;
+    ORIGIN_GIVEMEPORNCLUB:
+      ( Result as TNBoxSearchReqGmpClub ).SearchType := TGmpClubSearchType.Tag;
+  end;
+
 end;
 
 function OriginToStr(AOrigin: integer): string;
