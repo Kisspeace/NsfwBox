@@ -189,6 +189,7 @@ type
       BtnSetSaveOnItemTap: TRectButton;
 
     MenuItemTags: TNBoxSelectMenu;
+    //MenuItemTagsOrigin: integer;
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
     function GetBetterFilename(AFilename: string; AOrigin: integer = -2): string;
@@ -1610,11 +1611,14 @@ begin
     begin
       if not Aitem.HasPost then exit;
       if Supports(LPost, IHasTags) then begin
+
+        LTryFetchIfEmpty;
+
         var tags_ar: TArray<string>;
         tags_ar := (LPost as IHasTags).Tags;
         GotoItemTagsMenu(tags_ar);
-      end;
 
+      end;
     end;
 
     ACTION_COPY_THUMB_URL:
