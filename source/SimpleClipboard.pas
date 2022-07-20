@@ -2,7 +2,7 @@ unit SimpleClipboard;
 
 interface
 Uses
-  fmx.Platform, fmx.Clipboard;
+  FMX.Platform, FMX.Clipboard;
 
   function CopyToClipboard(const AText: string): boolean;
 
