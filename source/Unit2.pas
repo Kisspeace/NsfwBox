@@ -556,8 +556,8 @@ begin
   EditRequest.Edit.Text := Value.Request;
   EditPageId.Edit.Text := Value.PageId.ToString;
 
-  if Value is TNBoxSearchReqNsfwXxx then begin
-    with Value as TNBoxSearchReqNsfwXxx do begin
+  if ( Value is TNBoxSearchReqNsfwXxx ) then begin
+    with ( Value as TNBoxSearchReqNsfwXxx ) do begin
       NsfwXxxSortMenu.Selected := Ord(SortType);
       NsfwXxxSearchTypeMenu.Selected := Ord(SearchType);
       CheckImage.IsChecked := ( Image in Types);
@@ -566,6 +566,10 @@ begin
       CheckTrans.IsChecked := ( Shemale in Oris);
       CheckStraight.IsChecked := ( Straight in Oris );
       CheckCartoons.IsChecked := ( Cartoons in Oris );
+    end;
+  end else if ( Value is TNBoxSearchReqGmpClub ) then begin
+    with ( Value as TNBoxSearchReqGmpClub ) do begin
+      GmpClubSearchTypeMenu.Selected := Ord(SearchType);
     end;
   end;
 
