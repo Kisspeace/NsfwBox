@@ -9,13 +9,14 @@ uses
 type
 
   TNBoxNsfwXxxItem = class( TNBoxItemBase, IUIdAsInt, IHasTags, IHasAuthor,
-   IHasCaption, IFetchableContent)
+   IHasCaption, IFetchableContent, IFetchableTags)
     private
       FPage: TNsfwXxxPostPage;
       FItem: TNsfwXxxItem;
       procedure SetTags(const Value: TArray<string>);
       function GetTags: TArray<string>;
       function GetTagsCount: integer;
+      function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
       function GetAuthorName: string;
       procedure SetAuthorName(const Value: string);
@@ -43,6 +44,7 @@ type
       [DISABLE] property AuthorName: string read GetAuthorName write SetAuthorName;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       [DISABLE] property Tags: TArray<string> read GetTags write SetTags;
+      [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create;
   end;
 
@@ -126,12 +128,20 @@ end;
 
 function TNBoxNsfwXxxItem.GetTags: TArray<string>;
 begin
-  Result := FItem.Categories;
+  if ( ContentFetched ) then
+    Result := FPage.Items[0].Categories
+  else
+    Result := FItem.Categories;
 end;
 
 function TNBoxNsfwXxxItem.GetTagsCount: integer;
 begin
   Result := Length(FItem.Categories);
+end;
+
+function TNBoxNsfwXxxItem.GetTagsFetched: boolean;
+begin
+  Result := Self.ContentFetched;
 end;
 
 function TNBoxNsfwXxxItem.GetThumbnailUrl: string;
