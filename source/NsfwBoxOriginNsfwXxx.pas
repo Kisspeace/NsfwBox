@@ -9,7 +9,7 @@ uses
 type
 
   TNBoxNsfwXxxItem = class( TNBoxItemBase, IUIdAsInt, IHasTags, IHasAuthor,
-   IHasCaption, IFetchableContent, IFetchableTags)
+   IHasCaption, IFetchableContent)
     private
       FPage: TNsfwXxxPostPage;
       FItem: TNsfwXxxItem;
