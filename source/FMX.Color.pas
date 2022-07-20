@@ -1,90 +1,68 @@
 unit FMX.Color;
 
 interface
- uses
+uses
   System.classes, System.uitypes, system.SysUtils;
 
- function GetColor(R, G, B, A: Byte): TAlphaColor; overload;
- function GetColor(R, G, B: Byte): TAlphaColor; overload;
- function GetRandomColor(Alpha: boolean): Talphacolor; overload;
- Function GetRandomColor(Alpha: boolean; Brightness: byte): talphacolor; overload;
- function ChangeBrightnessColor(color: TAlphacolor; value: byte): talphacolor;
- function BgrToHex(Acolor: Talphacolor): string;
- function AbgrToHex(Acolor: TalphaColor): string;
+ function GetColor(R, G, B: Byte; A: byte = 255): TAlphaColor;
+ function GetRandomColor(AAlpha: boolean): TAlphaColor; overload;
+ Function GetRandomColor(AAlpha: boolean; ABrightness: byte): TAlphaColor; overload;
+ function ChangeBrightnessColor(AColor: TAlphaColor; AValue: byte): TAlphaColor;
+ function BGRToHex(AColor: TAlphaColor): string;
+ function ABGRToHex(Acolor: TAlphaColor): string;
 
 implementation
 
-function BgrToHex(Acolor: Talphacolor): string;
+function BgrToHex(Acolor: TAlphaColor): string;
 begin
   Result :=
-   Inttohex(Talphacolorrec(Acolor).B, 1) +
-   Inttohex(Talphacolorrec(Acolor).G, 1) +
-   Inttohex(Talphacolorrec(Acolor).R, 1)
-   ;
+    Inttohex(TAlphaColorRec(AColor).B, 1) +
+    Inttohex(TAlphaColorRec(AColor).G, 1) +
+    Inttohex(TAlphaColorRec(AColor).R, 1)
+  ;
 end;
 
-function AbgrToHex(Acolor: TalphaColor): string;
+function AbgrToHex(Acolor: TAlphaColor): string;
 begin
-  result := Inttohex(Talphacolorrec(Acolor).A, 1) + Bgrtohex(Acolor);
+  result := Inttohex(TAlphaColorRec(AColor).A, 1) + BGRToHex(AColor);
 end;
 
-function GetColor(R, G, B, A: Byte): TAlphaColor;
-var
-  Color: talphacolor;
+function GetColor(R, G, B: Byte; A: byte = 255): TAlphaColor;
 begin
-  talphacolorrec(color).R := r;
-  talphacolorrec(color).G := g;
-  talphacolorrec(color).b := b;
-  talphacolorrec(color).a := a;
-  Result := Color;
+  TAlphaColorRec(Result).R := R;
+  TAlphaColorRec(Result).G := G;
+  TAlphaColorRec(Result).B := B;
+  TAlphaColorRec(Result).A := A;
 end;
 
-function GetColor(R, G, B: Byte): TAlphaColor;
+
+function GetRandomColor(AAlpha: boolean): TAlphaColor;
 begin
-  Result := getColor(R, G, B, 255);
+  Result := GetColor(Random(256), Random(256), Random(256));
+  if AAlpha then
+    TAlphaColorRec(Result).A := Random(256);
 end;
 
-function GetRandomColor(Alpha: boolean): Talphacolor;
-var
-  Color: talphacolor;
+Function GetRandomColor(AAlpha: boolean; ABrightness: byte): TAlphaColor;
 begin
-  Talphacolorrec(color).R := Random(256);
-  Talphacolorrec(color).G := Random(256);
-  Talphacolorrec(color).B := Random(256);
-  if Alpha then
-    Talphacolorrec(color).A := Random(256)
-  else
-    Talphacolorrec(Color).A := 255;
-  Result := Color;
+  Result := GetColor(Random(ABrightness), Random(ABrightness), Random(ABrightness));
+  if AAlpha then
+    TAlphaColorRec(Result).A := Random(256);
 end;
 
-Function GetRandomColor(Alpha: boolean; Brightness: byte): TAlphaColor;
-var
-  Color: TAlphaColor;
-begin
-  Talphacolorrec(color).R := Random(brightness);
-  Talphacolorrec(color).G := Random(brightness);
-  Talphacolorrec(color).B := Random(brightness);
-  if Alpha then
-    Talphacolorrec(color).A := Random(256)
-  else
-    Talphacolorrec(Color).A := 255;
-  Result := Color;
-end;
-
-function ChangeBrightnessColor(color: TAlphacolor; value: byte): talphacolor;
+function ChangeBrightnessColor(AColor: TAlphaColor; AValue: byte): TAlphaColor;
 var
   R, G, B: byte;
 begin
-  R := talphacolorrec(Color).R;
-  G := talphacolorrec(Color).G;
-  B := talphacolorrec(Color).B;
+  R := TAlphaColorRec(AColor).R;
+  G := TAlphaColorRec(AColor).G;
+  B := TAlphaColorRec(AColor).B;
 
-  if R < value then value := R;
-  if G < value then value := G;
-  if B < value then value := B;
+  if R < AValue then AValue := R;
+  if G < AValue then AValue := G;
+  if B < AValue then AValue := B;
 
-  Result := getcolor(R - value, G - value, B - value, TAlphacolorrec(color).a);
+  Result := GetColor(R - AValue, G - AValue, B - AValue, TAlphaColorRec(AColor).A);
 end;
 
 end.
