@@ -4,18 +4,18 @@ interface
 Uses
   fmx.Platform, fmx.Clipboard;
 
-  function CopyToClipboard(const Atext: string): boolean;
+  function CopyToClipboard(const AText: string): boolean;
 
 implementation
 
-function CopyToClipboard(const Atext: string): boolean;
+function CopyToClipboard(const AText: string): boolean;
 var
   ClipBoard: IFMXExtendedClipboardService;
 begin
   if TPlatformServices.Current.SupportsPlatformService
   (IFMXExtendedClipboardService, clipboard) then
   begin
-    ClipBoard.SetText(Atext);
+    ClipBoard.SetText(AText);
     Result := true;
   end else
     Result := false;
