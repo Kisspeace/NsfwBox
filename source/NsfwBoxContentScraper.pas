@@ -103,7 +103,7 @@ begin
     SyncWebClientSet(Client.WebClient, APost.Origin);
 
     try
-      Item.Page := Client.GetPage(Item.Item.GetUrl);
+      Item.Page := Client.GetPage(Item.Item.GetUrl, false);
     finally
       Client.Free;
     end;
