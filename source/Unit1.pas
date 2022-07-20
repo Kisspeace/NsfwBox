@@ -189,7 +189,7 @@ type
       BtnSetSaveOnItemTap: TRectButton;
 
     MenuItemTags: TNBoxSelectMenu;
-    //MenuItemTagsOrigin: integer;
+    MenuItemTagsOrigin: integer;
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
     function GetBetterFilename(AFilename: string; AOrigin: integer = -2): string;
@@ -263,7 +263,7 @@ type
     procedure GotoSearchSettings(ABrowser: TNBoxBrowser = nil);
     procedure GotoItemMenu(AItem: TNBoxCardBase);
     procedure GotoDownloadsMenu;
-    procedure GotoItemTagsMenu(ATags: TArray<string>);
+    procedure GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
 
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient;
       AOrigin: integer);
@@ -1616,7 +1616,7 @@ begin
 
         var tags_ar: TArray<string>;
         tags_ar := (LPost as IHasTags).Tags;
-        GotoItemTagsMenu(tags_ar);
+        GotoItemTagsMenu(tags_ar, LPost.Origin);
 
       end;
     end;
@@ -2204,10 +2204,11 @@ begin
   ChangeInterface(MenuItem);
 end;
 
-procedure TForm1.GotoItemTagsMenu(ATags: TArray<string>);
+procedure TForm1.GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
 var
   I: integer;
 begin
+  MenuItemTagsOrigin := AOrigin;
   MenuItemTags.ClearButtons;
   for I := low(ATags) to high(ATags) do begin
     MenuItemTags.AddBtn(ATags[I], 0, ICON_COPY, true);
@@ -2677,7 +2678,8 @@ end;
 
 procedure TForm1.MenuItemTagsOnSelected(Sender: TObject);
 begin
-  CopyToClipboard(MenuItemTags.SelectedBtn.Text.Text);
+  //CopyToClipboard(MenuItemTags.SelectedBtn.Text.Text);
+  self.AddBrowser(CreateTagReq(MenuItemTagsOrigin, MenuItemTags.SelectedBtn.Text.Text));
 end;
 
 procedure TForm1.ReloadBookmarks;
