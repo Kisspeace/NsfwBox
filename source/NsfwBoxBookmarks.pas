@@ -3,7 +3,7 @@ unit NsfwBoxBookmarks;
 
 interface
 uses
-  System.SysUtils, System.Classes, XSuperObject, DbHelper,
+  SysUtils, Classes, XSuperObject, DbHelper,
   DB, NsfwBoxInterfaces, NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx,
   NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi, NsfwBoxOriginConst;
 
