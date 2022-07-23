@@ -28,7 +28,8 @@ uses
   FMX.Color in 'source\FMX.Color.pas',
   SimpleClipboard in 'source\SimpleClipboard.pas',
   NsfwBoxThreading in 'source\NsfwBoxThreading.pas',
-  NsfwBoxOriginGivemepornClub in 'source\NsfwBoxOriginGivemepornClub.pas';
+  NsfwBoxOriginGivemepornClub in 'source\NsfwBoxOriginGivemepornClub.pas',
+  NsfwBoxOrigin9hentaiToApi in 'source\NsfwBoxOrigin9hentaiToApi.pas';
 
 {$R *.res}
 
