@@ -95,7 +95,7 @@ type
   TNetHttpDownloader = TFileDownloader;
 
 implementation
-  uses unit1;
+
 { TDownloader }
 
 procedure TDownloader.AbortRequest;
