@@ -80,9 +80,9 @@ type
   INBoxItem = interface(IHasOrigin)
     ['{8AB3F5DB-4DD1-4CD7-BD1C-EE6D35F98270}']
     //--Setters and Getters--//
-    procedure SetContentUrls(const Value: TArray<string>);
+    //procedure SetContentUrls(const Value: TArray<string>);
     function GetContentUrls: TArray<string>;
-    procedure SetThumbnailUrl(const Value: string);
+    //procedure SetThumbnailUrl(const Value: string);
     function GetThumbnailUrl: string;
     procedure Assign(ASource: INBoxItem);
     function Clone: INBoxItem;
@@ -90,8 +90,8 @@ type
     function ContentUrlCount: integer;
     function ContentUrl: string;
     //--Properties--//
-    property ThumbnailUrl: string read GetThumbnailUrl write SetThumbnailUrl;
-    property ContentUrls: TArray<string> read GetContentUrls write SetContentUrls;
+    property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
+    property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
   end;
 
   INBoxItemList = TList<INBoxItem>;
@@ -100,9 +100,9 @@ type
   TNBoxItemBase = class(TInterfacedPersistent, INBoxItem, IHasOrigin)
     protected
       FOrigin: Integer;
-      procedure SetContentUrls(const Value: TArray<string>);  virtual; abstract;
+      //procedure SetContentUrls(const Value: TArray<string>);  virtual; abstract;
       function GetContentUrls: TArray<string>;                virtual; abstract;
-      procedure SetThumbnailUrl(const Value: string);         virtual; abstract;
+      //procedure SetThumbnailUrl(const Value: string);         virtual; abstract;
       function GetThumbnailUrl: string;                       virtual; abstract;
       function GetOrigin: integer;                            virtual;
       procedure SetOrigin(const Value: integer);              virtual;
@@ -112,8 +112,8 @@ type
       procedure Assign(ASource: INBoxItem);                   virtual; abstract;
       function Clone: INBoxItem;                              virtual; abstract;
       [DISABLE] property Origin: integer Read GetOrigin write SetOrigin;
-      [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl write SetThumbnailUrl;
-      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls write SetContentUrls;
+      [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
+      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
   end;
 
   INBoxSearchRequest = interface(IHasOrigin)

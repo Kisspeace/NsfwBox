@@ -24,7 +24,7 @@ type
       //procedure SetUIdInt(const Value: int64);
       //procedure SetCaption(const Value: String);
       function GetCaption: string;
-      procedure SetContentUrls(const Value: TArray<string>); override;
+      //procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
       //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
@@ -165,12 +165,12 @@ end;
 //  FItem.Caption := Value;
 //end;
 
-procedure TNBoxNsfwXxxItem.SetContentUrls(const Value: TArray<string>);
-begin
-  if Length(FPage.Items) < 1 then
-    FPage.Items := [TNsfwXxxItem.New];
-  FPage.Items[0].Thumbnails := Value;
-end;
+//procedure TNBoxNsfwXxxItem.SetContentUrls(const Value: TArray<string>);
+//begin
+//  if Length(FPage.Items) < 1 then
+//    FPage.Items := [TNsfwXxxItem.New];
+//  FPage.Items[0].Thumbnails := Value;
+//end;
 
 //procedure TNBoxNsfwXxxItem.SetTags(const Value: TArray<string>);
 //begin

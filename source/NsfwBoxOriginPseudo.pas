@@ -16,17 +16,17 @@ type
       FThumb: string;
     protected
       //--Setters and Getters--//
-      procedure SetContentUrls(const Value: TArray<string>); override;
+      procedure SetContentUrls(const Value: TArray<string>);
       function GetContentUrls: TArray<string>;               override;
-      procedure SetThumbnailUrl(const Value: string);        override;
+      procedure SetThumbnailUrl(const Value: string);
       function GetThumbnailUrl: string;                      override;
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
       //--Properties--//
       property Origin;
-      property ThumbnailUrl;
-      property ContentUrls;
+      property ThumbnailUrl read GetThumbnailUrl write SetThumbnailUrl;
+      property ContentUrls read GetContentUrls write SetContentUrls;
       constructor Create;
   end;
 
@@ -54,9 +54,9 @@ begin
     Exit;
 
   with ( ASource as TNBoxPseudoItem ) do begin
-    self.ContentUrls   := ContentUrls;
-    self.ThumbnailUrl  := ThumbnailUrl;
-    self.Origin        := Origin;
+    self.FUrls   := ContentUrls;
+    self.FThumb  := ThumbnailUrl;
+    self.FOrigin        := Origin;
   end;
 end;
 

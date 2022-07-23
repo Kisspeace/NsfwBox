@@ -24,7 +24,7 @@ type
       //procedure SetUIdInt(const Value: int64);
       //procedure SetCaption(const Value: String);
       function GetCaption: string;
-      procedure SetContentUrls(const Value: TArray<string>); override;
+      //procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
       //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
@@ -135,11 +135,11 @@ end;
 //  FItem.Title := Value;
 //end;
 
-procedure TNBoxGmpClubItem.SetContentUrls(const Value: TArray<string>);
-begin
-  if ( Length(Value) > 0 ) then
-    FPage.ContentUrl := Value[0];
-end;
+//procedure TNBoxGmpClubItem.SetContentUrls(const Value: TArray<string>);
+//begin
+//  if ( Length(Value) > 0 ) then
+//    FPage.ContentUrl := Value[0];
+//end;
 
 //procedure TNBoxGmpClubItem.SetTags(const Value: TArray<string>);
 //begin
