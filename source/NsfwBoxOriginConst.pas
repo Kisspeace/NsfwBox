@@ -11,6 +11,7 @@ const
   ORIGIN_R34JSONAPI     = 1;
   ORIGIN_R34APP         = 2;
   ORIGIN_GIVEMEPORNCLUB = 3;
+  ORIGIN_9HENTAITO      = 4;
 
 implementation
 

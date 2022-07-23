@@ -50,6 +50,7 @@ type
       BtnOriginR34App: TRectButton;
       BtnOriginR34JsonApi: TRectButton;
       BtnOriginGivemepornClub: TRectButton;
+      BtnOrigin9Hentaito: TRectButton;
       BtnOriginPseudo: TRectButton;
       BtnOriginBookmarks: TRectButton;
       constructor Create(AOwner: TComponent);
@@ -149,20 +150,22 @@ uses Unit1;
 
 constructor TNBoxOriginSetMenu.Create(AOwner: TComponent);
 
-  function NewBtn(AText: string; AOrigin: integer): TRectButton;
+  function NewBtn(AOrigin: integer): TRectButton;
   begin
-    Result := AddBtn(AText, AOrigin, Form1.AppStyle.GetImagePath(AOrigin));
+    Result := AddBtn(OriginToStr(AOrigin), AOrigin, Form1.AppStyle.GetImagePath(AOrigin));
   end;
+
 
 begin
   inherited;
   FSelected := ORIGIN_NSFWXXX;
-  BtnOriginNsfwxxx    := NewBtn(OriginToStr(ORIGIN_NSFWXXX), ORIGIN_NSFWXXX);
-  BtnOriginR34App     := NewBtn(OriginToStr(ORIGIN_R34APP), ORIGIN_R34APP);
-  BtnOriginR34JsonApi := NewBtn(OriginToStr(ORIGIN_R34JSONAPI), ORIGIN_R34JSONAPI);
-  BtnOriginGivemepornClub := NewBtn(OriginToStr(ORIGIN_GIVEMEPORNCLUB), ORIGIN_GIVEMEPORNCLUB);
-  BtnOriginBookmarks  := NewBtn(OriginToStr(ORIGIN_BOOKMARKS), ORIGIN_BOOKMARKS);
-  BtnOriginPseudo     := NewBtn(OriginToStr(ORIGIN_PSEUDO), ORIGIN_PSEUDO);
+  BtnOriginNsfwxxx    := NewBtn(ORIGIN_NSFWXXX);
+  BtnOriginR34App     := NewBtn(ORIGIN_R34APP);
+  BtnOriginR34JsonApi := NewBtn(ORIGIN_R34JSONAPI);
+  BtnOriginGivemepornClub := NewBtn(ORIGIN_GIVEMEPORNCLUB);
+  BtnOriginBookmarks  := NewBtn(ORIGIN_BOOKMARKS);
+  BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
+  BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
 end;
 
 destructor TNBoxOriginSetMenu.Destroy;

@@ -6,7 +6,7 @@ uses
   NsfwBoxInterfaces,
   NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
   NsfwBoxOriginBookmarks, NsfwBoxOriginR34JsonApi,
-  NsfwBoxOriginGivemepornClub, NsfwBoxOriginConst,
+  NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9HentaitoApi, NsfwBoxOriginConst,
   classes, sysutils, NsfwXxx.Types;
 
   function CreateItemByOrigin(AOrigin: integer): INBoxItem;
@@ -27,6 +27,7 @@ begin
     ORIGIN_R34JSONAPI: Result := TNBoxR34JsonApiItem.Create;
     ORIGIN_GIVEMEPORNCLUB: Result := TNBoxGmpClubItem.Create;
     ORIGIN_PSEUDO:     Result := TNBoxPseudoItem.Create;
+    ORIGIN_9HENTAITO:  Result := TNBox9HentaiToItem.Create;
   end;
 end;
 
@@ -39,6 +40,7 @@ begin
     ORIGIN_GIVEMEPORNCLUB: Result := TNBoxSearchReqGmpClub.Create;
     ORIGIN_PSEUDO:     Result := TNBoxSearchReqPseudo.Create;
     ORIGIN_BOOKMARKS:  Result := TNBoxSearchReqBookmarks.Create;
+    ORIGIN_9HENTAITO:  Result := TNBoxSearchReq9HentaiTo.Create;
   end;
 end;
 
@@ -90,6 +92,7 @@ begin
     ORIGIN_R34JSONAPI: Result := 'R34-json-api';
     ORIGIN_R34APP: Result     := 'R34.app';
     ORIGIN_GIVEMEPORNCLUB: Result := 'givemeporn.club';
+    ORIGIN_9HENTAITO:  Result := '9hentai.to';
     ORIGIN_BOOKMARKS: Result  := 'Bookmarks';
     ORIGIN_PSEUDO: Result     := 'None';
   end;

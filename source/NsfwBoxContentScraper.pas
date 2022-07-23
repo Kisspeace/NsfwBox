@@ -8,10 +8,10 @@ uses
   NetHttp.R34AppApi, R34App.Types,
   Nethttp.R34JsonApi, R34JsonAPi.Types, NetHttp.Scraper.NsfwXxx,
   NsfwXxx.Types, givemeporn.club.types, givemeporn.club.scraper,
-  Net.HttpClientComponent,
+  NineHentaito.APITypes, NineHentaito.API, Net.HttpClientComponent,
   NsfwBoxInterfaces, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginPseudo, NsfwBoxOriginR34App,
-  NsfwBoxOriginGivemepornClub,
+  NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9hentaiToApi,
   NsfwBoxOriginConst, NsfwBoxBookmarks, NsfwBoxOriginBookmarks,
   IoUtils, NsfwBoxFilesystem, System.Classes, system.SyncObjs,
   System.Threading, NsfwBoxThreading;
@@ -33,6 +33,7 @@ type
       function GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
       function GetContentR34App(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
       function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
+      function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ABookmarksListId: int64; APageId: integer = 1): boolean;
     public
       BookmarksDb: TNBoxBookmarksDb;
@@ -168,6 +169,15 @@ begin
       end;
     end;
 
+    ORIGIN_9HENTAITO:
+    begin
+      with ( ARequest As TNBoxSearchReq9Hentaito ) do begin
+      Result := Self.GetContent9Hentaito
+        ( AList,
+          SearchRec);
+      end;
+    end;
+
     ORIGIN_PSEUDO:
     begin
       Result := Self.GetContentPseudo(AList, ARequest.Request);
@@ -178,6 +188,30 @@ begin
       Result := Self.GetContentBookmarks(Alist, RequestAsInt, ARequest.PageId);
     end;
 
+  end;
+end;
+
+function TNBoxScraper.GetContent9Hentaito(AList: INBoxHasOriginList;
+  const ASearch: T9HentaiBookSearchRec): boolean;
+var
+  Client: T9HentaiClient;
+  i: integer;
+  Content: T9HentaiBookAr;
+begin
+  Result := false;
+  Client := T9HentaiClient.Create;
+  try
+    SyncWebClientSet(Client.WebClient, ORIGIN_9HENTAITO);
+    Content := Client.GetBook(ASearch);
+    Result := (length(Content) > 0);
+    for i := 0 to high(Content) do begin
+      var Item: TNBox9HentaitoItem;
+      Item := TNBox9HentaitoItem.Create(false);
+      Item.Item := Content[I];
+      AList.Add(Item);
+    end;
+  finally
+    Client.Free;
   end;
 end;
 
