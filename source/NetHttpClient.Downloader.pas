@@ -369,16 +369,16 @@ begin
 
           FTask.CheckCanceled;
           try
-            var StartPos: int64;
+//            var StartPos: int64;
+//
+//            if FStream.Size < 1 then
+//              StartPos := 0
+//            else begin
+//              StartPos := FStream.Size;
+//              FStream.Position := StartPos;
+//            end;
 
-            if FStream.Size < 1 then
-              StartPos := 0
-            else begin
-              StartPos := FStream.Size;
-              FStream.Position := StartPos;
-            end;
-
-            WebClient.GetRange(Url, StartPos, -1, FStream);
+            WebClient.GetRange(Url, FStream.Position, -1, FStream);
           except
             On E: Exception do begin
               GotError := true;
