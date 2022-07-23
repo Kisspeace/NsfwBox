@@ -149,6 +149,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="assets\themes\default\content-origin-4.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>content-origin-4.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\library\lib\armeabi\</RemoteDir>
             <RemoteName>libNsfwBox.so</RemoteName>
