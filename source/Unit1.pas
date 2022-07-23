@@ -2256,7 +2256,7 @@ begin
   end;
 end;
 
-procedure SetDefToWebClient(AClient: TNetHttpClient);
+procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = 0);
 begin
   with AClient do begin
     Useragent := Form1.Settings.DefaultUseragent;
@@ -2268,6 +2268,14 @@ begin
     SendTimeout := 6000;
     ConnectionTimeout := 6000;
     ResponseTimeout := 6000;
+
+    case AOrigin of
+      ORIGIN_9HENTAITO:
+      begin
+        CustomHeaders['Accept'] := 'application/json, text/plain, */*';
+        CustomHeaders['Content-Type'] := 'application/json;charset=utf-8';
+      end;
+    end;
   end;
 end;
 
@@ -2283,7 +2291,7 @@ begin
   tthread.Synchronize(Tthread.Current,
   procedure
   begin
-    SetDefToWebClient(AWebClient);
+    SetDefToWebClient(AWebClient, AOrigin);
   end);
 end;
 
