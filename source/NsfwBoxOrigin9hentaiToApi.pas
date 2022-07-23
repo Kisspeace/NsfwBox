@@ -63,15 +63,15 @@ begin
   if not ( ASource is TNBox9HentaitoItem ) then
     Exit;
   with ( ASource as TNBox9HentaitoItem ) do begin
-    Self.Item.Id := Item.Id;
-    Self.Item.Title := Item.Title;
-    Self.Item.AltTitle := Item.AltTitle;
-    Self.Item.TotalPage := item.TotalPage;
-    Self.Item.TotalFavorite := item.TotalFavorite;
-    Self.Item.TotalDownload := item.TotalDownload;
-    Self.Item.TotalView := item.TotalView;
-    Self.Item.ImageServer := item.ImageServer;
-    Self.Item.Tags := Item.Tags;
+    Self.FItem.Id := Item.Id;
+    Self.FItem.Title := Item.Title;
+    Self.FItem.AltTitle := Item.AltTitle;
+    Self.FItem.TotalPage := Item.TotalPage;
+    Self.FItem.TotalFavorite := Item.TotalFavorite;
+    Self.FItem.TotalDownload := Item.TotalDownload;
+    Self.FItem.TotalView := Item.TotalView;
+    Self.FItem.ImageServer := Item.ImageServer;
+    Self.FItem.Tags := Item.Tags;
   end;
 end;
 
