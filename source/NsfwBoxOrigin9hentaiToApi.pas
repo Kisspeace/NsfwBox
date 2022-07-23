@@ -40,13 +40,14 @@ type
       //FIncludedTags: T9HentaiTagAr;
       //FExcludedTags: T9HentaiTagAr;
       function GetOrigin: integer;
+      procedure SetOrigin(const value: integer);
       procedure SetRequest(const value: string);
       function GetRequest: string;
       procedure SetPageId(const value: integer);
       function GetPageId: integer;
     public
       function Clone: INBoxSearchRequest;
-      property Origin: integer read GetOrigin;
+      property Origin: integer read GetOrigin write SetOrigin;
       property SearchRec: T9HentaiBookSearchRec read FSearchRec write FSearchRec;
       [DISABLE] property Request: string read GetRequest write SetRequest;
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
@@ -160,6 +161,11 @@ end;
 function TNBoxSearchReq9Hentaito.GetRequest: string;
 begin
   Result := FSearchRec.Text;
+end;
+
+procedure TNBoxSearchReq9Hentaito.SetOrigin(const value: integer);
+begin
+
 end;
 
 procedure TNBoxSearchReq9Hentaito.SetPageId(const value: integer);
