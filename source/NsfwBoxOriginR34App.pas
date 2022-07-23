@@ -11,25 +11,25 @@ type
   TNBoxR34AppItem = class(TNBoxItemBase, INBoxitem, IUIdAsInt, IHasTags)
     protected
       FItem: TR34AppItem;
-      procedure SetTags(const Value: TArray<string>);
+      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TArray<string>;
       function GetTagsCount: integer;
       function GetUidInt: int64;
-      procedure SetUIdInt(const Value: int64);
+      //procedure SetUIdInt(const Value: int64);
       function GetCaption: string;
-      procedure SetContentUrls(const Value: TArray<string>); override;
+      //procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
-      procedure SetThumbnailUrl(const Value: string);        override;
+      //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
     public
       //--New--//
       property Item: TR34Appitem read FItem write FItem;
       //--Properties--//
       property Origin;
-      [DISABLE] property UIdInt: int64 read GetUidInt write SetUidInt;
-      [DISABLE] property ThumbnailUrl read GetThumbnailUrl write SetThumbnailUrl;
+      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
+      [DISABLE] property ThumbnailUrl read GetThumbnailUrl; // write SetThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property Tags: TArray<string> read GetTags write SetTags;
+      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
       [DISABLE] property TagsCount: integer read GetTagsCount;
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
@@ -103,28 +103,28 @@ begin
   Result := item.id;
 end;
 
-procedure TNBoxR34AppItem.SetContentUrls(const Value: TArray<string>);
-begin
-  if length(Value) > 0 then
-    Fitem.high_res_file.url := Value[0]
-  else
-    Fitem.high_res_file.url := '';
-end;
-
-procedure TNBoxR34AppItem.SetTags(const Value: TArray<string>);
-begin
-  FItem.tags := Value;
-end;
-
-procedure TNBoxR34AppItem.SetThumbnailUrl(const Value: string);
-begin
-  FItem.preview_file.url := Value;
-end;
-
-procedure TNBoxR34AppItem.SetUIdInt(const Value: int64);
-begin
-  FItem.id := Value;
-end;
+//procedure TNBoxR34AppItem.SetContentUrls(const Value: TArray<string>);
+//begin
+//  if length(Value) > 0 then
+//    Fitem.high_res_file.url := Value[0]
+//  else
+//    Fitem.high_res_file.url := '';
+//end;
+//
+//procedure TNBoxR34AppItem.SetTags(const Value: TArray<string>);
+//begin
+//  FItem.tags := Value;
+//end;
+//
+//procedure TNBoxR34AppItem.SetThumbnailUrl(const Value: string);
+//begin
+//  FItem.preview_file.url := Value;
+//end;
+//
+//procedure TNBoxR34AppItem.SetUIdInt(const Value: int64);
+//begin
+//  FItem.id := Value;
+//end;
 
 { TNBoxSearchReqR34Xxx }
 

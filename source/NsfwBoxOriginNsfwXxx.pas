@@ -13,20 +13,20 @@ type
     private
       FPage: TNsfwXxxPostPage;
       FItem: TNsfwXxxItem;
-      procedure SetTags(const Value: TArray<string>);
+      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TArray<string>;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
       function GetAuthorName: string;
-      procedure SetAuthorName(const Value: string);
+      //procedure SetAuthorName(const Value: string);
       function GetUidInt: int64;
-      procedure SetUIdInt(const Value: int64);
-      procedure SetCaption(const Value: String);
+      //procedure SetUIdInt(const Value: int64);
+      //procedure SetCaption(const Value: String);
       function GetCaption: string;
       procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
-      procedure SetThumbnailUrl(const Value: string);        override;
+      //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
       function GetHasAuthorName: boolean;
     public
@@ -39,11 +39,11 @@ type
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property UIdInt: int64 read GetUidInt write SetUidInt;
-      [DISABLE] property Caption: string read GetCaption write SetCaption;
-      [DISABLE] property AuthorName: string read GetAuthorName write SetAuthorName;
+      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
+      [DISABLE] property Caption: string read GetCaption; // write SetCaption;
+      [DISABLE] property AuthorName: string read GetAuthorName; // write SetAuthorName;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      [DISABLE] property Tags: TArray<string> read GetTags write SetTags;
+      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create;
   end;
@@ -155,15 +155,15 @@ begin
   Result := FItem.Id;
 end;
 
-procedure TNBoxNsfwXxxItem.SetAuthorName(const Value: string);
-begin
-  Fitem.Username := Value;
-end;
-
-procedure TNBoxNsfwXxxItem.SetCaption(const Value: String);
-begin
-  FItem.Caption := Value;
-end;
+//procedure TNBoxNsfwXxxItem.SetAuthorName(const Value: string);
+//begin
+//  Fitem.Username := Value;
+//end;
+//
+//procedure TNBoxNsfwXxxItem.SetCaption(const Value: String);
+//begin
+//  FItem.Caption := Value;
+//end;
 
 procedure TNBoxNsfwXxxItem.SetContentUrls(const Value: TArray<string>);
 begin
@@ -172,23 +172,23 @@ begin
   FPage.Items[0].Thumbnails := Value;
 end;
 
-procedure TNBoxNsfwXxxItem.SetTags(const Value: TArray<string>);
-begin
-  FItem.Categories := Value;
-end;
+//procedure TNBoxNsfwXxxItem.SetTags(const Value: TArray<string>);
+//begin
+//  FItem.Categories := Value;
+//end;
+//
+//procedure TNBoxNsfwXxxItem.SetThumbnailUrl(const Value: string);
+//begin
+//  if Length(FItem.Thumbnails) > 0 then
+//    FItem.Thumbnails[0] := Value
+//  else
+//    Fitem.Thumbnails := [Value];
+//end;
 
-procedure TNBoxNsfwXxxItem.SetThumbnailUrl(const Value: string);
-begin
-  if Length(FItem.Thumbnails) > 0 then
-    FItem.Thumbnails[0] := Value
-  else
-    Fitem.Thumbnails := [Value];
-end;
-
-procedure TNBoxNsfwXxxItem.SetUIdInt(const Value: int64);
-begin
-  FItem.Id := Value;
-end;
+//procedure TNBoxNsfwXxxItem.SetUIdInt(const Value: int64);
+//begin
+//  FItem.Id := Value;
+//end;
 
 { TNBoxSearchReqXxx }
 

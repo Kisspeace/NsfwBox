@@ -15,33 +15,33 @@ type
     private
       FPage: TGmpclubFullPage;
       FItem: TGmpclubItem;
-      procedure SetTags(const Value: TArray<string>);
+      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TArray<string>;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
       function GetUidInt: int64;
-      procedure SetUIdInt(const Value: int64);
-      procedure SetCaption(const Value: String);
+      //procedure SetUIdInt(const Value: int64);
+      //procedure SetCaption(const Value: String);
       function GetCaption: string;
       procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
-      procedure SetThumbnailUrl(const Value: string);        override;
+      //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
       //--New--//
-      property Item: TGmpclubItem read Fitem write Fitem;
+      property Item: TGmpclubItem read FItem write FItem;
       property Page: TGmpclubFullPage read Fpage write Fpage;
       //--Properties--//
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property UIdInt: int64 read GetUidInt write SetUidInt;
-      [DISABLE] property Caption: string read GetCaption write SetCaption;
+      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
+      [DISABLE] property Caption: string read GetCaption; // write SetCaption;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      [DISABLE] property Tags: TArray<string> read GetTags write SetTags;
+      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create;
   end;
@@ -130,10 +130,10 @@ begin
   Result := FItem.Id;
 end;
 
-procedure TNBoxGmpClubItem.SetCaption(const Value: String);
-begin
-  FItem.Title := Value;
-end;
+//procedure TNBoxGmpClubItem.SetCaption(const Value: String);
+//begin
+//  FItem.Title := Value;
+//end;
 
 procedure TNBoxGmpClubItem.SetContentUrls(const Value: TArray<string>);
 begin
@@ -141,20 +141,20 @@ begin
     FPage.ContentUrl := Value[0];
 end;
 
-procedure TNBoxGmpClubItem.SetTags(const Value: TArray<string>);
-begin
-  FPage.Tags := Value;
-end;
+//procedure TNBoxGmpClubItem.SetTags(const Value: TArray<string>);
+//begin
+//  FPage.Tags := Value;
+//end;
 
-procedure TNBoxGmpClubItem.SetThumbnailUrl(const Value: string);
-begin
-  FItem.ThumbnailUrl := Value;
-end;
+//procedure TNBoxGmpClubItem.SetThumbnailUrl(const Value: string);
+//begin
+//  FItem.ThumbnailUrl := Value;
+//end;
 
-procedure TNBoxGmpClubItem.SetUIdInt(const Value: int64);
-begin
-  FItem.Id := Value;
-end;
+//procedure TNBoxGmpClubItem.SetUIdInt(const Value: int64);
+//begin
+//  FItem.Id := Value;
+//end;
 
 { TNBoxSearchReqXxx }
 

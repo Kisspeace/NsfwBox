@@ -28,37 +28,37 @@ type
   IUIdAsInt = interface
     ['{2258085A-60A0-4FB0-B68F-C4D3F44285B1}']
     //--Setters and Getters--//
-    procedure SetUidInt(const value: int64);
+    //procedure SetUidInt(const value: int64);
     function GetUidInt: int64;
     //--Properties--//
-    property UIdInt: int64 read GetUIdInt write SetUIdInt;
+    property UIdInt: int64 read GetUIdInt; // write SetUIdInt;
   end;
 
   IHasTags = interface
     ['{598FEFF0-4DAD-425D-9480-4B78EA3B98FE}']
     //--Setters and Getters--//
-    procedure SetTags(const Value: TArray<string>);
+    // procedure SetTags(const Value: TArray<string>);
     function GetTags: TArray<string>;
     //--Properties--//
-    property Tags: TArray<string> read GetTags write SetTags;
+    property Tags: TArray<string> read GetTags; // write SetTags;
   end;
 
   IHasAuthor = interface
     ['{6DD3C056-7BB6-4022-8AB4-217B2CB4777B}']
     //--Setters and Getters--//
     function GetAuthorName: string;
-    procedure SetAuthorName(const Value: string);
+    //procedure SetAuthorName(const Value: string);
     //--Properties--//
-    property AuthorName: string read GetAuthorName write SetAuthorName;
+    property AuthorName: string read GetAuthorName; // write SetAuthorName;
   end;
 
   IHasCaption = interface
     ['{75A5AF4D-D3F4-4919-A742-37684522013C}']
     //--Setters and Getters--//
-    procedure SetCaption(const Value: String);
+    //procedure SetCaption(const Value: String);
     function GetCaption: string;
     //--Properties--//
-    property Caption: string read GetCaption write SetCaption;
+    property Caption: string read GetCaption; // write SetCaption;
   end;
 
   IFetchableContent = interface
