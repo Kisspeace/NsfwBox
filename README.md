@@ -3,7 +3,7 @@
 ![written_on](https://img.shields.io/badge/_-RAD_Studio-darkcyan?style=for-the-badge&logo=delphi)
 ![Platforms](https://img.shields.io/badge/Android-1A2541?style=for-the-badge&logo=android&logoColor=white)
 ![Platforms](https://img.shields.io/badge/Windows-1A2541?style=for-the-badge&logo=windows)
-![](https://img.shields.io/github/downloads/kisspeace/NsfwBox/total?style=for-the-badge&labelColor=1A2541)
+![Downloads](https://img.shields.io/github/downloads/kisspeace/NsfwBox/total?style=for-the-badge&labelColor=1A2541)
 <br><br>
 
 Native android and windows app for download content from porn sites.  
