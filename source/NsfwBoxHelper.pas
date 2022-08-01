@@ -49,8 +49,9 @@ begin
   if ( APost is TNBoxNsfwxxxitem ) then begin
     Result := TNBoxSearchReqNsfwXxx.create;
     with ( Result as TNBoxSearchReqNsfwXxx ) do begin
-      with ( APost as TNBoxNsfwXxxItem ) do
-        Result.Request := UidInt.ToString;
+      with ( APost as TNBoxNsfwXxxItem ) do begin
+        Result.Request := Item.PostUrl;
+      end;
       SearchType := TNsfwUrlType.Related;
     end;
   end else begin
@@ -60,6 +61,11 @@ end;
 
 function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
 begin
+  Result := nil;
+  if Supports(APost, IHasAuthor)
+  and (APost as IHasAuthor).AuthorName.IsEmpty then
+    exit;
+
   if ( APost is TNBoxNsfwXxxItem ) then begin
     Result := TNBoxSearchReqNsfwXxx.create;
     with ( Result as TNBoxSearchReqNsfwXxx ) do begin
@@ -67,8 +73,12 @@ begin
         Result.Request := AuthorName;
       SearchType := TNsfwUrlType.User;
     end;
-  end else begin
-    Result := nil;
+  end else if ( APost is TNBoxR34AppItem ) then begin
+    Result := TNBoxSearchReqR34App.Create;
+    Result.Request := TNBoxR34AppItem(APost).AuthorName;
+//    with ( Result as TNBoxSearchReqR34App ) do begin
+//
+//    end;
   end;
 end;
 

@@ -837,7 +837,7 @@
     },
     "Stroke2":    
     {
-      "Thickness":0.300000011920929,
+      "Thickness":0.6,
       "Color":      -1768490241,
       "Gradient":      
       {
@@ -888,7 +888,7 @@
     },
     "Stroke":    
     {
-      "Thickness":0.300000011920929,
+      "Thickness":0.6,
       "Color":      -1,
       "Gradient":      
       {
@@ -948,7 +948,7 @@
     },
     "Stroke2":    
     {
-      "Thickness":0.300000011920929,
+      "Thickness":0.6,
       "Color":      -1768490241,
       "Gradient":      
       {
@@ -999,7 +999,7 @@
     },
     "Stroke":    
     {
-      "Thickness":0.300000011920929,
+      "Thickness":0.6,
       "Color":      -15054486,
       "Gradient":      
       {
@@ -1061,7 +1061,7 @@
       },
       "Stroke2":      
       {
-        "Thickness":0.300000011920929,
+        "Thickness":0.6,
         "Color":        -1,
         "Gradient":        
         {
@@ -1394,7 +1394,7 @@
       },
       "Stroke2":      
       {
-        "Thickness":0.300000011920929,
+        "Thickness":0.6,
         "Color":        -1,
         "Gradient":        
         {
@@ -1887,7 +1887,7 @@
     },
     "Stroke":    
     {
-      "Thickness":0.300000011920929,
+      "Thickness":0.6,
       "Color":      -1,
       "Gradient":      
       {

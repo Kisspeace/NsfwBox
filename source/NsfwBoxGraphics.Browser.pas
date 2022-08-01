@@ -116,9 +116,9 @@ procedure TNBoxBrowser.TerminateThreads;
 var
   I: integer;
 begin
-  if FThreads.Count < 1 then
+  if ( FThreads.Count < 1 ) then
     exit;
-  for I := 0 to FThreads.Count - 1 do begin
+  for I := 0 to ( FThreads.Count - 1 ) do begin
     FThreads.Items[I].Terminate;
   end;
 end;
@@ -150,6 +150,7 @@ var
 begin
   if Assigned(BeforeBrowse) then
     BeforeBrowse(Self);
+
   Th                 := TBrowserTh.Create(true);
   Th.Owner           := Self;
   Th.Request         := Self.Request.Clone;
@@ -185,17 +186,17 @@ var
   I: integer;
 begin
   try
-  TerminateThreads;
-  WaitForThreads;
+    TerminateThreads;
+    WaitForThreads;
 
-  if items.Count > 0 then begin
-    items.Clear;
-    MultiLayout.RecalcSize;
-    MultiLayout.BlockPos := 0;
-  end;
+    if items.Count > 0 then begin
+      items.Clear;
+      MultiLayout.RecalcSize;
+      MultiLayout.BlockPos := 0;
+    end;
   except
     On E:Exception do
-      Log(E, 'TNBoxBrowser.clear: ');
+      SyncLog(E, 'TNBoxBrowser.clear: ');
   end;
 end;
 
@@ -225,6 +226,7 @@ var
     NotImageTypes: TArray<string> = ['text', 'html', 'json'];
   begin
     Result := true;
+    //Unit1.SyncLog(ARes.HeaderValue['Content-Type']);
     ContentType := ARes.HeaderValue['Content-Type'];
     for I := 0 to High(NotImageTypes) - 1 do begin
       if ( pos(NotImageTypes[I].ToUpper, ContentType.ToUpper) > 0 ) then begin
@@ -261,7 +263,14 @@ begin
         CachedThumb := TNBoxPath.GetThumbnailByUrl(LPost.ThumbnailUrl);
 
       if Assigned(LPost) and FileExists(CachedThumb) then begin
-        Fetched := TFileStream.Create(CachedThumb, FmOpenRead); //!!
+        while ( not Self.Terminated ) do begin
+          try
+            Fetched := TFileStream.Create(CachedThumb, FmOpenRead); //!!
+            break;
+          except
+            Sleep(100);
+          end;
+        end;
       end else if not ( Item.Origin = ORIGIN_PSEUDO ) and Assigned(LPost) then begin
 
         Web := TNetHttpClient.Create(nil);

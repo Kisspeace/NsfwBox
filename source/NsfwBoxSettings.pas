@@ -22,6 +22,7 @@ Const
   ACTION_DELETE_CARD        = 12;
   ACTION_SHOW_TAGS          = 13;
 
+  FORMAT_VAR_CONTENT_URL = '$(NSFWBOX_CONTENT_URL)';
 
 type
 
@@ -38,16 +39,16 @@ type
     ThreadsCount: integer;
     ContentLayoutsCount: integer;
     ItemIndent: single;
-    Language: string;
+    //Language: string;
     Fullscreen: boolean;
     AutoSaveSession: boolean;
     SaveSearchHistory: boolean;
     SaveDownloadHistory: boolean;
     SaveTapHistory: boolean;
-    HighlightsDownloaded: boolean;
+    //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
-    AutoRenameExistsFile: boolean;
-    DownloadDuplicates: boolean;
+    //AutoRenameExistsFile: boolean;
+    //DownloadDuplicates: boolean;
     MaxDownloadThreads: integer;
     AutoStartBrowse: boolean;
     AllowDuplicateTabs: boolean;
@@ -55,6 +56,12 @@ type
     ItemInteractions: TNBoxItemInteractions;
     FilenameLogUrls: string;
     DevMode: boolean;
+    AutoCheckUpdates: boolean;
+    ShowScrollBars: boolean;
+    {$IFDEF MSWINDOWS}
+      ContentPlayApp: string;
+      ContentPlayParams: string;
+    {$ENDIF}
     procedure Assign(ASource: TNsfwBoxSettings);
     constructor Create;
   end;
@@ -72,7 +79,7 @@ end;
 
 constructor TNsfwBoxSettings.Create;
 begin
-  Version                := 1;
+  Version                := 3;
   DevMode                := false;
   DefDownloadPath        := '';
   DefaultUserAgent       := '';
@@ -83,20 +90,27 @@ begin
   ContentLayoutsCount    := 2;
   MaxDownloadThreads     := 4;
   ItemIndent             := 2;
-  Language               := 'EN';
+  //Language               := 'EN';
   AutoSaveSession        := true;
   SaveSearchHistory      := true;
   SaveDownloadHistory    := true;
   SaveTapHistory         := false;
   Fullscreen             := true;
-  HighlightsDownloaded   := false;
+  //HighlightsDownloaded   := false;
   ShowCaptions           := true;
-  AutoRenameExistsFile   := false;
-  DownloadDuplicates     := false;
+  //AutoRenameExistsFile   := false;
+  //DownloadDuplicates     := false;
   AutoStartBrowse        := false;
   AllowDuplicateTabs     := true;
   AutoCloseItemMenu      := true;
   ItemInteractions       := [ ACTION_OPEN_MENU ];
+  AutoCheckUpdates       := true;
+  ShowScrollBars         := true;
+  {$IFDEF MSWINDOWS}
+    ShowScrollBars       := false;
+    ContentPlayApp := 'C:\Program Files\VideoLAN\VLC\vlc.exe';
+    ContentPlayParams := '"' + FORMAT_VAR_CONTENT_URL + '"';
+  {$ENDIF}
 end;
 
 end.

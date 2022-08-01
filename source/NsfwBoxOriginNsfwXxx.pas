@@ -8,6 +8,8 @@ uses
 
 type
 
+  TNsfwXxxSite = (NsfwXxx, PornpicXxx, HdpornPics);
+
   TNBoxNsfwXxxItem = class( TNBoxItemBase, IUIdAsInt, IHasTags, IHasAuthor,
    IHasCaption, IFetchableContent, IFetchableTags)
     private
@@ -54,6 +56,7 @@ type
       FSortType: TNsfwSort;
       FOris: TNsfwOris;
       FTypes: TNsfwItemTypes;
+      FSite: TNsfwXxxSite;
       function GetOrigin: integer;                        override;
       procedure SetSearchType(const value: TNsfwUrlType);
       procedure SetSortType(const value: TNsfwSort);
@@ -68,10 +71,22 @@ type
       property SortType: TNsfwSort read FSortType write SetSortType;
       property Oris: TNsfwOris read FOris write SetOris;
       property Types: TNsfwItemTypes read FTypes write SetTypes;
+      property Site: TNsfwXxxSite read FSite write FSite;
       constructor Create; override;
   end;
 
+  function TNsfwXxxSiteToUrl(AValue: TNsfwXxxSite): string;
+
 implementation
+
+function TNsfwXxxSiteToUrl(AValue: TNsfwXxxSite): string;
+begin
+  case AValue of
+    NsfwXxx:    Result := 'https://nsfw.xxx';
+    PornpicXxx: Result := 'https://pornpic.xxx';
+    HdpornPics: Result := 'https://hdporn.pics';
+  end;
+end;
 
 { TNBoxNsfwXxxItem }
 
@@ -202,6 +217,7 @@ begin
     SortType := Self.FSortType;
     Oris := Self.FOris;
     Types := Self.FTypes;
+    Site := Self.FSite;
   end;
 end;
 
@@ -212,6 +228,7 @@ begin
   FSortType := TNsfwSort.Recommended;
   FOris := [Straight, Gay, Shemale, Cartoons];
   FTypes := [Image, video, Gallery];
+  FSite := TNsfwXxxSite.NsfwXxx;
 end;
 
 function TNBoxSearchReqNsfwXxx.GetOrigin: integer;

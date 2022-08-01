@@ -29,7 +29,9 @@ uses
   SimpleClipboard in 'source\SimpleClipboard.pas',
   NsfwBoxThreading in 'source\NsfwBoxThreading.pas',
   NsfwBoxOriginGivemepornClub in 'source\NsfwBoxOriginGivemepornClub.pas',
-  NsfwBoxOrigin9hentaiToApi in 'source\NsfwBoxOrigin9hentaiToApi.pas';
+  NsfwBoxOrigin9hentaiToApi in 'source\NsfwBoxOrigin9hentaiToApi.pas',
+  NsfwBox.UpdateChecker in 'source\NsfwBox.UpdateChecker.pas',
+  NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas';
 
 {$R *.res}
 

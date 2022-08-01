@@ -3,9 +3,10 @@ unit NsfwBoxBookmarks;
 
 interface
 uses
-  SysUtils, Classes, XSuperObject, DbHelper,
+  SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
   DB, NsfwBoxInterfaces, NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx,
-  NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi, NsfwBoxOriginConst;
+  NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi, NsfwBoxOriginConst,
+  NsfwBoxHelper;
 
 type
 
@@ -106,9 +107,41 @@ type
     constructor Create(ADbFilename: string); override;
   end;
 
+  Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject); overload;
+  Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; AJsonString: string); overload;
 
 implementation
-uses NsfwBoxHelper, unit1;
+uses unit1;
+
+Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject);
+begin
+  if ( AObject is TNBoxR34AppItem ) then begin
+    //Unit1.Log('Is R34Item');
+    try
+      // v1.0.1
+      if ( JSON.O['item'].Ancestor['tags'].DataType = TDataType.dtArray ) then begin
+        //Unit1.Log('Array');
+        var LTagsAr: ISuperArray;
+        LTagsAr := JSON.O['item'].A['tags'].Clone;
+        JSON.O['item'].Remove('tags');
+        //Log(JSON.AsJSON(true));
+        JSON.O['item'].O['tags'].A['general'] := LTagsAr;
+      end;
+
+    except
+      On E: Exception do begin
+        Unit1.Log(E, 'SafeAssignFromJSON: ');
+      end;
+    end;
+  end;
+  AObject.AssignFromJSON(JSON);
+end;
+
+Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; AJsonString: string);
+begin
+  SafeAssignFromJSON(AObject, SO(AJSONString));
+end;
+
 { TNBoxBookmark }
 
 constructor TNBoxBookmark.Create(AItem: INBoxSearchRequest);
@@ -375,7 +408,7 @@ begin
       Id := Query.FieldByName('id').AsLargeInt;
       Origin := Query.FieldByName('origin').AsInteger;
       BookmarkType := TNBoxBookmarkType(Query.FieldByName('type').AsInteger);
-      json := Query.FieldByName('object').AsString;
+      Json := Query.FieldByName('object').AsString;
 
       case bookmarktype of
 
@@ -383,7 +416,7 @@ begin
           var Post: INBoxItem;
           Post := CreateItemByOrigin(Origin);
           tmp := (Post as TInterfacedPersistent);
-          tmp.AssignFromJSON(Json);
+          SafeAssignFromJSON(tmp, Json);
           Bookmark.Obj := tmp;
         end;
 
@@ -391,7 +424,7 @@ begin
           var Req: INBoxSearchRequest;
           Req := CreateReqByOrigin(Origin);
           tmp := (Req as TInterfacedPersistent);
-          tmp.AssignFromJSON(Json);
+          SafeAssignFromJSON(tmp, Json);
           Bookmark.Obj := tmp;
         end;
 
@@ -470,8 +503,8 @@ var
   LStart, LEnd: integer;
 begin
   LStart := (APageNum - 1) * PageSize;
-  if LStart < 1 then
-    LStart := 1;
+  if LStart < 0 then
+    LStart := 0;
   LEnd   := LStart + PageSize;
   Result := Get(AGroupId, LStart, LEnd);
 end;

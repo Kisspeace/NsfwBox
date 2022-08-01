@@ -29,9 +29,9 @@ type
       procedure SyncWebClientSet(AClient: TNetHttpClient; AOrigin: integer);
       procedure UploadItems(A: TNsfwXXXItemList; AList: INBoxHasOriginList);
       function GetContentPseudo(AList: INBoxHasOriginList; ARequest: string ): boolean;
-      function GetContentNsfwXxx(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer; Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris ): boolean;
+      function GetContentNsfwXxx(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer; Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris; ASite: TNsfwXxxSite): boolean;
       function GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
-      function GetContentR34App(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
+      function GetContentR34App(AList: INBoxHasOriginList; ATags: string; APageId: integer; ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
       function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ABookmarksListId: int64; APageId: integer = 1): boolean;
@@ -68,7 +68,7 @@ type
   End;
 
 implementation
-  uses unit1;
+uses unit1;
 { TNBoxScraper }
 
 constructor TNBoxScraper.Create;
@@ -138,16 +138,21 @@ begin
             Pageid,
             SortType,
             Types,
-            Oris );
+            Oris,
+            Site );
       end;
     end;
 
     ORIGIN_R34APP:
     begin
-      Result := self.GetContentR34App
-      ( AList,
-        ARequest.Request,
-        ARequest.PageId );
+      with ( ARequest As TNBoxSearchReqR34App ) do begin
+        Result := self.GetContentR34App
+        ( AList,
+          Request,
+          PageId,
+          20,
+          Booru );
+      end;
     end;
 
     ORIGIN_R34JSONAPI:
@@ -374,7 +379,7 @@ begin
 end;
 
 function TNBoxScraper.GetContentR34App(AList: INBoxHasOriginList; ATags: string;
-  APageId, ALimit: integer): boolean;
+  APageId, ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
 var
   Client: TR34AppClient;
   i: integer;
@@ -386,10 +391,10 @@ begin
     Client := TR34AppClient.Create;
 
     SyncWebClientSet(Client.WebClient, ORIGIN_R34APP);
-
-    Content := Client.GetPosts(ATags, APageId, ALimit);
+    Content := Client.GetPosts(ATags, APageId, ALimit, ABooru);
     Result := ( length(Content) > 0 );
-    for I := Low(Content) to High(Content) do begin
+
+    for I := 0 to Length(Content) - 1 do begin
       var item: TNBoxR34AppItem;
       item := TNBoxR34AppItem.Create;
       item.Item := Content[i];
@@ -403,7 +408,8 @@ end;
 
 function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
   AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer;
-  Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris): boolean;
+  Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
+  ASite: TNsfwXxxSite): boolean;
 var
   Client: TNsfwXxxScraper;
   i: integer;
@@ -412,6 +418,7 @@ begin
   Result := false;
   try
     Client := TNsfwXxxScraper.Create;
+    Client.Host := TNsfwXxxSiteToUrl(ASite);
     Content := TNsfwXXXItemList.Create;
 
     SyncWebClientSet(Client.WebClient, ORIGIN_NSFWXXX);

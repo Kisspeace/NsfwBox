@@ -4,7 +4,7 @@ unit NsfwBoxOriginBookmarks;
 interface
 uses
   System.SysUtils, System.Classes, NsfwBoxInterfaces,
-  NsfwBoxOriginConst, NsfwBoxBookmarks;
+  NsfwBoxOriginConst;
 
 type
 

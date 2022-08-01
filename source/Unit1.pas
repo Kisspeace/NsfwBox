@@ -10,11 +10,13 @@ uses
   FMX.Controls.Presentation, FMX.MultiView, FMX.Color, FMX.Edit, FMX.Layouts,
   Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBoxFilesystem, NsfwXxx.Types,
   NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox,
-  System.Hash, FMX.Surfaces, System.Variants,
+  System.Hash, FMX.Surfaces, System.Variants, System.Threading, system.NetEncoding,
   {$IFDEF ANDROID}
   Fmx.Helpers.Android, AndroidApi.Helpers,
   AndroidApi.JNI.GraphicsContentViewText,
   AndroidApi.JNI.JavaTypes,
+  {$ENDIF} {$IFDEF MSWINDOWS}
+  ShellApi, Windows,
   {$ENDIF}
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections,
@@ -25,7 +27,8 @@ uses
   NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
   NsfwBoxOriginR34JsonApi, NsfwBoxOriginBookmarks, NsfwBoxOriginConst,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
-  NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper, Unit2;
+  NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
+  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2;
 
 type
 
@@ -49,6 +52,7 @@ type
     MenuBookmarksDoList: TVertScrollBox;
     DialogYesOrNo: TVertScrollBox;
     MenuSearchDoList: TVertScrollBox;
+    MenuAnonMessage: TVertScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
@@ -165,7 +169,9 @@ type
     CheckSetAllowDuplicateTabs,
     CheckSetAutoStartBrowse,
     CheckSetAutoCloseItemMenu,
-    CheckSetDevMode
+    CheckSetDevMode,
+    CheckSetAutoCheckUpdates,
+    CheckSetShowScrollBars
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -174,9 +180,12 @@ type
     EditSetMaxDownloadThreads,
     EditSetLayoutsCount,
     EditSetItemIndent,
-    EditSetFilenameLogUrls
+    EditSetFilenameLogUrls,
+    EditSetPlayParams,
+    EditSetPlayApp
     : TNBoxSettingsEdit;
 
+    BtnSetAnonMsg,
     BtnSetViewLog,
     BtnSetChangeOnItemTap,
     BtnSetChangeTheme,
@@ -185,11 +194,18 @@ type
 
     MenuChangeTheme: TNBoxSelectMenu;
 
+    //Settings
     CheckMenuSetOnItemTap: TNBoxCheckMenu;
-      BtnSetSaveOnItemTap: TRectButton;
+    BtnSetSaveOnItemTap: TRectButton;
 
     MenuItemTags: TNBoxSelectMenu;
     MenuItemTagsOrigin: integer;
+
+    //Anonymous message menu (MenuAnonMessage)
+    EditNickMsgForDev: TNBoxEdit;
+    MemoMsgForDev: TNBoxMemo;
+    BtnSendMsgForDev: TRectButton;
+
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
     function GetBetterFilename(AFilename: string; AOrigin: integer = -2): string;
@@ -214,6 +230,8 @@ type
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
     //-------------------//
     procedure BtnOpenAppRepOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnSetAnonMsgOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnSendMsgForDevOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetChangeThemeOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnItemMenuOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetViewLogOnTap(Sender: TObject; const Point: TPointF);
@@ -309,7 +327,7 @@ type
     function AddMenuBtn: TRectButton;
     function AddMenuSearchBtn(AText: string; AImageName: string = ''; AOnTap: TTapEvent = nil): TRectButton;
     function AddItemMenuBtn(ACaption: string; AAction: TNBoxItemInteraction; AImageName: string = ''; ATag: string = ''): TRectButton;
-    function AddBrowser(ARequest: INBoxSearchRequest = nil): TNBoxTab;
+    function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser);
     //----- Properties ---------//
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
@@ -323,6 +341,7 @@ type
 
 var
   Form1: TForm1;
+  APP_VERSION: TSemVer;
 
   LOG_FILENAME         : string = 'log.txt';
   SETTINGS_FILENAME    : string = 'settings.json';
@@ -516,7 +535,7 @@ begin
   end;
 end;
 
-function TForm1.AddBrowser(ARequest: INBoxSearchRequest): TNBoxTab;
+function TForm1.AddBrowser(ARequest: INBoxSearchRequest; AAutoStartBrowse: boolean): TNBoxTab;
 var
   B: TNBoxBrowser;
   T: TNBoxTab;
@@ -552,6 +571,9 @@ begin
 
   form1.BrowserBtnsLayout.BringToFront;
   Result := T;
+
+  if AAutoStartBrowse then
+    B.GoBrowse;
 end;
 
 //function TForm1.AddDownload(AUrl: string; AContentOrigin: integer): TNBoxTab;
@@ -822,8 +844,7 @@ begin
     Req := TNBoxSearchReqBookmarks.Create;
     Req.Pageid := 1;
     Req.Request := CurrentBookmarkControl.Tag.ToString;
-    AddBrowser(Req);
-    Browsers.Last.GoBrowse;
+    AddBrowser(Req, true);
   end;
   
 
@@ -869,7 +890,7 @@ begin
           if Assigned(CurrentBookmarkControl) then begin
             Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
             if ( Table.Id <> -1 ) then begin
-              for I := 0 to CurrentBrowser.Items.Count - 1 do begin
+              for I := 0 to ( CurrentBrowser.Items.Count - 1 ) do begin
                 var Card := CurrentBrowser.Items[I];
                 if ( Card.HasBookmark and Card.Bookmark.IsRequest ) then
                   Table.Add(Card.Bookmark.AsRequest)
@@ -914,9 +935,13 @@ begin
 end;
 
 procedure TForm1.BtnOpenAppRepOnTap(Sender: TObject; const Point: TPointF);
+const
+  GH_PAGE: string = 'https://github.com/Kisspeace/NsfwBox';
 begin
   {$IFDEF ANDROID}
-  StartActivityView('https://github.com/kisspeace/NsfwBox');
+    StartActivityView(GH_PAGE);
+  {$ENDIF} {$IFDEF MSWINDOWS}
+    ShellExecute(0, 'open', Pchar(GH_PAGE), nil, nil, SW_SHOWNORMAL);
   {$ENDIF}
 end;
 
@@ -939,6 +964,31 @@ procedure TForm1.BtnSearchSetDefaultOnTap(Sender: TObject;
   const Point: TPointF);
 begin
 
+end;
+
+procedure TForm1.BtnSendMsgForDevOnTap(Sender: TObject; const Point: TPointF);
+var
+  Success: boolean;
+begin
+  try
+    Success := NsfwBox.MessageForDeveloper.SendMessage(
+      EditNickMsgForDev.Edit.Text,
+      Trim(MemoMsgForDev.Memo.Text)
+    );
+  except
+    Success := false;
+  end;
+
+  if Success then begin
+    MemoMsgForDev.Memo.Lines.Clear;
+    Showmessage('Success!');
+  end else
+    ShowMessage('Error.');
+end;
+
+procedure TForm1.BtnSetAnonMsgOnTap(Sender: TObject; const Point: TPointF);
+begin
+  ChangeInterface(MenuAnonMessage);
 end;
 
 procedure TForm1.BtnSetChangeOnItemTapOnTap(Sender: TObject;
@@ -972,6 +1022,10 @@ begin
     AllowCookies     := CheckSetAllowCookies.IsChecked;
     DefDownloadPath  := EditSetDefDownloadPath.Edit.Edit.Text;
     FilenameLogurls  := EditSetFilenameLogUrls.Edit.Edit.Text;
+    {$IFDEF MSWINDOWS}
+    ContentPlayApp    := EditSetPlayApp.Edit.Edit.Text;
+    ContentPlayParams := EditSetPlayParams.Edit.Edit.Text;
+    {$ENDIF}
 
     if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
       ThreadsCount := tmp
@@ -1005,6 +1059,8 @@ begin
     SaveSearchHistory    := CheckSetSaveSearchHistory.IsChecked;
     SaveDownloadHistory  := CheckSetSaveDownloadHistory.IsChecked;
     SaveTapHistory       := CheckSetSaveTapHistory.IsChecked;
+    AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
+    ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
 
     if AutoSaveSession then
       ConnectSession;
@@ -1207,6 +1263,8 @@ begin
     Result.OnWebClientCreate := OnBrowserSetWebClient;
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
     visible := false;
+    if Self.FFormCreated then
+      ShowScrollBars := Settings.ShowScrollBars;
   end;
 end;
 
@@ -1344,6 +1402,8 @@ begin
   Result := TVertScrollBox.Create(AOwner);
   with Result do begin
     Align := TAlignlayout.Client;
+    if Self.FFormCreated then
+      ShowScrollBars := Settings.ShowScrollBars;
   end;
 end;
 
@@ -1515,7 +1575,7 @@ begin
     ACTION_BROWSE:
     begin
       if not Assigned(Lrequest) then exit;
-      AddBrowser(Lrequest.Clone);
+      AddBrowser(Lrequest.Clone, Settings.AutoStartBrowse);
     end;
 
     ACTION_DOWNLOAD:
@@ -1526,13 +1586,17 @@ begin
 
     ACTION_PLAY_EXTERNALY:
     begin
-      {$IFDEF ANDROID}
       if not AItem.HasPost then exit;
-
       LTryFetchIfEmpty;
-
-      if ( LPost.ContentUrlCount > 0 ) then
-        StartActivityView(LPost.ContentUrl);
+      {$IFDEF ANDROID}
+        if ( LPost.ContentUrlCount > 0 ) then
+          StartActivityView(LPost.ContentUrl);
+      {$ENDIF}
+      {$IFDEF MSWINDOWS}
+        var LParams: string;
+        LParams := Settings.ContentPlayParams.Replace(FORMAT_VAR_CONTENT_URL, LPost.ContentUrls[0]);
+        if ( LPost.ContentUrlCount > 0 ) then
+          ShellExecute(0, 'open', PChar(Settings.ContentPlayApp), PChar(LParams), nil, SW_SHOWNORMAL);
       {$ENDIF}
     end;
 
@@ -1566,7 +1630,7 @@ begin
       if not AItem.HasPost then exit;
       LTmpReq := CreateRelatedReq(LPost);
       if Assigned(LTmpReq) then begin
-        AddBrowser(LTmpReq);
+        AddBrowser(LTmpReq, Settings.AutoStartBrowse);
       end;
     end;
 
@@ -1575,7 +1639,7 @@ begin
       if not AItem.HasPost then exit;
       LTmpReq := CreateAuthorReq(LPost);
       if Assigned(LTmpReq) then begin
-        AddBrowser(LTmpReq);
+        AddBrowser(LTmpReq, Settings.AutoStartBrowse);
       end;
     end;
 
@@ -1672,6 +1736,7 @@ var
 
 begin
   FFormCreated := false;
+  APP_VERSION := GetAppVersion;
   FCurrentBrowser := nil;
 
   SETTINGS_FILENAME := TPath.Combine(TNBoxPath.GetAppMainPath, SETTINGS_FILENAME);
@@ -1763,7 +1828,11 @@ begin
     AutoSize := true;
     Parent := TopTextLayout;
   end;
+  {$IFDEF ANDROID}
   SubHeader := 'Make L☮ve, not war';
+  {$ENDIF} {$IFDEF MSWINDOWS}
+  SubHeader := 'Make Love, not war';
+  {$ENDIF}
 
   TopBtnSearch := CreateDefButton(TopRect, BTN_STYLE_ICON2);
   with TopBtnSearch do begin
@@ -1852,8 +1921,15 @@ begin
 
   BtnOpenAppRep := AddSettingsButton('Author: Kisspeace ' + SLineBreak + 'Click to open GitHub repository', ICON_NSFWBOX);
   with BtnOpenAppRep do begin
-    Ontap := BtnOpenAppRepOnTap;
+    OnTap := BtnOpenAppRepOnTap;
     Height := Height * 1.5;
+    Text.WordWrap := true;
+  end;
+
+  BtnSetAnonMsg := AddSettingsButton('Anonymous message for developer', ICON_TRANS);
+  with BtnSetAnonMsg do begin
+    OnTap := BtnSetAnonMsgOnTap;
+    Height := Height * 1.25;
     Text.WordWrap := true;
   end;
 
@@ -1869,9 +1945,10 @@ begin
   CheckSetAllowDuplicateTabs.Visible := false;
 
   CheckSetAutoStartBrowse     := AddSettingsCheck('Auto start browse');
-  CheckSetAutoStartBrowse.Visible := false;
+  //CheckSetAutoStartBrowse.Visible := false;
 
   CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu');
+  CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars');
   EditSetDefUseragent         := AddSettingsEdit('Default Useragent string');
   EditSetDefDownloadPath      := AddSettingsEdit('Default downloads path');
   EditSetMaxDownloadThreads   := AddSettingsEdit('Max download threads count', '', EDIT_STYLE_INT);
@@ -1879,7 +1956,14 @@ begin
   EditSetLayoutsCount         := AddSettingsEdit('Content layouts count', '', EDIT_STYLE_INT);
   EditSetItemIndent           := AddSettingsEdit('Items indent', '', EDIT_STYLE_INT);
   EditSetFilenameLogUrls      := AddSettingsEdit('Urls log filename');
+  {$IFDEF MSWINDOWS}
+  EditSetPlayApp              := AddSettingsEdit('Player application path');
+  EditSetPlayParams           := AddSettingsEdit('Player params');
+    EditSetPlayParams.Text.Text := FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.';
+    EditSetPlayParams.Size.Height := EditSetPlayParams.Height + 30;
+  {$ENDIF}
   CheckSetDevMode             := AddSettingsCheck('Developer mode');
+  CheckSetAutoCheckUpdates    := AddSettingsCheck('Auto check updates');
 
   CheckMenuSetOnItemTap := TNBoxCheckMenu.Create(MainLayout);
   with CheckMenuSetOnItemTap do begin
@@ -1935,7 +2019,7 @@ begin
   with BtnSetViewLog do
     Ontap := BtnSetViewLogOnTap;
 
-  BtnSetChangeOnItemTap := AddSettingsButton('Change content On tap action', ICON_SETTINGS);
+  BtnSetChangeOnItemTap := AddSettingsButton('Change content on tap action', ICON_SETTINGS);
   with BtnSetChangeOnItemTap do begin
     OnTap := BtnSetChangeOnItemTapOnTap;
   end;
@@ -2042,6 +2126,36 @@ begin
     OnTap := BtnDialogNoOnTap;
   end;
 
+  //MenuAnonMessage
+  EditNickMsgForDev := Self.CreateDefEdit(MenuAnonMessage);
+  with EditNickMsgForDev do begin
+    Margins.Rect := TRectF.Create(10, 10, 10, 0);
+    Parent := MenuAnonMessage;
+    Edit.TextPrompt := 'Nickname (optional)';
+    Align := TAlignLayout.MostTop;
+  end;
+
+  MemoMsgForDev := Self.CreateDefMemo(MenuAnonMessage);
+  with MemoMsgForDev do begin
+    Parent := MenuAnonMessage;
+    Margins := EditNickMsgForDev.Margins;
+    Memo.Text := '';
+    Memo.AutoSelect := false;
+    Memo.MaxLength := 2000;
+    Align := TAlignLayout.Client;
+  end;
+
+  BtnSendMsgForDev := Self.CreateDefButton(MenuAnonMessage, BTN_STYLE_DEF2);
+  with BtnSendMsgForDev do begin
+    Margins := EditNickMsgForDev.Margins;
+    Margins.Bottom := Margins.Top;
+    Parent := MenuAnonMessage;
+    Align := TAlignlayout.MostBottom;
+    Text.Text := 'Send message';
+    Image.FileName := AppStyle.GetImagePath(ICON_TRANS);
+    OnTap := BtnSendMsgForDevOnTap;
+  end;
+
   //MenuSearchDoList
   BtnSearchAddBookmark := AddMenuSearchBtn('Add current request to bookmarks', ICON_BOOKMARKS, BtnSearchAddBookmarkOnTap);
   //BtnSearchSetDefault  := AddMenuSearchBtn('Set default request', ICON_SETTINGS, BtnSearchSetDefaultOnTap);
@@ -2069,6 +2183,7 @@ begin
 
   CurrentBrowser := Browsers.Last;
 
+  TabsScroll.ShowScrollBars := Settings.ShowScrollBars;
   {$IFDEF MSWINDOWS}
   MVMenu.Mode := TMultiviewMode.Panel;
   MvMenu.Width := 200;
@@ -2077,8 +2192,66 @@ begin
     FmxObj := Form1.Children.Items[I];
     if ( FmxObj is TControl ) then
       SetClick(FmxObj as TControl);
+    if ( FmxObj is TCustomScrollBox ) then
+      TCustomScrollBox(FmxObj).ShowScrollBars := Settings.ShowScrollBars;
   end;
   {$ENDIF}
+
+  //Update checking thread
+  if Settings.AutoCheckUpdates then begin
+    var Task: ITask;
+    Task := TTask.Create(
+      procedure
+      Const
+        RETRY_TIMEOUT: integer = 3500;
+        RETRY_COUNT: integer = 10;
+      var
+        I: integer;
+        LastRelease: TGithubRelease;
+        LastVer: TSemVer;
+        Success: boolean;
+      begin
+        Success := false;
+        for I := 1 to RETRY_COUNT do begin
+          Task.CheckCanceled;
+          try
+            LastRelease := GetLastRealeaseFromGitHub;
+            Success := true;
+            break;
+          except
+            Task.Wait(RETRY_TIMEOUT);
+          end;
+        end;
+
+        if not success then
+          exit;
+
+        LastVer := TSemVer.FromGhTagString(LastRelease.TagName);
+        if ( LastVer > APP_VERSION ) then begin
+          TThread.Synchronize(Nil, procedure begin
+            Form1.UserBooleanDialog('Update available: ' + LastRelease.Name + SLineBreak +
+                                    LastRelease.Body + SLineBreak +
+                                    'Click `Yes` to open release page.',
+            procedure begin
+              if UserSayYes then
+              {$IFDEF ANDROID}
+                StartActivityView(LastRelease.HtmlUrl);
+              {$ENDIF} {$IFDEF MSWINDOWS}
+                ShellExecute(0, 'open', Pchar(LastRelease.HtmlUrl), nil, nil, SW_SHOWNORMAL);
+              {$ENDIF}
+              Self.ChangeInterface(Self.BrowserLayout);
+            end);
+          end);
+        end;
+
+      end
+    ).Start;
+  end;
+
+  //var LStr, LEncStr: string;
+  //LStr := '' + '?wait=true';
+  //LEncStr := TNetEncoding.Base64String.Encode(LStr);
+  //unit1.Log(LEncStr);
 
 //  for I := 1 to 16 do begin
 //    BeMadDoBad;
@@ -2687,7 +2860,7 @@ end;
 procedure TForm1.MenuItemTagsOnSelected(Sender: TObject);
 begin
   //CopyToClipboard(MenuItemTags.SelectedBtn.Text.Text);
-  self.AddBrowser(CreateTagReq(MenuItemTagsOrigin, MenuItemTags.SelectedBtn.Text.Text));
+  self.AddBrowser(CreateTagReq(MenuItemTagsOrigin, MenuItemTags.SelectedBtn.Text.Text), Settings.AutoStartBrowse);
 end;
 
 procedure TForm1.ReloadBookmarks;
@@ -3044,10 +3217,17 @@ begin
   EditSetMaxDownloadThreads.Edit.Edit.Text := Settings.MaxDownloadThreads.ToString;
   DownloadManager.MaxThreadCount        := Settings.MaxDownloadThreads;
   CheckSetDevMode.IsChecked             := Settings.DevMode;
+  CheckSetAutoCheckUpdates.IsChecked    := Settings.AutoCheckUpdates;
+  CheckSetShowScrollBars.IsChecked      := Settings.ShowScrollbars;
+  {$IFDEF MSWINDOWS}
+  EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
+  EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
+  {$ENDIF}
 
   With SearchMenu.OriginSetMenu do begin
     BtnOriginPseudo.Visible := Settings.DevMode;
     BtnOriginBookmarks.Visible := Settings.DevMode;
+    BtnOrigin9Hentaito.Visible := Settings.DevMode;
   end;
 
 
