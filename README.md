@@ -25,7 +25,7 @@ Developed on RAD Studio 11 Alexandria.
 #### Dependencies:
 * [Alcinoe](https://github.com/Zeus64/alcinoe)
 * [ZeosLib 8.0](https://sourceforge.net/p/zeoslib/code-0/HEAD/tree/branches/8.0-patches/)
-* [Horse-XSuperObjects](https://github.com/claudneysessa/Horse-XSuperObjects)
+* [x-superobject](https://github.com/onryldz/x-superobject)
 * [HTMLp](https://github.com/RomanYankovsky/HTMLp)
 * [delphi-r34.app-api-wrapper](https://github.com/Kisspeace/delphi-r34.app-api-wrapper)
 * [delphi-r34-json-api-wrapper](https://github.com/Kisspeace/delphi-r34-json-api-wrapper)
