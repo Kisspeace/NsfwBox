@@ -15,7 +15,7 @@ uses
   NsfwBoxOriginNsfwXxx, NsfwBoxGraphics, NsfwBoxOriginConst,
   NsfwBoxGraphics.Rectangle, NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginGivemepornClub, NsfwBoxStyling, NsfwBoxOriginBookmarks,
-  NsfwBoxHelper;
+  NsfwBoxHelper, CoomerParty.Scraper, NsfwBoxOriginCoomerParty;
 
 type
 
@@ -54,6 +54,7 @@ type
       BtnOrigin9Hentaito: TRectButton;
       BtnOriginPseudo: TRectButton;
       BtnOriginBookmarks: TRectButton;
+      BtnOriginCoomerParty: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -119,6 +120,12 @@ type
           BtnGmpChangeSearchType: TRectButton;
         R34AppMenu: TNBoxSearchSubMenuBase;
           BtnR34AppChangeBooru: TRectButton;
+        CoomerPartyMenu: TNBoxSearchSubMenuBase;
+          EditCoomerPartyHost,
+          EditCoomerPartyUserId,
+          EditCoomerPartyService
+          : TNBoxEdit;
+          BtnCoomerPartyChangeSite: TRectButton;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -174,6 +181,7 @@ begin
   BtnOriginBookmarks  := NewBtn(ORIGIN_BOOKMARKS);
   BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
   BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
+  BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
 end;
 
 destructor TNBoxOriginSetMenu.Destroy;
@@ -374,7 +382,6 @@ begin
 
     end;
 
-
     NsfwXxxMenu := TNBoxSearchSubMenuBase.Create(Self);
     with NsfwXxxMenu do begin
       Parent := MainMenu;
@@ -467,6 +474,43 @@ begin
       end;
 
     end;
+
+    CoomerPartyMenu := TNBoxSearchSubMenuBase.Create(self);
+    with CoomerPartyMenu do begin
+      Parent := MainMenu;
+      Align := TAlignLayout.Top;
+      Visible := false;
+
+      EditCoomerPartyHost := Form1.CreateDefEdit(Self);
+      with EditCoomerPartyHost do begin
+        Parent := CoomerPartyMenu;
+        Align := TAlignlayout.Top;
+        Margins.Rect := M;
+        Edit.Text := URL_COOMER_PARTY;
+        Edit.TextPrompt := 'Host URL';
+      end;
+
+      EditCoomerPartyUserId := Form1.CreateDefEdit(Self);
+      with EditCoomerPartyUserId do begin
+        Parent := CoomerPartyMenu;
+        Align := TAlignlayout.Top;
+        Margins.Rect := M;
+        Edit.Text := '';
+        Edit.TextPrompt := 'Artist Id';
+      end;
+      BeBottom(EditCoomerPartyUserId, EditCoomerPartyHost);
+
+      EditCoomerPartyService := Form1.CreateDefEdit(Self);
+      with EditCoomerPartyService do begin
+        Parent := CoomerPartyMenu;
+        Align := TAlignlayout.Top;
+        Margins.Rect := M;
+        Edit.Text := '';
+        Edit.TextPrompt := 'Service name ( onlyfans, patreon, .. )';
+      end;
+      BeBottom(EditCoomerPartyService, EditCoomerPartyUserId);
+
+    end;
   end;
 
   Self.NsfwXxxSortMenu.Selected := Ord(Recommended);
@@ -537,6 +581,14 @@ begin
       end;
     end;
 
+    ORIGIN_COOMERPARTY: begin
+      with ( Result as TNBoxSearchReqCoomerParty ) do begin
+        Site := Self.EditCoomerPartyHost.Edit.Text;
+        Service := Self.EditCoomerPartyService.Edit.Text;
+        UserId := Self.EditCoomerPartyUserId.Edit.Text;
+      end;
+    end;
+
   end;
 
   with Result do begin
@@ -565,6 +617,7 @@ begin
   NsfwXxxMenu.Visible := False;
   GmpClubMenu.Visible := False;
   R34AppMenu.Visible := False;
+  CoomerPartyMenu.Visible := False;
 end;
 
 procedure TNBoxSearchMenu.OnGmpClubSearchTypeChanged(Sender: TObject);
@@ -632,7 +685,9 @@ begin
   else if ( OriginSetMenu.Selected = ORIGIN_GIVEMEPORNCLUB ) then
     GmpClubMenu.Visible := True
   else if ( OriginSetMenu.Selected = ORIGIN_R34APP ) then
-    R34AppMenu.Visible := True;
+    R34AppMenu.Visible := True
+  else if ( OriginSetMenu.Selected = ORIGIN_COOMERPARTY ) then
+    CoomerPartyMenu.Visible := True;
 end;
 
 procedure TNBoxSearchMenu.OnR34AppBooruChanged(Sender: TObject);
@@ -674,6 +729,14 @@ begin
 
     With ( Value as TNBoxSearchReqR34App ) do begin
       Self.R34AppBooruChangeMenu.Selected := Ord(Booru);
+    end;
+
+  end else if ( Value is TNBoxSearchReqCoomerParty ) then begin
+
+    with ( Value as TNBoxSearchReqCoomerParty ) do begin
+      Self.EditCoomerPartyHost.Edit.Text := Site;
+      Self.EditCoomerPartyUserId.Edit.Text := UserId;
+      Self.EditCoomerPartyService.Edit.Text := Service;
     end;
 
   end;

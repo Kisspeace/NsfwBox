@@ -12,6 +12,8 @@ uses
   NsfwBoxInterfaces, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginPseudo, NsfwBoxOriginR34App,
   NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9hentaiToApi,
+  NsfwBoxOriginCoomerParty, CoomerParty.HTMLParser, CoomerParty.Scraper,
+  CoomerParty.Types,
   NsfwBoxOriginConst, NsfwBoxBookmarks, NsfwBoxOriginBookmarks,
   IoUtils, NsfwBoxFilesystem, System.Classes, system.SyncObjs,
   System.Threading, NsfwBoxThreading;
@@ -34,6 +36,7 @@ type
       function GetContentR34App(AList: INBoxHasOriginList; ATags: string; APageId: integer; ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
       function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
+      function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string; ARequest, AUserId, AService: string; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ABookmarksListId: int64; APageId: integer = 1): boolean;
     public
       BookmarksDb: TNBoxBookmarksDb;
@@ -79,6 +82,7 @@ end;
 
 procedure TNBoxScraper.FetchContentUrls(var APost: INBoxItem);
 begin
+  //unit1.SyncLog('FetchContentUrls: ' + APost.Origin.ToString + ' ' + APost.ThumbnailUrl);
   if ( APost is TNBoxNsfwXxxItem ) then begin
 
     var Client: TNsfwXxxScraper;
@@ -108,6 +112,26 @@ begin
     finally
       Client.Free;
     end;
+
+  end else if ( APost is TNBoxCoomerPartyItem ) then begin
+
+    var Client: TCoomerPartyScraper;
+    var Item: TNBoxCoomerPartyItem;
+
+    Item := ( APost as TNBoxCoomerPartyItem );
+    Client := TCoomerPartyScraper.Create;
+    Client.Host := Item.Site;
+    SyncWebClientSet(Client.Client, APost.Origin);
+
+//    try
+    try
+      Item.Item := Client.GetPost(Item.Item.Author, Item.UIdInt);
+    finally
+      Client.Free;
+    end;
+//    except
+//      Unit1.SyncLog('EEEE!!')
+//    end;
 
   end;
 end;
@@ -166,7 +190,7 @@ begin
     ORIGIN_GIVEMEPORNCLUB:
     begin
       with ( ARequest As TNBoxSearchReqGmpClub ) do begin
-      Result := Self.GetContentGmpClub
+        Result := Self.GetContentGmpClub
         ( AList,
           Request,
           SearchType,
@@ -177,9 +201,23 @@ begin
     ORIGIN_9HENTAITO:
     begin
       with ( ARequest As TNBoxSearchReq9Hentaito ) do begin
-      Result := Self.GetContent9Hentaito
+        Result := Self.GetContent9Hentaito
         ( AList,
           SearchRec);
+      end;
+    end;
+
+    ORIGIN_COOMERPARTY:
+    begin
+      with ( ARequest As TNBoxSearchReqCoomerParty ) do begin
+        Result := Self.GetContentCoomerParty
+        ( AList,
+          Site,
+          Request,
+          UserId,
+          Service,
+          PageId
+        );
       end;
     end;
 
@@ -300,6 +338,42 @@ begin
   Bookmarks := nil;
 
   Result := (AList.Count > C);
+end;
+
+function TNBoxScraper.GetContentCoomerParty(AList: INBoxHasOriginList;
+  ASite: string; ARequest, AUserId, AService: string;
+  APageNum: integer): boolean;
+var
+  Client: TCoomerPartyScraper;
+  I: integer;
+  Content: TPartyPostsPage;
+begin
+  Result := false;
+  Client := TCoomerPartyScraper.Create;
+  try
+    SyncWebClientSet(Client.Client, ORIGIN_COOMERPARTY);
+
+    if ( Trim(AUserId).IsEmpty or Trim(AService).IsEmpty ) then begin
+      // Search by recent posts
+      Content := Client.GetRecentPostsByPageNum(ARequest, APageNum);
+    end else begin
+      // Search by artist posts
+      Content := Client.GetArtistPostsByPageNum(ARequest, AUserId, AService, APageNum);
+    end;
+
+    Result := ( length(Content.Posts) > 0 );
+    for I := 0 to High(Content.Posts) do begin
+      var Item: TNBoxCoomerPartyItem;
+      Item := TNBoxCoomerPartyItem.Create;
+      Item.Site := Client.Host;
+      Item.UIdInt := Content.Posts[I].Id;
+      Item.Item := TPartyPostToTPartyPostPage(Content.Posts[I]);
+      AList.Add(Item);
+    end;
+
+  finally
+    Client.Free;
+  end;
 end;
 
 function TNBoxScraper.GetContentPseudo(AList: INBoxHasOriginList;

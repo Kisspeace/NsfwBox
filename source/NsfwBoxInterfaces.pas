@@ -188,8 +188,10 @@ end;
 
 function TNBoxItemBase.ContentUrl: string;
 begin
-  if ContentUrlCount > 0 then
-    Result := ContentUrls[0];
+  if ( ContentUrlCount > 0 ) then
+    Result := ContentUrls[0]
+  else
+    Result := '';
 end;
 
 function TNBoxItemBase.ContentUrlCount: integer;

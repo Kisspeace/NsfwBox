@@ -1176,6 +1176,7 @@ begin
       if CurrentItem.HasPost then begin
         _SetVisible(ButtonsItemMenu, true);
         Post := CurrentItem.Post;
+        BtnShowTags.Visible    := Supports(Post, IHasTags);
         BtnOpenAuthor.Visible  := Supports(Post, IHasAuthor);
         BtnOpenRelated.Visible := ( Post is TNBoxNsfwXxxItem );
         BtnBrowse.Visible      := false;
@@ -1593,10 +1594,11 @@ begin
           StartActivityView(LPost.ContentUrl);
       {$ENDIF}
       {$IFDEF MSWINDOWS}
-        var LParams: string;
-        LParams := Settings.ContentPlayParams.Replace(FORMAT_VAR_CONTENT_URL, LPost.ContentUrls[0]);
-        if ( LPost.ContentUrlCount > 0 ) then
+        if ( LPost.ContentUrlCount > 0 ) then begin
+          var LParams: string;
+          LParams := Settings.ContentPlayParams.Replace(FORMAT_VAR_CONTENT_URL, LPost.ContentUrl);
           ShellExecute(0, 'open', PChar(Settings.ContentPlayApp), PChar(LParams), nil, SW_SHOWNORMAL);
+        end;
       {$ENDIF}
     end;
 

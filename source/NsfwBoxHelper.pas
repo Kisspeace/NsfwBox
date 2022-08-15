@@ -6,7 +6,9 @@ uses
   NsfwBoxInterfaces,
   NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
   NsfwBoxOriginBookmarks, NsfwBoxOriginR34JsonApi,
-  NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9HentaitoApi, NsfwBoxOriginConst,
+  NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9HentaitoApi,
+  NsfwBoxOriginCoomerParty,
+  NsfwBoxOriginConst,
   classes, sysutils, NsfwXxx.Types;
 
   function CreateItemByOrigin(AOrigin: integer): INBoxItem;
@@ -28,6 +30,7 @@ begin
     ORIGIN_GIVEMEPORNCLUB: Result := TNBoxGmpClubItem.Create;
     ORIGIN_PSEUDO:     Result := TNBoxPseudoItem.Create;
     ORIGIN_9HENTAITO:  Result := TNBox9HentaiToItem.Create;
+    ORIGIN_COOMERPARTY: Result := TNBoxCoomerPartyItem.Create;
   end;
 end;
 
@@ -41,6 +44,7 @@ begin
     ORIGIN_PSEUDO:     Result := TNBoxSearchReqPseudo.Create;
     ORIGIN_BOOKMARKS:  Result := TNBoxSearchReqBookmarks.Create;
     ORIGIN_9HENTAITO:  Result := TNBoxSearchReq9HentaiTo.Create;
+    ORIGIN_COOMERPARTY: Result := TNBoxSearchReqCoomerParty.Create;
   end;
 end;
 
@@ -67,19 +71,33 @@ begin
     exit;
 
   if ( APost is TNBoxNsfwXxxItem ) then begin
+
     Result := TNBoxSearchReqNsfwXxx.create;
     with ( Result as TNBoxSearchReqNsfwXxx ) do begin
       with ( APost as TNBoxNsfwXxxItem ) do
         Result.Request := AuthorName;
       SearchType := TNsfwUrlType.User;
     end;
+
   end else if ( APost is TNBoxR34AppItem ) then begin
+
     Result := TNBoxSearchReqR34App.Create;
     Result.Request := TNBoxR34AppItem(APost).AuthorName;
-//    with ( Result as TNBoxSearchReqR34App ) do begin
-//
-//    end;
+
+  end else if ( APost is TNBoxCoomerPartyItem ) then begin
+
+    var LPost: TNBoxCoomerPartyItem;
+    var LReq: TNBoxSearchReqCoomerParty;
+    LReq := TNBoxSearchReqCoomerParty.Create;
+    LPost := ( APost as TNBoxCoomerPartyItem );
+
+    LReq.Site := LPost.Site;
+    LReq.UserId := LPost.Item.Author.Id;
+    LReq.Service := LPost.Item.Author.Service;
+
+    Result := LReq;
   end;
+
 end;
 
 function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
@@ -103,6 +121,8 @@ begin
     ORIGIN_R34APP: Result     := 'R34.app';
     ORIGIN_GIVEMEPORNCLUB: Result := 'givemeporn.club';
     ORIGIN_9HENTAITO:  Result := '9hentai.to';
+    ORIGIN_COOMERPARTY: Result := '(coomer\kemono).party';
+
     ORIGIN_BOOKMARKS: Result  := 'Bookmarks';
     ORIGIN_PSEUDO: Result     := 'None';
   end;
