@@ -22,6 +22,7 @@ type
   TNBoxSelectMenu = class(TVertScrollBox)
     private
       FSelected: NativeInt;
+      FSelectedStr: string;
       FSelectedBtn: TRectButton;
       FOnSelect: TNotifyEvent;
       procedure SetSelected(const value: NativeInt); virtual;
@@ -32,13 +33,20 @@ type
     public
       property SelectedBtn: TRectButton read FSelectedBtn;
       property Selected: NativeInt read FSelected write SetSelected;
+      property SelectedStr: string read FSelectedStr;
       property OnSelected: TNotifyEvent read FOnSelect write FOnSelect;
       {}
       function AddBtn(AText: string;
        AId: NativeInt = 0;
        AImageFilename: string = '';
        AShortImageName: boolean = false
-      ): TRectButton; virtual;
+      ): TRectButton; overload; virtual;
+      {}
+      function AddBtnStr(AText: string;
+       ATagStr: string = '';
+       AImageFilename: string = '';
+       AShortImageName: boolean = false
+      ): TRectButton; overload; virtual;
       {}
       procedure ClearButtons;
       constructor Create(AOwner: TComponent);
@@ -84,6 +92,7 @@ type
       procedure OnNsfwXxxHostChanged(Sender: TObject);
       procedure OnGmpClubSearchTypeChanged(Sender: TObject);
       procedure OnR34AppBooruChanged(Sender: TObject);
+      procedure OnCoomerPartyHostChanged(Sender: TObject);
       procedure BtnSelectMenuOnTap(Sender: TObject; const Point: TPointF);
       procedure SetRequest(const value: INBoxSearchRequest);
       function GetRequest: INBoxSearchRequest;
@@ -97,6 +106,7 @@ type
       NsfwXxxHostChangeMenu: TNBoxSelectMenu;
       R34AppBooruChangeMenu: TNBoxSelectMenu;
       GmpClubSearchTypeMenu: TNBoxSelectMenu;
+      CoomerPartyHostChangeMenu: TNBoxSelectMenu;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -620,6 +630,11 @@ begin
   CoomerPartyMenu.Visible := False;
 end;
 
+procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
+begin
+  Self.EditCoomerPartyHost.Edit.Text := CoomerPartyHostChangeMenu.SelectedStr;
+end;
+
 procedure TNBoxSearchMenu.OnGmpClubSearchTypeChanged(Sender: TObject);
 var
   Selected: TGmpClubSearchType;
@@ -774,10 +789,18 @@ begin
   end;
 end;
 
+function TNBoxSelectMenu.AddBtnStr(AText: string; ATagStr,
+  AImageFilename: string; AShortImageName: boolean): TRectButton;
+begin
+  Result := Self.AddBtn(AText, 0, AImageFilename, AShortImageName);
+  Result.TagString := ATagStr;
+end;
+
 procedure TNBoxSelectMenu.BtnOnTap(Sender: TObject; const Point: TPointF);
 begin
   FSelectedBtn := (Sender As TRectButton);
   Selected := TFmxObject(Sender).Tag;
+  FSelectedStr := TFmxObject(Sender).TagString;
 end;
 
 procedure TNBoxSelectMenu.ClearButtons;
