@@ -31,7 +31,8 @@ uses
   NsfwBoxOriginGivemepornClub in 'source\NsfwBoxOriginGivemepornClub.pas',
   NsfwBoxOrigin9hentaiToApi in 'source\NsfwBoxOrigin9hentaiToApi.pas',
   NsfwBox.UpdateChecker in 'source\NsfwBox.UpdateChecker.pas',
-  NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas';
+  NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas',
+  NsfwBoxOriginCoomerParty in 'source\NsfwBoxOriginCoomerParty.pas';
 
 {$R *.res}
 
