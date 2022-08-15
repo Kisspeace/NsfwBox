@@ -123,15 +123,11 @@ begin
     Client.Host := Item.Site;
     SyncWebClientSet(Client.Client, APost.Origin);
 
-//    try
     try
       Item.Item := Client.GetPost(Item.Item.Author, Item.UIdInt);
     finally
       Client.Free;
     end;
-//    except
-//      Unit1.SyncLog('EEEE!!')
-//    end;
 
   end;
 end;
@@ -350,6 +346,7 @@ var
 begin
   Result := false;
   Client := TCoomerPartyScraper.Create;
+  Client.Host := ASite;
   try
     SyncWebClientSet(Client.Client, ORIGIN_COOMERPARTY);
 

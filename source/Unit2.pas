@@ -373,6 +373,13 @@ begin
       OnSelected := Self.OnR34AppBooruChanged;
     end;
 
+    CoomerPartyHostChangeMenu := NewSelectMenu;
+    with CoomerPartyHostChangeMenu do begin
+      AddBtnStr('coomer.party', URL_COOMER_PARTY, IconPath);
+      AddBtnStr('kemono.party', URL_KEMONO_PARTY, IconPath);
+      OnSelected := OnCoomerPartyHostChanged;
+    end;
+
     R34AppMenu := TNBoxSearchSubMenuBase.Create(Self);
     with R34AppMenu do begin
       Parent := MainMenu;
@@ -500,6 +507,18 @@ begin
         Edit.TextPrompt := 'Host URL';
       end;
 
+      BtnCoomerPartyChangeSite := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
+      With BtnCoomerPartyChangeSite do begin
+        Parent := CoomerPartyMenu;
+        Align := TAlignlayout.top;
+        Margins.Rect := M;
+        Text.Text := 'Change host URL';
+        TagObject := CoomerPartyHostChangeMenu; // linking button with menu
+        OnTap := BtnSelectMenuOnTap;
+        Image.FileName := IconPath;
+      end;
+      BeBottom(BtnCoomerPartyChangeSite, EditCoomerPartyHost);
+
       EditCoomerPartyUserId := Form1.CreateDefEdit(Self);
       with EditCoomerPartyUserId do begin
         Parent := CoomerPartyMenu;
@@ -508,7 +527,7 @@ begin
         Edit.Text := '';
         Edit.TextPrompt := 'Artist Id';
       end;
-      BeBottom(EditCoomerPartyUserId, EditCoomerPartyHost);
+      BeBottom(EditCoomerPartyUserId, BtnCoomerPartyChangeSite);
 
       EditCoomerPartyService := Form1.CreateDefEdit(Self);
       with EditCoomerPartyService do begin
@@ -620,6 +639,7 @@ begin
   NsfwXxxHostChangeMenu.Visible := false;
   R34AppBooruChangeMenu.Visible := false;
   GmpClubSearchTypeMenu.Visible := false;
+  CoomerPartyHostChangeMenu.Visible := False;
 end;
 
 procedure TNBoxSearchMenu.HideOriginMenus;
@@ -632,6 +652,7 @@ end;
 
 procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
 begin
+  ShowMainMenu;
   Self.EditCoomerPartyHost.Edit.Text := CoomerPartyHostChangeMenu.SelectedStr;
 end;
 
@@ -693,7 +714,6 @@ begin
   //OriginSetMenu.Visible := False;
   MainMenu.Visible := True;
   self.HideOriginMenus;
-
 
   if OriginSetMenu.Selected = ORIGIN_NSFWXXX then
     NsfwXxxMenu.Visible := True
@@ -799,8 +819,9 @@ end;
 procedure TNBoxSelectMenu.BtnOnTap(Sender: TObject; const Point: TPointF);
 begin
   FSelectedBtn := (Sender As TRectButton);
-  Selected := TFmxObject(Sender).Tag;
   FSelectedStr := TFmxObject(Sender).TagString;
+
+  Selected := TFmxObject(Sender).Tag;
 end;
 
 procedure TNBoxSelectMenu.ClearButtons;
@@ -820,7 +841,6 @@ end;
 {$IFDEF MSWINDOWS}
 procedure TNBoxSelectMenu.ClickTapRef(Sender: TObject);
 begin
-  //log('lasagma');
   with Sender as TControl do begin
     Ontap(Sender, TPointF.Create(0, 0));
   end;
