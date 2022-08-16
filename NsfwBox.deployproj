@@ -5,7 +5,7 @@
     </ProjectExtensions>
     <PropertyGroup>
         <DeviceId Condition="'$(Platform)'=='Android'"/>
-        <DeviceId Condition="'$(Platform)'=='Android64'"/>
+        <DeviceId Condition="'$(Platform)'=='Android64'">0123456789ABCDEF</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
     <ItemGroup Condition="'$(Platform)'=='Linux64'"/>
@@ -95,6 +95,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="assets\themes\default\content-origin-5.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>content-origin-5.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\res\drawable-xhdpi\</RemoteDir>
             <RemoteName>ic_notification.png</RemoteName>
@@ -131,6 +140,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="assets\themes\default\content-origin-4.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>content-origin-4.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\res\drawable-large\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
@@ -143,15 +161,6 @@
         <DeployFile Include="assets\themes\default\delete.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
             <RemoteName>delete.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="assets\themes\default\content-origin-4.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
-            <RemoteName>content-origin-4.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
