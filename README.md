@@ -21,6 +21,7 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="https://r34.app/_nuxt/icons/icon_512x512.307d7e.png" width="24" align="left">[r34.app](https://r34.app)
 * <img src="http://rule34.xxx/favicon.ico" width="24" align="left">[Rule34 Json API](https://github.com/KuroZen/r34-json-api)
 * <img src="https://givemeporn.club/static/images/favicon.png?v=1" width="24" align="left">[givemeporn.club](https://givemeporn.club/)
+* <img src="https://kemono.party/static/favicon.ico" width="24" align="left">[kemono.party](https://kemono.party), [coomer.party](https://coomer.party)
 
 #### Dependencies:
 * [Alcinoe](https://github.com/Zeus64/alcinoe)
@@ -32,6 +33,9 @@ Developed on RAD Studio 11 Alexandria.
 * [delphi-nsfw.xxx-scraper](https://github.com/Kisspeace/delphi-nsfw.xxx-scraper)
 * [delphi-givemeporn.club-scraper](https://github.com/Kisspeace/delphi-givemeporn.club-scraper)
 * [delphi-9hentai.to-api-wrapper](https://github.com/Kisspeace/delphi-9hentai.to-api-wrapper)
+* [coomer.party-scraper](https://github.com/Kisspeace/coomer.party-scraper)
 
-#### Download last release APK:
-## [DOWNLOAD](https://github.com/Kisspeace/NsfwBox/releases/download/v1.1.0/Kisspeace.NsfwBox.1.1.0.apk)
+#### Download last release:
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.2.0/Kisspeace.NsfwBox.v1.2.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.2.0/Kisspeace.NsfwBox-ins32.v1.2.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.2.0/Kisspeace.NsfwBox-ins64.v1.2.0.exe)  
