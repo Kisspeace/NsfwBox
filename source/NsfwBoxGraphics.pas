@@ -359,7 +359,8 @@ end;
 
 destructor TNBoxCardBase.Destroy;
 begin
-
+//  if Assigned(FItem) then                    // !!!!
+//    ( FItem as TInterfacedPersistent ).Free;
   inherited;
 end;
 

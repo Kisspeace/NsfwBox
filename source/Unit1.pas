@@ -25,7 +25,8 @@ uses
   // NsfwBox
   NsfwBoxInterfaces, NsfwBoxSettings, NsfwBoxGraphics, NsfwBoxContentScraper,
   NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
-  NsfwBoxOriginR34JsonApi, NsfwBoxOriginBookmarks, NsfwBoxOriginConst,
+  NsfwBoxOriginR34JsonApi, NsfwBoxOriginBookmarks,
+  NsfwBoxOriginCoomerParty, NsfwBoxOriginConst,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
   NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2;
@@ -1237,19 +1238,9 @@ begin
 end;
 
 function RandReq: INBoxSearchRequest;
-var
-  N: integer;
 begin
   Result := nil;
-  N := Random(3);
-
-  case N of
-    0: result := TNBoxSearchReqR34JsonApi.Create;
-    1: result := TNBoxSearchReqR34App.Create;
-    2: Result := TNBoxSearchReqNsfwxxx.Create;
-  end;
-  if Not Assigned(Result) then
-    Result := TNBoxSearchReqR34App.Create;
+  Result := TNBoxSearchReqNsfwxxx.Create;
 end;
 
 function TForm1.CreateDefBrowser(AOwner: TComponent): TNBoxBrowser;
@@ -1478,10 +1469,26 @@ begin
 end;
 
 function TForm1.CreateTabText(ABrowser: TNBoxBrowser): string;
+var
+  Req: INBoxSearchRequest;
 begin
-  Result := ABrowser.Request.Request;
-  if Result.IsEmpty then
-    Result := 'empty';
+  Req := ABrowser.Request;
+
+  Result := Req.Request;
+  if ( Result.IsEmpty ) then begin
+
+    if ( Req is TNBoxSearchReqCoomerParty ) then begin
+      var LReq: TNBoxSearchReqCoomerParty;
+      LReq := (Req as TNBoxSearchReqCoomerParty);
+      if ( not LReq.UserId.IsEmpty ) then
+        Result := LReq.UserId;
+    end;
+
+    if ( Result.IsEmpty ) then
+      Result := 'empty';
+
+  end;
+
   Result := Result + ': ' + ABrowser.Request.PageId.ToString + ' | '
     + ABrowser.Items.Count.ToString;
 end;
@@ -2425,7 +2432,6 @@ begin
       Bookmark := TNBoxBookmark.Create(B.Request);
       Group.Add(Bookmark);
       B.Tag := Group.GetMaxId;
-      //showmessage(B.Tag.ToString);
       Bookmark.Free;
     end;
   end;
@@ -2473,7 +2479,7 @@ end;
 procedure TForm1.OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser;
   Action: TCollectionNotification);
 begin
-  Self.TopBottomText.Text := 'Browsers: ' + Browsers.Count.ToString;
+  //Self.TopBottomText.Text := 'Browsers: ' + Browsers.Count.ToString;
 end;
 
 procedure TForm1.OnCardAutoLook(Sender: TObject);
