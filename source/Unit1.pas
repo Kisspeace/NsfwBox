@@ -2880,8 +2880,10 @@ var
   function _getName(AGroup: TBookmarkGroupRec): string;
   begin
     Result := AGroup.Name;
-    if Settings.DevMode then
+    if Settings.DevMode then begin
       Result := '[ id: ' + AGroup.Id.ToString + ' ] ' + Result;
+      Result := '[ LastPage: ' + AGroup.GetMaxPage.ToString + ' ] ' + Result;
+    end;
 
     Result := '(' + AGroup.GetItemsCount.ToString + ') ' + Result;
   end;
