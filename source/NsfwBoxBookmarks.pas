@@ -6,7 +6,7 @@ uses
   SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
   DB, NsfwBoxInterfaces, NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx,
   NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi, NsfwBoxOriginConst,
-  NsfwBoxHelper;
+  NsfwBoxHelper, Math;
 
 type
 
@@ -61,6 +61,7 @@ type
       procedure Delete(ABookmarkId: int64);
       function GetItemsCount: int64;
       function GetMaxId: int64;
+      function GetMaxPage: int64;
       procedure UpdateGroup;
   end;
 
@@ -85,6 +86,7 @@ type
       procedure Add(AGroupId: int64; AValue: INBoxItem);          overload;
       procedure Add(AGroupId: int64; AValue: INBoxSearchRequest); overload;
       function GetMaxId(AGroupId: int64): int64;
+      function GetMaxPage(AGroupId: int64): int64;
       function GetItemsCount(AGroupId: int64): int64;
       function GetPage(AGroupId: int64; APageNum: integer = 1): TBookmarkAr;
       function Get(AGroupId: int64; AStart, AEnd: integer): TBookmarkAr;
@@ -484,6 +486,18 @@ begin
   Query.Close;
   Query.SQL.Clear;
 end;
+
+function TNBoxBookmarksDb.GetMaxPage(AGroupId: int64): int64;
+var
+  count: int64;
+begin
+  count := self.GetItemsCount(AGroupId);
+  if count > 0 then
+    Result := Ceil(count / self.FPageSize)
+  else
+    Result := 0
+end;
+
 //
 //function TNBoxBookmarksDb.GetGroupById(AId: int64): TBookmarkGroupRec;
 //var
@@ -639,6 +653,11 @@ end;
 function TBookmarkGroupRec.GetMaxId: int64;
 begin
   Result := FDb.GetMaxId(Id);
+end;
+
+function TBookmarkGroupRec.GetMaxPage: int64;
+begin
+  Result := FDb.GetMaxPage(Id);
 end;
 
 function TBookmarkGroupRec.GetPage(APageNum: integer): TBookmarkAr;
