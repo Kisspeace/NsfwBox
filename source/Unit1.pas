@@ -2882,6 +2882,8 @@ var
     Result := AGroup.Name;
     if Settings.DevMode then
       Result := '[ id: ' + AGroup.Id.ToString + ' ] ' + Result;
+
+    Result := '(' + AGroup.GetItemsCount.ToString + ') ' + Result;
   end;
 
 begin

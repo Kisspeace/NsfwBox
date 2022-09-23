@@ -59,6 +59,7 @@ type
       function Get(AStart, AEnd: integer): TBookmarkAr;
       procedure DeleteGroup;
       procedure Delete(ABookmarkId: int64);
+      function GetItemsCount: int64;
       function GetMaxId: int64;
       procedure UpdateGroup;
   end;
@@ -84,6 +85,7 @@ type
       procedure Add(AGroupId: int64; AValue: INBoxItem);          overload;
       procedure Add(AGroupId: int64; AValue: INBoxSearchRequest); overload;
       function GetMaxId(AGroupId: int64): int64;
+      function GetItemsCount(AGroupId: int64): int64;
       function GetPage(AGroupId: int64; APageNum: integer = 1): TBookmarkAr;
       function Get(AGroupId: int64; AStart, AEnd: integer): TBookmarkAr;
       constructor Create(ADbFilename: string); override;
@@ -539,6 +541,24 @@ begin
   end;
 end;
 
+function TNBoxBookmarksDb.GetItemsCount(AGroupId: int64): int64;
+begin
+  if not Connection.Connected then
+    Connection.Connect;
+
+  with Query do begin
+    SQL.Text := 'SELECT COUNT(*) FROM `items` WHERE (`group_id` = :id);';
+    Params.ParamByName('id').AsInt64 := AGroupId;
+    Open;
+    try
+      Result := Query.FieldList[0].AsLargeInt;
+    finally
+      Close;
+      SQL.Clear;
+    end;
+  end;
+end;
+
 function TNBoxBookmarksDb.GetLastGroup: TBookmarkGroupRec;
 begin
   if not Connection.Connected then
@@ -609,6 +629,11 @@ end;
 function TBookmarkGroupRec.Get(AStart, AEnd: integer): TBookmarkAr;
 begin
   Result := FDb.Get(Id, AStart, AEnd);
+end;
+
+function TBookmarkGroupRec.GetItemsCount: int64;
+begin
+  Result := FDb.GetItemsCount(Id);
 end;
 
 function TBookmarkGroupRec.GetMaxId: int64;
