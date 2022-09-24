@@ -55,6 +55,7 @@ type
       function NewItem: TNBoxCardBase;
       procedure GoBrowse;
       procedure GoNextPage;
+      procedure GoPrevPage;
       procedure TerminateThreads;
       procedure WaitForThreads;
       procedure Clear;
@@ -169,6 +170,12 @@ begin
   if Assigned(OnRequestChanged) then
     OnRequestChanged(Self);
   self.GoBrowse;
+end;
+
+procedure TNBoxBrowser.GoPrevPage;
+begin
+  Request.PageId := Request.PageId - 2;
+  self.GoNextPage;
 end;
 
 function TNBoxBrowser.NewItem: TNBoxCardBase;
