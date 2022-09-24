@@ -96,21 +96,24 @@ type
   end;
 
   TNBoxBookmarksHistoryDb = class(TNBoxBookmarksDb)
-  private const
-    NAME_SEARCH_HISTORY   = 'search history';
-    NAME_TAP_HISTORY      = 'tap history';
-    NAME_DOWNLOAD_HISTORY = 'download history';
-  private
-    FSearchTable: TBookmarkGroupRec;
-    FTapTable: TBookmarkGroupRec;
-    FDownloadTable: TBookmarkGroupRec;
-  protected
-    procedure CreateBase; override;
-  public
-    property SearchGroup: TBookmarkGroupRec read FSearchTable;
-    property TapGroup: TBookmarkGroupRec read FTapTable;
-    property DownloadGroup: TBookmarkGroupRec read FDownloadTable;
-    constructor Create(ADbFilename: string); override;
+    private const
+      NAME_SEARCH_HISTORY   = 'search history';
+      NAME_TAP_HISTORY      = 'tap history';
+      NAME_DOWNLOAD_HISTORY = 'download history';
+      NAME_TABS_HISTORY     = 'closed tabs history';
+    private
+      FSearchTable: TBookmarkGroupRec;
+      FTapTable: TBookmarkGroupRec;
+      FDownloadTable: TBookmarkGroupRec;
+      FTabTable: TBookmarkGroupRec;
+    protected
+      procedure CreateBase; override;
+    public
+      property SearchGroup: TBookmarkGroupRec read FSearchTable;
+      property TapGroup: TBookmarkGroupRec read FTapTable;
+      property DownloadGroup: TBookmarkGroupRec read FDownloadTable;
+      property TabTable: TBookmarkGroupRec read FTabTable;
+      constructor Create(ADbFilename: string); override;
   end;
 
   Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject); overload;
@@ -714,6 +717,7 @@ begin
   FSearchTable := GetByName(Self.NAME_SEARCH_HISTORY);
   FTapTable    := GetByName(Self.NAME_TAP_HISTORY);
   FDownloadTable := GetByName(Self.NAME_DOWNLOAD_HISTORY);
+  FTabTable := GetByName(Self.NAME_TABS_HISTORY);
 end;
 
 procedure TNBoxBookmarksHistoryDb.CreateBase;
@@ -722,6 +726,7 @@ begin
   AddGroup(Self.NAME_SEARCH_HISTORY, 'list of searched requests.');
   AddGroup(Self.NAME_DOWNLOAD_HISTORY, 'list of downloaded content.');
   AddGroup(Self.NAME_TAP_HISTORY, 'clicked items.');
+  AddGroup(Self.NAME_TABS_HISTORY, 'all tabs that been closed.');
 end;
 
 end.
