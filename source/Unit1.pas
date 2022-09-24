@@ -1967,7 +1967,7 @@ begin
   MenuBtnBookmarks := AddMenuBtn;
   with MenuBtnBookmarks do begin
     Text.Text := 'History';
-    Image.FileName := AppStyle.GetImagePath(ICON_TAG);
+    Image.FileName := AppStyle.GetImagePath(ICON_HISTORY);
     OnTap := MenuBtnHistoryOnTap;
   end;
 
@@ -2999,7 +2999,7 @@ begin
         Check.Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS);
 //        Check.TagString := REGULAR_BMRKDB;
       end else if (ADataBase = HistoryDb) then begin
-        Check.Image.FileName := AppStyle.GetImagePath(ICON_TAG);
+        Check.Image.FileName := AppStyle.GetImagePath(ICON_HISTORY);
 //        Check.TagString := HISTORY_BMRKDB;
       end;
 
