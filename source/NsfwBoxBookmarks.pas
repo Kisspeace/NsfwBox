@@ -57,6 +57,7 @@ type
       procedure Add(AValue: INBoxSearchRequest); overload;
       function GetPage(APageNum: integer = 1): TBookmarkAr;
       function Get(AStart, AEnd: integer): TBookmarkAr;
+      procedure ClearGroup;
       procedure DeleteGroup;
       procedure Delete(ABookmarkId: int64);
       function GetItemsCount: int64;
@@ -79,6 +80,7 @@ type
       procedure UpdateGroup(AGroupId: int64; ANew: TBookmarkGroupRec);
       function AddGroup(AName, AAbout: string): TBookmarkGroupRec;
       function GetLastGroup: TBookmarkGroupRec;
+      procedure ClearGroup(AGroupId: int64);
       procedure DeleteGroup(AGroupId: Int64);
       procedure DeleteAllGroups;
       procedure Delete(ABookmarkId: int64);
@@ -295,6 +297,19 @@ begin
   end;
 
   Result := Self.GetLastGroup;
+end;
+
+procedure TNBoxBookmarksDb.ClearGroup(AGroupId: int64);
+begin
+  if not Connection.Connected then
+    Connection.Connect;
+
+  with Query do begin
+    SQL.Text := 'DELETE FROM `items` WHERE (`group_id` = :id);';
+    Params.ParamByName('id').AsLargeInt := AGroupId;
+    ExecSQL;
+    SQL.Clear;
+  end;
 end;
 
 constructor TNBoxBookmarksDb.Create(ADbFilename: string);
@@ -628,6 +643,11 @@ end;
 procedure TBookmarkGroupRec.Add(AValue: INBoxSearchRequest);
 begin
   FDb.Add(Id, AValue);
+end;
+
+procedure TBookmarkGroupRec.ClearGroup;
+begin
+  FDb.ClearGroup(Id);
 end;
 
 procedure TBookmarkGroupRec.Delete(ABookmarkId: int64);

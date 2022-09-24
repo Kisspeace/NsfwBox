@@ -29,7 +29,7 @@ uses
   NsfwBoxOriginCoomerParty, NsfwBoxOriginConst,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
   NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
-  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2, FMX.Ani;
+  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2;
 
 type
 
@@ -56,6 +56,7 @@ type
     MenuAnonMessage: TVertScrollBox;
     BrowserBtnsLayout2: TLayout;
     OnBrowserLayout: TLayout;
+    MenuHistory: TVertScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
@@ -68,6 +69,7 @@ type
     FFormCreated: boolean;
     FCurrentBrowser: TNBoxBrowser;
     FCurrentItem: TNBoxCardBase;
+    FCurrentBookmarksDb: TNBoxBookmarksDb;
     FCurrentBookmarkControl: TNBoxSettingsCheck;
     FCurrentBookmarkGroup: TBookmarkGroupRec;
     procedure SetSettings(const value: TNsfwBoxSettings);
@@ -77,6 +79,7 @@ type
     procedure SetCurrentBrowser(const Value: TNBoxBrowser);
     procedure SetCurrentItem(const value: TNBoxCardBase);
     procedure SetCurrentBookmarkControl(const value: TNBoxSettingsCheck);
+    procedure SetCurrentBookmarksDb(const value: TNBoxBookmarksDb);
     function GetSubHeader: string;
     procedure SetSubHeader(const Value: string);
   public
@@ -223,6 +226,7 @@ type
     procedure MenuBtnSettingsOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnNewTabOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
+    procedure MenuBtnHistoryOnTap(Sender: TObject; const Point: TPointF);
     //---Other-----------//
     procedure TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
     procedure TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
@@ -290,6 +294,7 @@ type
     procedure GotoItemMenu(AItem: TNBoxCardBase);
     procedure GotoDownloadsMenu;
     procedure GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
+    procedure GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
 
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient;
       AOrigin: integer);
@@ -306,7 +311,7 @@ type
     function LoadStyle: boolean;
     procedure ConnectSession;
     function LoadSession: boolean;
-    procedure ReloadBookmarks;
+    procedure ReloadBookmarks(ADataBase: TNBoxBookmarksDb; ALayout: TControl);
 
     //------ Fabric ------------//
     function CreateDefScroll(AOwner: TComponent): TVertScrollBox;
@@ -340,6 +345,7 @@ type
     //----- Properties ---------//
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
     property CurrentItem: TNBoxCardBase read FCurrentItem write SetCurrentItem;
+    property CurrentBookmarksDb: TNBoxBookmarksDb read FCurrentBookmarksDb write SetCurrentBookmarksDb;
     property CurrentBookmarkControl: TNBoxSettingsCheck read FCurrentBookmarkControl write SetCurrentBookmarkControl;
     property CurrentBookmarkGroup: TBookmarkGroupRec read FCurrentBookmarkGroup;
     property AppStyle: TNBoxGUIStyle read GetAppStyle write SetAppStyle;
@@ -741,11 +747,9 @@ begin
 end;
 
 procedure TForm1.BookmarksControlOnTap(Sender: TObject; const Point: TPointF);
-var
-  Req: INBoxSearchRequest;
-  Browser: TNBoxBrowser;
 begin
   CurrentBookmarkControl := ( Sender As TNBoxSettingsCheck );
+
   if not NowUserSelect then begin
     DoWithAllItems := false;
     ChangeInterface(MenuBookmarksDoList);
@@ -774,7 +778,7 @@ begin
       Group.Name := EditBMarkName.Edit.Text;
       Group.About := MemoBMarkAbout.memo.lines.Text;
       Group.UpdateGroup;
-      ChangeInterface(MenuBookmarks);
+      GotoBookmarksMenu(CurrentBookmarksDb);
     end;
   end;
 end;
@@ -808,25 +812,35 @@ begin
       Groups: TBookmarkGroupRecAr;
     begin
       if UserSayYes then begin
-        Groups := BookmarksDb.GetBookmarksGroups;
+        Groups := CurrentBookmarksDb.GetBookmarksGroups;
         for I := 0 to Length(Groups) - 1 do begin
           Groups[I].DeleteGroup;
         end;
         BookmarksControls.Clear;
       end;
-      ChangeInterface(MenuBookmarks);
+      GotoBookmarksMenu(CurrentBookmarksDb);
       AfterUserEvent := nil;
     end
     );
   end else begin
-    UserBooleanDialog('Are you sure ?' + SLineBreak + 'Delete bookmarks group: ' + CurrentBookmarkGroup.Name,
+    var Word: string;
+    if (CurrentBookmarksDb = HistoryDb) then
+      Word := 'Clear'
+    else
+      Word := 'Delete';
+
+    UserBooleanDialog('Are you sure ?' + SLineBreak + Word + ' bookmarks group: ' + CurrentBookmarkGroup.Name,
     procedure
     begin
       if UserSayYes then begin
-        CurrentBookmarkGroup.DeleteGroup;
+        if (CurrentBookmarksDb = HistoryDb) then
+          CurrentBookmarkGroup.ClearGroup
+        else
+          CurrentBookmarkGroup.DeleteGroup;
+
         CurrentBookmarkControl := nil;
       end;
-      ChangeInterface(MenuBookmarks);
+      GotoBookmarksMenu(CurrentBookmarksDb);
       AfterUserEvent := nil;
     end
     );
@@ -835,12 +849,12 @@ end;
 
 procedure TForm1.BMarkOpen(AOpenLastPage: boolean);
 var
-  Req: INBoxSearchRequest;
+  Req: TNBoxSearchReqBookmarks;
   I: integer;
   Groups: TBookmarkGroupRecAr;
 begin
   if DoWithAllItems then begin
-    Groups := BookmarksDb.GetBookmarksGroups;
+    Groups := CurrentBookmarksDb.GetBookmarksGroups;
     for I := 0 to Length(Groups) - 1 do begin
       Req := TNBoxSearchReqBookmarks.Create;
 
@@ -850,6 +864,12 @@ begin
         Req.Pageid := 1;
 
       Req.Request := Groups[I].Id.ToString;
+
+      if (CurrentBookmarksDb = HistoryDb) then
+        Req.Path := HISTORY_BMRKDB
+      else if (CurrentBookmarksDb = BookmarksDb) then
+        Req.Path := REGULAR_BMRKDB;
+
       AddBrowser(Req);
       Browsers.Last.GoBrowse;
     end;
@@ -861,10 +881,14 @@ begin
     else
       Req.Pageid := 1;
 
+    if (CurrentBookmarksDb = HistoryDb) then
+      Req.Path := HISTORY_BMRKDB
+    else if (CurrentBookmarksDb = BookmarksDb) then
+      Req.Path := REGULAR_BMRKDB;
+
     Req.Request := CurrentBookmarkControl.Tag.ToString;
     AddBrowser(Req, true);
   end;
-
 
   CurrentBrowser := browsers.Last;
   ChangeInterface(Self.BrowserLayout);
@@ -1192,7 +1216,10 @@ begin
     MemoLog.Memo.GoToTextEnd;
   end else if ( ALayout = MenuBookmarks ) then begin
     {Menu with bookmark groups}
-    ReloadBookmarks;
+    ReloadBookmarks(BookmarksDb, MenuBookmarks);
+  end else if ( ALayout = MenuHistory ) then begin
+    {Menu with bookmark groups but on HistoryDb}
+    ReloadBookmarks(HistoryDb, MenuHistory);
   end else if ( ALayout = MenuBookmarksChange ) then begin
     {Menu for change bookmark group data}
     if Assigned(CurrentBookmarkControl) then begin
@@ -1937,6 +1964,13 @@ begin
     OnTap := MenuBtnBookmarksOnTap;
   end;
 
+  MenuBtnBookmarks := AddMenuBtn;
+  with MenuBtnBookmarks do begin
+    Text.Text := 'History';
+    Image.FileName := AppStyle.GetImagePath(ICON_TAG);
+    OnTap := MenuBtnHistoryOnTap;
+  end;
+
   MenuBtnSettings := AddMenuBtn;
   with MenuBtnSettings do begin
     Image.FileName := AppStyle.GetImagePath(ICON_SETTINGS);
@@ -2229,6 +2263,8 @@ begin
   Session.PageSize := 100;
   ConnectSession;
 
+  CurrentBookmarksDb := BookmarksDb;
+
   if Settings.AutoSaveSession then
     loadSession;
 
@@ -2416,6 +2452,15 @@ begin
     Result := nil;
 end;
 
+procedure TForm1.GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
+begin
+  CurrentBookmarksDb := ABookmarksDb;
+  if CurrentBookmarksDb = BookmarksDb then
+    ChangeInterface(MenuBookmarks)
+  else if CurrentBookmarksDb = HistoryDb then
+    ChangeInterface(MenuHistory)
+end;
+
 procedure TForm1.GotoDownloadsMenu;
 begin
   ChangeInterface(MenuDownloads);
@@ -2509,6 +2554,7 @@ procedure TForm1.OnBrowserScraperCreate(Sender: TObject;
   var AScraper: TNBoxScraper);
 begin
   AScraper.BookmarksDb := BookmarksDb;
+  AScraper.HistoryDb := HistoryDb;
 end;
 
 procedure TForm1.OnBrowserSetWebClient(Sender: TObject;
@@ -2879,7 +2925,12 @@ end;
 
 procedure TForm1.MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
 begin
-  ChangeInterface(MenuBookmarks);
+  GotoBookmarksMenu(BookmarksDb);
+end;
+
+procedure TForm1.MenuBtnHistoryOnTap(Sender: TObject; const Point: TPointF);
+begin
+  GotoBookmarksMenu(HistoryDb);
 end;
 
 procedure TForm1.MenuBtnDownloadsOnTap(Sender: TObject; const Point: TPointF);
@@ -2916,7 +2967,7 @@ begin
   self.AddBrowser(CreateTagReq(MenuItemTagsOrigin, MenuItemTags.SelectedBtn.Text.Text), Settings.AutoStartBrowse);
 end;
 
-procedure TForm1.ReloadBookmarks;
+procedure TForm1.ReloadBookmarks(ADataBase: TNBoxBookmarksDb; ALayout: TControl);
 var
   I: Integer;
   Groups: TBookmarkGroupRecAr;
@@ -2934,15 +2985,24 @@ var
   end;
 
 begin
-  Groups := BookmarksDb.GetBookmarksGroups;
+  Groups := ADataBase.GetBookmarksGroups;
   BookmarksControls.Clear;
+
   for I := Low(Groups) to High(Groups) do begin
-    Control := Self.CreateDefSettingsCheck(Form1.MenuBookmarks);
+    Control := Self.CreateDefSettingsCheck(ALayout);
     with Control do begin
-      Parent := MenuBookmarks;
+      Parent := ALayout;
       Check.Image.Visible := true;
       Check.Image.Margins.Rect := TRectF.Create(0, 5, 0, 5);
-      Check.Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS);
+
+      if (ADataBase = BookmarksDb) then begin
+        Check.Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS);
+//        Check.TagString := REGULAR_BMRKDB;
+      end else if (ADataBase = HistoryDb) then begin
+        Check.Image.FileName := AppStyle.GetImagePath(ICON_TAG);
+//        Check.TagString := HISTORY_BMRKDB;
+      end;
+
       Align := TAlignLayout.Top;
       Position.Y := Single.MaxValue;
       Check.Text.Text := _getName(Groups[I]);
@@ -3221,7 +3281,14 @@ procedure TForm1.SetCurrentBookmarkControl(const value: TNBoxSettingsCheck);
 begin
   FCurrentBookmarkControl := Value;
   if Assigned(value) then
-    FCurrentBookmarkGroup := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
+    FCurrentBookmarkGroup := CurrentBookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
+end;
+
+procedure TForm1.SetCurrentBookmarksDb(const value: TNBoxBookmarksDb);
+begin
+  FCurrentBookmarksDb := value;
+  FCurrentBookmarkControl := nil;
+//  FCurrentBookmarkGroup := nil;
 end;
 
 procedure TForm1.SetCurrentBrowser(const Value: TNBoxBrowser);
@@ -3368,7 +3435,7 @@ end;
 
 procedure TForm1.UserSelectBookmarkList(AWhenSelected: TProcedureRef);
 begin
-  ChangeInterface(MenuBookmarks);
+  GotoBookmarksMenu(BookmarksDb);
   NowUserSelect := true;
   AfterUserEvent := AWhenSelected;
 end;

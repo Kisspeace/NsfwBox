@@ -10,11 +10,13 @@ type
 
   TNBoxSearchReqBookmarks = class(TNBoxSearchRequestBase)
     protected
+      FPath: string;
       function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
+      property Path: string read FPath write FPath;
       property PageId;
   end;
 
@@ -25,9 +27,10 @@ implementation
 function TNBoxSearchReqBookmarks.Clone: INBoxSearchRequest;
 begin
   Result := TNBoxSearchReqBookmarks.Create;
-  with Result do begin
+  with (Result as TNBoxSearchReqBookmarks) do begin
     Pageid := self.FPageId;
     Request := Self.FRequest;
+    Path := Self.Path;
   end;
 end;
 

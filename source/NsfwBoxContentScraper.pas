@@ -18,6 +18,10 @@ uses
   IoUtils, NsfwBoxFilesystem, System.Classes, system.SyncObjs,
   System.Threading, NsfwBoxThreading;
 
+const
+  REGULAR_BMRKDB: string = '<BOOKMARKS>';
+  HISTORY_BMRKDB: string = '<HISTORY>';
+
 type
 
   TWebClientSetEvent = procedure(Sender: TObject; AWebClient: TNetHttpClient;
@@ -37,9 +41,10 @@ type
       function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string; ARequest, AUserId, AService: string; APageNum: integer): boolean;
-      function GetContentBookmarks(AList: INBoxHasOriginList; ABookmarksListId: int64; APageId: integer = 1): boolean;
+      function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
     public
       BookmarksDb: TNBoxBookmarksDb;
+      HistoryDb: TNBoxBookmarksDb;
       procedure FetchContentUrls(var APost: INBoxItem);
       procedure FetchTags(var APost: INBoxItem);
       function TryFetchContentUrls(var APost: INBoxItem): boolean;
@@ -224,7 +229,9 @@ begin
 
     ORIGIN_BOOKMARKS:
     begin
-      Result := Self.GetContentBookmarks(Alist, RequestAsInt, ARequest.PageId);
+      with ( ARequest As TNBoxSearchReqBookmarks ) do begin
+        Result := Self.GetContentBookmarks(Alist, Path, RequestAsInt, ARequest.PageId);
+      end;
     end;
 
   end;
@@ -303,21 +310,28 @@ begin
   end;
 end;
 
-function TNBoxScraper.GetContentBookmarks(AList: INBoxHasOriginList;
+function TNBoxScraper.GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string;
   ABookmarksListId: int64; APageId: integer): boolean;
 var
   I, C: integer;
   Groups: TBookmarkGroupRecAr;
   Group: TBookmarkGroupRec;
   bookmarks: TBookmarkAr;
+  TargetDb: TNBoxBookmarksDb;
 begin
   Result := false;
-  if not Assigned(BookmarksDb) then
+
+  if (ADbPath = REGULAR_BMRKDB) or ADbPath.IsEmpty then
+    TargetDb := Self.BookmarksDb
+  else if (ADbPath = HISTORY_BMRKDB) then
+    TargetDb := Self.HistoryDb;
+
+  if not Assigned(TargetDb) then
     exit;
 
   C := AList.Count;
 
-  Groups := BookmarksDb.GetBookmarksGroups;
+  Groups := TargetDb.GetBookmarksGroups;
   for I := low(Groups) to high(Groups) do begin
     if Groups[i].Id = ABookmarksListId then begin
       Group := Groups[i];

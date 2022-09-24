@@ -136,6 +136,8 @@ type
           EditCoomerPartyService
           : TNBoxEdit;
           BtnCoomerPartyChangeSite: TRectButton;
+        BookmarksMenu: TNBoxSearchSubMenuBase;
+          EditBookmarksPath: TNBoxEdit;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -399,6 +401,22 @@ begin
 
     end;
 
+    BookmarksMenu := TNBoxSearchSubMenuBase.Create(Self);
+    With BookmarksMenu do begin
+      Parent := MainMenu;
+      Align := TAlignLayout.Top;
+      Visible := false;
+
+      EditBookmarksPath := Form1.CreateDefEdit(Self);
+      with EditBookmarksPath do begin
+        Parent := BookmarksMenu;
+        Align := TAlignlayout.Top;
+        Margins.Rect := M;
+        Edit.Text := '<BOOKMARKS>';
+        Edit.TextPrompt := 'Bookmarks data base path';
+      end;
+    end;
+
     NsfwXxxMenu := TNBoxSearchSubMenuBase.Create(Self);
     with NsfwXxxMenu do begin
       Parent := MainMenu;
@@ -618,6 +636,12 @@ begin
       end;
     end;
 
+    ORIGIN_BOOKMARKS: begin
+      with ( Result as TNBoxSearchReqBookmarks ) do begin
+        Path := self.EditBookmarksPath.Edit.Text;
+      end;
+    end
+
   end;
 
   with Result do begin
@@ -647,6 +671,7 @@ begin
   NsfwXxxMenu.Visible := False;
   GmpClubMenu.Visible := False;
   R34AppMenu.Visible := False;
+  BookmarksMenu.Visible := False;
   CoomerPartyMenu.Visible := False;
 end;
 
@@ -722,7 +747,9 @@ begin
   else if ( OriginSetMenu.Selected = ORIGIN_R34APP ) then
     R34AppMenu.Visible := True
   else if ( OriginSetMenu.Selected = ORIGIN_COOMERPARTY ) then
-    CoomerPartyMenu.Visible := True;
+    CoomerPartyMenu.Visible := True
+  else if ( OriginSetMenu.Selected = ORIGIN_BOOKMARKS ) then
+    BookmarksMenu.Visible := True;
 end;
 
 procedure TNBoxSearchMenu.OnR34AppBooruChanged(Sender: TObject);
@@ -773,6 +800,11 @@ begin
       Self.EditCoomerPartyUserId.Edit.Text := UserId;
       Self.EditCoomerPartyService.Edit.Text := Service;
     end;
+
+  end else if ( Value is TNBoxSearchReqBookmarks ) then begin
+
+    with ( Value as TNBoxSearchReqBookmarks ) do
+      self.EditBookmarksPath.Edit.Text := Path;
 
   end;
 

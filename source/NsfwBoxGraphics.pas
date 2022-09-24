@@ -12,7 +12,7 @@ uses
   FMX.ScrollBox, FMX.Memo, ALFmxObjects, ALFmxGraphics, NsfwXxx.Types,
   NsfwBoxInterfaces, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34JsonApi,
   NsfwBoxContentScraper, NsfwBoxGraphics.Rectangle, Fmx.ActnList,
-  NsfwBoxBookmarks, NsfwBoxHelper;
+  NsfwBoxBookmarks, NsfwBoxHelper, NsfwBoxOriginBookmarks;
 
 type
 
@@ -123,16 +123,20 @@ begin
     var str: string;
     with Bookmark.AsRequest do begin
       str := '[' + OriginToStr(Origin) + ']: ' + SLineBreak
-      + Request + SLineBreak;
+      + 'Req: "' + Request + '"' + SLineBreak;
 
       if PageId > 1 then
-        str := str + 'Page: ' + PageId.ToString;
+        str := str + 'Page: ' + PageId.ToString + SLineBreak;
+
+      if (Bookmark.AsRequest is TNBoxSearchReqBookmarks) then
+        str := str + 'Path: ' + (Bookmark.AsRequest as TNBoxSearchReqBookmarks).Path;
 
       str := trim(str);
     end;
 
     Text.Text := str;
-    Text.Font.Size := 12;
+    Text.Font.Size := 11;
+    Text.AutoSize := true;
     Rect.Visible := true;
     Rect.Align := TAlignlayout.Client;
 
