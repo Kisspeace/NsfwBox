@@ -2226,6 +2226,7 @@ begin
   HistoryDb := TNBoxBookmarksHistoryDb.Create(HISTORY_FILENAME);
   BookmarksDb := TNBoxBookmarksDb.Create(BOOKMARKSDB_FILENAME);
   Session := TnBoxBookmarksDb.Create(SESSION_FILENAME);
+  Session.PageSize := 100;
   ConnectSession;
 
   if Settings.AutoSaveSession then
