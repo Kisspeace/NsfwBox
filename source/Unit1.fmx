@@ -38,19 +38,37 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      Visible = False
       TabOrder = 1
-      object BrowserBtnsLayout: TLayout
-        Align = Bottom
-        Margins.Left = 10.000000000000000000
-        Margins.Right = 20.000000000000000000
-        Margins.Bottom = 20.000000000000000000
-        Position.X = 10.000000000000000000
-        Position.Y = 397.000000000000000000
-        Size.Width = 275.000000000000000000
-        Size.Height = 60.000000000000000000
+      object OnBrowserLayout: TLayout
+        Align = Client
+        Size.Width = 305.000000000000000000
+        Size.Height = 477.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
+        object BrowserBtnsLayout: TLayout
+          Align = Bottom
+          Margins.Left = 10.000000000000000000
+          Margins.Right = 20.000000000000000000
+          Margins.Bottom = 20.000000000000000000
+          Position.X = 10.000000000000000000
+          Position.Y = 397.000000000000000000
+          Size.Width = 275.000000000000000000
+          Size.Height = 60.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+        end
+        object BrowserBtnsLayout2: TLayout
+          Align = Bottom
+          Margins.Left = 10.000000000000000000
+          Margins.Right = 20.000000000000000000
+          Margins.Bottom = 10.000000000000000000
+          Position.X = 10.000000000000000000
+          Position.Y = 327.000000000000000000
+          Size.Width = 275.000000000000000000
+          Size.Height = 60.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+        end
       end
     end
     object MenuItem: TVertScrollBox

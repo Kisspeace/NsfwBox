@@ -29,7 +29,7 @@ uses
   NsfwBoxOriginCoomerParty, NsfwBoxOriginConst,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
   NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
-  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2;
+  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2, FMX.Ani;
 
 type
 
@@ -54,6 +54,8 @@ type
     DialogYesOrNo: TVertScrollBox;
     MenuSearchDoList: TVertScrollBox;
     MenuAnonMessage: TVertScrollBox;
+    BrowserBtnsLayout2: TLayout;
+    OnBrowserLayout: TLayout;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
@@ -97,6 +99,7 @@ type
     Browsers: TNBoxBrowserList;
     Tabs: TNBoxTabList;
     BtnNext: TRectButton;
+    BtnPrev: TRectButton;
 
     //DialogYesOrNo
     UserSayYes: boolean;
@@ -225,6 +228,7 @@ type
     procedure TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
     procedure TopBtnPopMenuOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnNextOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnPrevOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuItemTagsOnSelected(Sender: TObject);
     procedure LayoutDialogYesOrNoOnResize(Sender: TObject);
     //---Tabs------------//
@@ -573,7 +577,7 @@ begin
   if Assigned(ARequest) then
     B.Request := ARequest;
 
-  form1.BrowserBtnsLayout.BringToFront;
+  form1.OnBrowserLayout.BringToFront;
   Result := T;
 
   if AAutoStartBrowse then
@@ -954,9 +958,14 @@ end;
 
 procedure TForm1.BtnNextOnTap(Sender: TObject; const Point: TPointF);
 begin
-  if Assigned(CurrentBrowser) then begin
+  if Assigned(CurrentBrowser) then
     CurrentBrowser.GoNextPage;
-  end;
+end;
+
+procedure TForm1.BtnPrevOnTap(Sender: TObject; const Point: TPointF);
+begin
+  if Assigned(CurrentBrowser) then
+    CurrentBrowser.GoPrevPage;
 end;
 
 procedure TForm1.BtnOpenAppRepOnTap(Sender: TObject; const Point: TPointF);
@@ -1897,6 +1906,16 @@ begin
     OnTap := BtnNextOnTap;
     Width := Height;
     Image.FileName := AppStyle.GetImagePath(ICON_NEXT);
+  end;
+
+  BtnPrev := CreateDefButton(BrowserBtnsLayout2, BTN_STYLE_ICON);
+  with BtnPrev do begin
+    Parent := BrowserBtnsLayout2;
+    Align := TAlignLayout.Right;
+    OnTap := BtnPrevOnTap;
+    Width := Height;
+    Image.FileName := AppStyle.GetImagePath(ICON_NEXT);
+    Image.RotationAngle := 180;
   end;
 
   MVMenuScroll := CreateDefScroll(MVRect);
