@@ -27,6 +27,7 @@ const
   ICON_ADD         = 'add.png';
   ICON_EDIT        = 'edit.png';
   ICON_DELETE      = 'delete.png';
+  ICON_HISTORY     = 'history.png';
 
   ICON_IMAGE       = 'image.png';
   ICON_VIDEO       = 'video.png';
