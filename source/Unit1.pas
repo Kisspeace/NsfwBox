@@ -173,6 +173,7 @@ type
     CheckSetSaveSearchHistory,
     CheckSetSaveTapHistory,
     CheckSetSaveDownloadHistory,
+    CheckSetSaveTabHistory,
     CheckSetShowCaptions,
     CheckSetAllowDuplicateTabs,
     CheckSetAutoStartBrowse,
@@ -1117,6 +1118,7 @@ begin
     SaveSearchHistory    := CheckSetSaveSearchHistory.IsChecked;
     SaveDownloadHistory  := CheckSetSaveDownloadHistory.IsChecked;
     SaveTapHistory       := CheckSetSaveTapHistory.IsChecked;
+    SaveClosedTabHistory := CheckSetSaveTabHistory.IsChecked;
     AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
     ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
 
@@ -1141,7 +1143,10 @@ var
   NewCount: integer;
 begin
   B := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
-  HistoryDb.TabTable.Add(B.Request);  // Save this tab on history
+
+  if Settings.SaveClosedTabHistory then
+    HistoryDb.TabTable.Add(B.Request);  // Save this tab on history
+
   NewCount := Browsers.Count - 1;
 
   if (CurrentBrowser = B) and (NewCount > 0) then begin
@@ -2026,6 +2031,7 @@ begin
   CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history');
   CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history');
   CheckSetSaveTapHistory      := AddSettingsCheck('Save tap history');
+  CheckSetSaveTabHistory      := AddSettingsCheck('Save closed tab history');
   CheckSetShowCaptions        := AddSettingsCheck('Show content caption');
 
   CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs');
@@ -3360,6 +3366,7 @@ begin
   CheckSetSaveSearchHistory.IsChecked   := Settings.SaveSearchHistory;
   CheckSetSaveDownloadHistory.IsChecked := Settings.SaveDownloadHistory;
   CheckSetSaveTapHistory.IsChecked      := Settings.SaveTapHistory;
+  CheckSetSaveTabHistory.IsChecked      := Settings.SaveClosedTabHistory;
 
   for I := 0 to Browsers.Count - 1 do begin
     with Browsers[I] do begin
