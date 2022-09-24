@@ -45,6 +45,7 @@ type
     SaveSearchHistory: boolean;
     SaveDownloadHistory: boolean;
     SaveTapHistory: boolean;
+    SaveClosedTabHistory: boolean;
     //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
     //AutoRenameExistsFile: boolean;
@@ -94,6 +95,7 @@ begin
   AutoSaveSession        := true;
   SaveSearchHistory      := true;
   SaveDownloadHistory    := true;
+  SaveClosedTabHistory   := true;
   SaveTapHistory         := false;
   Fullscreen             := true;
   //HighlightsDownloaded   := false;
