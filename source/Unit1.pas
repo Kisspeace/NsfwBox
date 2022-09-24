@@ -2483,7 +2483,7 @@ begin
   MenuItemTagsOrigin := AOrigin;
   MenuItemTags.ClearButtons;
   for I := low(ATags) to high(ATags) do begin
-    MenuItemTags.AddBtn(ATags[I], 0, ICON_COPY, true);
+    MenuItemTags.AddBtn(ATags[I], 0, ICON_TAG, true);
   end;
   ChangeInterface(MenuItemTags);
 end;
