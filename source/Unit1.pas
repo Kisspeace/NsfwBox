@@ -1141,6 +1141,7 @@ var
   NewCount: integer;
 begin
   B := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
+  HistoryDb.TabTable.Add(B.Request);  // Save this tab on history
   NewCount := Browsers.Count - 1;
 
   if (CurrentBrowser = B) and (NewCount > 0) then begin
