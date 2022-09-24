@@ -131,6 +131,7 @@ type
     //MenuBookmarksDoList
     BtnBMarkCreate,
     BtnBMarkOpen,
+    BtnBMarkOpenLastPage,
     BtnBMarkChange,
     BtnBMarkDelete
     //BtnBMarkCopy
@@ -248,7 +249,9 @@ type
     procedure BtnSearchSetDefaultOnTap(Sender: TObject; const Point: TPointF);
     //---Bookmark menu buttons---------//
     procedure BtnBMarkSaveChangesOnTap(Sender: TObject; const Point: TPointF);
+    procedure BMarkOpen(AOpenLastPage: boolean);
     procedure BtnBMarkOpenOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnBMarkOpenLastPageOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnBMarkChangeOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnBMarkCreateOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnBMarkDeleteOnTap(Sender: TObject; const Point: TPointF);
@@ -826,7 +829,7 @@ begin
   end;
 end;
 
-procedure TForm1.BtnBMarkOpenOnTap(Sender: TObject; const Point: TPointF);
+procedure TForm1.BMarkOpen(AOpenLastPage: boolean);
 var
   Req: INBoxSearchRequest;
   I: integer;
@@ -836,21 +839,42 @@ begin
     Groups := BookmarksDb.GetBookmarksGroups;
     for I := 0 to Length(Groups) - 1 do begin
       Req := TNBoxSearchReqBookmarks.Create;
-      Req.Pageid := 1;
+
+      if AOpenLastPage then
+        Req.PageId := Groups[I].GetMaxPage
+      else
+        Req.Pageid := 1;
+
       Req.Request := Groups[I].Id.ToString;
       AddBrowser(Req);
       Browsers.Last.GoBrowse;
     end;
   end else begin
     Req := TNBoxSearchReqBookmarks.Create;
-    Req.Pageid := 1;
+
+    if AOpenLastPage then
+      Req.PageId := CurrentBookmarkGroup.GetMaxPage
+    else
+      Req.Pageid := 1;
+
     Req.Request := CurrentBookmarkControl.Tag.ToString;
     AddBrowser(Req, true);
   end;
-  
+
 
   CurrentBrowser := browsers.Last;
   ChangeInterface(Self.BrowserLayout);
+end;
+
+procedure TForm1.BtnBMarkOpenLastPageOnTap(Sender: TObject;
+  const Point: TPointF);
+begin
+  BMarkOpen(True);
+end;
+
+procedure TForm1.BtnBMarkOpenOnTap(Sender: TObject; const Point: TPointF);
+begin
+  BMarkOpen(False);
 end;
 
 procedure TForm1.BtnBMarkSaveChangesOnTap(Sender: TObject; const Point: TPointF);
@@ -2091,6 +2115,7 @@ begin
 
   BtnBMarkCreate := AddBMarksDoListButton('Create new bookmarks list', ICON_ADD, BtnBMarkCreateOnTap, TAG_CAN_USE_MORE_THAN_ONE);
   BtnBMarkOpen   := AddBMarksDoListButton('Open and show', ICON_NEWTAB, BtnBMarkOpenOnTap, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnBMarkOpenLastPage := AddBMarksDoListButton('Open and show (last page)', ICON_NEWTAB, BtnBMarkOpenLastPageOnTap, TAG_CAN_USE_MORE_THAN_ONE);
   BtnBMarkChange := AddBMarksDoListButton('Change bookmark list', ICON_EDIT, BtnBMarkChangeOnTap);
   BtnBMarkDelete := AddBMarksDoListButton('Delete', ICON_DELETE, BtnBMarkDeleteOnTap, TAG_CAN_USE_MORE_THAN_ONE);
   //BtnBMarkCopy   := AddBMarksDoListButton('Copy to new list', ICON_COPY, BtnBMarkOpenOnTap);
