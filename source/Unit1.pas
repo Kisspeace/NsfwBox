@@ -1666,7 +1666,7 @@ begin
       AddBrowser(Lrequest.Clone, Settings.AutoStartBrowse);
     end;
 
-    ACTION_DOWNLOAD:
+    ACTION_DOWNLOAD_ALL:
     begin
       if not AItem.HasPost then exit;
       AddDownload(LPost);
@@ -2012,7 +2012,7 @@ begin
   end;
 
   BtnBrowse       := AddItemMenuBtn('Browse', ACTION_BROWSE, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnDownload     := AddItemMenuBtn('Download content', ACTION_DOWNLOAD, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnDownload     := AddItemMenuBtn('Download content', ACTION_DOWNLOAD_ALL, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
   BtnPlay         := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
   BtnAddBookmark  := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
   BtnOpenRelated  := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
@@ -2080,7 +2080,7 @@ begin
     Align := TAlignlayout.Client;
 
     AddCheck('Open menu', ACTION_OPEN_MENU);
-    AddCheck('Download content', ACTION_DOWNLOAD);
+    AddCheck('Download content', ACTION_DOWNLOAD_ALL);
     AddCheck('Play externaly', ACTION_PLAY_EXTERNALY);
     AddCheck('Add to bookmarks', ACTION_ADD_BOOKMARK);
     AddCheck('Delete from bookmarks', ACTION_DELETE_BOOKMARK);

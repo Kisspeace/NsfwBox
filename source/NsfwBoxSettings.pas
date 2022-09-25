@@ -8,7 +8,7 @@ uses
 Const
 
   ACTION_OPEN_MENU          = 0;
-  ACTION_DOWNLOAD           = 1;
+  ACTION_DOWNLOAD_ALL       = 1;
   ACTION_PLAY_EXTERNALY     = 2;
   ACTION_ADD_BOOKMARK       = 3;
   ACTION_DELETE_BOOKMARK    = 4;
@@ -21,6 +21,7 @@ Const
   ACTION_BROWSE             = 11;
   ACTION_DELETE_CARD        = 12;
   ACTION_SHOW_TAGS          = 13;
+  ACTION_DOWNLOAD_MENU      = 14;
 
   FORMAT_VAR_CONTENT_URL = '$(NSFWBOX_CONTENT_URL)';
 
