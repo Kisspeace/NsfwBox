@@ -114,7 +114,7 @@ type
 
     //Layout Item Menu
     BtnBrowse,
-    BtnDownload,
+    BtnDownloadAll,
     BtnPlay,
     BtnAddBookmark,
     BtnOpenRelated,
@@ -2012,7 +2012,7 @@ begin
   end;
 
   BtnBrowse       := AddItemMenuBtn('Browse', ACTION_BROWSE, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnDownload     := AddItemMenuBtn('Download content', ACTION_DOWNLOAD_ALL, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnDownloadAll  := AddItemMenuBtn('Download content', ACTION_DOWNLOAD_ALL, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
   BtnPlay         := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
   BtnAddBookmark  := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
   BtnOpenRelated  := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
