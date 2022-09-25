@@ -2527,7 +2527,6 @@ var
   B: TNBoxBrowser;
   Groups: TBookmarkGroupRecAr;
   Group: TBookmarkGroupRec;
-  Bookmark: TNBoxBookmark;
 begin
   B := TNBoxBrowser(Sender);
   T := GetTab(Sender as TNBoxBrowser);
@@ -2544,10 +2543,9 @@ begin
       Group := Groups[0];
       if ( B.Tag <> -1 ) then
         Group.Delete(B.Tag);
-      Bookmark := TNBoxBookmark.Create(B.Request);
-      Group.Add(Bookmark);
+
+      Group.Add(B.Request);
       B.Tag := Group.GetMaxId;
-      Bookmark.Free;
     end;
   end;
 end;
