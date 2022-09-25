@@ -80,7 +80,7 @@ end;
 
 constructor TNsfwBoxSettings.Create;
 begin
-  Version                := 4;
+  Version                := 5;
   DevMode                := false;
   DefDownloadPath        := '';
   DefaultUserAgent       := '';
