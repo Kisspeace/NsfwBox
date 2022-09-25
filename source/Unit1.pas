@@ -1154,7 +1154,7 @@ begin
   B := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
 
   if Settings.SaveClosedTabHistory then
-    HistoryDb.TabTable.Add(B.Request);  // Save this tab on history
+    HistoryDb.TabGroup.Add(B.Request);  // Save this tab on history
 
   NewCount := Browsers.Count - 1;
 
@@ -2278,6 +2278,15 @@ begin
   Session := TnBoxBookmarksDb.Create(SESSION_FILENAME);
   Session.PageSize := 100;
   ConnectSession;
+
+  // Data base update
+  if not HistoryDb.HasGroup(HistoryDb.NAME_TABS_HISTORY) then begin
+    // v1.3.0
+    HistoryDb.AddGroup(HistoryDb.NAME_TABS_HISTORY, 'all tabs that been closed.');
+    HistoryDb.Free;
+    HistoryDb := TNBoxBookmarksHistoryDb.Create(HISTORY_FILENAME);
+  end;
+
 
   CurrentBookmarksDb := BookmarksDb;
 
