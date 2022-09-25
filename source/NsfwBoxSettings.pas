@@ -59,6 +59,7 @@ type
     DevMode: boolean;
     AutoCheckUpdates: boolean;
     ShowScrollBars: boolean;
+    ShowNavigateBackButton: boolean;
     {$IFDEF MSWINDOWS}
       ContentPlayApp: string;
       ContentPlayParams: string;
@@ -108,6 +109,7 @@ begin
   ItemInteractions       := [ ACTION_OPEN_MENU ];
   AutoCheckUpdates       := true;
   ShowScrollBars         := true;
+  ShowNavigateBackButton := True;
   {$IFDEF MSWINDOWS}
     ShowScrollBars       := false;
     ContentPlayApp := 'C:\Program Files\VideoLAN\VLC\vlc.exe';
