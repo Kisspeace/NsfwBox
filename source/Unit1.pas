@@ -1849,7 +1849,7 @@ begin
     form1.Width := round(form1.Height * 1.6);
   {$ENDIF}
 
-  Log('|----------------Application start-----------------|');
+  Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
 
   DownloadItems := TNBoxTabList.Create;
   DownloadManager := TNBoxDownloadManager.Create(self);
