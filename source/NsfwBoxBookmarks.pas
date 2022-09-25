@@ -79,6 +79,7 @@ type
       property PageSize: integer read FPageSize write FPageSize;
       function GetBookmarksGroups: TBookmarkGroupRecAr;
       function GetGroupById(AGroupId: int64): TBookmarkGroupRec;
+      function GetGroupsByName(AGroupName: string): TBookmarkGroupRecAr;
       procedure UpdateGroup(AGroupId: int64; ANew: TBookmarkGroupRec);
       function AddGroup(AName, AAbout: string): TBookmarkGroupRec;
       function GetLastGroup: TBookmarkGroupRec;
@@ -99,23 +100,24 @@ type
   end;
 
   TNBoxBookmarksHistoryDb = class(TNBoxBookmarksDb)
-    private const
+    private
+      FSearchGroup: TBookmarkGroupRec;
+      FTapGroup: TBookmarkGroupRec;
+      FDownloadGroup: TBookmarkGroupRec;
+      FTabGroup: TBookmarkGroupRec;
+    protected
+      procedure CreateBase; override;
+    public const
       NAME_SEARCH_HISTORY   = 'search history';
       NAME_TAP_HISTORY      = 'tap history';
       NAME_DOWNLOAD_HISTORY = 'download history';
       NAME_TABS_HISTORY     = 'closed tabs history';
-    private
-      FSearchTable: TBookmarkGroupRec;
-      FTapTable: TBookmarkGroupRec;
-      FDownloadTable: TBookmarkGroupRec;
-      FTabTable: TBookmarkGroupRec;
-    protected
-      procedure CreateBase; override;
     public
-      property SearchGroup: TBookmarkGroupRec read FSearchTable;
-      property TapGroup: TBookmarkGroupRec read FTapTable;
-      property DownloadGroup: TBookmarkGroupRec read FDownloadTable;
-      property TabTable: TBookmarkGroupRec read FTabTable;
+      function HasGroup(AGroupName: string): boolean;
+      property SearchGroup: TBookmarkGroupRec read FSearchGroup;
+      property TapGroup: TBookmarkGroupRec read FTapGroup;
+      property DownloadGroup: TBookmarkGroupRec read FDownloadGroup;
+      property TabGroup: TBookmarkGroupRec read FTabGroup;
       constructor Create(ADbFilename: string); override;
   end;
 
@@ -128,15 +130,12 @@ uses unit1;
 Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject);
 begin
   if ( AObject is TNBoxR34AppItem ) then begin
-    //Unit1.Log('Is R34Item');
     try
       // v1.0.1
       if ( JSON.O['item'].Ancestor['tags'].DataType = TDataType.dtArray ) then begin
-        //Unit1.Log('Array');
         var LTagsAr: ISuperArray;
         LTagsAr := JSON.O['item'].A['tags'].Clone;
         JSON.O['item'].Remove('tags');
-        //Log(JSON.AsJSON(true));
         JSON.O['item'].O['tags'].A['general'] := LTagsAr;
       end;
 
@@ -617,6 +616,37 @@ begin
   end;
 end;
 
+function TNBoxBookmarksDb.GetGroupsByName(
+  AGroupName: string): TBookmarkGroupRecAr;
+var
+  Rec: TBookmarkGroupRec;
+begin
+  Result := [];
+
+  if not Connection.Connected then
+    Connection.Connect;
+
+  with Query do begin
+    SQL.Text := 'SELECT * FROM `groups` WHERE (name = :name);';
+    Params[0].AsString := AGroupName;
+    Open;
+
+    try
+      First;
+
+      while ( not Query.Eof ) do begin
+        Rec := Self.ReadGroup;
+        Result := Result + [Rec];
+        Next;
+      end;
+
+    finally
+      Close;
+      SQL.Clear;
+    end;
+  end;
+end;
+
 function TNBoxBookmarksDb.GetItemsCount(AGroupId: int64): int64;
 begin
   if not Connection.Connected then
@@ -758,10 +788,10 @@ var
 begin
   inherited;
   Groups := Self.GetBookmarksGroups;
-  FSearchTable := GetByName(Self.NAME_SEARCH_HISTORY);
-  FTapTable    := GetByName(Self.NAME_TAP_HISTORY);
-  FDownloadTable := GetByName(Self.NAME_DOWNLOAD_HISTORY);
-  FTabTable := GetByName(Self.NAME_TABS_HISTORY);
+  FSearchGroup := GetByName(Self.NAME_SEARCH_HISTORY);
+  FTapGroup    := GetByName(Self.NAME_TAP_HISTORY);
+  FDownloadGroup := GetByName(Self.NAME_DOWNLOAD_HISTORY);
+  FTabGroup := GetByName(Self.NAME_TABS_HISTORY);
 end;
 
 procedure TNBoxBookmarksHistoryDb.CreateBase;
@@ -771,6 +801,14 @@ begin
   AddGroup(Self.NAME_DOWNLOAD_HISTORY, 'list of downloaded content.');
   AddGroup(Self.NAME_TAP_HISTORY, 'clicked items.');
   AddGroup(Self.NAME_TABS_HISTORY, 'all tabs that been closed.');
+end;
+
+function TNBoxBookmarksHistoryDb.HasGroup(AGroupName: string): boolean;
+var
+  Groups: TBookmarkGroupRecAr;
+begin
+  Groups := Self.GetGroupsByName(AGroupName);
+  Result := (Length(Groups) > 0);
 end;
 
 end.
