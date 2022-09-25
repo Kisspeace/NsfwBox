@@ -940,16 +940,25 @@ begin
         var
           Table: TBookmarkGroupRec;
           I: integer;
+          Items: TArray<IHasOrigin>;
         begin
           if Assigned(CurrentBookmarkControl) then begin
             Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
             if ( Table.Id <> -1 ) then begin
+              SetLength(Items, CurrentBrowser.Items.Count);
               for I := 0 to ( CurrentBrowser.Items.Count - 1 ) do begin
                 var Card := CurrentBrowser.Items[I];
                 if ( Card.HasBookmark and Card.Bookmark.IsRequest ) then
-                  Table.Add(Card.Bookmark.AsRequest)
+                  Items[I] := Card.Bookmark.AsRequest
+//                  Table.Add(Card.Bookmark.AsRequest)
                 else if Card.HasPost then
-                  Table.Add(Card.Post);
+                  Items[I] := Card.Post;
+//                  Table.Add(Card.Post);
+              end;
+
+              if Length(Items) > 0 then begin
+                Table.Add(Items);
+                Items := nil;
               end;
             end;
 

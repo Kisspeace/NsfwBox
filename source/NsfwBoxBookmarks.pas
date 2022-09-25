@@ -6,7 +6,7 @@ uses
   SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
   DB, NsfwBoxInterfaces, NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx,
   NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi, NsfwBoxOriginConst,
-  NsfwBoxHelper, Math;
+  NsfwBoxHelper, Math, system.Generics.Collections;
 
 type
 
@@ -52,9 +52,9 @@ type
       Name: string;
       About: string;
       Timestamp: TDateTime;
-      procedure Add(A: TNBoxBookmark);           overload;
-      procedure Add(AValue: INBoxItem);          overload;
-      procedure Add(AValue: INBoxSearchRequest); overload;
+      procedure AddB(A: TNBoxBookmark);
+      procedure Add(AValue: IHasOrigin);         overload;
+      procedure Add(AValues: TArray<IHasOrigin>); overload;
       function GetPage(APageNum: integer = 1): TBookmarkAr;
       function Get(AStart, AEnd: integer): TBookmarkAr;
       procedure ClearGroup;
@@ -69,10 +69,12 @@ type
   TBookmarkGroupRecAr = TArray<TBookmarkGroupRec>;
 
   TNBoxBookmarksDb = class(TDbHelper)
+  private
     protected
       FPageSize: integer;
       procedure CreateBase; override;
       function ReadGroup: TBookmarkGroupRec;
+      function NewBookmark(AValue: IHasOrigin): TNBoxBookmark;
     public
       property PageSize: integer read FPageSize write FPageSize;
       function GetBookmarksGroups: TBookmarkGroupRecAr;
@@ -84,9 +86,10 @@ type
       procedure DeleteGroup(AGroupId: Int64);
       procedure DeleteAllGroups;
       procedure Delete(ABookmarkId: int64);
-      procedure Add(AGroupId: int64; A: TNBoxBookmark);           overload;
-      procedure Add(AGroupId: int64; AValue: INBoxItem);          overload;
-      procedure Add(AGroupId: int64; AValue: INBoxSearchRequest); overload;
+      procedure AddB(AGroupId: int64; A: TNBoxBookmark);           overload;
+      procedure AddB(AGroupId: int64; AValues: TBookmarkAr);       overload;
+      procedure Add(AGroupId: int64; AValue: IHasOrigin);         overload;
+      procedure Add(AGroupId: int64; AValues: TArray<IHasOrigin>); overload;
       function GetMaxId(AGroupId: int64): int64;
       function GetMaxPage(AGroupId: int64): int64;
       function GetItemsCount(AGroupId: int64): int64;
@@ -226,51 +229,85 @@ end;
 
 { TNBoxBookmarksDb }
 
-procedure TNBoxBookmarksDb.Add(AGroupId: int64; A: TNBoxBookmark);
+procedure TNBoxBookmarksDb.AddB(AGroupId: int64; A: TNBoxBookmark);
+begin
+  Self.AddB(AGroupId, [A]);
+end;
+
+procedure TNBoxBookmarksDb.AddB(AGroupId: int64; AValues: TBookmarkAr);
+const
+  MAX_ITEMS_COUNT: integer = 100;
+  VALUES_TEMPLATE: string = '(:group_id%d, :origin%d, :type%d, :about%d, :object%d)';
+var
+  I, Stop, Pos, ArPos, Iter: integer;
 begin
   if not Connection.Connected then
     Connection.Connect;
 
   With Query do begin
-    Query.SQL.AddStrings([
-      'INSERT INTO `items` (`group_id`, `origin`, `type`, `about`, `object`)',
-      'VALUES',
-      '  (:group_id, :origin, :type, :about, :object);'
-    ]);
-    Params.ParamByName('group_id').AsInt64  := AGroupId;
-    Params.ParamByName('origin').AsInteger  := A.Origin;
-    Params.ParamByName('type').AsInteger    := ord(A.FBookmarkType);
-    Params.ParamByName('about').AsString    := A.About;
-    //Params.ParamByName('timestamp').AsDateTime := A.Time;
-    Params.ParamByName('object').AsString := A.Obj.AsJSON(false);
-    ExecSQL;
-    SQL.Clear;
+    ArPos := 0;
+    while True do begin
+      SQL.AddStrings([
+        'INSERT INTO `items` (`group_id`, `origin`, `type`, `about`, `object`)',
+        'VALUES'
+      ]);
+
+      Stop := ArPos + (MAX_ITEMS_COUNT - 1);
+      if (Stop > High(AValues)) then
+        Stop := High(AValues);
+//      unit1.SyncLog(ARPos.ToString + ' ' + Stop.ToString + ' len: ' + Length(AValues).ToString);
+
+      Iter := 0;
+      for I := ArPos to Stop do begin
+        SQL.Add(format(VALUES_TEMPLATE, [I, I, I, I, I]));
+
+        if (I < Stop) then
+          SQL.Add(',');
+
+        Pos := Iter * 5;
+        Params.Items[Pos + 0].AsInt64 := AGroupId; // group_id
+        params.Items[Pos + 1].AsInteger := AValues[I].Origin; // origin
+        params.Items[Pos + 2].AsInteger := ord(AValues[I].FBookmarkType); // type
+        params.Items[Pos + 3].AsString := AValues[I].About; // about
+        Params.Items[Pos + 4].AsString := AValues[I].Obj.AsJSON(false); // object
+        inc(Iter);
+      end;
+
+      ExecSQL;
+      SQL.Clear;
+
+      ArPos := I;
+      if ArPos > High(AValues) then
+        break;
+    end;
+
   end;
 end;
 
-procedure TNBoxBookmarksDb.Add(AGroupId: int64; AValue: INBoxSearchRequest);
+procedure TNBoxBookmarksDb.Add(AGroupId: int64; AValue: IHasOrigin);
 var
   B: TNboxBookmark;
 begin
   try
-    B := TNBoxBookmark.Create(AValue);
-    B.Time := Now;
-    Add(AGroupId, B);
+    B := NewBookmark(AValue);
+    AddB(AGroupId, B);
   finally
     B.Free;
   end;
 end;
 
-procedure TNBoxBookmarksDb.Add(AGroupId: int64; AValue: INBoxItem);
+procedure TNBoxBookmarksDb.Add(AGroupId: int64; AValues: TArray<IHasOrigin>);
 var
-  B: TNboxBookmark;
+  I: integer;
+  Bookmarks: TObjectList<TNBoxBookmark>;
 begin
+  Bookmarks := TObjectList<TNBoxBookmark>.Create;
   try
-    B := TNBoxBookmark.Create(AValue);
-    B.Time := Now;
-    Add(AGroupId, B);
+    for I := 0 to High(AValues) do
+      Bookmarks.Add(NewBookmark(AValues[I]));
+    Self.AddB(AGroupId, Bookmarks.ToArray);
   finally
-    B.Free;
+    Bookmarks.Free;
   end;
 end;
 
@@ -543,6 +580,13 @@ begin
   Result := Get(AGroupId, LStart, LEnd);
 end;
 
+function TNBoxBookmarksDb.NewBookmark(AValue: IHasOrigin): TNBoxBookmark;
+begin
+  Result := TNBoxBookmark.Create;
+  Result.Obj := ( AValue as TInterfacedPersistent );
+  Result.Time := Now;
+end;
+
 function TNBoxBookmarksDb.ReadGroup: TBookmarkGroupRec;
 begin
   With Result do begin
@@ -633,19 +677,19 @@ end;
 
 { TBookmarkGroupRec }
 
-procedure TBookmarkGroupRec.Add(A: TNBoxBookmark);
-begin
-  FDb.Add(Id, A);
-end;
-
-procedure TBookmarkGroupRec.Add(AValue: INBoxItem);
+procedure TBookmarkGroupRec.Add(AValue: IHasOrigin);
 begin
   FDb.Add(Id, AValue);
 end;
 
-procedure TBookmarkGroupRec.Add(AValue: INBoxSearchRequest);
+procedure TBookmarkGroupRec.Add(AValues: TArray<IHasOrigin>);
 begin
-  FDb.Add(Id, AValue);
+  FDb.Add(Id, AValues);
+end;
+
+procedure TBookmarkGroupRec.AddB(A: TNBoxBookmark);
+begin
+  FDb.AddB(Id, A);
 end;
 
 procedure TBookmarkGroupRec.ClearGroup;
