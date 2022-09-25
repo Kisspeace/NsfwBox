@@ -180,7 +180,8 @@ type
     CheckSetAutoCloseItemMenu,
     CheckSetDevMode,
     CheckSetAutoCheckUpdates,
-    CheckSetShowScrollBars
+    CheckSetShowScrollBars,
+    CheckSetShowNavigateBackButton
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -1130,6 +1131,7 @@ begin
     SaveClosedTabHistory := CheckSetSaveTabHistory.IsChecked;
     AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
     ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
+    ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
 
     if AutoSaveSession then
       ConnectSession;
@@ -1209,7 +1211,10 @@ begin
     MainLayout.Controls.Items[I].Visible := false;
   end;
 
-  if ( ALayout = MenuSettings ) then begin
+  if ( ALayout = BrowserLayout ) then begin
+    {Browser}
+    BtnPrev.Visible := Settings.ShowNavigateBackButton;
+  end else if ( ALayout = MenuSettings ) then begin
     {App settings menu}
     Settings := Settings;
   end else if ( ALayout = CheckMenuSetOnItemTap ) then begin
@@ -2051,6 +2056,7 @@ begin
 
   CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu');
   CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars');
+  CheckSetShowNavigateBackButton := AddSettingsCheck('Show navigate back button');
   EditSetDefUseragent         := AddSettingsEdit('Default Useragent string');
   EditSetDefDownloadPath      := AddSettingsEdit('Default downloads path');
   EditSetMaxDownloadThreads   := AddSettingsEdit('Max download threads count', '', EDIT_STYLE_INT);
@@ -3366,6 +3372,7 @@ begin
   CheckSetDevMode.IsChecked             := Settings.DevMode;
   CheckSetAutoCheckUpdates.IsChecked    := Settings.AutoCheckUpdates;
   CheckSetShowScrollBars.IsChecked      := Settings.ShowScrollbars;
+  CheckSetShowNavigateBackButton.IsChecked := Settings.ShowNavigateBackButton;
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
