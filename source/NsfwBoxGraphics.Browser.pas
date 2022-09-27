@@ -211,6 +211,8 @@ end;
 { TNBoxBrowser.TBrowserSubTh }
 
 procedure TNBoxBrowser.TBrowserSubTh.Execute;
+const
+  START_ITEM_HEIGHT: single = 320;
 var
   Web: TNetHttpClient;
   Fetched: TStream;
@@ -265,6 +267,22 @@ begin
         else if ( LBookmark.BookmarkType = SearchRequest ) then
           LRequest := LBookmark.AsRequest;
       end;
+
+      Self.Synchronize(
+      procedure begin
+        LItm := B.NewItem;
+
+        With LItm do begin
+          Height := START_ITEM_HEIGHT;
+
+          if Assigned(LBookmark) then
+            LItm.Item := LBookmark
+          else
+            LItm.Item := LPost.Clone;
+
+          Visible := true;
+        end;
+      end);
 
       if Assigned(LPost) then
         CachedThumb := TNBoxPath.GetThumbnailByUrl(LPost.ThumbnailUrl);
@@ -322,13 +340,13 @@ begin
       var
         I: integer;
       begin
-        LItm := B.NewItem;
+//        LItm := B.NewItem;
         With LItm do begin
 
-          if Assigned(LBookmark) then
-            LItm.Item := LBookmark
-          else
-            LItm.Item := LPost.Clone;
+//          if Assigned(LBookmark) then
+//            LItm.Item := LBookmark
+//          else
+//            LItm.Item := LPost.Clone;
 
           try
 
