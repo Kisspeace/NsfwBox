@@ -140,15 +140,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="assets\themes\default\content-origin-4.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
-            <RemoteName>content-origin-4.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\res\drawable-large\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
@@ -167,6 +158,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="assets\themes\default\content-origin-4.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>content-origin-4.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\library\lib\armeabi\</RemoteDir>
             <RemoteName>libNsfwBox.so</RemoteName>
@@ -179,6 +179,15 @@
         <DeployFile Include="assets\themes\default\save.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
             <RemoteName>save.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="assets\themes\default\history.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>history.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
