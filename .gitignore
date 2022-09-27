@@ -66,3 +66,10 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
+
+# hey!
+NsfwBox.res
+Android64/
+Win32/
+Win64/
+AndroidManifest.template.xml
