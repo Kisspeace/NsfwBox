@@ -2014,7 +2014,7 @@ begin
 
   BtnBrowse       := AddItemMenuBtn('Browse', ACTION_BROWSE, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
   BtnDownloadAll  := AddItemMenuBtn('Download content', ACTION_DOWNLOAD_ALL, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnDownloadMenu := AddItemMenuBtn('Choose files to download', ACTION_DOWNLOAD_MENU, ICON_DOWNLOAD);
+//  BtnDownloadMenu := AddItemMenuBtn('Choose files to download', ACTION_DOWNLOAD_MENU, ICON_DOWNLOAD);
   BtnPlay         := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
   BtnAddBookmark  := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
   BtnOpenRelated  := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
@@ -2515,6 +2515,7 @@ var
 begin
   MenuItemTagsOrigin := AOrigin;
   MenuItemTags.ClearButtons;
+
   for I := low(ATags) to high(ATags) do begin
     MenuItemTags.AddBtn(ATags[I], 0, ICON_TAG, true);
   end;
