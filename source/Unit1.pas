@@ -2974,10 +2974,11 @@ procedure TForm1.MenuBtnNewTabOnTap(Sender: TObject; const Point: TPointF);
 begin
   try
     AddBrowser;
-    if Browsers.Count < 2 then
-      CurrentBrowser := Browsers.Last;
+    CurrentBrowser := Browsers.Last;
+    GotoSearchSettings(CurrentBrowser);
   except
-
+    on E: Exception do
+      Log(E, 'TForm1.MenuBtnNewTabOnTap: ');
   end;
 end;
 
