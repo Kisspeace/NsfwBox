@@ -3,30 +3,30 @@
 * <img src="default/history.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/history" title="history icons">History icons created by kmg design - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/refresh_2530313)
 * <img src="default/bookmarks.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/favorite" title="favorite icons">Favorite icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/bookmark_2698202)
 * <img src="default/download.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/download" title="download icons">Download icons created by pancaza - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/download_3879019)
-* <img src="default/downloads.png" width="24" align="left"> 🤷 idk
-* <img src="default/video.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/video" title="video icons">Video icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/video-camera_3039381)
+* <img src="default/downloads.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/folder" title="folder icons">Folder icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/folder_8113134)
+* <img src="default/video.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/video" title="video icons">Video icons created by Hilmy Abiyyu A. - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/videography_6878718)
 * <img src="default/transgender.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/transgender" title="transgender icons">Transgender icons created by Becris - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/lgbt_5965637)
-* <img src="default/save.png" width="24" align="left"> 🤷 idk
+* <img src="default/save.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/save-file" title="save file icons">Save file icons created by berkahicon - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/save-file_4725444)
 * <img src="default/search.png" width="24" align="left"> 🤷 idk
-* <img src="default/tag.png" width="24" align="left"> 🤷 idk
+* <img src="default/tag.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/price-tag" title="price tag icons">Price tag icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/price-tag_2924720)
 * <img src="default/tab-close.png" width="24" align="left"> 🤷 idk
 * <img src="default/settings.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/settings" title="settings icons">Settings icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/settings_2698011)
-* <img src="default/repair.png" width="24" align="left"> 🤷 idk
+<!-- * <img src="default/repair.png" width="24" align="left"> 🤷 idk -->
 * <img src="default/play.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">Play button icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/play-button_3308709)
 * <img src="default/next.png" width="24" align="left"> 🤷 idk
 * <img src="default/menu.png" width="24" align="left"> 🤷 idk
-* <img src="default/new-tab.png" width="24" align="left"> 🤷 idk
-* <img src="default/image.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/image" title="image icons">Image icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/image_739147)
+* <img src="default/new-tab.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/ui" title="ui icons">Ui icons created by apien - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/add_6187712)
+* <img src="default/image.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/ui" title="ui icons">Ui icons created by Icon Place - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/gallery_6039315)
 * <img src="default/heterosexual.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/gender" title="gender icons">Gender icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/heterosexual_1864727)
 * <img src="default/gay.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/gender" title="gender icons">Gender icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/gay_4634402)
-* <img src="default/edit.png" width="24" align="left"> 🤷 idk
+* <img src="default/edit.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/register" title="register icons">Register icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/clipboard_3719648)
 * <img src="default/delete.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by kmg design - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/trash_3177433)
 * <img src="default/current-tab.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/eyes" title="eyes icons">Eyes icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/eyes_599324)
-* <img src="default/copy.png" width="24" align="left"> 🤷 idk
-* <img src="default/cartoons.png" width="24" align="left"> 🤷 idk
+* <img src="default/copy.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/copy" title="copy icons">Copy icons created by berkahicon - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/documents_4725436)
+* <img src="default/cartoons.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/face-mask" title="face mask icons">Face mask icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/girl_2945419)
 * <img src="default/app-icon.png" width="24" align="left"> Kisspeace
-* <img src="default/add.png" width="24" align="left"> 🤷 idk
-* <img src="default/content-origin--2.png" width="24" align="left"> 🤷 idk
+* <img src="default/add.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/add-button" title="add button icons">Add button icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/add-button_5501851)
+* <img src="default/content-origin--2.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/code" title="code icons">Code icons created by riajulislam - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/coding_8220372)
 * <img src="default/content-origin--1.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/heart" title="heart icons">Heart icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/heart_210545)
 * <img src="default/content-origin-0.png" width="24" align="left"> https://nsfw.xxx -> [Item page](https://nsfw.xxx/favicon.ico)
 * <img src="default/content-origin-1.png" width="24" align="left"> http://rule34.xxx -> [Item page](http://rule34.xxx/favicon.ico)
