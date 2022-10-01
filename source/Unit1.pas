@@ -3064,7 +3064,7 @@ begin
 
   FSettings := TNsfwBoxSettings.Create;
   with FSettings do begin
-    DefaultUseragent := 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0';
+    DefaultUseragent := 'Mozilla/5.0 (Windows NT 10.0; rv:105.0) Gecko/20100101 Firefox/105.0';
     AllowCookies := false;
     DefDownloadPath := TPath.Combine(TPath.GetSharedDownloadsPath, 'NsfwBox');
     FilenameLogUrls := TPath.Combine(DefDownloadPath, 'nsfw-box-content-urls.txt');
