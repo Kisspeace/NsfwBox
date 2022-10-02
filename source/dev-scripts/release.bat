@@ -13,6 +13,7 @@ MKDIR %work_dir%
 cd %work_dir%
 
 CALL :pack Win32 ins32
+CALL :pack Win64 ins64
 
 EXIT /B 0
 
