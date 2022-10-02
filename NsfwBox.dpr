@@ -23,7 +23,7 @@ uses
   NsfwBoxHelper in 'source\NsfwBoxHelper.pas',
   NsfwBoxOriginBookmarks in 'source\NsfwBoxOriginBookmarks.pas',
   NetHttpClient.Downloader in 'source\NetHttpClient.Downloader.pas',
-  Fmx.Scroller in 'source\Fmx.Scroller.pas',
+  FMX.Scroller in 'source\FMX.Scroller.pas',
   NsfwBoxFileSystem in 'source\NsfwBoxFileSystem.pas',
   FMX.Color in 'source\FMX.Color.pas',
   SimpleClipboard in 'source\SimpleClipboard.pas',
