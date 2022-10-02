@@ -69,6 +69,7 @@ modules/
 
 # hey!
 NsfwBox.res
+Android/
 Android64/
 Win32/
 Win64/
