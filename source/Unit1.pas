@@ -2333,6 +2333,7 @@ begin
         LastRelease: TGithubRelease;
         LastVer: TSemVer;
         Success: boolean;
+        LastExcept: Exception;
       begin
         Success := false;
         for I := 1 to RETRY_COUNT do begin
@@ -2342,14 +2343,21 @@ begin
             Success := true;
             break;
           except
-            Task.Wait(RETRY_TIMEOUT);
+            On E: Exception do begin
+              LastExcept := E;
+              SyncLog(E, 'OnUpdateCheck: ');
+              Task.Wait(RETRY_TIMEOUT);
+            end;
           end;
         end;
 
         if not success then
-          exit;
+          exit
+        else begin
+          LastVer := TSemVer.FromGhTagString(LastRelease.TagName);
+          SyncLog('Last release: ' + LastVer.ToGhTagString);
+        end;
 
-        LastVer := TSemVer.FromGhTagString(LastRelease.TagName);
         if ( LastVer > APP_VERSION ) then begin
           TThread.Synchronize(Nil, procedure begin
             Form1.UserBooleanDialog('Update available: ' + LastRelease.Name + SLineBreak +
