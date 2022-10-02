@@ -1,19 +1,26 @@
 <h1 align="left">NsfwBox<img src="./assets/android-icons/Kisspeace-NsfwBox-icon.svg" width="128" align="left"/></h1>
 
-![written_on](https://img.shields.io/badge/_-RAD_Studio-darkcyan?style=for-the-badge&logo=delphi)
+[![written_on](https://img.shields.io/badge/_-RAD_Studio-darkcyan?style=for-the-badge&logo=delphi)](https://www.embarcadero.com/products/rad-studio/)
 ![Platforms](https://img.shields.io/badge/Android-1A2541?style=for-the-badge&logo=android&logoColor=white)
 ![Platforms](https://img.shields.io/badge/Windows-1A2541?style=for-the-badge&logo=windows)
-![Downloads](https://img.shields.io/github/downloads/kisspeace/NsfwBox/total?style=for-the-badge&labelColor=1A2541)
+[![Downloads](https://img.shields.io/github/downloads/kisspeace/NsfwBox/total?style=for-the-badge&labelColor=1A2541)](https://github.com/Kisspeace/NsfwBox/releases)
 <br><br>
 
 Native android and windows app for download content from porn sites.  
 Developed on RAD Studio 11 Alexandria.
 
-#### Censored screenshots:
+### Censored screenshots:
+
+#### Android:
 <div>
-  <img src="./assets/github/screenshot_1.jpg" width="25%" align=""/>
-  <img src="./assets/github/screenshot_2.jpg" width="25%" align=""/>
-  <img src="./assets/github/screenshot_3.jpg" width="25%" align=""/>
+  <img src="./assets/github/screenshot_1.jpg" width="32%"/>
+  <img src="./assets/github/screenshot_2.jpg" width="32%"/>
+  <img src="./assets/github/screenshot_3.jpg" width="32%"/>
+</div>
+
+#### Windows:
+<div>
+  <img src="./assets/github/screenshot_win_1.jpg" width="97%"/> 
 </div>
 
 #### Supported sites / APIs:
@@ -36,6 +43,6 @@ Developed on RAD Studio 11 Alexandria.
 * [coomer.party-scraper](https://github.com/Kisspeace/coomer.party-scraper)
 
 #### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.2.0/Kisspeace.NsfwBox.v1.2.0.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.2.0/Kisspeace.NsfwBox-ins32.v1.2.0.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.2.0/Kisspeace.NsfwBox-ins64.v1.2.0.exe)  
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.3.0/Kisspeace.NsfwBox.v1.3.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.3.0/Kisspeace.NsfwBox-ins32.v1.3.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v1.3.0/Kisspeace.NsfwBox-ins64.v1.3.0.exe)  
