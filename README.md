@@ -23,6 +23,8 @@ Developed on RAD Studio 11 Alexandria.
   <img src="./assets/github/screenshot_win_1.jpg" width="97%"/> 
 </div>
 
+[✨ About design ✨](./assets/themes#readme)
+
 #### Supported sites / APIs:
 * <img src="https://nsfw.xxx/favicon.ico" width="24" align="left">[nsfw.xxx](https://nsfw.xxx), [pornpic.xxx](https://pornpic.xxx/), [hdporn.pics](https://hdporn.pics/)
 * <img src="https://r34.app/_nuxt/icons/icon_512x512.307d7e.png" width="24" align="left">[r34.app](https://r34.app)
