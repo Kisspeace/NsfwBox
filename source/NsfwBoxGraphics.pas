@@ -12,11 +12,13 @@ uses
   FMX.ScrollBox, FMX.Memo, ALFmxObjects, ALFmxGraphics, NsfwXxx.Types,
   NsfwBoxInterfaces, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34JsonApi,
   NsfwBoxContentScraper, NsfwBoxGraphics.Rectangle, Fmx.ActnList,
-  NsfwBoxBookmarks, NsfwBoxHelper, NsfwBoxOriginBookmarks;
+  NsfwBoxBookmarks, NsfwBoxHelper, NsfwBoxOriginBookmarks,
+  // you-did-well!
+  YDW.FMX.ImageWithURL.AlRectangle;
 
 type
 
-  TNBoxCardBase = class(TAlRectangle)
+  TNBoxCardBase = class(TAlRectangleImageWithURL)
     protected
       FItem: IHasOrigin;
       FOnAutoLook: TNotifyEvent;
