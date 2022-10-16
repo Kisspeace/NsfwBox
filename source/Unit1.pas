@@ -1872,7 +1872,7 @@ begin
 
 
   IWUCacheManager := TIWUCacheManager.Create(Self);
-  IWUCacheManager.SetSaveAndLoadPath(TPath.Combine(TNBoxPath.GetAppMainPath, 'thumbnails'));
+  IWUCacheManager.SetSaveAndLoadPath(Tpath.Combine(TNBoxPath.GetCachePath, 'thumbnails'));
 
   IWUContentManager := TIWUContentManager.Create(Self);
   IWUContentManager.OnImageLoadException := OnIWUException;
