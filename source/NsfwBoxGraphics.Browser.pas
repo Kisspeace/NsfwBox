@@ -12,7 +12,10 @@ uses
   // NsfwBox
   NsfwBoxInterfaces, NsfwBoxContentScraper, NsfwBoxOriginPseudo,
   NsfwBoxOriginNsfwXxx, NsfwBoxGraphics, NsfwBoxOriginConst,
-  NsfwBoxBookmarks, NsfwBoxOriginR34App;
+  NsfwBoxBookmarks, NsfwBoxOriginR34App,
+  // you-did-well!
+  YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.AlRectangle,
+  YDW.FMX.ImageWithURLManager;
 
 type
 
@@ -49,7 +52,9 @@ type
       FOnScraperCreate: TScraperCreateEvent;
       FOnRequestChanged: TNotifyEvent;
       FBeforeBrowse: TNotifyEvent;
+      FImageManager: IImageWithUrlManager;
       procedure SetRequest(const value: INBoxSearchRequest);
+      procedure OnItemImageLoadFinished(Sender: TObject; ASuccess: boolean);
     public
       Items: TNBoxCardObjList;
       function NewItem: TNBoxCardBase;
@@ -60,6 +65,7 @@ type
       procedure WaitForThreads;
       procedure Clear;
       property Request: INBoxSearchRequest read FRequest write SetRequest;
+      property ImageManager: IImageWithUrlManager read FImageManager write FImageManager; //FIXME
       property MaxParallelThumbLoaders: integer read FMaxParallelThumbLoaders write FMaxParallelThumbLoaders;
       property BeforeBrowse: TNotifyEvent read FBeforeBrowse write FBeforeBrowse;
       property OnItemCreate: TBrowserItemCreateEvent read FOnItemCreate write FOnItemCreate;
@@ -181,12 +187,27 @@ end;
 function TNBoxBrowser.NewItem: TNBoxCardBase;
 begin
   Result := TNBoxCardSimple.Create(self);
+  Result.ImageManager := Self.ImageManager;
+  Result.OnLoadingFinished := OnItemImageLoadFinished;
   Items.Add(Result);
   Self.MultiLayout.AddControl(Result);
   if Assigned(OnItemCreate) then
     OnItemCreate(Self, Result);
 end;
 
+
+procedure TNBoxBrowser.OnItemImageLoadFinished(Sender: TObject;
+  ASuccess: boolean);
+var
+  LControl: TControl;
+begin
+  LControl := Sender As TControl;
+
+  if Assigned(LControl.OnResize) then
+    LControl.OnResize(LControl);
+
+  Self.MultiLayout.ReCalcBlocksSize;
+end;
 
 procedure TNBoxBrowser.Clear;
 var
@@ -419,23 +440,19 @@ begin
 end;
 
 procedure TNBoxBrowser.TBrowserTh.Execute;
+const
+  START_ITEM_HEIGHT: single = 320;
 var
   I: integer;
-  Subs: TObjectList<TBrowserSubTh>;
   Scraper: TNBoxScraper;
   Content: INBoxHasOriginList;
+//  LNewItems: TArray<TNBoxCardBase>;
   Fetched: boolean;
 
-  function NotFinishedCount: integer;
-  var
-    N: integer;
-  begin
-    Result := 0;
-    for N := 0 to Subs.Count - 1 do begin
-      if not Subs.Items[N].Finished then
-        Inc(Result);
-    end;
-  end;
+  LNewItem: TNBoxCardBase;
+  LPost: INBoxItem;
+  LRequest: INBoxSearchRequest;
+  LBookmark: TNBoxBookmark;
 
   function IsNeedToBeSync: boolean;
   begin
@@ -445,16 +462,19 @@ var
 begin
   try
     Fetched := false;
-    Subs := TObjectList<TBrowserSubTh>.create;
     Scraper := TNBoxScraper.Create;
     Content := INBoxHasOriginList.Create;
 
-    self.Synchronize(procedure begin
+    Self.Synchronize(
+    procedure
+    begin
+
       if Assigned(Owner.OnWebClientCreate) then
         Scraper.OnWebClientSet := Owner.OnWebClientCreate;
 
       if Assigned(Owner.OnScraperCreate) then
         Owner.OnScraperCreate(Self.Owner, Scraper);
+
     end);
 
     if Terminated then
@@ -478,42 +498,113 @@ begin
       end;
     end;
 
-    for I := 0 to Content.Count - 1 do begin
-      if Terminated then
-        exit;
 
-      while ( NotFinishedCount >= MaxThreadsCount ) do begin
-        if Terminated then
-          exit;
-        Sleep(10);
+    for I := 0 to Content.Count - 1 do begin
+      var LContentItem := Content[I];
+
+      if Self.Terminated then exit;
+
+      LBookmark := nil;
+      LPost     := nil;
+      LRequest  := nil;
+
+      Supports(LContentItem, INBoxItem, LPost);
+
+      if ( LContentItem is TNBoxBookmark ) then begin
+        LBookmark := TNBoxBookmark(LContentItem);
+        if ( LBookmark.BookmarkType = TNBoxBookmarkType.Content ) then
+          LPost := LBookmark.AsItem
+        else if ( LBookmark.BookmarkType = SearchRequest ) then
+          LRequest := LBookmark.AsRequest;
       end;
 
-      var Th: TBrowserSubTh;
-      Th := TBrowserSubTh.Create(true);
-      Th.Owner := Self;
-      Th.Item := Content.Items[I];
-      Th.FreeOnTerminate := false;
-      Subs.Add(Th);
-      Th.Start;
-      while not Th.Started do
-        sleep(1);
+      Self.Synchronize(
+      procedure
+      begin
+        LNewItem := Self.Owner.NewItem;
+
+        With LNewItem do begin
+          Height := START_ITEM_HEIGHT;
+
+          if Assigned(LBookmark) then
+            LNewItem.Item := LBookmark
+          else
+            LNewItem.Item := LPost.Clone;
+
+          Visible := true;
+          Fill.Kind := TBrushKind.Bitmap;
+
+          if Assigned(LPost) then
+            ImageURL := LPost.ThumbnailUrl;
+        end;
+
+        Self.Owner.MultiLayout.ReCalcBlocksSize;
+      end);
+
     end;
+
+//    LNewItems := [];
+    Self.Synchronize(
+    procedure
+    var
+      I: integer;
+    begin
+
+
+      Self.Owner.MultiLayout.ReCalcBlocksSize;
+    end);
+
+
+
+
+//    for I := 0 to Content.Count - 1 do begin
+//      var Item := Content[I];
+//
+//      if Self.Terminated then
+//        exit;
+//
+////      LBookmark := nil;
+////      LPost     := nil;
+////      LRequest  := nil;
+////      B         := Self.Owner;
+////
+////      Supports(Item, INBoxItem, LPost);
+////
+////      if ( Item is TNBoxBookmark ) then begin
+////        LBookmark := TNBoxBookmark(Item);
+////        if ( LBookmark.BookmarkType = TNBoxBookmarkType.Content ) then
+////          LPost := LBookmark.AsItem
+////        else if ( LBookmark.BookmarkType = SearchRequest ) then
+////          LRequest := LBookmark.AsRequest;
+////      end;
+//
+//      Self.Synchronize(
+//      procedure begin
+//        LItm := B.NewItem;
+//
+//        With LItm do begin
+//          Height := START_ITEM_HEIGHT;
+//
+//          if Assigned(LBookmark) then
+//            LItm.Item := LBookmark
+//          else
+//            LItm.Item := LPost.Clone;
+//
+//          Visible := true;
+//        end;
+//
+//        B.MultiLayout.ReCalcBlocksSize;
+//      end);
+//
+//      LItm.Fill.Kind := TBrushKind.Bitmap;
+//      if Assigned(LPost) then
+//        LItm.ImageURL := LPost.ThumbnailUrl;
+//
+//    end;
 
   finally
-    if Terminated then begin
-      for I := 0 to Subs.Count - 1 do begin
-        Subs.Items[I].Terminate;
-      end;
-    end;
-
-    for I := 0 to Subs.Count - 1 do begin
-      while not Subs.Items[I].Finished do
-        sleep(10);
-    end;
-
     Scraper.Free;
     Content.Free;
-    Subs.Free;
   end;
 end;
 
