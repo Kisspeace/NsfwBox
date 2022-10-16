@@ -29,9 +29,15 @@ uses
   NsfwBoxOriginCoomerParty, NsfwBoxOriginConst,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
   NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
-  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2;
+  NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
+  // you-did-well!
+  YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
+  YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces;
 
 type
+
+  TIWUContentManager = TImageWithUrlManager;
+  TIWUCacheManager = TImageWithURLCahceManager;
 
   TControlObjList = TObjectList<TControl>;
   TControlList = TList<TControl>;
@@ -62,6 +68,7 @@ type
       Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     FSettings: TNsfwBoxSettings;
@@ -238,6 +245,7 @@ type
     procedure BtnPrevOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuItemTagsOnSelected(Sender: TObject);
     procedure LayoutDialogYesOrNoOnResize(Sender: TObject);
+    procedure OnIWUException(Sender: TObject; AImage: IImageWithURL; const AUrl: string; const AException: Exception);
     //---Tabs------------//
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -304,6 +312,7 @@ type
     procedure OnBrowserScraperCreate(Sender: TObject; var AScraper: TNBoxScraper);
     procedure OnBrowserReqChanged(Sender: TObject);
     procedure BrowserBeforeBrowse(Sender: TObject);
+
     //------ Cards events ------//
     procedure OnNewItem(Sender: TObject; var AItem: TNBoxCardBase);
     procedure OnSimpleCardResize(Sender: TObject);
@@ -366,6 +375,8 @@ var
   SESSION_FILENAME     : string = 'session.sqlite';
   HISTORY_FILENAME     : string = 'history.sqlite';
 
+  IWUContentManager: TIWUContentManager;
+  IWUCacheManager: TIWUCacheManager;
   BookmarksDb: TNBoxBookmarksDb;
   HistoryDb: TNBoxBookmarksHistoryDb;
   Session: TNBoxBookmarksDb;
@@ -1336,6 +1347,8 @@ begin
     Result.OnWebClientCreate := OnBrowserSetWebClient;
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
     visible := false;
+    ImageManager := IWUContentManager;
+
     if Self.FFormCreated then
       ShowScrollBars := Settings.ShowScrollBars;
   end;
@@ -1856,6 +1869,15 @@ begin
   {$ENDIF}
 
   Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
+
+
+  IWUCacheManager := TIWUCacheManager.Create(Self);
+  IWUCacheManager.SetSaveAndLoadPath(TPath.Combine(TNBoxPath.GetAppMainPath, 'thumbnails'));
+
+  IWUContentManager := TIWUContentManager.Create(Self);
+  IWUContentManager.OnImageLoadException := OnIWUException;
+  IWUContentManager.LoadThumbnailFromFile := True;
+  IWUContentManager.CacheManager := IWUCacheManager;
 
   DownloadItems := TNBoxTabList.Create;
   DownloadManager := TNBoxDownloadManager.Create(self);
@@ -2390,6 +2412,11 @@ begin
 
 end;
 
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  IWUContentManager.Free;
+end;
+
 procedure TForm1.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
   Shift: TShiftState);
 var
@@ -2654,6 +2681,16 @@ begin
     OnRequestException := DownloaderOnException;
     OnFinish := Self.DownloaderOnFinish;
   end;
+end;
+
+procedure TForm1.OnIWUException(Sender: TObject; AImage: IImageWithURL;
+  const AUrl: string; const AException: Exception);
+begin
+  TThread.Synchronize(nil,
+  procedure
+  begin
+    Log(AException, 'OnIWUException ' + AUrl + ': ');
+  end);
 end;
 
 function DownloadItemText(A: TNetHttpDownloader): string;
@@ -3365,6 +3402,9 @@ begin
   FSettings.Assign(Value);
   if not FFormCreated then
     exit;
+
+  IWUContentManager.ThreadsCount := Settings.ThreadsCount;
+//  IWUContentManager.EnableSaveToCache := Settings.
 
   EditSetDefUseragent.Edit.Edit.Text    := Settings.DefaultUseragent;
   EditSetDefDownloadPath.Edit.Edit.Text := Settings.DefDownloadPath;

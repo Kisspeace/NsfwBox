@@ -24,6 +24,7 @@ object Form1: TForm1
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   OnClose = FormClose
+  OnDestroy = FormDestroy
   OnKeyUp = FormKeyUp
   OnShow = FormShow
   DesignerMasterStyle = 0
