@@ -307,6 +307,10 @@ type
     procedure GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
     procedure GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
 
+    //------ Browsers ----------//
+    procedure OnBrowserViewportPositionChange(Sender: TObject;
+      const OldViewportPosition, NewViewportPosition: TPointF;
+      const ContentSizeChanged: Boolean);
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient;
       AOrigin: integer);
     procedure OnBrowserScraperCreate(Sender: TObject; var AScraper: TNBoxScraper);
@@ -1348,6 +1352,7 @@ begin
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
     visible := false;
     ImageManager := IWUContentManager;
+    OnViewportPositionChange := OnBrowserViewportPositionChange;
 
     if Self.FFormCreated then
       ShowScrollBars := Settings.ShowScrollBars;
@@ -2638,6 +2643,19 @@ procedure TForm1.OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser;
   Action: TCollectionNotification);
 begin
   //Self.TopBottomText.Text := 'Browsers: ' + Browsers.Count.ToString;
+end;
+
+procedure TForm1.OnBrowserViewportPositionChange(Sender: TObject;
+  const OldViewportPosition, NewViewportPosition: TPointF;
+  const ContentSizeChanged: Boolean);
+var
+  LBrowser: TNBoxBrowser;
+begin
+  LBrowser := TNBoxBrowser(Sender);
+  if round(NewViewportPosition.Y) = round(LBrowser.ContentBounds.Height - LBrowser.Height) then begin
+    // Scrolled down
+    LBrowser.GoNextPage;
+  end;
 end;
 
 procedure TForm1.OnCardAutoLook(Sender: TObject);
