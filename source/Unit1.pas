@@ -379,7 +379,7 @@ var
   SESSION_FILENAME     : string = 'session.sqlite';
   HISTORY_FILENAME     : string = 'history.sqlite';
 
-//  IWUContentManager: TIWUContentManager;
+  IWUContentManager: TIWUContentManager;
   BrowsersIWUContentManager: TIWUContentManager;
   IWUCacheManager: TIWUCacheManager;
   BookmarksDb: TNBoxBookmarksDb;
@@ -1880,10 +1880,17 @@ begin
   IWUCacheManager := TIWUCacheManager.Create(Self);
   IWUCacheManager.SetSaveAndLoadPath(Tpath.Combine(TNBoxPath.GetCachePath, 'thumbnails'));
 
+  // IWU content manager for browsers only
   BrowsersIWUContentManager := TIWUContentManager.Create(Self);
   BrowsersIWUContentManager.OnImageLoadException := OnIWUException;
   BrowsersIWUContentManager.LoadThumbnailFromFile := True;
   BrowsersIWUContentManager.CacheManager := IWUCacheManager;
+
+  // IWU content manager for other app images (like buttons)
+  IWUContentManager := TIWUContentManager.Create(Self);
+  IWUContentManager.OnImageLoadException := OnIWUException;
+  IWUContentManager.LoadThumbnailFromFile := False;
+  IWUContentManager.CacheManager := IWUCacheManager;
 
   DownloadItems := TNBoxTabList.Create;
   DownloadManager := TNBoxDownloadManager.Create(self);
