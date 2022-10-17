@@ -379,7 +379,8 @@ var
   SESSION_FILENAME     : string = 'session.sqlite';
   HISTORY_FILENAME     : string = 'history.sqlite';
 
-  IWUContentManager: TIWUContentManager;
+//  IWUContentManager: TIWUContentManager;
+  BrowsersIWUContentManager: TIWUContentManager;
   IWUCacheManager: TIWUCacheManager;
   BookmarksDb: TNBoxBookmarksDb;
   HistoryDb: TNBoxBookmarksHistoryDb;
@@ -1351,7 +1352,7 @@ begin
     Result.OnWebClientCreate := OnBrowserSetWebClient;
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
     visible := false;
-    ImageManager := IWUContentManager;
+    ImageManager := BrowsersIWUContentManager;
     OnViewportPositionChange := OnBrowserViewportPositionChange;
 
     if Self.FFormCreated then
@@ -1879,10 +1880,10 @@ begin
   IWUCacheManager := TIWUCacheManager.Create(Self);
   IWUCacheManager.SetSaveAndLoadPath(Tpath.Combine(TNBoxPath.GetCachePath, 'thumbnails'));
 
-  IWUContentManager := TIWUContentManager.Create(Self);
-  IWUContentManager.OnImageLoadException := OnIWUException;
-  IWUContentManager.LoadThumbnailFromFile := True;
-  IWUContentManager.CacheManager := IWUCacheManager;
+  BrowsersIWUContentManager := TIWUContentManager.Create(Self);
+  BrowsersIWUContentManager.OnImageLoadException := OnIWUException;
+  BrowsersIWUContentManager.LoadThumbnailFromFile := True;
+  BrowsersIWUContentManager.CacheManager := IWUCacheManager;
 
   DownloadItems := TNBoxTabList.Create;
   DownloadManager := TNBoxDownloadManager.Create(self);
@@ -2419,7 +2420,7 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  IWUContentManager.Free;
+  BrowsersIWUContentManager.Free;
 end;
 
 procedure TForm1.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
@@ -3421,7 +3422,7 @@ begin
   if not FFormCreated then
     exit;
 
-  IWUContentManager.ThreadsCount := Settings.ThreadsCount;
+  BrowsersIWUContentManager.ThreadsCount := Settings.ThreadsCount;
 //  IWUContentManager.EnableSaveToCache := Settings.
 
   EditSetDefUseragent.Edit.Edit.Text    := Settings.DefaultUseragent;
