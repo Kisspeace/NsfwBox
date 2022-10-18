@@ -49,7 +49,7 @@ type
       ): TRectButton; overload; virtual;
       {}
       procedure ClearButtons;
-      constructor Create(AOwner: TComponent);
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
   end;
 
