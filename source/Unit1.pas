@@ -1714,15 +1714,10 @@ begin
         if Assigned(CurrentBookmarkControl) then begin
           Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
           if ( Table.Id <> -1 ) then begin
-            try
-              if Assigned(LRequest) then
-                Table.Add(LRequest)
-              else
-                Table.Add(LPost);
-            except
-              On E: Exception do
-                Log(E, 'ACTION_ADD_BOOKMARK: ');
-            end;
+            if Assigned(LRequest) then
+              Table.Add(LRequest)
+            else
+              Table.Add(LPost);
           end;
 
           CurrentBookmarkControl := nil;
@@ -1771,7 +1766,6 @@ begin
       var LBrowserTab: TNBoxTab;
       var LBrowser: TNBoxBrowser;
       LBrowserTab := self.AddBrowser(nil, false);
-      LBrowserTab.Text.Text := 'Files list';
       LBrowser := TNBoxBrowser(LBrowserTab.Owner);
       
       for I := 0 to LPost.ContentUrlCount - 1 do begin
@@ -1798,6 +1792,7 @@ begin
       end;
 
       Self.CurrentBrowser := LBrowser;
+      LBrowserTab.Text.Text := 'Files list (' + LBrowser.Items.Count.ToString + ')';
       
     end;
 
