@@ -21,7 +21,7 @@ Const
   ACTION_BROWSE             = 11;
   ACTION_DELETE_CARD        = 12;
   ACTION_SHOW_TAGS          = 13;
-  ACTION_DOWNLOAD_MENU      = 14;
+  ACTION_SHOW_FILES         = 14;
 
   FORMAT_VAR_CONTENT_URL = '$(NSFWBOX_CONTENT_URL)';
 
