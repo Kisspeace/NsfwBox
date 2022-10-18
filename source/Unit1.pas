@@ -2553,7 +2553,7 @@ begin
     AutomaticDecompression := [THttpCompressionMethod.Any];
     Customheaders['Accept'] := '*/*';
     CustomHeaders['Accept-Language'] := 'en-US,en;q=0.5';
-    CustomHeaders['Accept-Encoding'] := 'gzip, deflate, br';
+    CustomHeaders['Accept-Encoding'] := 'gzip, deflate'; { br not support }
     AllowCookies := Form1.Settings.AllowCookies;
     SendTimeout := 6000;
     ConnectionTimeout := 6000;
