@@ -1600,7 +1600,7 @@ var
   var
     LScraper: TNBoxScraper;
   begin
-    if  Supports(LPost, IFetchableContent)
+    if Supports(LPost, IFetchableContent)
     And ( not (LPost as IFetchableContent).ContentFetched ) then begin
       LScraper := Form1.CreateDefScraper;
       try
@@ -1714,10 +1714,15 @@ begin
         if Assigned(CurrentBookmarkControl) then begin
           Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
           if ( Table.Id <> -1 ) then begin
-            if Assigned(LRequest) then
-              Table.Add(LRequest)
-            else
-              Table.Add(LPost);
+            try
+              if Assigned(LRequest) then
+                Table.Add(LRequest)
+              else
+                Table.Add(LPost);
+            except
+              On E: Exception do
+                Log(E, 'ACTION_ADD_BOOKMARK: ');
+            end;
           end;
 
           CurrentBookmarkControl := nil;
@@ -1757,6 +1762,43 @@ begin
       if not Assigned(LPost) then exit;
       LTryFetchIfEmpty;
       CopyToClipboard(trim(ConcatS(LPost.ContentUrls)));
+    end;
+
+    ACTION_SHOW_FILES:
+    begin
+      if not Assigned(LPost) then exit;
+      LTryFetchIfEmpty;
+      var LBrowserTab: TNBoxTab;
+      var LBrowser: TNBoxBrowser;
+      LBrowserTab := self.AddBrowser(nil, false);
+      LBrowserTab.Text.Text := 'Files list';
+      LBrowser := TNBoxBrowser(LBrowserTab.Owner);
+      
+      for I := 0 to LPost.ContentUrlCount - 1 do begin
+        var LNewCard := LBrowser.NewItem;
+        var LFileItem := TNBoxPseudoItem.Create;
+        var LThumbSet: boolean := false;
+
+        LFileItem.ContentUrls := [LPost.ContentUrls[I]]; // One URL per file
+
+        if LPost is TNBoxCoomerPartyItem then begin
+          var LCoomerPost := (LPost as TNBoxCoomerPartyItem);
+          if I < Length(LCoomerPost.Item.Thumbnails) then begin
+            LFileItem.ThumbnailUrl := LCoomerPost.Site + LCoomerPost.Item.Thumbnails[I];
+            LThumbSet := True;
+          end;
+        end;
+
+        if not LThumbSet then
+          LFileItem.ThumbnailUrl := LPost.ThumbnailUrl;  
+        
+        LNewCard.Item := LFileItem;   
+        LNewCard.Fill.Kind := TBrushkind.Bitmap;
+        LNewCard.ImageURL := LNewCard.Post.ThumbnailUrl; // Start thumbnail load image
+      end;
+
+      Self.CurrentBrowser := LBrowser;
+      
     end;
 
   end;
@@ -2002,7 +2044,7 @@ begin
 
   BtnBrowse       := AddItemMenuBtn('Browse', ACTION_BROWSE, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
   BtnDownloadAll  := AddItemMenuBtn('Download content', ACTION_DOWNLOAD_ALL, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
-//  BtnDownloadMenu := AddItemMenuBtn('Choose files to download', ACTION_DOWNLOAD_MENU, ICON_DOWNLOAD);
+  BtnDownloadMenu := AddItemMenuBtn('Show available files', ACTION_SHOW_FILES, ICON_DOWNLOAD);
   BtnPlay         := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
   BtnAddBookmark  := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
   BtnOpenRelated  := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
