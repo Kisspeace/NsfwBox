@@ -128,6 +128,17 @@ implementation
 uses unit1;
 
 Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject);
+
+  function _AsStrings(const Lx: ISuperArray): TArray<String>;
+  var
+    I: integer;
+  begin
+    Result := [];
+    for I := 0 to Lx.Length - 1 do begin
+      Result := Result + [Lx.S[I]];
+    end;
+  end;
+
 begin
   if ( AObject is TNBoxR34AppItem ) then begin
     try
@@ -145,7 +156,12 @@ begin
       end;
     end;
   end;
+
   AObject.AssignFromJSON(JSON);
+  if AObject is TNBoxPseudoItem then begin
+    var LPseudoItem := TNBoxPseudoItem(AObject);
+    LPseudoItem.ContentUrls := _AsStrings(JSON.A['ContentUrls']); // without that not works
+  end;
 end;
 
 Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; AJsonString: string);
