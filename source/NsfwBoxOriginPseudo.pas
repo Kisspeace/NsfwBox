@@ -3,14 +3,14 @@ unit NsfwBoxOriginPseudo;
 
 interface
 uses
-  System.SysUtils, System.Classes, NsfwBoxInterfaces,
+  System.SysUtils, System.Classes, XSuperObject, NsfwBoxInterfaces,
   NsfwBoxOriginConst;
 
 type
 
   // This item used to test graphic interface on dev mode
 
-  TNBoxPseudoItem = class(TNBoxItemBase)
+  TNBoxPseudoItem = class(TNBoxItemBase, INBoxItem)
     private
       FUrls: TArray<string>;
       FThumb: string;
@@ -25,8 +25,10 @@ type
       function Clone: INBoxItem;                             override;
       //--Properties--//
       property Origin;
-      property ThumbnailUrl read GetThumbnailUrl write SetThumbnailUrl;
-      property ContentUrls read GetContentUrls write SetContentUrls;
+      [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl write SetThumbnailUrl;
+      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls write SetContentUrls;
+      [ALIAS('ThumbnailUrl')] property _ThumbnailUrl: string read FThumb write FThumb; // serialize
+      [ALIAS('ContentUrls')] property _ContentUrls: TArray<string> read FUrls write FUrls; // serialize
       constructor Create;
   end;
 
