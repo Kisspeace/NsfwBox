@@ -1319,7 +1319,6 @@ begin
     Align                    := TAlignlayout.Contents;
     MultiLayout.BlockCount   := Settings.ContentLayoutsCount;
     MultiLayout.LayoutIndent := Settings.ItemIndent;
-    MaxParallelThumbLoaders  := Settings.ThreadsCount;
     Request                  := RandReq;
     Result.OnWebClientCreate := OnBrowserSetWebClient;
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
