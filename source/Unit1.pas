@@ -3439,7 +3439,7 @@ begin
   With SearchMenu.OriginSetMenu do begin
     BtnOriginPseudo.Visible := Settings.DevMode;
     BtnOriginBookmarks.Visible := Settings.DevMode;
-    BtnOrigin9Hentaito.Visible := Settings.DevMode;
+//    BtnOrigin9Hentaito.Visible := Settings.DevMode;
   end;
 
 
