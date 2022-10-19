@@ -187,7 +187,8 @@ type
     CheckSetDevMode,
     CheckSetAutoCheckUpdates,
     CheckSetShowScrollBars,
-    CheckSetShowNavigateBackButton
+    CheckSetShowNavigateBackButton,
+    CheckSetBrowseNextPageByScrollDown
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -1100,6 +1101,7 @@ begin
     AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
     ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
     ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
+    BrowseNextPageByScrollDown := CheckSetBrowseNextPageByScrollDown.IsChecked;
 
     if AutoSaveSession then
       ConnectSession;
@@ -2078,6 +2080,7 @@ begin
   CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs');
   CheckSetAllowDuplicateTabs.Visible := false; // FIXME
 
+  CheckSetBrowseNextPageByScrollDown := AddSettingsCheck('Browse next page by scrolling down');
   CheckSetAutoStartBrowse     := AddSettingsCheck('Auto start browse');
   CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu');
   CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars');
@@ -2636,10 +2639,12 @@ var
   LBrowser: TNBoxBrowser;
 begin
   LBrowser := TNBoxBrowser(Sender);
-  if round(NewViewportPosition.Y) = round(LBrowser.ContentBounds.Height - LBrowser.Height) then begin
-    // Scrolled down
-    LBrowser.GoNextPage;
-  end;
+  if Settings.BrowseNextPageByScrollDown then begin
+    if round(NewViewportPosition.Y) = round(LBrowser.ContentBounds.Height - LBrowser.Height) then begin
+      // Scrolled down
+      LBrowser.GoNextPage;
+    end;
+  end
 end;
 
 procedure TForm1.OnCardAutoLook(Sender: TObject);
@@ -3418,6 +3423,7 @@ begin
   CheckSetAutoCheckUpdates.IsChecked    := Settings.AutoCheckUpdates;
   CheckSetShowScrollBars.IsChecked      := Settings.ShowScrollbars;
   CheckSetShowNavigateBackButton.IsChecked := Settings.ShowNavigateBackButton;
+  CheckSetBrowseNextPageByScrollDown.IsChecked := Settings.BrowseNextPageByScrollDown;
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;

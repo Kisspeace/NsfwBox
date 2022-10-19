@@ -47,6 +47,7 @@ type
     SaveDownloadHistory: boolean;
     SaveTapHistory: boolean;
     SaveClosedTabHistory: boolean;
+    BrowseNextPageByScrollDown: boolean;
     //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
     //AutoRenameExistsFile: boolean;
@@ -100,6 +101,7 @@ begin
   SaveClosedTabHistory   := true;
   SaveTapHistory         := false;
   Fullscreen             := true;
+  BrowseNextPageByScrollDown := True;
   //HighlightsDownloaded   := false;
   ShowCaptions           := true;
   //AutoRenameExistsFile   := false;
