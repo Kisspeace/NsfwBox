@@ -158,10 +158,6 @@ begin
   end;
 
   AObject.AssignFromJSON(JSON);
-  if AObject is TNBoxPseudoItem then begin
-    var LPseudoItem := TNBoxPseudoItem(AObject);
-    LPseudoItem.ContentUrls := _AsStrings(JSON.A['ContentUrls']); // without that not works
-  end;
 end;
 
 Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; AJsonString: string);
