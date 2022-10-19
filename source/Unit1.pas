@@ -26,7 +26,7 @@ uses
   NsfwBoxInterfaces, NsfwBoxSettings, NsfwBoxGraphics, NsfwBoxContentScraper,
   NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
   NsfwBoxOriginR34JsonApi, NsfwBoxOriginBookmarks,
-  NsfwBoxOriginCoomerParty, NsfwBoxOriginConst,
+  NsfwBoxOriginCoomerParty, NsfwBoxOrigin9HentaiToApi, NsfwBoxOriginConst,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
   NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
@@ -1783,7 +1783,14 @@ begin
             LFileItem.ThumbnailUrl := LCoomerPost.Site + LCoomerPost.Item.Thumbnails[I];
             LThumbSet := True;
           end;
+        end else if LPost is TNBox9HentaitoItem then begin
+          var L9HentItem := (LPost as TNBox9HentaitoItem);
+          if I <= L9HentItem.Item.TotalPage then begin
+            LFileItem.ThumbnailUrl := L9HentItem.Item.GetImageThumbUrl(I + 1);
+            LThumbSet := True;
+          end;
         end;
+
 
         if not LThumbSet then
           LFileItem.ThumbnailUrl := LPost.ThumbnailUrl;  
