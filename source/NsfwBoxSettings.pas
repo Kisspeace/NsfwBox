@@ -48,6 +48,8 @@ type
     SaveTapHistory: boolean;
     SaveClosedTabHistory: boolean;
     BrowseNextPageByScrollDown: boolean;
+    ImageCacheSave: boolean;
+    ImageCacheLoad: boolean;
     //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
     //AutoRenameExistsFile: boolean;
@@ -118,6 +120,8 @@ begin
     ContentPlayApp := 'C:\Program Files\VideoLAN\VLC\vlc.exe';
     ContentPlayParams := '"' + FORMAT_VAR_CONTENT_URL + '"';
   {$ENDIF}
+  ImageCacheSave := True;
+  ImageCacheLoad := True;
 end;
 
 end.
