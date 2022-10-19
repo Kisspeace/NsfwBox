@@ -25,10 +25,10 @@ type
   TNBoxBrowser = class(TMultiLayoutScroller)
     protected
       type
-        TBrowserWorker = Class(TGenericYDWQueuedThreadComponent<INBoxSearchRequest>)
+        TBrowserWorker = Class(TGenericYDWQueuedThreadComponent<TNBoxSearchRequestBase>)
           protected
             Browser: TNBoxBrowser;
-            procedure SubThreadExecute(AItem: INBoxSearchRequest); override;
+            procedure SubThreadExecute(AItem: TNBoxSearchRequestBase); override;
         End;
     private
       FWorker: TBrowserWorker;
@@ -114,7 +114,7 @@ begin
   if Assigned(BeforeBrowse) then
     BeforeBrowse(Self);
 
-  FWorker.QueueAdd(Self.Request.Clone);
+  FWorker.QueueAdd(Self.Request.Clone as TNBoxSearchRequestBase);
 end;
 
 procedure TNBoxBrowser.GoNextPage;
@@ -180,7 +180,7 @@ end;
 
 { TNBoxBrowser.TBrowserWorker }
 
-procedure TNBoxBrowser.TBrowserWorker.SubThreadExecute(AItem: INBoxSearchRequest);
+procedure TNBoxBrowser.TBrowserWorker.SubThreadExecute(AItem: TNBoxSearchRequestBase);
 const
   START_ITEM_HEIGHT: single = 320;
 var
@@ -271,9 +271,8 @@ begin
           if Assigned(LBookmark) then
             LNewItem.Item := LBookmark
           else
-            LNewItem.Item := LPost.Clone;
+            LNewItem.Item := LPost; // LPost.Clone;
 
-          Visible := true;
           Fill.Kind := TBrushKind.Bitmap;
 
           if Assigned(LPost) then
@@ -286,16 +285,8 @@ begin
     end;
 
   finally
-    Try
-//      TThread.Synchronize(nil, procedure begin
-        if Assigned(AItem) then
-          TObject(AItem).Free;
-//      end);
-    except
-      On E: Exception do begin
-        Synclog(E, 'Browser Thread AItem.Free: ');
-      end;
-    end;
+
+    (AItem as TObject).Free;
     Scraper.Free;
     Content.Free;
 
