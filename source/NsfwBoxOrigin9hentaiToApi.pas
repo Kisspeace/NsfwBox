@@ -33,21 +33,20 @@ type
       destructor Destroy; override;
   end;
 
-  TNBoxSearchReq9Hentaito = class(TInterfacedPersistent, INBoxSearchRequest,
+  TNBoxSearchReq9Hentaito = class(TNBoxSearchRequestBase, INBoxSearchRequest,
    IHasOrigin)
     protected
       FSearchRec: T9HentaiBookSearchRec;
       //FIncludedTags: T9HentaiTagAr;
       //FExcludedTags: T9HentaiTagAr;
-      function GetOrigin: integer;
-      procedure SetOrigin(const value: integer);
-      procedure SetRequest(const value: string);
-      function GetRequest: string;
-      procedure SetPageId(const value: integer);
-      function GetPageId: integer;
+      function GetOrigin: integer; override;
+      procedure SetRequest(const value: string); override;
+      function GetRequest: string;               override;
+      procedure SetPageId(const value: integer); override;
+      function GetPageId: integer; override;
     public
-      function Clone: INBoxSearchRequest;
-      property Origin: integer read GetOrigin write SetOrigin;
+      function Clone: INBoxSearchRequest; override;
+      property Origin;
       property SearchRec: T9HentaiBookSearchRec read FSearchRec write FSearchRec;
       [DISABLE] property Request: string read GetRequest write SetRequest;
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
@@ -56,7 +55,7 @@ type
 
 implementation
 
-{ TNBoxGmpClubItem }
+{ TNBox9HentaitoItem }
 
 procedure TNBox9HentaitoItem.Assign(ASource: INBoxItem);
 begin
@@ -161,11 +160,6 @@ end;
 function TNBoxSearchReq9Hentaito.GetRequest: string;
 begin
   Result := FSearchRec.Text;
-end;
-
-procedure TNBoxSearchReq9Hentaito.SetOrigin(const value: integer);
-begin
-
 end;
 
 procedure TNBoxSearchReq9Hentaito.SetPageId(const value: integer);

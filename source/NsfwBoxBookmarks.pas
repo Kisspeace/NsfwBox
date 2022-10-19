@@ -13,11 +13,11 @@ type
   TNBoxBookmarkType = ( Content, SearchRequest );
   TNBoxBookmarksDb = class;
 
-  TNBoxBookmark = class(TInterfacedPersistent, IHasOrigin)
+  TNBoxBookmark = class(TNoRefCountObject, IHasOrigin)
     private
       FId: int64;
       FTableName: string;
-      FObj: TInterfacedPersistent;
+      FObj: TObject;
       FOrigin: integer;
       FBookmarkType: TNBoxBookmarkType;
       FAbout: string;
@@ -25,11 +25,11 @@ type
       function GetBookmarkType: TNBoxBookmarkType;
       function GetOrigin: integer;
       function GetTime: TDateTime;
-      procedure SetObj(const value: TInterfacedPersistent);
+      procedure SetObj(const value: TObject);
     public
       property Id: int64 read FId write FId;
       property Tablename: string read FTableName write FTableName;
-      property Obj: TInterfacedPersistent read FObj write SetObj;
+      property Obj: TObject read FObj write SetObj;
       property Time: TDateTime read GetTime write FTime;
       property About: string read FAbout write FAbout;
       property Origin: integer read GetOrigin write FOrigin;
@@ -40,6 +40,7 @@ type
       constructor Create(AItem: INBoxItem); overload;
       constructor Create(AItem: INBoxSearchRequest); overload;
       constructor Create; overload;
+      destructor destroy; override;
   end;
 
   TBookmarkAr = TArray<TNBoxBookmark>;
@@ -121,13 +122,13 @@ type
       constructor Create(ADbFilename: string); override;
   end;
 
-  Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject); overload;
-  Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; AJsonString: string); overload;
+  Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject); overload;
+  Procedure SafeAssignFromJSON(AObject: TObject; AJsonString: string); overload;
 
 implementation
 uses unit1;
 
-Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; JSON: ISuperObject);
+Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject);
 
   function _AsStrings(const Lx: ISuperArray): TArray<String>;
   var
@@ -160,7 +161,7 @@ begin
   AObject.AssignFromJSON(JSON);
 end;
 
-Procedure SafeAssignFromJSON(AObject: TInterfacedPersistent; AJsonString: string);
+Procedure SafeAssignFromJSON(AObject: TObject; AJsonString: string);
 begin
   SafeAssignFromJSON(AObject, SO(AJSONString));
 end;
@@ -169,27 +170,23 @@ end;
 
 constructor TNBoxBookmark.Create(AItem: INBoxSearchRequest);
 begin
-  Obj := ( Aitem as TInterfacedPersistent );
+  Obj := ( Aitem as TObject );
 end;
 
 constructor TNBoxBookmark.Create(Aitem: INBoxItem);
 begin
-  Obj := ( Aitem as TInterfacedPersistent );
+  Obj := ( Aitem as TObject );
 end;
 
 function TNBoxBookmark.AsItem: INBoxItem;
 begin
-  if Supports(Obj, INBoxItem) then
-    Result := ( Obj as INBoxItem )
-  else
+  if not Supports(Obj, INBoxItem, Result) then
     Result := nil;
 end;
 
 function TNBoxBookmark.AsRequest: INBoxSearchRequest;
 begin
-  if Supports(Obj, INBoxSearchRequest) then
-    Result := ( Obj as INBoxSearchRequest )
-  else
+  if not Supports(Obj, INBoxSearchRequest, Result) then
     Result := nil;
 end;
 
@@ -197,6 +194,13 @@ end;
 constructor TNBoxBookmark.Create;
 begin
   FObj := nil;
+end;
+
+destructor TNBoxBookmark.destroy;
+begin
+//  if Assigned(Self.Obj) then
+//    Obj.Free;
+  inherited;
 end;
 
 function TNBoxBookmark.GetBookmarkType: TNBoxBookmarkType;
@@ -223,12 +227,15 @@ begin
   Result := Assigned(Req);
 end;
 
-procedure TNBoxBookmark.SetObj(const value: TInterfacedPersistent);
+procedure TNBoxBookmark.SetObj(const value: TObject);
+var
+  LHasOrigin: IHasOrigin;
 begin
   FObj := Value;
   if Assigned(Obj) then begin
 
-    Origin := (Obj as IHasOrigin).Origin;
+    supports(Obj, IHasOrigin, LHasOrigin);
+    Origin := LHasOrigin.Origin;
 
     if Supports(Obj, INboxItem) then
       BookmarkType := Content
@@ -458,7 +465,7 @@ var
   I, Pos: integer;
   Bookmark: TNBoxBookmark;
   Json: string;
-  tmp: TInterfacedPersistent;
+  tmp: TObject;
 begin
   Result := [];
   Pos := 1;
@@ -485,7 +492,7 @@ begin
         Content: begin
           var Post: INBoxItem;
           Post := CreateItemByOrigin(Origin);
-          tmp := (Post as TInterfacedPersistent);
+          tmp := (Post as TObject);
           SafeAssignFromJSON(tmp, Json);
           Bookmark.Obj := tmp;
         end;
@@ -493,7 +500,7 @@ begin
         SearchRequest: begin
           var Req: INBoxSearchRequest;
           Req := CreateReqByOrigin(Origin);
-          tmp := (Req as TInterfacedPersistent);
+          tmp := (Req as TObject);
           SafeAssignFromJSON(tmp, Json);
           Bookmark.Obj := tmp;
         end;
@@ -594,7 +601,7 @@ end;
 function TNBoxBookmarksDb.NewBookmark(AValue: IHasOrigin): TNBoxBookmark;
 begin
   Result := TNBoxBookmark.Create;
-  Result.Obj := ( AValue as TInterfacedPersistent );
+  Result.Obj := ( AValue as TObject );
   Result.Time := Now;
 end;
 

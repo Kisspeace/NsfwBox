@@ -97,7 +97,7 @@ type
   INBoxItemList = TList<INBoxItem>;
   INBoxHasOriginList = TList<IHasOrigin>;
 
-  TNBoxItemBase = class(TInterfacedPersistent, INBoxItem, IHasOrigin)
+  TNBoxItemBase = class(TNoRefCountObject, INBoxItem, IHasOrigin)
     protected
       FOrigin: Integer;
       //procedure SetContentUrls(const Value: TArray<string>);  virtual; abstract;
@@ -129,13 +129,13 @@ type
     property PageId: integer read GetPageId write SetPageId;
   end;
 
-  TNBoxSearchRequestBase = class(TInterfacedPersistent, INBoxSearchRequest, IHasOrigin)
+  TNBoxSearchRequestBase = class(TNoRefCountObject, INBoxSearchRequest, IHasOrigin)
     protected
       FRequest: string;
       FPageId: integer;
       //--Setters and Getters--//
       function GetOrigin: integer;               virtual; abstract;
-      function GetRequest: string;
+      function GetRequest: string;               virtual;
       procedure SetRequest(const Value: string); virtual;
       function GetPageId: integer;               virtual;
       procedure SetPageId(const Value: integer); virtual;

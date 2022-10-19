@@ -348,7 +348,6 @@ begin
 
 end;
 
-
 { TNBoxCard }
 
 procedure TNBoxCardBase.AutoLook;
@@ -365,8 +364,11 @@ end;
 
 destructor TNBoxCardBase.Destroy;
 begin
-//  if Assigned(FItem) then                    // !!!!
-//    ( FItem as TInterfacedPersistent ).Free;
+  if Assigned(FItem) then begin
+    if Self.HasBookmark then
+      FreeAndNil(TNBoxBookmark(FItem).Obj);
+    ( FItem as TObject ).Free;
+  end;
   inherited;
 end;
 
@@ -411,7 +413,7 @@ begin
     exit;
 
   if Assigned(FItem) then                    // !!!!
-    ( FItem as TInterfacedPersistent ).Free;
+    (FItem as TObject).Free;
 
 //  if Supports(Value, INBoxItem) then
 //    FItem := ( Value as INBoxItem ).Clone   // !!!!
