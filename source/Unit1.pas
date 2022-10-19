@@ -188,7 +188,9 @@ type
     CheckSetAutoCheckUpdates,
     CheckSetShowScrollBars,
     CheckSetShowNavigateBackButton,
-    CheckSetBrowseNextPageByScrollDown
+    CheckSetBrowseNextPageByScrollDown,
+    CheckSetImageCacheSave,
+    CheckSetImageCacheLoad
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -1103,6 +1105,15 @@ begin
     ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
     BrowseNextPageByScrollDown := CheckSetBrowseNextPageByScrollDown.IsChecked;
 
+    ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
+    ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
+
+    IWUContentManager.EnableSaveToCache := ImageCacheSave;
+    IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
+
+    BrowsersIWUContentManager.EnableSaveToCache := ImageCacheSave;
+    BrowsersIWUContentManager.EnableLoadFromCache := ImageCacheLoad;
+
     if AutoSaveSession then
       ConnectSession;
   end;
@@ -1884,12 +1895,16 @@ begin
   BrowsersIWUContentManager.OnImageLoadException := OnIWUException;
   BrowsersIWUContentManager.LoadThumbnailFromFile := True;
   BrowsersIWUContentManager.CacheManager := IWUCacheManager;
+  BrowsersIWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
+  BrowsersIWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
 
   // IWU content manager for other app images (like buttons)
   IWUContentManager := TIWUContentManager.Create(Self);
   IWUContentManager.OnImageLoadException := OnIWUException;
   IWUContentManager.LoadThumbnailFromFile := False;
   IWUContentManager.CacheManager := IWUCacheManager;
+  IWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
+  IWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
 
   DownloadItems := TNBoxTabList.Create;
   DownloadManager := TNBoxDownloadManager.Create(self);
@@ -2083,6 +2098,8 @@ begin
   CheckSetSaveTapHistory      := AddSettingsCheck('Save tap history');
   CheckSetSaveTabHistory      := AddSettingsCheck('Save closed tab history');
   CheckSetShowCaptions        := AddSettingsCheck('Show content caption');
+  CheckSetImageCacheSave      := AddSettingsCheck('Cache thumbnails');
+  CheckSetImageCacheLoad      := AddSettingsCheck('Load thumbnails from cache');
 
   CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs');
   CheckSetAllowDuplicateTabs.Visible := false; // FIXME
@@ -3431,6 +3448,8 @@ begin
   CheckSetShowScrollBars.IsChecked      := Settings.ShowScrollbars;
   CheckSetShowNavigateBackButton.IsChecked := Settings.ShowNavigateBackButton;
   CheckSetBrowseNextPageByScrollDown.IsChecked := Settings.BrowseNextPageByScrollDown;
+  CheckSetImageCacheSave.IsChecked      := Settings.ImageCacheSave;
+  CheckSetImageCacheLoad.IsChecked      := Settings.ImageCacheLoad;
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
