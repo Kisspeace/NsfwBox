@@ -15,7 +15,7 @@ uses
   NsfwBoxBookmarks, NsfwBoxOriginR34App,
   // you-did-well!
   YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.AlRectangle,
-  YDW.FMX.ImageWithURLManager;
+  YDW.FMX.ImageWithURLManager, YDW.Threading;
 
 type
 
@@ -25,19 +25,13 @@ type
   TNBoxBrowser = class(TMultiLayoutScroller)
     protected
       type
-        TBrowserTh = Class(TThread)
-          public
-            Owner: TNBoxBrowser;
-            Request: INBoxSearchRequest;
-            MaxThreadsCount: integer;
-            procedure Execute; override;
-            destructor Destroy; override;
-          End;
-
-        TBrowserThList = TObjectList<TBrowserTh>;
+        TBrowserWorker = Class(TGenericYDWQueuedThreadComponent<INBoxSearchRequest>)
+          protected
+            Browser: TNBoxBrowser;
+            procedure SubThreadExecute(AItem: INBoxSearchRequest); override;
+        End;
     private
-      FThreads: TBrowserThList;
-      FMaxParallelThumbLoaders: integer;
+      FWorker: TBrowserWorker;
       FRequest: INBoxSearchRequest;
       FOnItemCreate: TBrowserItemCreateEvent;
       FOnWebClientCreate: TWebClientSetEvent;
@@ -53,12 +47,9 @@ type
       procedure GoBrowse;
       procedure GoNextPage;
       procedure GoPrevPage;
-      procedure TerminateThreads;
-      procedure WaitForThreads;
       procedure Clear;
       property Request: INBoxSearchRequest read FRequest write SetRequest;
       property ImageManager: IImageWithUrlManager read FImageManager write FImageManager; //FIXME
-      property MaxParallelThumbLoaders: integer read FMaxParallelThumbLoaders write FMaxParallelThumbLoaders;
       property BeforeBrowse: TNotifyEvent read FBeforeBrowse write FBeforeBrowse;
       property OnItemCreate: TBrowserItemCreateEvent read FOnItemCreate write FOnItemCreate;
       property OnScraperCreate: TScraperCreateEvent read FOnScraperCreate write FOnScraperCreate;
@@ -78,16 +69,16 @@ implementation
 constructor TNBoxBrowser.Create(Aowner:Tcomponent);
 begin
   Inherited create(Aowner);
+  FWorker := TBrowserWorker.Create(Self);
+  FWorker.Browser := Self;
   FOnScraperCreate      := nil;
   FBeforeBrowse         := nil;
   FOnWebClientCreate    := nil;
   FOnRequestChanged     := nil;
-  FThreads := TBrowserThList.Create;
   items := TNBoxCardObjList.Create;
   LayoutIndent := 20;
   MultiLayout.PlusHeight := LayoutIndent;
   MultiLayout.BlockCount := 2;
-  FMaxParallelThumbLoaders := 5;
   FRequest := TNBoxSearchReqNsfwXxx.create;
 end;
 
@@ -110,56 +101,20 @@ begin
     OnRequestChanged(Self);
 end;
 
-
-procedure TNBoxBrowser.TerminateThreads;
-var
-  I: integer;
-begin
-  if ( FThreads.Count < 1 ) then
-    exit;
-  for I := 0 to ( FThreads.Count - 1 ) do begin
-    FThreads.Items[I].Terminate;
-  end;
-end;
-
-procedure TNBoxBrowser.WaitForThreads;
-var
-  I: integer;
-begin
-  if FThreads.Count < 1 then
-    exit;
-
-  for I := 0 to FThreads.Count - 1 do begin
-    FThreads.Items[I].WaitFor;
-  end;
-
-  FThreads.Clear;
-end;
-
 Destructor TNBoxBrowser.Destroy;
 begin
   self.Clear;
+  FWorker.Free;
   items.Free;
   inherited Destroy;
 end;
 
 procedure TNBoxBrowser.GoBrowse;
-var
-  Th: TBrowserTh;
 begin
   if Assigned(BeforeBrowse) then
     BeforeBrowse(Self);
 
-  Th                 := TBrowserTh.Create(true);
-  Th.Owner           := Self;
-  Th.Request         := Self.Request.Clone;
-  Th.MaxThreadsCount := Self.MaxParallelThumbLoaders;
-  Th.FreeOnTerminate := false;
-  Th.Start;
-  FThreads.Add(Th);
-   while not Th.Started do begin
-    sleep(1);
-  end;
+  FWorker.QueueAdd(Self.Request.Clone);
 end;
 
 procedure TNBoxBrowser.GoNextPage;
@@ -202,12 +157,15 @@ begin
 end;
 
 procedure TNBoxBrowser.Clear;
-var
-  I: integer;
 begin
   try
-    TerminateThreads;
-    WaitForThreads;
+    try
+      FWorker.Terminate;
+      FWorker.WaitForFinish;
+    except
+      On E:Exception do
+        SyncLog(E, 'TNBoxBrowser.clear - FWorker: ');
+    end;
 
     if items.Count > 0 then begin
       items.Clear;
@@ -220,15 +178,9 @@ begin
   end;
 end;
 
-{ TNBoxBrowser.TBrowserTh }
+{ TNBoxBrowser.TBrowserWorker }
 
-destructor TNBoxBrowser.TBrowserTh.Destroy;
-begin
-  if Assigned(Request) then
-    ( Request as TInterfacedPersistent ).Free;
-end;
-
-procedure TNBoxBrowser.TBrowserTh.Execute;
+procedure TNBoxBrowser.TBrowserWorker.SubThreadExecute(AItem: INBoxSearchRequest);
 const
   START_ITEM_HEIGHT: single = 320;
 var
@@ -244,7 +196,7 @@ var
 
   function IsNeedToBeSync: boolean;
   begin
-    Result := ( Request.Origin = ORIGIN_BOOKMARKS );
+    Result := ( AItem.Origin = ORIGIN_BOOKMARKS );
   end;
 
 begin
@@ -253,44 +205,46 @@ begin
     Scraper := TNBoxScraper.Create;
     Content := INBoxHasOriginList.Create;
 
-    Self.Synchronize(
+    TThread.Synchronize(nil,
     procedure
     begin
 
-      if Assigned(Owner.OnWebClientCreate) then
-        Scraper.OnWebClientSet := Owner.OnWebClientCreate;
+      if Assigned(Browser.OnWebClientCreate) then
+        Scraper.OnWebClientSet := Browser.OnWebClientCreate;
 
-      if Assigned(Owner.OnScraperCreate) then
-        Owner.OnScraperCreate(Self.Owner, Scraper);
+      if Assigned(Browser.OnScraperCreate) then
+        Browser.OnScraperCreate(Self.Owner, Scraper);
 
     end);
 
-    if Terminated then
-      exit;
+    if TThread.Current.CheckTerminated then exit;
 
     try
 
       if IsNeedToBeSync then begin
-        Synchronize(procedure begin Fetched := Scraper.GetContent(Request, Content); end);
+
+        TThread.Synchronize(nil, procedure
+        begin
+          Fetched := Scraper.GetContent(AItem, Content);
+        end);
+
       end else begin
-        Fetched := Scraper.GetContent(Request, Content);
+        Fetched := Scraper.GetContent(AItem, Content);
       end;
 
-      if not Fetched then
-        exit;
+      if not Fetched then exit;
 
     except
       on E: Exception do begin
-        SyncLog(E, 'Origin: ' + Request.Origin.ToString + ' Browser Main thread -> Scraper.GetContent: ');
+        SyncLog(E, 'Origin: ' + AItem.Origin.ToString + ' Browser Main thread -> Scraper.GetContent: ');
         exit;
       end;
     end;
 
-
     for I := 0 to Content.Count - 1 do begin
       var LContentItem := Content[I];
 
-      if Self.Terminated then exit;
+      if TThread.Current.CheckTerminated then exit;
 
       LBookmark := nil;
       LPost     := nil;
@@ -306,10 +260,10 @@ begin
           LRequest := LBookmark.AsRequest;
       end;
 
-      Self.Synchronize(
+      TThread.Synchronize(nil,
       procedure
       begin
-        LNewItem := Self.Owner.NewItem;
+        LNewItem := Self.Browser.NewItem;
 
         With LNewItem do begin
           Height := START_ITEM_HEIGHT;
@@ -326,14 +280,25 @@ begin
             ImageURL := LPost.ThumbnailUrl;
         end;
 
-        Self.Owner.MultiLayout.ReCalcBlocksSize;
+        Self.Browser.MultiLayout.ReCalcBlocksSize;
       end);
 
     end;
 
   finally
+    Try
+//      TThread.Synchronize(nil, procedure begin
+        if Assigned(AItem) then
+          TObject(AItem).Free;
+//      end);
+    except
+      On E: Exception do begin
+        Synclog(E, 'Browser Thread AItem.Free: ');
+      end;
+    end;
     Scraper.Free;
     Content.Free;
+
   end;
 end;
 
