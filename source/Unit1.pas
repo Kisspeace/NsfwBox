@@ -104,6 +104,7 @@ type
         MenuBtnBookmarks: TRectButton;
         MenuBtnSettings: TRectButton;
         MenuBtnNewTab: TRectButton;
+        MenuBtnTest: TRectButton;
     TabsScroll: TVertScrollBox;
     Browsers: TNBoxBrowserList;
     Tabs: TNBoxTabList;
@@ -236,6 +237,7 @@ type
     procedure MenuBtnNewTabOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnHistoryOnTap(Sender: TObject; const Point: TPointF);
+    procedure MenuBtnTestOnTap(Sender: TObject; const Point: TPointF);
     { -> Other -------------------- }
     procedure TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
     procedure TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
@@ -2054,6 +2056,14 @@ begin
     OnTap := MenuBtnNewTabOnTap;
   end;
 
+  MenuBtnTest := AddMenuBtn;
+  with MenuBtnTest do begin
+    image.FileName := AppStyle.GetImagePath(ICON_NSFWBOX);
+    Text.Text := 'Stress';
+    OnTap := MenuBtnTestOnTap;
+  end;
+  MenuBtnTest.Visible := Settings.DevMode;
+
   SearchMenu := TNBoxSearchMenu.Create(self);
   with Searchmenu do begin
     Parent := MenuSearchSettings;
@@ -3054,6 +3064,39 @@ end;
 procedure TForm1.MenuBtnSettingsOnTap(Sender: TObject; const Point: TPointF);
 begin
   ChangeInterface(MenuSettings);
+end;
+
+procedure TForm1.MenuBtnTestOnTap(Sender: TObject; const Point: TPointF);
+var
+  I, II: integer;
+  LBrowser: TNBoxBrowser;
+  LTab: TNBoxTab;
+begin
+  LTab := Self.AddBrowser(nil, false);
+  LTab.CloseBtn.Visible := false;
+  LBrowser := LTab.Owner as TNBoxBrowser;
+  Self.CurrentBrowser := LBrowser;
+  Application.ProcessMessages;
+
+  try
+    for I := 1 to 20 do begin
+      Lbrowser.GoNextPage;
+
+      Application.ProcessMessages;
+      CheckSynchronize(1);
+      sleep(random(14));
+
+      if I mod 3 = 0 then begin
+        Lbrowser.Clear;
+      end;
+
+      Sleep(Random(1));
+    end;
+  except On E: Exception do
+      Log(E, 'TestButton: ');
+  end;
+
+  LTab.CloseBtn.Visible := True;
 end;
 
 procedure TForm1.MenuChangeThemeOnSelected(Sender: TObject);

@@ -105,7 +105,7 @@ type
 
 
 implementation
-//uses unit1;
+uses unit1;
 { TNsfwBoxItem }
 
 procedure TNBoxCardSimple.AutoLook;
@@ -199,8 +199,6 @@ end;
 
 Destructor TNBoxCardSimple.Destroy;
 begin
-  Text.Free;
-  Rect.Free;
   inherited;
 end;
 
@@ -364,12 +362,22 @@ end;
 
 destructor TNBoxCardBase.Destroy;
 begin
-  if Assigned(FItem) then begin
-    if Self.HasBookmark then
-      FreeAndNil(TNBoxBookmark(FItem).Obj);
-    ( FItem as TObject ).Free;
+  try
+    try
+      inherited;
+    except
+      On E: Exception do
+        Synclog(E, 'TNBoxCardBase.Destroy inherited: ');
+    end;
+    if Assigned(FItem) then begin
+      if Self.HasBookmark then
+        FreeAndNil(TNBoxBookmark(FItem).Obj);
+      ( FItem as TObject ).Free;
+    end;
+  except
+    On E: Exception do
+      Synclog(E, 'TNBoxCardBase.Destroy');
   end;
-  inherited;
 end;
 
 function TNBoxCardBase.GetBookmark: TNBoxBookmark;
