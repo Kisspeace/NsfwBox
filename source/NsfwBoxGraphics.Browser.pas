@@ -25,7 +25,7 @@ type
   TNBoxBrowser = class(TMultiLayoutScroller)
     protected
       type
-        TBrowserWorker = Class(TGenericYDWQueuedThreadComponent<TNBoxSearchRequestBase>)
+        TBrowserWorker = Class(TInterfaceYDWQueuedThreadComponent<TNBoxSearchRequestBase>)
           protected
             Browser: TNBoxBrowser;
             procedure SubThreadExecute(AItem: TNBoxSearchRequestBase); override;
@@ -157,15 +157,12 @@ begin
 end;
 
 procedure TNBoxBrowser.Clear;
+var
+  I: integer;
 begin
   try
-    try
       FWorker.Terminate;
       FWorker.WaitForFinish;
-    except
-      On E:Exception do
-        SyncLog(E, 'TNBoxBrowser.clear - FWorker: ');
-    end;
 
     if items.Count > 0 then begin
       items.Clear;
