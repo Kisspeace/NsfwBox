@@ -32,6 +32,9 @@ uses
   NsfwBoxOrigin9hentaiToApi in 'source\NsfwBoxOrigin9hentaiToApi.pas',
   NsfwBox.UpdateChecker in 'source\NsfwBox.UpdateChecker.pas',
   NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas',
+  {$IFDEF MSWINDOWS}
+  NsfwBoxWindowsTitlebar in 'source\NsfwBoxWindowsTitlebar.pas',
+  {$ENDIF}
   NsfwBoxOriginCoomerParty in 'source\NsfwBoxOriginCoomerParty.pas';
 
 {$R *.res}
