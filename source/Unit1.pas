@@ -5,7 +5,7 @@ unit Unit1;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.SysUtils, System.Types, System.UITypes, System.Classes, Fmx.Objects,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, XSuperObject,
   FMX.Controls.Presentation, FMX.MultiView, FMX.Color, FMX.Edit, FMX.Layouts,
   Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBoxFilesystem, NsfwXxx.Types,
@@ -464,7 +464,7 @@ var
   LDir: string;
 begin
   try
-    LDir := Tpath.GetDirectoryName(AFilename);
+    LDir := TPath.GetDirectoryName(AFilename);
     if Not DirectoryExists(LDir) then
       CreateDir(LDir);
 
@@ -515,7 +515,7 @@ begin
   with Result do begin
     Parent := MenuBookmarksDoList;
     Align := TAlignlayout.Top;
-    Image.FileName := AppStyle.GetImagePath(AImageName);
+    Image.ImageURL := AppStyle.GetImagePath(AImageName);
     Text.Text := AText;
     OnTap := AOnTap;
     TagString := ATag;
@@ -635,7 +635,7 @@ begin
   with Result do begin
     Parent := MenuItem;
     Align := TAlignlayout.Top;
-    Image.FileName := AppStyle.GetImagePath(AImageName);
+    Image.ImageURL := AppStyle.GetImagePath(AImageName);
     Text.Text := ACaption;
     Tag := Ord(AAction);
     OnTap := BtnItemMenuOnTap;
@@ -663,7 +663,7 @@ begin
     Align := TAlignLayout.Top;
     Text.Text := AText;
     Position.Y := Single.MaxValue;
-    Image.FileName := AppStyle.GetImagePath(AImageName);
+    Image.ImageURL := AppStyle.GetImagePath(AImageName);
     OnTap := AOnTap;
   end;
 end;
@@ -697,7 +697,7 @@ begin
     _SetDefSettingsControl(Result);
     Text.Text := AText;
     if not AImageName.IsEmpty then
-      Image.FileName := AppStyle.GetImagePath(AImageName);
+      Image.ImageURL := AppStyle.GetImagePath(AImageName);
   end;
 end;
 
@@ -1382,8 +1382,9 @@ begin
 
     Text.Font.Size := 12;
     Text.Color := AppStyle.TextColors[0];
-    Image.WrapMode := TAlImageWrapMode.Stretch;
+    Image.WrapMode := TImageWrapMode.Stretch;
     Image.OnResize := IconOnResize;
+    Image.ImageManager := IWUContentManager;
     Height := BUTTON_HEIGHT;
     Image.OnResize(Image);
   end;
@@ -1426,7 +1427,8 @@ begin
     Image.OnResize := IconOnResize;
     Text.Font.Size := 11;
     Text.Color := AppStyle.TextColors[0];
-    Image.WrapMode := TAlImageWrapMode.Stretch;
+    Image.ImageManager := IWUContentManager;
+    Image.WrapMode := TImageWrapMode.Stretch;
     Image.OnResize(Image);
     Check.OnResize(Check);
   end;
@@ -1459,6 +1461,7 @@ begin
   with Result do begin
     AppStyle.CheckButton.Apply(Result);
     Height := CONTROLS_DEF_HEIGHT;
+    Image.ImageManager := IWUContentManager;
   end;
 end;
 
@@ -1532,12 +1535,14 @@ function TForm1.CreateDefTab(AOwner: TComponent): TNBoxTab;
 begin
   Result := TNBoxTab.Create(AOwner);
   with Result do begin
-    Image.WrapMode := TAlImageWrapMode.Stretch;
+    Image.WrapMode := TImageWrapMode.Stretch;
     Image.OnResize := IconOnResize;
+    Image.ImageManager := IWUContentManager;
     with CloseBtn do begin
       Text.Color := AppStyle.TextColors[0];
-      Image.WrapMode := TAlImageWrapMode.Stretch;
+      Image.WrapMode := TImageWrapMode.Stretch;
       Image.OnResize := IconOnResize;
+      Image.ImageManager := IWUContentManager;
     end;
     AppStyle.tab.Apply(result);
     Height := TAB_DEF_HEIGHT;
@@ -1894,26 +1899,7 @@ begin
   end;
   LoadStyle;
 
-  {$IFDEF ANDROID}
-    Form1.MVMenu.Mode := TMultiviewMode.Drawer;
-  {$ELSE IF MSWINDOWS}
-    if Settings.UseNewAppTitlebar then begin
-      TitleBar := TNBoxFormTitleBar.Create(Self);
-      TitleBar.Stroke.Kind := TBrushKind.None;
-      AppStyle.Topbar.Apply(TitleBar.Fill);
-      TitleBar.BtnTitle.Image.Visible := False;
-      TitleBar.BtnTitle.Margins.Left := 5;
-      TitleBar.BtnTitle.Text.Text := '  🌈 NsfwBox v' + APP_VERSION.ToString;
-      TitleBar.BtnClose.Image.FileName := AppStyle.GetImagePath(ICON_CLOSETAB);
-      TitleBar.BtnMaxMin.Image.FileName := AppStyle.GetImagePath(ICON_CURRENT_TAB);
-      TitleBar.BtnHide.Image.FileName := AppStyle.GetImagePath(ICON_MENU);
-      Self.BorderStyle := TFmxFormBorderStyle.None;
-    end;
-    form1.Width := Round(Form1.Height * 1.6);
-  {$ENDIF}
-
   Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
-
 
   IWUCacheManager := TIWUCacheManager.Create(Self);
   IWUCacheManager.SetSaveAndLoadPath(Tpath.Combine(TNBoxPath.GetCachePath, 'thumbnails'));
@@ -1933,6 +1919,24 @@ begin
   IWUContentManager.CacheManager := IWUCacheManager;
   IWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
   IWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
+
+  {$IFDEF ANDROID}
+    Form1.MVMenu.Mode := TMultiviewMode.Drawer;
+  {$ELSE IF MSWINDOWS}
+    if Settings.UseNewAppTitlebar then begin
+      TitleBar := TNBoxFormTitleBar.Create(Self);
+      TitleBar.Stroke.Kind := TBrushKind.None;
+      AppStyle.Topbar.Apply(TitleBar.Fill);
+      TitleBar.BtnTitle.Image.Visible := False;
+      TitleBar.BtnTitle.Margins.Left := 5;
+      TitleBar.BtnTitle.Text.Text := '  🌈 NsfwBox v' + APP_VERSION.ToString;
+      TitleBar.BtnClose.Image.ImageURL := AppStyle.GetImagePath(ICON_CLOSETAB);
+      TitleBar.BtnMaxMin.Image.ImageURL := AppStyle.GetImagePath(ICON_CURRENT_TAB);
+      TitleBar.BtnHide.Image.ImageURL := AppStyle.GetImagePath(ICON_MENU);
+      Self.BorderStyle := TFmxFormBorderStyle.None;
+    end;
+    form1.Width := Round(Form1.Height * 1.6);
+  {$ENDIF}
 
   DownloadItems := TNBoxTabList.Create;
   DownloadManager := TNBoxDownloadManager.Create(self);
@@ -1973,7 +1977,7 @@ begin
   with TopBtnApp do begin
     Parent := TopRect;
     Align := TAlignlayout.MostLeft;
-    Image.FileName := AppStyle.GetImagePath(ICON_NSFWBOX);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_NSFWBOX);
     OnTap := TopBtnAppOnTap;
   end;
 
@@ -2009,7 +2013,7 @@ begin
   with TopBtnSearch do begin
     parent := TopRect;
     align := TAlignlayout.right;
-    Image.FileName := AppStyle.GetImagePath(ICON_SEARCH);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_SEARCH);
     OnTap := TopBtnSearchOnTap;
   end;
 
@@ -2017,7 +2021,7 @@ begin
   with TopBtnPopMenu do begin
     Parent := TopRect;
     Align := TALignlayout.MostRight;
-    Image.FileName := AppStyle.GetImagePath(ICON_MENU);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_MENU);
     OnTap := TopBtnPopMenuOnTap;
   end;
 
@@ -2034,7 +2038,7 @@ begin
     Align := TAlignLayout.Right;
     OnTap := BtnNextOnTap;
     Width := Height;
-    Image.FileName := AppStyle.GetImagePath(ICON_NEXT);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_NEXT);
   end;
 
   BtnPrev := CreateDefButton(BrowserBtnsLayout2, BTN_STYLE_ICON);
@@ -2043,7 +2047,7 @@ begin
     Align := TAlignLayout.Right;
     OnTap := BtnPrevOnTap;
     Width := Height;
-    Image.FileName := AppStyle.GetImagePath(ICON_NEXT);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_NEXT);
     Image.RotationAngle := 180;
   end;
 
@@ -2055,41 +2059,41 @@ begin
   MenuBtnDownloads := AddMenuBtn;
   with MenuBtnDownloads do begin
     Text.Text := 'Downloads';
-    IMage.FileName := AppStyle.GetImagePath(ICON_DOWNLOADS);
+    IMage.ImageURL := AppStyle.GetImagePath(ICON_DOWNLOADS);
     OnTap := MenuBtnDownloadsOnTap;
   end;
 
   MenuBtnBookmarks := AddMenuBtn;
   with MenuBtnBookmarks do begin
     Text.Text := 'Bookmarks';
-    Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_BOOKMARKS);
     OnTap := MenuBtnBookmarksOnTap;
   end;
 
   MenuBtnBookmarks := AddMenuBtn;
   with MenuBtnBookmarks do begin
     Text.Text := 'History';
-    Image.FileName := AppStyle.GetImagePath(ICON_HISTORY);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_HISTORY);
     OnTap := MenuBtnHistoryOnTap;
   end;
 
   MenuBtnSettings := AddMenuBtn;
   with MenuBtnSettings do begin
-    Image.FileName := AppStyle.GetImagePath(ICON_SETTINGS);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_SETTINGS);
     text.Text := 'Settings';
     OnTap := MenuBtnSettingsOnTap;
   end;
 
   MenuBtnNewTab := AddMenuBtn;
   with MenuBtnNewTab do begin
-    image.FileName := AppStyle.GetImagePath(ICON_NEWTAB);
+    image.ImageURL := AppStyle.GetImagePath(ICON_NEWTAB);
     Text.Text := 'Create new tab';
     OnTap := MenuBtnNewTabOnTap;
   end;
 
   MenuBtnTest := AddMenuBtn;
   with MenuBtnTest do begin
-    image.FileName := AppStyle.GetImagePath(ICON_NSFWBOX);
+    image.ImageURL := AppStyle.GetImagePath(ICON_NSFWBOX);
     Text.Text := 'Stress';
     OnTap := MenuBtnTestOnTap;
   end;
@@ -2188,7 +2192,7 @@ begin
     for I := 0 to Content.Controls.Count - 1 do begin
       Control := Content.Controls.Items[I];
       if Control is TNBoxCheckButton then
-        (Control as TNBoxCheckButton).Image.FileName :=
+        (Control as TNBoxCheckButton).Image.ImageURL :=
           AppStyle.GetImagePath(ICON_SETTINGS);
     end;
 
@@ -2200,7 +2204,7 @@ begin
       Align := TAlignLayout.Top;
       Position.Y := Single.MaxValue;
       Margins.Rect := TRectF.Create(6, 6, 6, 0);
-      Image.FileName := AppStyle.GetImagePath(ICON_SAVE);
+      Image.ImageURL := AppStyle.GetImagePath(ICON_SAVE);
       OnTap := BtnSetSaveOnItemTapOnTap;
       Text.Text := 'Save tap settings';
     end;
@@ -2246,7 +2250,7 @@ begin
       Align := TAlignLayout.MostLeft;
       OnResize := Self.IconOnResize;
       Margins.Right := 6;
-      Image.Filename := AppStyle.GetImagePath(ICON_BOOKMARKS);
+      Image.ImageURL := AppStyle.GetImagePath(ICON_BOOKMARKS);
     end;
 
     EditBmarkName := Self.CreateDefEdit(LayoutBMarkChangeTop);
@@ -2274,7 +2278,7 @@ begin
     OnTap := BtnBMarkSaveChangesOnTap;
     Margins.Rect := LayoutBMarkChangeTop.Margins.Rect;
     Margins.Bottom := Margins.Top;
-    Image.FileName := AppStyle.GetImagePath(ICON_SAVE);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_SAVE);
     Text.Text := 'Save changes';
     Position.Y := Single.MaxValue;
   end;
@@ -2351,7 +2355,7 @@ begin
     Parent := MenuAnonMessage;
     Align := TAlignlayout.MostBottom;
     Text.Text := 'Send message';
-    Image.FileName := AppStyle.GetImagePath(ICON_TRANS);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_TRANS);
     OnTap := BtnSendMsgForDevOnTap;
   end;
 
@@ -3194,9 +3198,9 @@ begin
         Check.Image.Margins.Rect := TRectF.Create(0, 5, 0, 5);
 
         if (ADataBase = BookmarksDb) then
-          Check.Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS)
+          Check.Image.ImageURL := AppStyle.GetImagePath(ICON_BOOKMARKS)
         else if (ADataBase = HistoryDb) then
-          Check.Image.FileName := AppStyle.GetImagePath(ICON_HISTORY);
+          Check.Image.ImageURL := AppStyle.GetImagePath(ICON_HISTORY);
 
         Align := TAlignLayout.Top;
         Position.Y := Single.MaxValue;
@@ -3509,14 +3513,14 @@ begin
   if Assigned(FCurrentBrowser) then begin
     Tab := self.GetTab(FCurrentBrowser);
     Tab.Image.Visible := false;
-    Tab.Image.FileName := '';
+    Tab.Image.Bitmap.SetSize(0, 0);
     FCurrentBrowser.Visible := false;
   end;
 
   FCurrentBrowser := Value;
   Tab := self.GetTab(FCurrentBrowser);
   Tab.Image.Visible := true;
-  Tab.Image.FileName := AppStyle.GetImagePath(AppStyle.Tab.ImageFilename);
+  Tab.Image.ImageURL := AppStyle.GetImagePath(AppStyle.Tab.ImageFilename);
   FCurrentBrowser.Visible := true;
 end;
 

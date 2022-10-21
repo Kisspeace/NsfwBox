@@ -255,7 +255,7 @@ var
   begin
     Result := Form1.CreateDefCheckButton(Self);
     with Result do begin
-      Image.FileName := Form1.AppStyle.GetImagePath(AImageName);
+      Image.ImageURL := Form1.AppStyle.GetImagePath(AImageName);
       Text.Text := AText;
       IsChecked := true;
       Margins.Bottom := M.Top / 2;
@@ -396,7 +396,7 @@ begin
         Text.Text := 'Change booru';
         TagObject := Self.R34AppBooruChangeMenu; // linking button with menu
         OnTap := BtnSelectMenuOnTap;
-        Image.FileName := IconPath;
+        Image.ImageURL := IconPath;
       end;
 
     end;
@@ -461,7 +461,7 @@ begin
         Text.Text := 'Change sort';
         TagObject := NsfwXxxSortMenu; // linking button with menu
         OnTap := BtnSelectMenuOnTap;
-        Image.FileName := IconPath;
+        Image.ImageURL := IconPath;
       end;
 
       BtnChangeUrlType := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
@@ -473,7 +473,7 @@ begin
         Text.Text := 'Change search type';
         TagObject := NsfwXxxSearchTypeMenu; // linking button with menu
         OnTap := BtnSelectMenuOnTap;
-        Image.FileName := IconPath;
+        Image.ImageURL := IconPath;
       end;
 
       BtnChangeSite := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
@@ -485,7 +485,7 @@ begin
         Text.Text := 'Change site';
         TagObject := Self.NsfwXxxHostChangeMenu; // linking button with menu
         OnTap := BtnSelectMenuOnTap;
-        Image.FileName := IconPath;
+        Image.ImageURL := IconPath;
       end;
 
       DoAutoSize;
@@ -505,7 +505,7 @@ begin
         Text.Text := 'Change search type';
         TagObject := GmpClubSearchTypeMenu; // linking button with menu
         OnTap := BtnSelectMenuOnTap;
-        Image.FileName := IconPath;
+        Image.ImageURL := IconPath;
       end;
 
     end;
@@ -533,7 +533,7 @@ begin
         Text.Text := 'Change host URL';
         TagObject := CoomerPartyHostChangeMenu; // linking button with menu
         OnTap := BtnSelectMenuOnTap;
-        Image.FileName := IconPath;
+        Image.ImageURL := IconPath;
       end;
       BeBottom(BtnCoomerPartyChangeSite, EditCoomerPartyHost);
 
@@ -733,7 +733,7 @@ end;
 
 procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
 begin
-  BtnChangeOrigin.Image.FileName := form1.AppStyle.GetImagePath(OriginSetMenu.Selected);
+  BtnChangeOrigin.Image.ImageURL := form1.AppStyle.GetImagePath(OriginSetMenu.Selected);
   BtnChangeOrigin.Text.Text := '( ' + OriginToStr(OriginSetMenu.Selected) + ' ) Change content provider';
   self.HideMenus;
   //OriginSetMenu.Visible := False;
@@ -829,9 +829,9 @@ begin
     Text.Text := AText;
 
     if AShortImageName then
-      Image.FileName := Form1.AppStyle.GetImagePath(AImageFilename)
+      Image.ImageURL := Form1.AppStyle.GetImagePath(AImageFilename)
     else
-      Image.FileName := AImageFilename;
+      Image.ImageURL := AImageFilename;
 
     Tag := AId;
     OnTap := self.BtnOnTap;
