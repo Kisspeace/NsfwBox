@@ -65,6 +65,7 @@ type
     ShowScrollBars: boolean;
     ShowNavigateBackButton: boolean;
     {$IFDEF MSWINDOWS}
+      UseNewAppTitlebar: boolean;
       ContentPlayApp: string;
       ContentPlayParams: string;
     {$ENDIF}
@@ -102,7 +103,6 @@ begin
   SaveDownloadHistory    := true;
   SaveClosedTabHistory   := true;
   SaveTapHistory         := false;
-  Fullscreen             := true;
   BrowseNextPageByScrollDown := True;
   //HighlightsDownloaded   := false;
   ShowCaptions           := true;
@@ -117,8 +117,12 @@ begin
   ShowNavigateBackButton := True;
   {$IFDEF MSWINDOWS}
     ShowScrollBars       := false;
-    ContentPlayApp := 'C:\Program Files\VideoLAN\VLC\vlc.exe';
-    ContentPlayParams := '"' + FORMAT_VAR_CONTENT_URL + '"';
+    ContentPlayApp       := 'C:\Program Files\VideoLAN\VLC\vlc.exe';
+    ContentPlayParams    := '"' + FORMAT_VAR_CONTENT_URL + '"';
+    UseNewAppTitlebar    := True;
+    FullScreen           := False;
+  {$ELSE IF ANDROID}
+    Fullscreen           := True;
   {$ENDIF}
   ImageCacheSave := True;
   ImageCacheLoad := True;

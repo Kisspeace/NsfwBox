@@ -15,8 +15,8 @@ uses
   Fmx.Helpers.Android, AndroidApi.Helpers,
   AndroidApi.JNI.GraphicsContentViewText,
   AndroidApi.JNI.JavaTypes,
-  {$ENDIF} {$IFDEF MSWINDOWS}
-  ShellApi, Windows,
+  {$ELSE IF MSWINDOWS}
+  ShellApi, Windows, NsfwBoxWindowsTitlebar,
   {$ENDIF}
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections,
@@ -87,8 +87,14 @@ type
     procedure SetCurrentBookmarksDb(const value: TNBoxBookmarksDb);
     function GetSubHeader: string;
     procedure SetSubHeader(const Value: string);
+    function GetAppFullscreen: boolean;
+    procedure SetAppFullscreen(const Value: boolean);
   public
     { Public declarations }
+    {$IFDEF MSWINDOWS}
+    TitleBar: TNBoxFormTitleBar;
+    {$ENDIF}
+
     AfterUserEvent: TProcedureRef;
     TopRect: TAlRectangle;
       TopBtnApp: TRectButton;
@@ -361,6 +367,7 @@ type
     property AppStyle: TNBoxGUIStyle read GetAppStyle write SetAppStyle;
     property Settings: TNsfwBoxSettings read GetSettings write SetSettings;
     property SubHeader: string read GetSubHeader write SetSubHeader;
+    property AppFullscreen: boolean read GetAppFullscreen write SetAppFullscreen;
   end;
 
 var
@@ -1690,7 +1697,7 @@ begin
       {$IFDEF ANDROID}
       if ( LPost.ContentUrlCount > 0 ) then
         StartActivityView(LPost.ContentUrl);
-      {$ENDIF} {$IFDEF MSWINDOWS}
+      {$ELSE IF MSWINDOWS}
       if ( LPost.ContentUrlCount > 0 ) then begin
         var LParams: string;
         LParams := Settings.ContentPlayParams.Replace(FORMAT_VAR_CONTENT_URL, LPost.ContentUrl);
@@ -1866,6 +1873,7 @@ var
 
 begin
   FFormCreated := false;
+
   APP_VERSION := GetAppVersion;
   FCurrentBrowser := nil;
 
@@ -1888,11 +1896,20 @@ begin
 
   {$IFDEF ANDROID}
     Form1.MVMenu.Mode := TMultiviewMode.Drawer;
-  {$ENDIF}
-
-  {$IFDEF MSWINDOWS}
-    fSettings.Fullscreen := false;
-    form1.Width := round(form1.Height * 1.6);
+  {$ELSE IF MSWINDOWS}
+    if Settings.UseNewAppTitlebar then begin
+      TitleBar := TNBoxFormTitleBar.Create(Self);
+      TitleBar.Stroke.Kind := TBrushKind.None;
+      AppStyle.Topbar.Apply(TitleBar.Fill);
+      TitleBar.BtnTitle.Image.Visible := False;
+      TitleBar.BtnTitle.Margins.Left := 5;
+      TitleBar.BtnTitle.Text.Text := '  🌈 NsfwBox v' + APP_VERSION.ToString;
+      TitleBar.BtnClose.Image.FileName := AppStyle.GetImagePath(ICON_CLOSETAB);
+      TitleBar.BtnMaxMin.Image.FileName := AppStyle.GetImagePath(ICON_CURRENT_TAB);
+      TitleBar.BtnHide.Image.FileName := AppStyle.GetImagePath(ICON_MENU);
+      Self.BorderStyle := TFmxFormBorderStyle.None;
+    end;
+    form1.Width := Round(Form1.Height * 1.6);
   {$ENDIF}
 
   Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
@@ -1946,6 +1963,10 @@ begin
     Align := TAlignlayout.MostTop;
     Parent := form1;
     Height := TOPRECT_HEIGHT;
+    {$IFDEF MSWINDOWS}
+    if Settings.UseNewAppTitlebar then
+      TitleBar.DoMyJobWithMe(TopRect);
+    {$ENDIF}
   end;
 
   TopBtnApp := CreateDefButton(TopRect, BTN_STYLE_ICON3);
@@ -1980,7 +2001,7 @@ begin
   end;
   {$IFDEF ANDROID}
   SubHeader := 'Make L☮ve, not war';
-  {$ENDIF} {$IFDEF MSWINDOWS}
+  {$ELSE IF MSWINDOWS}
   SubHeader := 'Make Love, not war';
   {$ENDIF}
 
@@ -2431,7 +2452,7 @@ begin
             if UserSayYes then
             {$IFDEF ANDROID}
               StartActivityView(LastRelease.HtmlUrl);
-            {$ENDIF} {$IFDEF MSWINDOWS}
+            {$ELSE IF MSWINDOWS}
               ShellExecute(0, 'open', Pchar(LastRelease.HtmlUrl), nil, nil, SW_SHOWNORMAL);
             {$ENDIF}
             Self.ChangeInterface(Self.BrowserLayout);
@@ -2488,7 +2509,7 @@ begin
     VkEscape:
     begin
       {$IFDEF MSWINDOWS}
-      Form1.FullScreen := false;
+      Form1.AppFullScreen := false;
       {$ENDIF}
       ChangeInterface(BrowserLayout);
     end;
@@ -2499,6 +2520,11 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   FAppStyle.Form.Apply(form1.Fill);
+end;
+
+function TForm1.GetAppFullscreen: boolean;
+begin
+  Result := Form1.FullScreen;
 end;
 
 function TForm1.GetAppStyle: TNBoxGUIStyle;
@@ -3103,7 +3129,13 @@ begin
 
       Application.ProcessMessages;
       CheckSynchronize(1);
-      sleep(random(14));
+
+      {$IFDEF ANDROID}
+        sleep(random(230));
+      {$ELSE IF MSWINDOWS}
+        Sleep(random(100));
+      {$ENDIF}
+
 
       if I mod 3 = 0 then begin
         Lbrowser.Clear;
@@ -3431,6 +3463,19 @@ begin
   Settings.AsJSONObject.SaveTo(SETTINGS_FILENAME, true);
 end;
 
+procedure TForm1.SetAppFullscreen(const Value: boolean);
+begin
+  Form1.FullScreen := Value;
+  {$IFDEF MSWINDOWS}
+    if Assigned(TitleBar) and Settings.UseNewAppTitlebar then
+      TitleBar.Visible := Not Value; // if fullscreen then hide
+    if Value then begin // fix position
+      Form1.Top := 0;
+      Form1.Left := 0;
+    end;
+  {$ENDIF}
+end;
+
 procedure TForm1.SetAppStyle(const Value: TNBoxGUIStyle);
 begin
   FAppStyle.Assign(Value);
@@ -3501,7 +3546,7 @@ begin
   EditSetItemIndent.Edit.Edit.Text      := Settings.ItemIndent.ToString;
   EditSetFilenameLogUrls.Edit.Edit.Text := Settings.FilenameLogUrls;
   CheckSetFullscreen.IsChecked          := settings.Fullscreen;
-  Form1.FullScreen                      := FSettings.Fullscreen;
+  Form1.AppFullScreen                      := FSettings.Fullscreen;
   CheckSetAllowCookies.IsChecked        := Settings.AllowCookies;
   CheckSetShowCaptions.IsChecked        := Settings.ShowCaptions;
   CheckSetAllowDuplicateTabs.IsChecked  := Settings.AllowDuplicateTabs;
