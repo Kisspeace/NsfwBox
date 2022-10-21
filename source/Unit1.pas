@@ -723,8 +723,10 @@ begin
     DoWithAllItems := false;
     ChangeInterface(MenuBookmarksDoList);
   end else begin
-    if assigned(Self.AfterUserEvent) then
-      AfterUserEvent;
+    if assigned(Self.AfterUserEvent) then begin
+      AfterUserEvent();
+      AfterUserEvent := nil;
+    end;
     NowUserSelect := false;
   end;
 end;
@@ -883,22 +885,28 @@ end;
 
 procedure TForm1.BtnBMarkSaveChangesOnTap(Sender: TObject; const Point: TPointF);
 begin
-  if Assigned(AfterUserEvent) then
-    AfterUserEvent;
+  if Assigned(AfterUserEvent) then begin
+    AfterUserEvent();
+    AfterUserEvent := nil;
+  end;
 end;
 
 procedure TForm1.BtnDialogNoOnTap(Sender: TObject; const Point: TPointF);
 begin
   UserSayYes := false;
-  if Assigned(AfterUserEvent) then
-    AfterUserEvent;
+  if Assigned(AfterUserEvent) then begin
+    AfterUserEvent();
+    AfterUserEvent := nil;
+  end;
 end;
 
 procedure TForm1.BtnDialogYesOnTap(Sender: TObject; const Point: TPointF);
 begin
   UserSayYes := true;
-  if Assigned(AfterUserEvent) then
-    AfterUserEvent;
+  if Assigned(AfterUserEvent) then begin
+    AfterUserEvent();
+    AfterUserEvent := nil;
+  end;
 end;
 
 procedure TForm1.BtnItemMenuOnTap(Sender: TObject; const Point: TPointF);
@@ -2553,11 +2561,16 @@ end;
 
 procedure TForm1.GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
 begin
-  CurrentBookmarksDb := ABookmarksDb;
-  if CurrentBookmarksDb = BookmarksDb then
-    ChangeInterface(MenuBookmarks)
-  else if CurrentBookmarksDb = HistoryDb then
-    ChangeInterface(MenuHistory)
+  try
+    CurrentBookmarksDb := ABookmarksDb;
+    if CurrentBookmarksDb = BookmarksDb then
+      ChangeInterface(MenuBookmarks)
+    else if CurrentBookmarksDb = HistoryDb then
+      ChangeInterface(MenuHistory)
+  except
+    On E: Exception do
+      Log(E, 'GotoBookmarksMenu: ');
+  end;
 end;
 
 procedure TForm1.GotoDownloadsMenu;
@@ -3137,40 +3150,45 @@ var
   end;
 
 begin
-  Groups := ADataBase.GetBookmarksGroups;
-  BookmarksControls.Clear;
+  try
+    Groups := ADataBase.GetBookmarksGroups;
+    BookmarksControls.Clear;
 
-  for I := Low(Groups) to High(Groups) do begin
-    Control := Self.CreateDefSettingsCheck(ALayout);
-    with Control do begin
-      Parent := ALayout;
-      Check.Image.Visible := true;
-      Check.Image.Margins.Rect := TRectF.Create(0, 5, 0, 5);
+    for I := Low(Groups) to High(Groups) do begin
+      Control := Self.CreateDefSettingsCheck(ALayout);
+      with Control do begin
+        Parent := ALayout;
+        Check.Image.Visible := true;
+        Check.Image.Margins.Rect := TRectF.Create(0, 5, 0, 5);
 
-      if (ADataBase = BookmarksDb) then
-        Check.Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS)
-      else if (ADataBase = HistoryDb) then
-        Check.Image.FileName := AppStyle.GetImagePath(ICON_HISTORY);
+        if (ADataBase = BookmarksDb) then
+          Check.Image.FileName := AppStyle.GetImagePath(ICON_BOOKMARKS)
+        else if (ADataBase = HistoryDb) then
+          Check.Image.FileName := AppStyle.GetImagePath(ICON_HISTORY);
 
-      Align := TAlignLayout.Top;
-      Position.Y := Single.MaxValue;
-      Check.Text.Text := _getName(Groups[I]);
-      Text.Text := Groups[I].About;
-      Tag := Groups[I].Id;
-      Check.HitTest := false;
-      Text.HitTest := false;
-      Text.VertTextAlign := TTextAlign.Leading;
-      Check.Check.Visible := false;
-      Check.Height := Control.Check.Height * 0.8;
-      Height := Control.Height * 1.5;
-      Margins.Rect := TRectF.Create(5, 5, 5, 0);
-      OnTap := BookmarksControlOnTap;
-      {$IFDEF MSWINDOWS}
-      Control.OnClick := ClickTapRef;
-      {$ENDIF}
+        Align := TAlignLayout.Top;
+        Position.Y := Single.MaxValue;
+        Check.Text.Text := _getName(Groups[I]);
+        Text.Text := Groups[I].About;
+        Tag := Groups[I].Id;
+        Check.HitTest := false;
+        Text.HitTest := false;
+        Text.VertTextAlign := TTextAlign.Leading;
+        Check.Check.Visible := false;
+        Check.Height := Control.Check.Height * 0.8;
+        Height := Control.Height * 1.5;
+        Margins.Rect := TRectF.Create(5, 5, 5, 0);
+        OnTap := BookmarksControlOnTap;
+        {$IFDEF MSWINDOWS}
+        Control.OnClick := ClickTapRef;
+        {$ENDIF}
+      end;
+
+      BookmarksControls.Add(Control);
     end;
-    
-    BookmarksControls.Add(Control);
+  except
+    On E: Exception do
+      Log(E, 'ReloadBookmarks: ');
   end;
 end;
 
@@ -3591,9 +3609,14 @@ end;
 
 procedure TForm1.UserSelectBookmarkList(AWhenSelected: TProcedureRef);
 begin
-  GotoBookmarksMenu(BookmarksDb);
-  NowUserSelect := true;
-  AfterUserEvent := AWhenSelected;
+  try
+    GotoBookmarksMenu(BookmarksDb);
+    NowUserSelect := true;
+    AfterUserEvent := AWhenSelected;
+  except
+    On E: Exception do
+      Log(E, 'UserSelectBookmarkList: ');
+  end;
 end;
 
 end.
