@@ -2127,11 +2127,12 @@ begin
     Text.WordWrap := true;
   end;
 
-  BtnSetAnonMsg := AddSettingsButton('Anonymous message for developer', ICON_TRANS);
+  BtnSetAnonMsg := AddSettingsButton('Anonymous message for developer', '');
   with BtnSetAnonMsg do begin
     OnTap := BtnSetAnonMsgOnTap;
     Height := Height * 1.25;
     Text.WordWrap := true;
+    Image.ImageURL := 'https://avatars.githubusercontent.com/u/101427274';
   end;
 
   CheckSetFullscreen          := AddSettingsCheck('Fullscreen mode');
