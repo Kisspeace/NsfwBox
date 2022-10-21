@@ -323,7 +323,7 @@ begin
 
       if not ImageFilename.IsEmpty then begin
         if ( Self.Owner is TNBoxGUIStyle ) then begin
-          Image.FileName := ( Self.Owner as TNBoxGUIStyle )
+          Image.ImageURL := ( Self.Owner as TNBoxGUIStyle )
             .GetImagePath(self.ImageFilename);
         end;
       end;

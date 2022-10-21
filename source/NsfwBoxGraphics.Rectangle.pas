@@ -6,7 +6,8 @@ uses
   SysUtils, System.Types, System.UITypes, Classes,
   FMX.Types, FMX.Controls, FMX.Graphics,
   FMX.TextLayout, FMX.MultiResBitmap,
-  FMX.ActnList, AlFmxObjects, AlFmxGraphics, system.generics.collections;
+  FMX.ActnList, AlFmxObjects, AlFmxGraphics, system.generics.collections,
+  YDW.FMX.ImageWithURL;
 
 type
 
@@ -32,7 +33,7 @@ type
       procedure SetStrokeDef(const Value: TStrokeBrush);
       procedure SetStrokeMove(const Value: TStrokeBrush);
     public
-      Image: TAlImage;
+      Image: TImageWithURL;
       property FillDef: Tbrush read FFillDef write SetFillDef;
       property StrokeDef: TStrokeBrush read FStrokeDef write SetStrokeDef;
       property FillMove: Tbrush read FFillMove write SetFillMove;
@@ -205,7 +206,7 @@ begin
   FFillDef    := tbrush.Create(Fill.Kind, fill.Color);;
   FStrokeDef  := TStrokeBrush.Create(Fill.Kind, stroke.Color);
 
-  Image := TAlImage.Create(Self);
+  Image := TImageWithURL.Create(Self);
   with Image do begin
     parent := Self;
     Hittest := false;
