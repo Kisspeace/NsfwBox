@@ -66,7 +66,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
@@ -352,6 +351,7 @@ type
     function AddItemMenuBtn(ACaption: string; AAction: TNBoxItemInteraction; AImageName: string = ''; ATag: string = ''): TRectButton;
     function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser);
+    procedure DeleteAllBrowsers;
     { -> Properies ---------------- }
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
     property CurrentItem: TNBoxCardBase read FCurrentItem write SetCurrentItem;
@@ -1568,6 +1568,15 @@ begin
     + ABrowser.Items.Count.ToString;
 end;
 
+procedure TForm1.DeleteAllBrowsers;
+var
+  I: integer;
+begin
+  for I := 0 to Browsers.Count - 1 do begin
+    DeleteBrowser(Browsers.First);
+  end;
+end;
+
 procedure TForm1.DeleteBrowser(ABrowser: TNBoxBrowser);
 var
   LBrowserIndex, LTabIndex: integer;
@@ -1818,13 +1827,6 @@ begin
     end;
 
   end;
-end;
-
-procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  log('Destroing app');
-  DownloadFetcher.Free;
-  DownloadManager.Free;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -2441,6 +2443,10 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
+  log('Destroing app');
+  DownloadFetcher.Free;
+  DownloadManager.Free;
+  DeleteAllBrowsers;
   BrowsersIWUContentManager.Free;
   IWUContentManager.Free;
 end;
