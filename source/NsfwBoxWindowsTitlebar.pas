@@ -40,7 +40,7 @@ uses unit1;
 procedure TNBoxFormTitleBar.BtnCloseOnTap(Sender: TObject;
   const Point: TPointF);
 begin
-  Application.Free; // Killing application
+  Application.Terminate; // Killing application
 end;
 
 procedure TNBoxFormTitleBar.BtnHideOnTap(Sender: TObject; const Point: TPointF);
