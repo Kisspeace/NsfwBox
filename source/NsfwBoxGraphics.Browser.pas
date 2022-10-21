@@ -161,10 +161,14 @@ var
   I: integer;
 begin
   try
-      FWorker.Terminate;
-      FWorker.WaitForFinish;
+    FWorker.Terminate;
+    FWorker.WaitForFinish;
 
     if items.Count > 0 then begin
+      for I := 0 to Items.Count - 1 do begin
+        Items[I].AbortLoading;
+      end;
+
       items.Clear;
       MultiLayout.RecalcSize;
       MultiLayout.BlockPos := 0;
@@ -202,17 +206,11 @@ begin
     Scraper := TNBoxScraper.Create;
     Content := INBoxHasOriginList.Create;
 
-    TThread.Synchronize(nil,
-    procedure
-    begin
+    if Assigned(Browser.OnWebClientCreate) then
+      Scraper.OnWebClientSet := Browser.OnWebClientCreate;
 
-      if Assigned(Browser.OnWebClientCreate) then
-        Scraper.OnWebClientSet := Browser.OnWebClientCreate;
-
-      if Assigned(Browser.OnScraperCreate) then
-        Browser.OnScraperCreate(Self.Owner, Scraper);
-
-    end);
+    if Assigned(Browser.OnScraperCreate) then
+      Browser.OnScraperCreate(Self.Owner, Scraper);
 
     if TThread.Current.CheckTerminated then exit;
 
