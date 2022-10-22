@@ -329,6 +329,9 @@ type
     procedure ConnectSession;
     function LoadSession: boolean;
     procedure ReloadBookmarks(ADataBase: TNBoxBookmarksDb; ALayout: TControl);
+    { -> Control utils ------------ }
+    procedure ClearControlBitmap(AControl: TControl);
+    procedure SetStretchImage(AImage: TControl);
     { -> Fabrics ------------------ }
     function CreateDefScroll(AOwner: TComponent): TVertScrollBox;
     function CreateDefRect(AOwner: TComponent): TAlRectangle;
@@ -3514,7 +3517,7 @@ begin
   if Assigned(FCurrentBrowser) then begin
     Tab := self.GetTab(FCurrentBrowser);
     Tab.Image.Visible := false;
-    Tab.Image.Bitmap.SetSize(0, 0);
+    ClearControlBitmap(Tab.Image);
     FCurrentBrowser.Visible := false;
   end;
 
@@ -3667,6 +3670,22 @@ begin
     On E: Exception do
       Log(E, 'UserSelectBookmarkList: ');
   end;
+end;
+
+procedure TForm1.ClearControlBitmap(AControl: TControl);
+begin
+  if (AControl is TImage) then
+    (AControl as TImage).Bitmap.SetSize(0, 0)
+  else if (AControl is TAlRectangle) then
+    (AControl as TAlRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0);
+end;
+
+procedure TForm1.SetStretchImage(AImage: TControl);
+begin
+  if (AImage is TImage) then
+    (AImage as TImage).WrapMode := TImageWrapMode.Stretch
+  else if (AImage is TAlRectangle) then
+    (AImage as TAlRectangle).Fill.Bitmap.WrapMode := TWrapMode.TileStretch;
 end;
 
 end.
