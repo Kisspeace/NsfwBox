@@ -926,6 +926,8 @@ var
 begin
   Action := TNBoxItemInteraction(TControl(Sender).Tag);
 
+  if not Assigned(CurrentBrowser) then exit;
+
   if DoWithAllItems and ( CurrentBrowser.Items.Count > 0 ) then begin
 
     if ( Action = ACTION_ADD_BOOKMARK ) then begin
