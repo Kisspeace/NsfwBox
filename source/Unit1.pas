@@ -3636,13 +3636,13 @@ var
   Req: INBoxSearchRequest;
 begin
   if MenuSearchSettings.Visible then begin
-    if Assigned(CurrentBrowser) then begin
-      Req := SearchMenu.Request;
-      CurrentBrowser.Request := Req;
+    if not Assigned(CurrentBrowser) then
+      CurrentBrowser := self.AddBrowser(nil, false).Owner as TNBoxBrowser;
 
-      ChangeInterface(form1.BrowserLayout);
-      CurrentBrowser.GoBrowse;
-    end;
+    Req := SearchMenu.Request;
+    CurrentBrowser.Request := Req;
+    ChangeInterface(form1.BrowserLayout);
+    CurrentBrowser.GoBrowse;
   end else begin
 
     if not Assigned(CurrentBrowser) then begin
