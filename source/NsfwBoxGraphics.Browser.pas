@@ -43,6 +43,7 @@ type
       procedure OnItemImageLoadFinished(Sender: TObject; ASuccess: boolean);
     public
       Items: TNBoxCardObjList;
+      DummyImage: TBitmap;
       function NewItem: TNBoxCardBase;
       procedure GoBrowse;
       procedure GoNextPage;
@@ -75,6 +76,7 @@ begin
   FBeforeBrowse         := nil;
   FOnWebClientCreate    := nil;
   FOnRequestChanged     := nil;
+  DummyImage            := nil;
   items := TNBoxCardObjList.Create;
   LayoutIndent := 20;
   MultiLayout.PlusHeight := LayoutIndent;
@@ -269,6 +271,9 @@ begin
             LNewItem.Item := LPost; // LPost.Clone;
 
           Fill.Kind := TBrushKind.Bitmap;
+
+          if Assigned(Self.Browser.DummyImage) then
+            LnewItem.BitmapIWU.Assign(Self.Browser.DummyImage);
 
           if Assigned(LPost) then
             ImageURL := LPost.ThumbnailUrl;
