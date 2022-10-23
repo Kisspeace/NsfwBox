@@ -394,6 +394,9 @@ var
   DoWithAllItems: boolean = false;
   BadThingsNum: integer = 0;
 
+  { Static Images }
+  DummyLoadingImage: Fmx.Graphics.TBitmap;
+
 const
   TAG_CAN_USE_MORE_THAN_ONE: string = '>';
   BTN_STYLE_DEF        = 0;
@@ -539,6 +542,7 @@ begin
     OnRequestChanged := OnBrowserReqChanged;
     OnItemCreate     := OnNewItem;
     BeforeBrowse     := BrowserBeforeBrowse;
+    DummyImage       := DummyLoadingImage;
   end;
 
   T := Form1.CreateDefTab(B);
@@ -1924,6 +1928,9 @@ begin
   IWUContentManager.CacheManager := IWUCacheManager;
   IWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
   IWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
+
+  DummyLoadingImage := FMX.Graphics.TBitmap.Create;
+  DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
 
   {$IFDEF ANDROID}
     Form1.MVMenu.Mode := TMultiviewMode.Drawer;

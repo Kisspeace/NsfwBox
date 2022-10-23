@@ -38,6 +38,8 @@ const
 
   ICON_ORIGIN_PREFIX = 'content-origin-';
 
+  IMAGE_LOADING    = 'image-loading.jpg';
+
 
 type
 
