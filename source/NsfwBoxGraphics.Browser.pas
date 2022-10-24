@@ -275,7 +275,7 @@ begin
           if Assigned(Self.Browser.DummyImage) then
             LnewItem.BitmapIWU.Assign(Self.Browser.DummyImage);
 
-          if Assigned(LPost) then
+          if (Assigned(LPost) and (not LPost.ThumbnailUrl.IsEmpty)) then
             ImageURL := LPost.ThumbnailUrl;
         end;
 
