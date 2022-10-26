@@ -49,6 +49,7 @@ type
       procedure GoNextPage;
       procedure GoPrevPage;
       procedure Clear;
+      function IsBrowsingNow: boolean;
       property Request: INBoxSearchRequest read FRequest write SetRequest;
       property ImageManager: IImageWithUrlManager read FImageManager write FImageManager; //FIXME
       property BeforeBrowse: TNotifyEvent read FBeforeBrowse write FBeforeBrowse;
@@ -129,6 +130,11 @@ procedure TNBoxBrowser.GoPrevPage;
 begin
   Request.PageId := Request.PageId - 2;
   self.GoNextPage;
+end;
+
+function TNBoxBrowser.IsBrowsingNow: boolean;
+begin
+  Result := FWorker.GetIsRunning;
 end;
 
 function TNBoxBrowser.NewItem: TNBoxCardBase;
