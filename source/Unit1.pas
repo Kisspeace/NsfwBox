@@ -2737,7 +2737,8 @@ begin
   if Settings.BrowseNextPageByScrollDown then begin
     if round(NewViewportPosition.Y) = round(LBrowser.ContentBounds.Height - LBrowser.Height) then begin
       // Scrolled down
-      LBrowser.GoNextPage;
+      if Not LBrowser.IsBrowsingNow then
+        LBrowser.GoNextPage;
     end;
   end
 end;
