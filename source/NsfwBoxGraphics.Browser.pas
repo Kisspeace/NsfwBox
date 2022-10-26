@@ -5,7 +5,7 @@ interface
 uses
   SysUtils, Types, System.UITypes, Classes,
   System.Variants, FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics,
-  Fmx.Scroller, System.Threading, System.Generics.Collections, Net.HttpClient,
+  FMX.ColumnsView, System.Threading, System.Generics.Collections, Net.HttpClient,
   Net.HttpClientComponent, NsfwBoxFileSystem,
   // Alcinoe
   AlFmxGraphics, AlFmxObjects,
@@ -22,7 +22,7 @@ type
   TBrowserItemCreateEvent = procedure (Sender: TObject; var AItem: TNBoxCardBase) of object;
   TScraperCreateEvent = procedure (Sender: TObject; var AScraper: TNBoxScraper) of object;
 
-  TNBoxBrowser = class(TMultiLayoutScroller)
+  TNBoxBrowser = class(TColumnsView)
     protected
       type
         TBrowserWorker = Class(TInterfaceYDWQueuedThreadComponent<TNBoxSearchRequestBase>)
@@ -78,9 +78,7 @@ begin
   FOnRequestChanged     := nil;
   DummyImage            := nil;
   items := TNBoxCardObjList.Create;
-  LayoutIndent := 20;
-  MultiLayout.PlusHeight := LayoutIndent;
-  MultiLayout.BlockCount := 2;
+  ColumnsCount := 2;
   FRequest := TNBoxSearchReqNsfwXxx.create;
 end;
 
@@ -139,7 +137,7 @@ begin
   Result.ImageManager := Self.ImageManager;
   Result.OnLoadingFinished := OnItemImageLoadFinished;
   Items.Add(Result);
-  Self.MultiLayout.AddControl(Result);
+  Result.Parent := Self;
   if Assigned(OnItemCreate) then
     OnItemCreate(Self, Result);
 end;
@@ -155,7 +153,7 @@ begin
   if Assigned(LControl.OnResize) then
     LControl.OnResize(LControl);
 
-  Self.MultiLayout.ReCalcBlocksSize;
+  Self.RecalcColumns;
 end;
 
 procedure TNBoxBrowser.Clear;
@@ -172,8 +170,7 @@ begin
       end;
 
       items.Clear;
-      MultiLayout.RecalcSize;
-      MultiLayout.BlockPos := 0;
+      RecalcColumns;
     end;
   except
     On E:Exception do
@@ -279,7 +276,7 @@ begin
             ImageURL := LPost.ThumbnailUrl;
         end;
 
-        Self.Browser.MultiLayout.ReCalcBlocksSize;
+        Self.Browser.RecalcColumns;
       end);
 
     end;

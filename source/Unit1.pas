@@ -1343,8 +1343,8 @@ begin
   Result := TNBoxBrowser.Create(AOwner);
   with Result do begin
     Align                    := TAlignlayout.Contents;
-    MultiLayout.BlockCount   := Settings.ContentLayoutsCount;
-    MultiLayout.LayoutIndent := Settings.ItemIndent;
+    ColumnsCount   := Settings.ContentLayoutsCount;
+    ItemsIndent    := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
     Request                  := RandReq;
     Result.OnWebClientCreate := OnBrowserSetWebClient;
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
@@ -3598,8 +3598,8 @@ begin
 
   for I := 0 to Browsers.Count - 1 do begin
     with Browsers[I] do begin
-      MultiLayout.BlockCount := Settings.ContentLayoutsCount;
-      MultiLayout.LayoutIndent := Settings.ItemIndent;
+      ColumnsCount   := Settings.ContentLayoutsCount;
+      ItemsIndent    := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
     end;
   end;
 end;

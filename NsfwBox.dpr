@@ -34,8 +34,9 @@ uses
   NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas',
   {$IFDEF MSWINDOWS}
   NsfwBoxWindowsTitlebar in 'source\NsfwBoxWindowsTitlebar.pas',
-  {$ENDIF}
-  NsfwBoxOriginCoomerParty in 'source\NsfwBoxOriginCoomerParty.pas';
+  {$ENDIF }
+  NsfwBoxOriginCoomerParty in 'source\NsfwBoxOriginCoomerParty.pas',
+  FMX.ColumnsView in 'source\FMX.ColumnsView.pas';
 
 {$R *.res}
 
