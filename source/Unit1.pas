@@ -359,8 +359,8 @@ type
     function AddMenuSearchBtn(AText: string; AImageName: string = ''; AOnTap: TTapEvent = nil): TRectButton;
     function AddItemMenuBtn(ACaption: string; AAction: TNBoxItemInteraction; AImageName: string = ''; ATag: string = ''): TRectButton;
     function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
-    procedure DeleteBrowser(ABrowser: TNBoxBrowser);
-    procedure DeleteAllBrowsers;
+    procedure DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean = True);
+    procedure DeleteAllBrowsers(ADeleteFromSession: boolean = True);
     { -> Properies ---------------- }
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
     property CurrentItem: TNBoxCardBase read FCurrentItem write SetCurrentItem;
@@ -1597,16 +1597,16 @@ begin
     + ABrowser.Items.Count.ToString;
 end;
 
-procedure TForm1.DeleteAllBrowsers;
+procedure TForm1.DeleteAllBrowsers(ADeleteFromSession: boolean = True);
 var
   I: integer;
 begin
   for I := 0 to Browsers.Count - 1 do begin
-    DeleteBrowser(Browsers.First);
+    DeleteBrowser(Browsers.First, ADeleteFromSession);
   end;
 end;
 
-procedure TForm1.DeleteBrowser(ABrowser: TNBoxBrowser);
+procedure TForm1.DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean);
 var
   LBrowserIndex, LTabIndex: integer;
   Groups: TBookmarkGroupRecAr;
@@ -1626,7 +1626,7 @@ begin
   ABrowser.Visible := false;
   Tabs.Items[LTabIndex].Visible := false;
 
-  if ABrowser.Tag <> -1 then begin
+  if (ABrowser.Tag <> -1) and ADeleteFromSession then begin
     Groups := Session.GetBookmarksGroups;
     if Length(Groups) > 0 then begin
       Group := Groups[0];
@@ -2492,7 +2492,7 @@ begin
   log('Destroing app');
   DownloadFetcher.Free;
   DownloadManager.Free;
-  DeleteAllBrowsers;
+  DeleteAllBrowsers(False);
   BrowsersIWUContentManager.Free;
   IWUContentManager.Free;
 end;
