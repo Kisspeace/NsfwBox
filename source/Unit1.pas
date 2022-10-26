@@ -1157,24 +1157,24 @@ end;
 
 procedure TForm1.BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
 var
-  B: TNBoxBrowser;
+  LBrowser: TNBoxBrowser;
   NewCount: integer;
 begin
-  B := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
+  LBrowser := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
 
-  if Settings.SaveClosedTabHistory then
-    HistoryDb.TabGroup.Add(B.Request);  // Save this tab on history
+  if Settings.SaveClosedTabHistory then // Maybe move this to DeleteBrowser()
+    HistoryDb.TabGroup.Add(LBrowser.Request);  // Save this tab on history
 
   NewCount := Browsers.Count - 1;
 
-  if (CurrentBrowser = B) and (NewCount > 0) then begin
-    if (CurrentBrowser = Browsers.Last) and (NewCount > 1) then
+  if (CurrentBrowser = LBrowser) and (NewCount > 0) then begin
+    if (CurrentBrowser = Browsers.Last) then
       CurrentBrowser := Browsers.First
     else
       CurrentBrowser := Browsers.Last;
   end;
 
-  DeleteBrowser(B);
+  DeleteBrowser(LBrowser);
 end;
 
 procedure TForm1.ChangeInterface(ALayout: TControl);
