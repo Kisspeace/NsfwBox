@@ -10,7 +10,7 @@ type
 
   // This item used to test graphic interface on dev mode
 
-  TNBoxPseudoItem = class(TNBoxItemBase, INBoxItem)
+  TNBoxPseudoItem = class(TNBoxItemBase, INBoxItem, IHasCaption)
     private
       FUrls: TArray<string>;
       FThumb: string;
@@ -20,6 +20,7 @@ type
       function GetContentUrls: TArray<string>;               override;
       procedure SetThumbnailUrl(const Value: string);
       function GetThumbnailUrl: string;                      override;
+      function GetCaption: string;
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
@@ -27,6 +28,7 @@ type
       property Origin;
       [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl write SetThumbnailUrl;
       [DISABLE] property ContentUrls: TArray<string> read GetContentUrls write SetContentUrls;
+      [DISABLE] property Caption: string read GetCaption;
       [ALIAS('ThumbnailUrl')] property _ThumbnailUrl: string read FThumb write FThumb; // serialize
       [ALIAS('ContentUrls')] property _ContentUrls: TArray<string> read FUrls write FUrls; // serialize
       constructor Create;
@@ -71,6 +73,11 @@ end;
 constructor TNBoxPseudoItem.Create;
 begin
   FOrigin := ORIGIN_PSEUDO;
+end;
+
+function TNBoxPseudoItem.GetCaption: string;
+begin
+  Result := Self.ContentUrl;
 end;
 
 function TNBoxPseudoItem.GetContentUrls: TArray<string>;
