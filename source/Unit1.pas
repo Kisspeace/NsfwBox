@@ -255,6 +255,7 @@ type
     procedure LayoutDialogYesOrNoOnResize(Sender: TObject);
     procedure OnIWUException(Sender: TObject; AImage: IImageWithURL; const AUrl: string; const AException: Exception);
     procedure NetHttpOnValidateCertAutoAccept(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
+    procedure SetDefToWebClient(AClient: TNetHttpClient);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -2693,29 +2694,29 @@ begin
   end;
 end;
 
-procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = 0);
+procedure TForm1.SetDefToWebClient(AClient: TNetHttpClient); //AOrigin: integer = 0
 begin
   with AClient do begin
-    Useragent := Form1.Settings.DefaultUseragent;
+    Useragent := Settings.DefaultUseragent;
     AutomaticDecompression := [THttpCompressionMethod.Any];
     Customheaders['Accept'] := '*/*';
     CustomHeaders['Accept-Language'] := 'en-US,en;q=0.5';
     CustomHeaders['Accept-Encoding'] := 'gzip, deflate'; { br not support }
-    AllowCookies := Form1.Settings.AllowCookies;
+    AllowCookies := Settings.AllowCookies;
     SendTimeout := 6000;
     ConnectionTimeout := 6000;
     ResponseTimeout := 6000;
 
-    if Form1.Settings.AutoAcceptAllCertificates then
+    if Settings.AutoAcceptAllCertificates then
       AClient.OnValidateServerCertificate := Form1.NetHttpOnValidateCertAutoAccept;
 
-    case AOrigin of
-      ORIGIN_9HENTAITO:
-      begin
-        CustomHeaders['Accept'] := 'application/json, text/plain, */*';
-        CustomHeaders['Content-Type'] := 'application/json;charset=utf-8';
-      end;
-    end;
+//    case AOrigin of
+//      ORIGIN_9HENTAITO:
+//      begin
+//        CustomHeaders['Accept'] := 'application/json, text/plain, */*';
+//        CustomHeaders['Content-Type'] := 'application/json;charset=utf-8';
+//      end;
+//    end;
   end;
 end;
 
@@ -2732,7 +2733,8 @@ begin
   tthread.Synchronize(Tthread.Current,
   procedure
   begin
-    SetDefToWebClient(AWebClient, AOrigin);
+    SetDefToWebClient(AWebClient);
+
   end);
 end;
 
