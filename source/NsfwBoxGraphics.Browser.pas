@@ -142,8 +142,14 @@ begin
   Result := TNBoxCardSimple.Create(self);
   Result.ImageManager := Self.ImageManager;
   Result.OnLoadingFinished := OnItemImageLoadFinished;
+  Result.Fill.Kind := TBrushKind.Bitmap;
   Items.Add(Result);
+
+  if Assigned(Self.DummyImage) then
+    Result.BitmapIWU.Assign(Self.DummyImage);
+
   Result.Parent := Self;
+
   if Assigned(OnItemCreate) then
     OnItemCreate(Self, Result);
 end;
@@ -272,11 +278,6 @@ begin
             LNewItem.Item := LBookmark
           else
             LNewItem.Item := LPost; // LPost.Clone;
-
-          Fill.Kind := TBrushKind.Bitmap;
-
-          if Assigned(Self.Browser.DummyImage) then
-            LnewItem.BitmapIWU.Assign(Self.Browser.DummyImage);
 
           if (Assigned(LPost) and (not LPost.ThumbnailUrl.IsEmpty)) then
             ImageURL := LPost.ThumbnailUrl;
