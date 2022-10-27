@@ -1815,11 +1815,17 @@ begin
     begin
       if not Assigned(LPost) then exit;
       LTryFetchIfEmpty;
+
       var LBrowserTab: TNBoxTab;
       var LBrowser: TNBoxBrowser;
       LBrowserTab := self.AddBrowser(nil, false);
       LBrowser := TNBoxBrowser(LBrowserTab.Owner);
-      
+
+      if (LPost.ContentUrlCount < 1) then begin
+        showmessage('Have no files');
+        exit;
+      end;
+
       for I := 0 to LPost.ContentUrlCount - 1 do begin
         var LNewCard := LBrowser.NewItem;
         var LFileItem := TNBoxPseudoItem.Create;
@@ -2771,6 +2777,7 @@ begin
       AppStyle.ItemCardRequest.Fill2.Apply(LCardS.Rect.Fill);
     end;
   end;
+  LCard.Fill.Kind := TBrushKind.Bitmap;
 end;
 
 procedure TForm1.OnCreateDownloader(Sender: Tobject;
