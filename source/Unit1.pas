@@ -1852,8 +1852,13 @@ begin
             LFileItem.ThumbnailUrl := L9HentItem.Item.GetImageThumbUrl(I + 1);
             LThumbSet := True;
           end;
+        end else if LPost is TNBoxNsfwXxxItem then begin
+          var LNsfwXxxItem := (LPost as TNBoxNsfwXxxItem);
+          if I < Length(LNsfwXxxItem.Item.Thumbnails) then begin
+            LFileItem.ThumbnailUrl := LNsfwXxxItem.Item.Thumbnails[I];
+            LThumbSet := True;
+          end;
         end;
-
 
         if not LThumbSet then
           LFileItem.ThumbnailUrl := LPost.ThumbnailUrl;  
