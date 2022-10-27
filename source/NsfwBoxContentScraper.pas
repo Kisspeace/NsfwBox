@@ -16,7 +16,7 @@ uses
   CoomerParty.Types,
   NsfwBoxOriginConst, NsfwBoxBookmarks, NsfwBoxOriginBookmarks,
   IoUtils, NsfwBoxFilesystem, System.Classes, system.SyncObjs,
-  System.Threading, NsfwBoxThreading;
+  System.Threading, NsfwBoxThreading, NsfwBoxHelper, System.Math;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -42,6 +42,8 @@ type
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string; ARequest, AUserId, AService: string; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
+      { ------------------------------------- }
+      function GetContentRandomizer(AList: INBoxHasOriginList): boolean;
     public
       BookmarksDb: TNBoxBookmarksDb;
       HistoryDb: TNBoxBookmarksDb;
@@ -232,6 +234,11 @@ begin
       with ( ARequest As TNBoxSearchReqBookmarks ) do begin
         Result := Self.GetContentBookmarks(Alist, Path, RequestAsInt, ARequest.PageId);
       end;
+    end;
+
+    ORIGIN_RANDOMIZER:
+    begin
+      Result := Self.GetContentRandomizer(AList);
     end;
 
   end;
@@ -435,6 +442,35 @@ begin
 
   finally
     Client.Free;
+  end;
+end;
+
+function TNBoxScraper.GetContentRandomizer(AList: INBoxHasOriginList): boolean;
+const
+  PROVIDERS: array of integer = [ORIGIN_NSFWXXX, ORIGIN_R34APP,
+                                 ORIGIN_GIVEMEPORNCLUB, ORIGIN_COOMERPARTY];
+var
+  LProvider: integer;
+  LRequest: INBoxSearchRequest;
+begin
+  LProvider := System.Math.RandomFrom(PROVIDERS);
+  LRequest := CreateReqByOrigin(LProvider);
+
+  if (LRequest is TNBoxSearchReqNsfwXxx) then
+    LRequest.PageId := RandomRange(1, 50)
+  else if (LRequest is TNBoxSearchReqR34App) then
+    LRequest.PageId := RandomRange(0, 1000)
+  else if (LRequest is TNBoxSearchReqGmpClub) then
+    TNBoxSearchReqGmpClub(LRequest).SearchType := TGmpClubSearchType.Random
+  else if (LRequest is TNBoxSearchReqCoomerParty) then begin
+    TNBoxSearchReqCoomerParty(LRequest).PageId := RandomRange(0, 173628);
+    TNBoxSearchReqCoomerParty(LRequest).Site := CoomerParty.Scraper.URL_COOMER_PARTY;
+  end;
+
+  try
+    Result := Self.GetContent(LRequest, AList);
+  finally
+    (LRequest as TObject).Free;
   end;
 end;
 

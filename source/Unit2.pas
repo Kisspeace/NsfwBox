@@ -15,7 +15,8 @@ uses
   NsfwBoxOriginNsfwXxx, NsfwBoxGraphics, NsfwBoxOriginConst,
   NsfwBoxGraphics.Rectangle, NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginGivemepornClub, NsfwBoxStyling, NsfwBoxOriginBookmarks,
-  NsfwBoxHelper, CoomerParty.Scraper, NsfwBoxOriginCoomerParty;
+  NsfwBoxHelper, CoomerParty.Scraper, NsfwBoxOriginCoomerParty,
+  NsfwBoxOriginRandomizer;
 
 type
 
@@ -63,6 +64,7 @@ type
       BtnOriginPseudo: TRectButton;
       BtnOriginBookmarks: TRectButton;
       BtnOriginCoomerParty: TRectButton;
+      BtnOriginRandomizer: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -194,6 +196,7 @@ begin
   BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
   BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
   BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
+  BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
 end;
 
 destructor TNBoxOriginSetMenu.Destroy;

@@ -36,7 +36,8 @@ uses
   NsfwBoxWindowsTitlebar in 'source\NsfwBoxWindowsTitlebar.pas',
   {$ENDIF }
   NsfwBoxOriginCoomerParty in 'source\NsfwBoxOriginCoomerParty.pas',
-  FMX.ColumnsView in 'source\FMX.ColumnsView.pas';
+  FMX.ColumnsView in 'source\FMX.ColumnsView.pas',
+  NsfwBoxOriginRandomizer in 'source\NsfwBoxOriginRandomizer.pas';
 
 {$R *.res}
 

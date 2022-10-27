@@ -8,6 +8,7 @@ uses
   NsfwBoxOriginBookmarks, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9HentaitoApi,
   NsfwBoxOriginCoomerParty,
+  NsfwBoxOriginRandomizer,
   NsfwBoxOriginConst,
   classes, sysutils, NsfwXxx.Types;
 
@@ -45,6 +46,7 @@ begin
     ORIGIN_BOOKMARKS:  Result := TNBoxSearchReqBookmarks.Create;
     ORIGIN_9HENTAITO:  Result := TNBoxSearchReq9HentaiTo.Create;
     ORIGIN_COOMERPARTY: Result := TNBoxSearchReqCoomerParty.Create;
+    ORIGIN_RANDOMIZER: Result := TNBoxSearchReqRandomizer.Create;
   end;
 end;
 
@@ -125,6 +127,7 @@ begin
 
     ORIGIN_BOOKMARKS: Result  := 'Bookmarks';
     ORIGIN_PSEUDO: Result     := 'None';
+    ORIGIN_RANDOMIZER: Result := 'Randomizer';
   end;
 end;
 
