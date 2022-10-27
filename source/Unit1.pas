@@ -10,7 +10,8 @@ uses
   FMX.Controls.Presentation, FMX.MultiView, FMX.Color, FMX.Edit, FMX.Layouts,
   Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBoxFilesystem, NsfwXxx.Types,
   NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox,
-  System.Hash, FMX.Surfaces, System.Variants, System.Threading, system.NetEncoding,
+  System.Hash, FMX.Surfaces, System.Variants, System.Threading,
+  system.NetEncoding, System.Net.URLClient,
   {$IFDEF ANDROID}
   Fmx.Helpers.Android, AndroidApi.Helpers,
   AndroidApi.JNI.GraphicsContentViewText,
@@ -196,7 +197,8 @@ type
     CheckSetShowNavigateBackButton,
     CheckSetBrowseNextPageByScrollDown,
     CheckSetImageCacheSave,
-    CheckSetImageCacheLoad
+    CheckSetImageCacheLoad,
+    CheckSetAutoAcceptAllCertificates
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -252,6 +254,7 @@ type
     procedure MenuItemTagsOnSelected(Sender: TObject);
     procedure LayoutDialogYesOrNoOnResize(Sender: TObject);
     procedure OnIWUException(Sender: TObject; AImage: IImageWithURL; const AUrl: string; const AException: Exception);
+    procedure NetHttpOnValidateCertAutoAccept(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -361,6 +364,7 @@ type
     function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean = True);
     procedure DeleteAllBrowsers(ADeleteFromSession: boolean = True);
+        property Action;
     { -> Properies ---------------- }
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
     property CurrentItem: TNBoxCardBase read FCurrentItem write SetCurrentItem;
@@ -1133,6 +1137,7 @@ begin
 
     ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
     ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
+    AutoAcceptAllCertificates := CheckSetAutoAcceptAllCertificates.IsChecked;
 
     IWUContentManager.EnableSaveToCache := ImageCacheSave;
     IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
@@ -2155,6 +2160,7 @@ begin
 
   CheckSetFullscreen          := AddSettingsCheck('Fullscreen mode');
   CheckSetAllowCookies        := AddSettingsCheck('Allow cookies');
+  CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates');
   CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session');
   CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history');
   CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history');
@@ -2700,6 +2706,9 @@ begin
     ConnectionTimeout := 6000;
     ResponseTimeout := 6000;
 
+    if Form1.Settings.AutoAcceptAllCertificates then
+      AClient.OnValidateServerCertificate := Form1.NetHttpOnValidateCertAutoAccept;
+
     case AOrigin of
       ORIGIN_9HENTAITO:
       begin
@@ -3189,6 +3198,13 @@ begin
                   Settings.AutoStartBrowse);
 end;
 
+procedure TForm1.NetHttpOnValidateCertAutoAccept(const Sender: TObject;
+  const ARequest: TURLRequest; const Certificate: TCertificate;
+  var Accepted: Boolean);
+begin
+  Accepted := TRUE;
+end;
+
 procedure TForm1.ReloadBookmarks(ADataBase: TNBoxBookmarksDb; ALayout: TControl);
 var
   I: Integer;
@@ -3586,6 +3602,7 @@ begin
   CheckSetBrowseNextPageByScrollDown.IsChecked := Settings.BrowseNextPageByScrollDown;
   CheckSetImageCacheSave.IsChecked      := Settings.ImageCacheSave;
   CheckSetImageCacheLoad.IsChecked      := Settings.ImageCacheLoad;
+  CheckSetAutoAcceptAllCertificates.IsChecked := Settings.AutoAcceptAllCertificates;
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
