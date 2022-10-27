@@ -2913,6 +2913,7 @@ procedure TForm1.DownloaderOnCreateWebClient(const Sender: TObject;
   AWebClient: TNetHttpClient);
 begin
   SetDefToWebClient(AWebClient);
+  AWebClient.AcceptEncoding := '';
 end;
 
 procedure TForm1.OnSimpleCardResize(Sender: TObject);
