@@ -50,6 +50,7 @@ type
     BrowseNextPageByScrollDown: boolean;
     ImageCacheSave: boolean;
     ImageCacheLoad: boolean;
+    AutoAcceptAllCertificates: boolean;
     //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
     //AutoRenameExistsFile: boolean;
@@ -126,6 +127,7 @@ begin
   {$ENDIF}
   ImageCacheSave := True;
   ImageCacheLoad := True;
+  AutoAcceptAllCertificates := False;
 end;
 
 end.
