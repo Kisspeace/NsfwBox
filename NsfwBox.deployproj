@@ -10,7 +10,7 @@
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
     <ItemGroup Condition="'$(Platform)'=='Linux64'"/>
     <ItemGroup Condition="'$(Platform)'=='Win32'">
-        <DeployFile Include="Win32\Release\NsfwBox.exe" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="Win32\Debug\NsfwBox.exe" Condition="'$(Config)'=='Debug'">
             <RemoteDir>NsfwBox\</RemoteDir>
             <RemoteName>NsfwBox.exe</RemoteName>
             <DeployClass>ProjectOutput</DeployClass>
@@ -20,7 +20,7 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="Win32\Debug\NsfwBox.exe" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="Win32\Release\NsfwBox.exe" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\</RemoteDir>
             <RemoteName>NsfwBox.exe</RemoteName>
             <DeployClass>ProjectOutput</DeployClass>
@@ -35,15 +35,6 @@
         <DeployFile Include="assets\themes\default\content-origin-3.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
             <RemoteName>content-origin-3.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="assets\themes\default\downloads.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
-            <RemoteName>downloads.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -80,6 +71,15 @@
         <DeployFile Include="libs\libsqliteX.so" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\assets\internal\libs\</RemoteDir>
             <RemoteName>libsqliteX.so</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="assets\themes\default\content-origin--3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>content-origin--3.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -181,6 +181,15 @@
             <RemoteName>libNsfwBox.so</RemoteName>
             <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="assets\themes\default\image-loading.jpg" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>image-loading.jpg</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -518,6 +527,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="assets\themes\default\content-origin-0.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>content-origin-0.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="assets\themes\default\download.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
             <RemoteName>download.png</RemoteName>
@@ -537,11 +555,11 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>NsfwBox\res\drawable-normal\</RemoteDir>
-            <RemoteName>splash_image.png</RemoteName>
-            <DeployClass>Android_SplashImage470</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="assets\themes\default\downloads.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
+            <RemoteName>downloads.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -555,11 +573,11 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="assets\themes\default\content-origin-0.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>NsfwBox\assets\internal\themes\default\</RemoteDir>
-            <RemoteName>content-origin-0.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
+        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\res\drawable-normal\</RemoteDir>
+            <RemoteName>splash_image.png</RemoteName>
+            <DeployClass>Android_SplashImage470</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -588,6 +606,15 @@
             <RemoteDir>NsfwBox\res\drawable-hdpi\</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>Android_LauncherIcon72</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="assets\android-icons\nsfwbox96.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>NsfwBox\res\drawable-xhdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+            <DeployClass>Android_LauncherIcon96</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -751,15 +778,6 @@
             <RemoteDir>NsfwBox\res\drawable-mdpi\</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>Android_LauncherIcon48</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="assets\android-icons\nsfwbox96.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>NsfwBox\res\drawable-xhdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-            <DeployClass>Android_LauncherIcon96</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>

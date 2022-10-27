@@ -4,6 +4,7 @@ unit NsfwBoxOriginConst;
 interface
 
 const
+  ORIGIN_RANDOMIZER     = -3;
   ORIGIN_PSEUDO         = -2;
   ORIGIN_BOOKMARKS      = -1;
 

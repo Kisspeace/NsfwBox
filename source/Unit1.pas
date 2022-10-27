@@ -28,6 +28,7 @@ uses
   NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
   NsfwBoxOriginR34JsonApi, NsfwBoxOriginBookmarks,
   NsfwBoxOriginCoomerParty, NsfwBoxOrigin9HentaiToApi, NsfwBoxOriginConst,
+  NsfwBoxOriginRandomizer,
   NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
   NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
