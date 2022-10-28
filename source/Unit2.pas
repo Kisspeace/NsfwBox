@@ -116,7 +116,7 @@ type
           BtnChangeOrigin: TRectButton;
           EditPageId: TNBoxEdit;
         NsfwXxxMenu: TNBoxSearchSubMenuBase;
-          CheckGrid: TColumnsView;
+          CheckGrid: TColumnsLayout;
           BtnChangeSort: TRectButton;
           BtnChangeUrlType: TRectButton;
           BtnChangeSite: TRectButton;
@@ -433,7 +433,7 @@ begin
         Margins.Rect := M;
       end;
 
-      CheckGrid := TColumnsView.Create(NsfwXxxMenu);
+      CheckGrid := TColumnsLayout.Create(NsfwXxxMenu);
       with CheckGrid do begin
         Parent := NsfwXxxMenu;
         Align := TAlignLayout.Top;
