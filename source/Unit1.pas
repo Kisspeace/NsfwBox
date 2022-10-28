@@ -2675,6 +2675,7 @@ end;
 procedure TForm1.OnBrowserReqChanged(Sender: TObject);
 var
   LTab: TNBoxTab;
+  LNewTabImageName: string;
   LBrowser: TNBoxBrowser;
   Groups: TBookmarkGroupRecAr;
   Group: TBookmarkGroupRec;
@@ -2686,6 +2687,9 @@ begin
     Exit;
 
   LTab.Text.Text := CreateTabText(LBrowser);
+  LNewTabImageName := AppStyle.GetImagePath(LBrowser.Request.Origin);
+  if LNewTabImageName <> LTab.Image.ImageURL then
+    LTab.Image.ImageURL := LNewTabImageName;
 
   if ( not NowLoadingSession ) And Settings.AutoSaveSession then begin
     Groups := Session.GetBookmarksGroups;
@@ -3566,7 +3570,7 @@ begin
   FCurrentBrowser := Value;
   Tab := self.GetTab(FCurrentBrowser);
   Tab.Image.Visible := true;
-  Tab.Image.ImageURL := AppStyle.GetImagePath(AppStyle.Tab.ImageFilename);
+  Tab.Image.ImageURL := AppStyle.GetImagePath(FCurrentBrowser.Request.Origin);
   FCurrentBrowser.Visible := true;
 end;
 
