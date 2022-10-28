@@ -5,7 +5,7 @@ interface
 uses
   SysUtils, Types, System.UITypes, Classes,
   System.Variants, FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics,
-  Fmx.Scroller, System.Threading, System.Generics.Collections, Net.HttpClient,
+  FMX.ColumnsView, System.Threading, System.Generics.Collections, Net.HttpClient,
   Net.HttpClientComponent, Fmx.Layouts, NsfwXxx.Types, Fmx.ActnList, FMX.Memo,
   NetHttp.R34AppApi,
   // Alcinoe
@@ -116,7 +116,7 @@ type
           BtnChangeOrigin: TRectButton;
           EditPageId: TNBoxEdit;
         NsfwXxxMenu: TNBoxSearchSubMenuBase;
-          CheckGrid: TMultiLayout;
+          CheckGrid: TColumnsView;
           BtnChangeSort: TRectButton;
           BtnChangeUrlType: TRectButton;
           BtnChangeSite: TRectButton;
@@ -264,7 +264,8 @@ var
       Margins.Bottom := M.Top / 2;
     end;
     if not Assigned(AParent) then
-      CheckGrid.AddControl(Result)
+      Result.Parent := CheckGrid
+//      CheckGrid.AddControl(Result)
     else
       Result.Parent := AParent;
   end;
@@ -432,18 +433,18 @@ begin
         Margins.Rect := M;
       end;
 
-      CheckGrid := TMultiLayout.Create(NsfwXxxMenu);
+      CheckGrid := TColumnsView.Create(NsfwXxxMenu);
       with CheckGrid do begin
         Parent := NsfwXxxMenu;
         Align := TAlignLayout.Top;
         BeBottom(CheckGrid, CheckGallery);
 
         Margins.Rect := M;
-        LayoutIndent := M.Top / 2;
-        Margins.Left := LayoutIndent;
+        ItemsIndent := TPointF.Create(M.Top / 2, M.Top / 2);
+        Margins.Left := ItemsIndent.X;
         Margins.Right := Margins.Left;
-        Margins.Top := LayoutIndent;
-        BlockCount := 2;
+        Margins.Top := ItemsIndent.Y;
+        ColumnsCount := 2;
 
         CheckImage    := NewCheck(ICON_IMAGE, 'Image');
         CheckVideo    := NewCheck(ICON_VIDEO, 'Video');
@@ -452,7 +453,7 @@ begin
         CheckCartoons := NewCheck(ICON_CARTOONS, 'Cartoons');
         CheckGay      := NewCheck(ICON_GAY, 'Gay');
 
-        ReCalcBlocksSize;
+        AutoSize := TRUE;
       end;
 
       BtnChangeSort := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
