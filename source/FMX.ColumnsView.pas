@@ -37,11 +37,14 @@ type
     private
       procedure SetColumnsCount(const Value: integer);
       function GetMinColumn: TColumn;
+      function GetMaxColumn: TColumn;
       procedure SetIndent(const Value: TPointF);
       function GetColumnsCount: integer;
+      procedure SetAutoSize(const Value: boolean);
     protected
       FColumns: TColumnList;
       FIndent: TPointF;
+      FAutoSize: Boolean;
       procedure Resize; override;
       function PlaceControl(ANew: TControl): TColumn;
       procedure DoAddObject(const AObject: TFmxObject); override;
@@ -54,6 +57,7 @@ type
     published
       property ColumnsCount: integer read GetColumnsCount write SetColumnsCount;
       property ItemsIndent: TPointF read FIndent write SetIndent;
+      property AutoSize: boolean read FAutoSize write SetAutoSize;
   End;
 
 implementation
@@ -95,6 +99,7 @@ begin
   Inherited;
   FColumns := TColumnList.Create;
   Self.ColumnsCount := 1;
+  FAutoSize := False
 end;
 
 destructor TColumnsView.Destroy;
@@ -113,6 +118,20 @@ end;
 function TColumnsView.GetColumnsCount: integer;
 begin
   Result := FColumns.Count;
+end;
+
+function TColumnsView.GetMaxColumn: TColumn;
+var
+  I: integer;
+begin
+  Result := Nil;
+  if (FColumns.Count < 1) then exit;
+  Result := FColumns.First;
+
+  for I := 1 to FColumns.Count - 1 do begin
+    if (FColumns[I].GetBottom > Result.GetBottom) then
+      Result := FColumns[I];
+  end;
 end;
 
 function TColumnsView.GetMinColumn: TColumn;
@@ -145,6 +164,9 @@ begin
   ANew.Margins.Top := FIndent.Y;
   LTargetColumn.Add(ANew);
   Result := LTargetColumn;
+
+  if FAutoSize then
+    Self.Resize;
 end;
 
 procedure TColumnsView.RecalcColumns;
@@ -184,9 +206,22 @@ begin
 end;
 
 procedure TColumnsView.Resize;
+var
+  LCol: TColumn;
 begin
   Self.RecalcColumns;
+  if FAutoSize then begin
+    LCol := Self.GetMaxColumn;
+    if Assigned(LCol) then
+      Self.Height := LCol.GetBottom;
+  end;
   inherited;
+end;
+
+procedure TColumnsView.SetAutoSize(const Value: boolean);
+begin
+  FAutoSize := Value;
+  Self.Resize;
 end;
 
 procedure TColumnsView.SetColumnsCount(const Value: integer);
