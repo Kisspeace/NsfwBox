@@ -54,6 +54,8 @@ type
       destructor Destroy; override;
   end;
 
+  TTNBoxSelectMenuList = TList<TNBoxSelectMenu>;
+
   TNBoxOriginSetMenu = class(TNBoxSelectMenu)
     public
       BtnOriginNsfwXxx: TRectButton;
@@ -82,12 +84,18 @@ type
   end;
 
   TNBoxSearchSubMenuBase = class(TLayout)
+    private
+      procedure OnResizeEvent(Sender: TObject);
     public
       procedure DoAutoSize; virtual;
   end;
 
+  TNBoxSearchSubMenuBaseList = TList<TNBoxSearchSubMenuBase>;
+
   TNBoxSearchMenu = Class(TLayout)
     private
+      FSelectMenus: TTNBoxSelectMenuList;
+      FProviderMenus: TNBoxSearchSubMenuBaseList;
       procedure OnOriginChanged(Sender: TObject);
       procedure OnNsfwXxxSortChanged(Sender: TObject);
       procedure OnNsfwXxxSearchTypeChanged(Sender: TObject);
@@ -227,7 +235,12 @@ begin
   end;
 
   Size.Height := MaxY + Control.Height;
+//  Size.Height := Self.ChildrenRect.height;
+end;
 
+procedure TNBoxSearchSubMenuBase.OnResizeEvent(Sender: TObject);
+begin
+  Self.DoAutoSize;
 end;
 
 { TNBoxSearchMenu }
@@ -251,7 +264,7 @@ var
 
   procedure BeBottom(AControl, AControlOnTop: TControl);
   begin
-    AControl.Position.Y := AControlOnTop.Position.Y + 1;
+    AControl.Position.Y := AControlOnTop.Position.Y + 1 + AControlOnTop.Height;
   end;
 
   function NewCheck(AImageName, AText: string; AParent: TFmxObject = nil): TNBoxCheckButton;
@@ -265,7 +278,6 @@ var
     end;
     if not Assigned(AParent) then
       Result.Parent := CheckGrid
-//      CheckGrid.AddControl(Result)
     else
       Result.Parent := AParent;
   end;
@@ -278,10 +290,25 @@ var
       Visible := false;
       Align := TAlignlayout.Client;
     end;
+    FSelectMenus.Add(Result);
+  end;
+
+  function NewProviderMenu: TNBoxSearchSubMenuBase;
+  begin
+    Result := TNBoxSearchSubMenuBase.Create(Self);
+    with Result do begin
+      Parent := MainMenu;
+      Align := TAlignLayout.Top;
+      Visible := false;
+    end;
+    FProviderMenus.Add(Result);
   end;
 
 begin
   inherited;
+  FSelectMenus := TTNBoxSelectMenuList.Create;
+  FProviderMenus := TNBoxSearchSubMenuBaseList.Create;
+
   M := TRectF.Create(10, 10, 10, 0);
 
   OriginSetMenu := TNBoxOriginSetMenu.Create(Self);
@@ -291,6 +318,7 @@ begin
     Align := TAlignlayout.Client;
     OnSelected := Self.OnOriginChanged;
   end;
+  FSelectMenus.Add(OriginSetMenu);
 
   MainMenu := TVertScrollBox.Create(self);
   With MainMenu do begin
@@ -386,12 +414,8 @@ begin
       OnSelected := OnCoomerPartyHostChanged;
     end;
 
-    R34AppMenu := TNBoxSearchSubMenuBase.Create(Self);
+    R34AppMenu := NewProviderMenu;
     with R34AppMenu do begin
-      Parent := MainMenu;
-      Align := TAlignLayout.Top;
-      Visible := false;
-
       BtnR34AppChangeBooru := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
       With BtnR34AppChangeBooru do begin
         Parent := R34AppMenu;
@@ -405,12 +429,8 @@ begin
 
     end;
 
-    BookmarksMenu := TNBoxSearchSubMenuBase.Create(Self);
+    BookmarksMenu := NewProviderMenu;
     With BookmarksMenu do begin
-      Parent := MainMenu;
-      Align := TAlignLayout.Top;
-      Visible := false;
-
       EditBookmarksPath := Form1.CreateDefEdit(Self);
       with EditBookmarksPath do begin
         Parent := BookmarksMenu;
@@ -421,12 +441,8 @@ begin
       end;
     end;
 
-    NsfwXxxMenu := TNBoxSearchSubMenuBase.Create(Self);
+    NsfwXxxMenu := NewProviderMenu;
     with NsfwXxxMenu do begin
-      Parent := MainMenu;
-      Align := TAlignlayout.Top;
-      Visible := False;
-
       CheckGallery  := NewCheck(ICON_IMAGE, 'Gallery (set of images)', NsfwXxxMenu);
       with CheckGallery do begin
         Align := TAlignlayout.Top;
@@ -492,14 +508,11 @@ begin
         Image.ImageURL := IconPath;
       end;
 
-      DoAutoSize;
+      OnResize := OnResizeEvent;
     end;
 
-    GmpClubMenu := TNBoxSearchSubMenuBase.Create(self);
+    GmpClubMenu := NewProviderMenu;
     with GmpClubMenu do begin
-      Parent := MainMenu;
-      Align := TAlignlayout.Top;
-      Visible := false;
 
       BtnGmpChangeSearchType := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
       With BtnGmpChangeSearchType do begin
@@ -514,11 +527,8 @@ begin
 
     end;
 
-    CoomerPartyMenu := TNBoxSearchSubMenuBase.Create(self);
+    CoomerPartyMenu := NewProviderMenu;
     with CoomerPartyMenu do begin
-      Parent := MainMenu;
-      Align := TAlignLayout.Top;
-      Visible := false;
 
       EditCoomerPartyHost := Form1.CreateDefEdit(Self);
       with EditCoomerPartyHost do begin
@@ -564,12 +574,11 @@ begin
     end;
   end;
 
-  Self.NsfwXxxSortMenu.Selected := Ord(Recommended);
-  Self.NsfwXxxSearchTypeMenu.Selected := Ord(TNsfwUrlType.Default);
-  Self.GmpClubSearchTypeMenu.Selected := Ord(TGmpclubSearchType.Empty);
-  Self.NsfwXxxHostChangeMenu.Selected := Ord(TNsfwXxxSite.NsfwXxx);
-  Self.R34AppBooruChangeMenu.Selected := Ord(TR34AppFreeBooru.rule34xxx);
-  //Unit1.Log('anal');
+//  Self.NsfwXxxSortMenu.Selected := Ord(Newest);
+//  Self.NsfwXxxSearchTypeMenu.Selected := Ord(TNsfwUrlType.Default);
+//  Self.GmpClubSearchTypeMenu.Selected := Ord(TGmpclubSearchType.Empty);
+//  Self.NsfwXxxHostChangeMenu.Selected := Ord(TNsfwXxxSite.NsfwXxx);
+//  Self.R34AppBooruChangeMenu.Selected := Ord(TR34AppFreeBooru.rule34xxx);
 end;
 
 destructor TNBoxSearchMenu.Destroy;
@@ -579,6 +588,8 @@ begin
   EditRequest.Free;
   EditPageId.Free;
   MainMenu.Free;
+  FSelectMenus.Free;
+  FProviderMenus.Free;
   inherited;
 end;
 
@@ -659,24 +670,20 @@ begin
 end;
 
 procedure TNBoxSearchMenu.HideMenus;
+var
+  I: integer;
 begin
   MainMenu.Visible := false;
-  OriginSetMenu.Visible := false;
-  NsfwXxxSortMenu.Visible := false;
-  NsfwXxxSearchTypeMenu.Visible := false;
-  NsfwXxxHostChangeMenu.Visible := false;
-  R34AppBooruChangeMenu.Visible := false;
-  GmpClubSearchTypeMenu.Visible := false;
-  CoomerPartyHostChangeMenu.Visible := False;
+  for I := 0 to FSelectMenus.Count - 1 do
+    FSelectMenus[I].Visible := False;
 end;
 
 procedure TNBoxSearchMenu.HideOriginMenus;
+var
+  I: integer;
 begin
-  NsfwXxxMenu.Visible := False;
-  GmpClubMenu.Visible := False;
-  R34AppMenu.Visible := False;
-  BookmarksMenu.Visible := False;
-  CoomerPartyMenu.Visible := False;
+  for I := 0 to FProviderMenus.Count - 1 do
+    FProviderMenus[I].Visible := False;
 end;
 
 procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
