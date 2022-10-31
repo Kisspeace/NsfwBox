@@ -37,7 +37,8 @@ uses
   {$ENDIF }
   NsfwBoxOriginCoomerParty in 'source\NsfwBoxOriginCoomerParty.pas',
   FMX.ColumnsView in 'source\FMX.ColumnsView.pas',
-  NsfwBoxOriginRandomizer in 'source\NsfwBoxOriginRandomizer.pas';
+  NsfwBoxOriginRandomizer in 'source\NsfwBoxOriginRandomizer.pas',
+  NsfwBox.Provider.motherless in 'source\NsfwBox.Provider.motherless.pas';
 
 {$R *.res}
 
