@@ -16,7 +16,7 @@ uses
   NsfwBoxGraphics.Rectangle, NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi,
   NsfwBoxOriginGivemepornClub, NsfwBoxStyling, NsfwBoxOriginBookmarks,
   NsfwBoxHelper, CoomerParty.Scraper, NsfwBoxOriginCoomerParty,
-  NsfwBoxOriginRandomizer;
+  NsfwBoxOriginRandomizer, NsfwBox.Provider.motherless, Motherless.types;
 
 type
 
@@ -66,6 +66,7 @@ type
       BtnOriginPseudo: TRectButton;
       BtnOriginBookmarks: TRectButton;
       BtnOriginCoomerParty: TRectButton;
+      BtnOriginMotherless: TRectButton;
       BtnOriginRandomizer: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
@@ -103,6 +104,10 @@ type
       procedure OnGmpClubSearchTypeChanged(Sender: TObject);
       procedure OnR34AppBooruChanged(Sender: TObject);
       procedure OnCoomerPartyHostChanged(Sender: TObject);
+      procedure OnMotherlessMediaChanged(Sender: TObject);
+      procedure OnMotherlessSortChanged(Sender: TObject);
+      procedure OnMotherlessUploadDateChanged(Sender: TObject);
+      procedure OnMotherlessMediaSizeChanged(Sender: TObject);
       procedure BtnSelectMenuOnTap(Sender: TObject; const Point: TPointF);
       procedure SetRequest(const value: INBoxSearchRequest);
       function GetRequest: INBoxSearchRequest;
@@ -117,6 +122,10 @@ type
       R34AppBooruChangeMenu: TNBoxSelectMenu;
       GmpClubSearchTypeMenu: TNBoxSelectMenu;
       CoomerPartyHostChangeMenu: TNBoxSelectMenu;
+      MotherlessSortChangeMenu: TNBoxSelectMenu;
+      MotherlessMediaChangeMenu: TNBoxSelectMenu;
+      MotherlessUploadDateChangeMenu: TNBoxSelectMenu;
+      MotherlessMediaSizeChangeMenu: TNBoxSelectMenu;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -146,6 +155,11 @@ type
           EditCoomerPartyService
           : TNBoxEdit;
           BtnCoomerPartyChangeSite: TRectButton;
+        MotherlessMenu: TNBoxSearchSubMenuBase;
+          BtnMotherlessChangeSort: TRectButton;
+          BtnMotherlessChangeMedia: TRectButton;
+          BtnMotherlessChangeUploadDate: TRectButton;
+          BtnMotherlessChangeMediaSize: TRectButton;
         BookmarksMenu: TNBoxSearchSubMenuBase;
           EditBookmarksPath: TNBoxEdit;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
@@ -204,6 +218,7 @@ begin
   BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
   BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
   BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
+  BtnOriginMotherless := NewBtn(ORIGIN_MOTHERLESS);
   BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
 end;
 
@@ -302,6 +317,32 @@ var
       Visible := false;
     end;
     FProviderMenus.Add(Result);
+  end;
+
+  procedure SetBtnTriggerSelectMenu(ABtn: TRectbutton; AMenu: TNBoxSelectMenu);
+  begin
+    ABtn.OnTap := Self.BtnSelectMenuOnTap;
+    ABtn.TagObject := AMenu;
+  end;
+
+  function NewBtn(AParent: TControl; AText: string; ABeBottomControl: TControl = nil): TRectButton;
+  begin
+    Result := Form1.CreateDefButton(Self, BTN_STYLE_DEF2);
+    with Result do begin
+      Parent := AParent;
+      Align := TAlignlayout.top;
+      Margins.Rect := M;
+      Text.Text := AText;
+      if Assigned(ABeBottomControl) then
+        BeBottom(Result, ABeBottomControl);
+      Image.ImageURL := IconPath; //delete this
+    end;
+  end;
+
+  function NewSelectBtn(AParent: TControl; AText: string; ASelectMenu: TNBoxSelectMenu; ABeBottomControl: TControl = nil): TRectButton;
+  begin
+    Result := NewBtn(AParent, AText, ABeBottomControl);
+    SetBtnTriggerSelectMenu(Result, ASelectMenu);
   end;
 
 begin
@@ -572,6 +613,46 @@ begin
       BeBottom(EditCoomerPartyService, EditCoomerPartyUserId);
 
     end;
+
+    { Motherless menu -------- }
+
+    MotherlessMenu := NewProviderMenu;
+    MotherlessMediaChangeMenu := NewSelectMenu;
+    with MotherlessMediaChangeMenu do begin
+      OnSelected := OnMotherlessMediaChanged;
+      for I := Ord(TMotherlessMediaType.MediaImage) to Ord(TMotherlessMediaType.MediaVideo) do
+        Addbtn(MediaTypeToStr(TMotherlessMediaType(I)), I, IconPath);
+    end;
+    BtnMotherlessChangeMedia := NewSelectBtn(MotherlessMenu, '', MotherlessMediaChangeMenu);
+    MotherlessMediaChangeMenu.Selected := ord(TMotherlessMediaType.MediaImage);
+
+
+    MotherlessSortChangeMenu := NewSelectMenu;
+    with MotherlessSortChangeMenu do begin
+      OnSelected := OnMotherlessSortChanged;
+      for I := Ord(TMotherlessSort.SortRecent) to Ord(TMotherlessSort.SortDate) do
+        Addbtn(SortTypeToStr(TMotherlessSort(I)), I, IconPath);
+    end;
+    BtnMotherlessChangeSort := NewSelectBtn(MotherlessMenu, '', MotherlessSortChangeMenu, BtnMotherlessChangeMedia);
+    MotherlessSortChangeMenu.Selected := Ord(TMotherlessSort.SortRecent);
+
+    MotherlessUploadDateChangeMenu := NewSelectMenu;
+    with MotherlessUploadDateChangeMenu do begin
+      OnSelected := OnMotherlessUploadDateChanged;
+      for I := Ord(TMotherLessUploadDate.DateAll) to Ord(TMotherLessUploadDate.DateThisYear) do
+        Addbtn(UploadDateToStr(TMotherLessUploadDate(I)), I, IconPath);
+    end;
+    BtnMotherlessChangeUploadDate := NewSelectBtn(MotherlessMenu, '', MotherlessUploadDateChangeMenu, BtnMotherlessChangeSort);
+    MotherlessUploadDateChangeMenu.Selected := Ord(TMotherLessUploadDate.DateAll);
+
+    MotherlessMediaSizeChangeMenu := NewSelectMenu;
+    with MotherlessMediaSizeChangeMenu do begin
+      OnSelected := OnMotherlessMediaSizeChanged;
+      for I := Ord(TMotherLessMediaSize.SizeAll) to Ord(TMotherLessMediaSize.SizeBig) do
+        Addbtn(MediaSizeToStr(TMotherLessMediaSize(I)), I, IconPath);
+    end;
+    BtnMotherlessChangeMediaSize := NewSelectBtn(MotherlessMenu, '', MotherlessMediaSizeChangeMenu, BtnMotherlessChangeUploadDate);
+    MotherlessMediaSizeChangeMenu.Selected := Ord(TMotherLessMediaSize.SizeAll);
   end;
 
 //  Self.NsfwXxxSortMenu.Selected := Ord(Newest);
@@ -651,6 +732,15 @@ begin
       end;
     end;
 
+    ORIGIN_MOTHERLESS: begin
+      with ( Result as TNBoxSearchReqMotherless ) do begin
+        ContentType := TMotherlessMediaType(MotherlessMediaChangeMenu.Selected);
+        Sort := TMotherlessSort(MotherlessSortChangeMenu.Selected);
+        UploadDate := TMotherlessUploadDate(MotherlessUploadDateChangeMenu.Selected);
+        MediaSize := TMotherlessMediaSize(MotherlessMediaSizeChangeMenu.Selected);
+      end;
+    end;
+
     ORIGIN_BOOKMARKS: begin
       with ( Result as TNBoxSearchReqBookmarks ) do begin
         Path := self.EditBookmarksPath.Edit.Text;
@@ -704,6 +794,42 @@ begin
     TGmpclubSearchType.Category: BtnGmpChangeSearchType.Text.Text := 'Search by category';
     TGmpclubSearchType.Random:   BtnGmpChangeSearchType.Text.Text := 'Random content';
   end;
+end;
+
+procedure TNBoxSearchMenu.OnMotherlessMediaChanged(Sender: TObject);
+var
+  LSelected: TMotherlessMediaType;
+begin
+  ShowMainMenu;
+  LSelected := TMotherlessMediaType((Sender as TNBoxSelectMenu).Selected);
+  BtnMotherlessChangeMedia.Text.Text := MediaTypeToStr(LSelected);
+end;
+
+procedure TNBoxSearchMenu.OnMotherlessMediaSizeChanged(Sender: TObject);
+var
+  LSelected: TMotherlessMediaSize;
+begin
+  ShowMainMenu;
+  LSelected := TMotherlessMediaSize((Sender as TNBoxSelectMenu).Selected);
+  BtnMotherlessChangeMediaSize.Text.Text := MediaSizeToStr(LSelected);
+end;
+
+procedure TNBoxSearchMenu.OnMotherlessSortChanged(Sender: TObject);
+var
+  LSelected: TMotherlessSort;
+begin
+  ShowMainMenu;
+  LSelected := TMotherlessSort((Sender as TNBoxSelectMenu).Selected);
+  BtnMotherlessChangeSort.Text.Text := SortTypeToStr(LSelected);
+end;
+
+procedure TNBoxSearchMenu.OnMotherlessUploadDateChanged(Sender: TObject);
+var
+  LSelected: TMotherlessUploadDate;
+begin
+  ShowMainMenu;
+  LSelected := TMotherlessUploadDate((Sender as TNBoxSelectMenu).Selected);
+  BtnMotherlessChangeUploadDate.Text.Text := UploadDateToStr(LSelected);
 end;
 
 procedure TNBoxSearchMenu.OnNsfwXxxHostChanged(Sender: TObject);
@@ -760,7 +886,9 @@ begin
   else if ( OriginSetMenu.Selected = ORIGIN_COOMERPARTY ) then
     CoomerPartyMenu.Visible := True
   else if ( OriginSetMenu.Selected = ORIGIN_BOOKMARKS ) then
-    BookmarksMenu.Visible := True;
+    BookmarksMenu.Visible := True
+  else if ( OriginSetMenu.Selected = ORIGIN_MOTHERLESS ) then
+    MotherlessMenu.Visible := True;
 end;
 
 procedure TNBoxSearchMenu.OnR34AppBooruChanged(Sender: TObject);
@@ -810,6 +938,15 @@ begin
       Self.EditCoomerPartyHost.Edit.Text := Site;
       Self.EditCoomerPartyUserId.Edit.Text := UserId;
       Self.EditCoomerPartyService.Edit.Text := Service;
+    end;
+
+  end else if ( Value is TNBoxSearchReqMotherless ) then begin
+
+    with ( Value as TNBoxSearchReqMotherless ) do begin
+      MotherlessSortChangeMenu.Selected := Ord(Sort);
+      MotherlessMediaChangeMenu.Selected := Ord(ContentType);
+      MotherlessUploadDateChangeMenu.Selected := Ord(UploadDate);
+      MotherlessMediaSizeChangeMenu.Selected := Ord(MediaSize);
     end;
 
   end else if ( Value is TNBoxSearchReqBookmarks ) then begin

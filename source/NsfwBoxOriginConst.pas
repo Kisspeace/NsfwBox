@@ -14,6 +14,7 @@ const
   ORIGIN_GIVEMEPORNCLUB = 3;
   ORIGIN_9HENTAITO      = 4;
   ORIGIN_COOMERPARTY    = 5;
+  ORIGIN_MOTHERLESS     = 6;
 
 implementation
 

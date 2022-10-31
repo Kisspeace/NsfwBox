@@ -13,7 +13,8 @@ uses
   NsfwBoxOriginPseudo, NsfwBoxOriginR34App,
   NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9hentaiToApi,
   NsfwBoxOriginCoomerParty, CoomerParty.HTMLParser, CoomerParty.Scraper,
-  CoomerParty.Types,
+  CoomerParty.Types, motherless.types, motherless.scraper,
+  NsfwBox.Provider.motherless,
   NsfwBoxOriginConst, NsfwBoxBookmarks, NsfwBoxOriginBookmarks,
   IoUtils, NsfwBoxFilesystem, System.Classes, system.SyncObjs,
   System.Threading, NsfwBoxThreading, NsfwBoxHelper, System.Math;
@@ -41,6 +42,7 @@ type
       function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string; ARequest, AUserId, AService: string; APageNum: integer): boolean;
+      function GetContentMotherless(AList: INBoxHasOriginList; ARequest: string; APage: integer; AMediaType: TMotherlessMediaType; ASort: TMotherLessSort; ASize: TMotherlessMediaSize; AUploadDate: TMotherLessUploadDate): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
       function GetContentRandomizer(AList: INBoxHasOriginList): boolean;
@@ -136,6 +138,22 @@ begin
       Client.Free;
     end;
 
+  end else if ( APost is TNBoxMotherlessItem ) then begin
+
+    var LClient := TMotherlessScraper.Create;
+    var LItem := (APost as TNBoxMotherlessItem);
+    SyncWebClientSet(LClient.WebClient, APost.Origin);
+
+    try
+      var LPage: TMotherlessPostPage;
+      LPage := LClient.FetchFullPost(LItem.Page.Item.GetPageUrl);
+      var LTmpItem := LItem.Page.Item;
+      LPage.Item := LTmpItem;
+      LItem.Page := LPage;
+    finally
+      LClient.Free;
+    end;
+
   end;
 end;
 
@@ -220,6 +238,21 @@ begin
           UserId,
           Service,
           PageId
+        );
+      end;
+    end;
+
+    ORIGIN_MOTHERLESS:
+    begin
+      with ( ARequest As TNBoxSearchReqMotherless ) do begin
+        Result := Self.GetContentMotherless
+        ( AList,
+          Request,
+          PageId,
+          ContentType,
+          Sort,
+          MediaSize,
+          UploadDate
         );
       end;
     end;
@@ -314,6 +347,36 @@ begin
 
   finally
     Client.Free;
+  end;
+end;
+
+function TNBoxScraper.GetContentMotherless(AList: INBoxHasOriginList;
+  ARequest: string; APage: integer; AMediaType: TMotherlessMediaType;
+  ASort: TMotherLessSort; ASize: TMotherlessMediaSize;
+  AUploadDate: TMotherLessUploadDate): boolean;
+var
+  LClient: TMotherlessScraper;
+  LContent: TMotherlessItemAr;
+  I: integer;
+begin
+  Result := False;
+  LClient := TMotherlessScraper.Create;
+  try
+    SyncWebClientSet(LClient.WebClient, ORIGIN_MOTHERLESS);
+
+    LContent := LClient.Search(ARequest, APage, AMediaType, ASort, ASize, AUploadDate);
+    Result := (Length(LContent) > 0);
+    for I := 0 to High(LContent) do begin
+      var Item := TNBoxMotherlessItem.Create;
+      var LTmp := Item.Page;
+      LTmp.Item := LContent[I];
+      Item.Page := LTmp;
+      AList.Add(Item);
+    end;
+
+  finally
+    LContent := nil;
+    LClient.Free;
   end;
 end;
 

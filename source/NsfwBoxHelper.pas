@@ -9,6 +9,7 @@ uses
   NsfwBoxOriginGivemepornClub, NsfwBoxOrigin9HentaitoApi,
   NsfwBoxOriginCoomerParty,
   NsfwBoxOriginRandomizer,
+  NsfwBox.Provider.motherless,
   NsfwBoxOriginConst,
   classes, sysutils, NsfwXxx.Types;
 
@@ -32,6 +33,7 @@ begin
     ORIGIN_PSEUDO:     Result := TNBoxPseudoItem.Create;
     ORIGIN_9HENTAITO:  Result := TNBox9HentaiToItem.Create;
     ORIGIN_COOMERPARTY: Result := TNBoxCoomerPartyItem.Create;
+    ORIGIN_MOTHERLESS: Result := TNBoxMotherlessItem.Create;
   end;
 end;
 
@@ -47,6 +49,7 @@ begin
     ORIGIN_9HENTAITO:  Result := TNBoxSearchReq9HentaiTo.Create;
     ORIGIN_COOMERPARTY: Result := TNBoxSearchReqCoomerParty.Create;
     ORIGIN_RANDOMIZER: Result := TNBoxSearchReqRandomizer.Create;
+    ORIGIN_MOTHERLESS: Result := TNBoxSearchReqMotherless.Create;
   end;
 end;
 
@@ -124,6 +127,7 @@ begin
     ORIGIN_GIVEMEPORNCLUB: Result := 'givemeporn.club';
     ORIGIN_9HENTAITO:  Result := '9hentai.to';
     ORIGIN_COOMERPARTY: Result := '(coomer\kemono).party';
+    ORIGIN_MOTHERLESS: Result := 'motherless.com';
 
     ORIGIN_BOOKMARKS: Result  := 'Bookmarks';
     ORIGIN_PSEUDO: Result     := 'None';
