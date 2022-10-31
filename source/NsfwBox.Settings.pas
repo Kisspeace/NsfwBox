@@ -52,6 +52,7 @@ type
     ImageCacheSave: boolean;
     ImageCacheLoad: boolean;
     AutoAcceptAllCertificates: boolean;
+    YDWSyncLoadFromFile: boolean;
     //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
     //AutoRenameExistsFile: boolean;
@@ -129,6 +130,7 @@ begin
   ImageCacheSave := True;
   ImageCacheLoad := True;
   AutoAcceptAllCertificates := False;
+  YDWSyncLoadFromFile := False;
 end;
 
 end.
