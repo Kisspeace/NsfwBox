@@ -2170,9 +2170,11 @@ begin
   end;
 
   CheckSetFullscreen          := AddSettingsCheck('Fullscreen mode');
+  {$IFDEF MSWINDOWS}
   CheckSetUseNewAppTitlebar   := AddSettingsCheck('Use new titlebar');
+  {$ENDIF}
   CheckSetAllowCookies        := AddSettingsCheck('Allow cookies');
-  CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates');
+  CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates'); { issues on ANDROID }
   CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session');
   CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history');
   CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history');
