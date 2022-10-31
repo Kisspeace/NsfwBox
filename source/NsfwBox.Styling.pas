@@ -42,6 +42,7 @@ const
   ICON_ORIGIN_PREFIX = 'content-origin-';
 
   IMAGE_LOADING    = 'image-loading.jpg';
+  IMAGE_REQUEST_ITEM = 'request-item.png';
 
 
 type

@@ -2794,8 +2794,8 @@ begin
   else
     LCardS := nil;
 
+  AppStyle.ItemCard.Apply(LCard);
   if LCard.HasPost then begin
-    AppStyle.ItemCard.Apply(LCard);
     if Assigned(LCardS) then begin
       LCardS.Text.Color := AppStyle.TextColors[0];
       AppStyle.ItemCard.Fill2.Apply(LCardS.Rect.Fill);
@@ -2804,10 +2804,11 @@ begin
         LCardS.Rect.Visible := Settings.ShowCaptions;
     end;
   end else if ( LCard.HasBookmark and LCard.Bookmark.IsRequest ) then begin
-    AppStyle.ItemCardRequest.Apply(LCard);
+//    AppStyle.ItemCardRequest.Apply(LCard);
     if Assigned(LCardS) then begin
       LCardS.Text.Color := AppStyle.TextColors[0];
-      AppStyle.ItemCardRequest.Fill2.Apply(LCardS.Rect.Fill);
+//      AppStyle.ItemCardRequest.Fill2.Apply(LCardS.Rect.Fill);
+      LCardS.ImageURL := AppStyle.GetImagePath(IMAGE_REQUEST_ITEM);
     end;
   end;
   LCard.Fill.Kind := TBrushKind.Bitmap;

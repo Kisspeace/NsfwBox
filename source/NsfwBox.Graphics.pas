@@ -141,6 +141,7 @@ begin
     Text.Font.Size := 11;
     Text.AutoSize := true;
     Rect.Visible := true;
+    Rect.Fill.Kind := TBrushKind.None;
     Rect.Align := TAlignlayout.Client;
 
   end;
