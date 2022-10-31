@@ -2209,6 +2209,7 @@ begin
 
     AddCheck('Open menu', ACTION_OPEN_MENU);
     AddCheck('Download content', ACTION_DOWNLOAD_ALL);
+    AddCheck('Show available files', ACTION_SHOW_FILES);
     AddCheck('Play externaly', ACTION_PLAY_EXTERNALY);
     AddCheck('Add to bookmarks', ACTION_ADD_BOOKMARK);
     AddCheck('Delete from bookmarks', ACTION_DELETE_BOOKMARK);
