@@ -200,7 +200,8 @@ type
     CheckSetImageCacheSave,
     CheckSetImageCacheLoad,
     CheckSetAutoAcceptAllCertificates,
-    CheckSetYDWSyncLoadFromFile
+    CheckSetYDWSyncLoadFromFile,
+    CheckSetUseNewAppTitlebar
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -1098,6 +1099,7 @@ begin
     {$IFDEF MSWINDOWS}
     ContentPlayApp    := EditSetPlayApp.Edit.Edit.Text;
     ContentPlayParams := EditSetPlayParams.Edit.Edit.Text;
+    UseNewAppTitlebar   := CheckSetUseNewAppTitlebar.IsChecked;
     {$ENDIF}
 
     if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
@@ -2168,6 +2170,7 @@ begin
   end;
 
   CheckSetFullscreen          := AddSettingsCheck('Fullscreen mode');
+  CheckSetUseNewAppTitlebar   := AddSettingsCheck('Use new titlebar');
   CheckSetAllowCookies        := AddSettingsCheck('Allow cookies');
   CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates');
   CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session');
@@ -3624,9 +3627,11 @@ begin
   CheckSetImageCacheLoad.IsChecked      := Settings.ImageCacheLoad;
   CheckSetAutoAcceptAllCertificates.IsChecked := Settings.AutoAcceptAllCertificates;
   CheckSetYDWSyncLoadFromFile.IsChecked := Settings.YDWSyncLoadFromFile;
+
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
+  CheckSetUseNewAppTitlebar.IsChecked   := Settings.UseNewAppTitlebar;
   {$ENDIF}
 
   With SearchMenu.OriginSetMenu do begin
