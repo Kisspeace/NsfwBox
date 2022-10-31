@@ -164,6 +164,13 @@ type
           BtnMotherlessChangeMediaSize: TRectButton;
         BookmarksMenu: TNBoxSearchSubMenuBase;
           EditBookmarksPath: TNBoxEdit;
+        RandomizerMenu: TNBoxSearchSubMenuBase;
+          BtnRandNsfwXxx: TNBoxCheckButton;
+          BtnRandR34App: TNBoxCheckButton;
+          BtnRandGmpClub: TNBoxCheckButton;
+          BtnRandCoomerParty: TNBoxCheckButton;
+          BtnRandMotherless: TNBoxCheckButton;
+          BtnRand9Hentaito: TNBoxCheckButton;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -297,6 +304,19 @@ var
       Result.Parent := CheckGrid
     else
       Result.Parent := AParent;
+  end;
+
+  function NewBtnCheck(AText: string; AParent: TControl; AImageName: string; AIsChecked: boolean = True): TNBoxCheckButton;
+  begin
+    Result := Form1.CreateDefCheckButton(Self);
+    with Result do begin
+      Image.ImageURL := AImageName;
+      Text.Text := AText;
+      Parent := AParent;
+      Align := TAlignLayout.Top;
+      Margins.Rect := M;
+      IsChecked := AIsChecked;
+    end;
   end;
 
   function NewSelectMenu: TNBoxSelectMenu;
@@ -658,6 +678,18 @@ begin
     MotherlessMediaSizeChangeMenu.Selected := Ord(TMotherLessMediaSize.SizeAll);
   end;
 
+  { Randomizer menu ------------- }
+
+  RandomizerMenu := NewProviderMenu;
+  BtnRandNsfwXxx := NewBtnCheck(OriginToStr(ORIGIN_NSFWXXX), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_NSFWXXX));
+  BtnRandR34App := NewBtnCheck(OriginToStr(ORIGIN_R34APP), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_R34APP));
+  BtnRandGmpClub := NewBtnCheck(OriginToStr(ORIGIN_GIVEMEPORNCLUB), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_GIVEMEPORNCLUB));
+  BtnRandCoomerParty := NewBtnCheck(OriginToStr(ORIGIN_COOMERPARTY), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_COOMERPARTY));
+  BtnRandMotherless := NewBtnCheck(OriginToStr(ORIGIN_MOTHERLESS), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_MOTHERLESS));
+  BtnRand9Hentaito := NewBtnCheck(OriginToStr(ORIGIN_9HENTAITO), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_9HENTAITO));
+  RandomizerMenu.DoAutoSize;
+  RandomizerMenu.OnResize := RandomizerMenu.OnResizeEvent;
+
 //  Self.NsfwXxxSortMenu.Selected := Ord(Newest);
 //  Self.NsfwXxxSearchTypeMenu.Selected := Ord(TNsfwUrlType.Default);
 //  Self.GmpClubSearchTypeMenu.Selected := Ord(TGmpclubSearchType.Empty);
@@ -748,7 +780,19 @@ begin
       with ( Result as TNBoxSearchReqBookmarks ) do begin
         Path := self.EditBookmarksPath.Edit.Text;
       end;
-    end
+    end;
+
+    ORIGIN_RANDOMIZER: begin
+      with ( Result as TNBoxSearchReqRandomizer ) do begin
+        Providers := [];
+        if BtnRandNsfwXxx.IsChecked then Providers := Providers + [ORIGIN_NSFWXXX];
+        if BtnRandR34App.IsChecked then Providers := Providers + [ORIGIN_R34APP];
+        if BtnRandGmpClub.IsChecked then Providers := Providers + [ORIGIN_GIVEMEPORNCLUB];
+        if BtnRandCoomerParty.IsChecked then Providers := Providers + [ORIGIN_COOMERPARTY];
+        if BtnRand9Hentaito.IsChecked then Providers := Providers + [ORIGIN_9HENTAITO];
+        if BtnRandMotherless.IsChecked then Providers := Providers + [ORIGIN_MOTHERLESS];
+      end;
+    end;
 
   end;
 
@@ -890,18 +934,15 @@ begin
   MainMenu.Visible := True;
   self.HideOriginMenus;
 
-  if OriginSetMenu.Selected = ORIGIN_NSFWXXX then
-    NsfwXxxMenu.Visible := True
-  else if ( OriginSetMenu.Selected = ORIGIN_GIVEMEPORNCLUB ) then
-    GmpClubMenu.Visible := True
-  else if ( OriginSetMenu.Selected = ORIGIN_R34APP ) then
-    R34AppMenu.Visible := True
-  else if ( OriginSetMenu.Selected = ORIGIN_COOMERPARTY ) then
-    CoomerPartyMenu.Visible := True
-  else if ( OriginSetMenu.Selected = ORIGIN_BOOKMARKS ) then
-    BookmarksMenu.Visible := True
-  else if ( OriginSetMenu.Selected = ORIGIN_MOTHERLESS ) then
-    MotherlessMenu.Visible := True;
+  case OriginSetMenu.Selected of
+    ORIGIN_NSFWXXX:        NsfwXxxMenu.Visible := True;
+    ORIGIN_GIVEMEPORNCLUB: GmpClubMenu.Visible := True;
+    ORIGIN_R34APP:         R34AppMenu.Visible := True;
+    ORIGIN_COOMERPARTY:    CoomerPartyMenu.Visible := True;
+    ORIGIN_BOOKMARKS:      BookmarksMenu.Visible := True;
+    ORIGIN_MOTHERLESS:     MotherlessMenu.Visible := True;
+    ORIGIN_RANDOMIZER:      RandomizerMenu.Visible := True;
+  end;
 end;
 
 procedure TNBoxSearchMenu.OnR34AppBooruChanged(Sender: TObject);
@@ -914,6 +955,22 @@ begin
 end;
 
 procedure TNBoxSearchMenu.SetRequest(const value: INBoxSearchRequest);
+
+  function _IN(AAr: TArray<Integer>; AInt: Integer): boolean;
+  var
+    LIndex, I: integer;
+  begin
+    LIndex := -1;
+    for I := Low(AAr) to High(AAr) do begin
+      if (AAr[I] = AInt) then begin
+        LIndex := I;
+        Break;
+      end;
+    end;
+
+    Result := (LIndex <> -1)
+  end;
+
 begin
   OriginSetMenu.Selected := Value.Origin;
   EditRequest.Edit.Text := Value.Request;
@@ -966,6 +1023,17 @@ begin
 
     with ( Value as TNBoxSearchReqBookmarks ) do
       self.EditBookmarksPath.Edit.Text := Path;
+
+  end else if ( Value is TNBoxSearchReqRandomizer ) then begin
+
+    with ( Value as TNBoxSearchReqRandomizer ) do begin
+      BtnRandNsfwXxx.IsChecked := _IN(Providers, ORIGIN_NSFWXXX);
+      BtnRandR34App.IsChecked := _IN(Providers, ORIGIN_R34APP);
+      BtnRandGmpClub.IsChecked := _IN(Providers, ORIGIN_GIVEMEPORNCLUB);
+      BtnRandCoomerParty.IsChecked := _IN(Providers, ORIGIN_COOMERPARTY);
+      BtnRand9Hentaito.IsChecked := _IN(Providers, ORIGIN_9HENTAITO);
+      BtnRandMotherless.IsChecked := _IN(Providers, ORIGIN_MOTHERLESS);
+    end;
 
   end;
 
