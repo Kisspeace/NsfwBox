@@ -1138,9 +1138,11 @@ var
 begin
   FSelected := value;
 
-  I := BtnIndexByIntTag(value);
-  if ( I <> -1 ) then
-    Self.FSelectedBtn := (Content.Controls[I] as TRectButton);
+  if not Assigned(Self.FSelectedBtn) then begin
+    I := BtnIndexByIntTag(value);
+    if ( I <> -1 ) then
+      Self.FSelectedBtn := (Content.Controls[I] as TRectButton);
+  end;
 
   if Assigned(OnSelected) then
     OnSelected(self);
