@@ -1,4 +1,5 @@
-﻿//♡2022 by Kisspeace. https://github.com/kisspeace
+﻿{ ❤ 2022 by Kisspeace - https://github.com/Kisspeace --------- }
+{ ❤ Part of NsfwBox ❤- https://github.com/101427274/505234915 }
 unit NsfwBox.Provider.Pseudo;
 
 interface
