@@ -1,4 +1,5 @@
-﻿{  This unit is part of https://github.com/Kisspeace/NsfwBox }
+﻿{ ❤ 2022 by Kisspeace - https://github.com/Kisspeace --------- }
+{ ❤ Part of NsfwBox ❤- https://github.com/101427274/505234915 }
 unit FMX.ColumnsView;
 
 interface

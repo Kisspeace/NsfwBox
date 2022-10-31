@@ -1,5 +1,5 @@
-﻿//♡2022 by Kisspeace. https://github.com/kisspeace
-// zalupka! 🤭  🫶🏻
+﻿{ ❤ 2022 by Kisspeace - https://github.com/Kisspeace --------- }
+{ ❤ Part of NsfwBox ❤- https://github.com/101427274/505234915 }
 unit Unit1;
 
 interface
