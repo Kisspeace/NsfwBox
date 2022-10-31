@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Android64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>32787</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>NsfwBox.dpr</MainSource>
@@ -260,38 +260,38 @@
         <DCCReference Include="source\Unit1.pas">
             <Form>Form1</Form>
         </DCCReference>
-        <DCCReference Include="source\NsfwBoxSettings.pas"/>
-        <DCCReference Include="source\NsfwBoxInterfaces.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginNsfwXxx.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginR34JsonApi.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginR34App.pas"/>
-        <DCCReference Include="source\NsfwBoxContentScraper.pas"/>
-        <DCCReference Include="source\NsfwBoxGraphics.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginPseudo.pas"/>
-        <DCCReference Include="source\NsfwBoxGraphics.Browser.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginConst.pas"/>
-        <DCCReference Include="source\NsfwBoxStyling.pas"/>
-        <DCCReference Include="source\NsfwBoxGraphics.Rectangle.pas"/>
+        <DCCReference Include="source\NsfwBox.Settings.pas"/>
+        <DCCReference Include="source\NsfwBox.Interfaces.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.NsfwXxx.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.R34JsonApi.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.R34App.pas"/>
+        <DCCReference Include="source\NsfwBox.ContentScraper.pas"/>
+        <DCCReference Include="source\NsfwBox.Graphics.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.Pseudo.pas"/>
+        <DCCReference Include="source\NsfwBox.Graphics.Browser.pas"/>
+        <DCCReference Include="source\NsfwBox.Consts.pas"/>
+        <DCCReference Include="source\NsfwBox.Styling.pas"/>
+        <DCCReference Include="source\NsfwBox.Graphics.Rectangle.pas"/>
         <DCCReference Include="source\Unit2.pas"/>
-        <DCCReference Include="source\NsfwBoxDownloadManager.pas"/>
-        <DCCReference Include="source\NsfwBoxBookmarks.pas"/>
+        <DCCReference Include="source\NsfwBox.DownloadManager.pas"/>
+        <DCCReference Include="source\NsfwBox.Bookmarks.pas"/>
         <DCCReference Include="source\DbHelper.pas"/>
-        <DCCReference Include="source\NsfwBoxHelper.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginBookmarks.pas"/>
+        <DCCReference Include="source\NsfwBox.Helper.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.Bookmarks.pas"/>
         <DCCReference Include="source\NetHttpClient.Downloader.pas"/>
         <DCCReference Include="source\FMX.Scroller.pas"/>
-        <DCCReference Include="source\NsfwBoxFileSystem.pas"/>
+        <DCCReference Include="source\NsfwBox.FileSystem.pas"/>
         <DCCReference Include="source\FMX.Color.pas"/>
         <DCCReference Include="source\SimpleClipboard.pas"/>
         <DCCReference Include="source\NsfwBoxThreading.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginGivemepornClub.pas"/>
-        <DCCReference Include="source\NsfwBoxOrigin9hentaiToApi.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.GivemepornClub.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.NineHentaiToApi.pas"/>
         <DCCReference Include="source\NsfwBox.UpdateChecker.pas"/>
         <DCCReference Include="source\NsfwBox.MessageForDeveloper.pas"/>
-        <DCCReference Include="source\NsfwBoxWindowsTitlebar.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginCoomerParty.pas"/>
+        <DCCReference Include="source\NsfwBox.WindowsTitlebar.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.CoomerParty.pas"/>
         <DCCReference Include="source\FMX.ColumnsView.pas"/>
-        <DCCReference Include="source\NsfwBoxOriginRandomizer.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.Randomizer.pas"/>
         <DCCReference Include="source\NsfwBox.Provider.motherless.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -347,9 +347,10 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Android64\Release\libNsfwBox.so" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="assets\themes\default\content-origin-0.png" Configuration="Release" Class="File">
                     <Platform Name="Android64">
-                        <RemoteName>libNsfwBox.so</RemoteName>
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>content-origin-0.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -424,12 +425,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Android\Release\libNsfwBox.so" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Android">
-                        <RemoteName>libNsfwBox.so</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Win32\Release\NsfwBox.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>NsfwBox.exe</RemoteName>
@@ -439,6 +434,12 @@
                 <DeployFile LocalName="Win32\Debug\NsfwBox.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>NsfwBox.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Android\Release\libNsfwBox.so" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteName>libNsfwBox.so</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -840,22 +841,22 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="assets\themes\default\download.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>download.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="assets\android-icons\nsfwbox48.png" Configuration="Release" Class="Android_LauncherIcon48">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Release" Class="Android_SplashImage470">
+                <DeployFile LocalName="Android64\Release\libNsfwBox.so" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Android64">
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="assets\themes\default\content-origin-0.png" Configuration="Release" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>content-origin-0.png</RemoteName>
+                        <RemoteName>libNsfwBox.so</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -866,10 +867,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\download.png" Configuration="Release" Class="File">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Release" Class="Android_SplashImage470">
                     <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>download.png</RemoteName>
+                        <RemoteName>splash_image.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1686,8 +1686,8 @@
                 </DeployClass>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>

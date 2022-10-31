@@ -4,7 +4,7 @@ unit NsfwBox.Provider.motherless;
 interface
 uses
   System.SysUtils, System.Classes, XSuperObject,
-  motherless.types, NsfwBoxInterfaces, NsfwBoxOriginConst;
+  motherless.types, NsfwBox.Interfaces, NsfwBox.Consts;
 
 type
 

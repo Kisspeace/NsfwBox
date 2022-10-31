@@ -11,12 +11,12 @@ uses
   // Alcinoe
   AlFmxGraphics, AlFmxObjects,
   // NsfwBox
-  NsfwBoxInterfaces, NsfwBoxContentScraper, NsfwBoxOriginPseudo,
-  NsfwBoxOriginNsfwXxx, NsfwBoxGraphics, NsfwBoxOriginConst,
-  NsfwBoxGraphics.Rectangle, NsfwBoxOriginR34App, NsfwBoxOriginR34JsonApi,
-  NsfwBoxOriginGivemepornClub, NsfwBoxStyling, NsfwBoxOriginBookmarks,
-  NsfwBoxHelper, CoomerParty.Scraper, NsfwBoxOriginCoomerParty,
-  NsfwBoxOriginRandomizer, NsfwBox.Provider.motherless, Motherless.types;
+  NsfwBox.Interfaces, NsfwBox.ContentScraper, NsfwBox.Provider.Pseudo,
+  NsfwBox.Provider.NsfwXxx, NsfwBox.Graphics, NsfwBox.Consts,
+  NsfwBox.Graphics.Rectangle, NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi,
+  NsfwBox.Provider.GivemepornClub, NsfwBox.Styling, NsfwBox.Provider.Bookmarks,
+  NsfwBox.Helper, CoomerParty.Scraper, NsfwBox.Provider.CoomerParty,
+  NsfwBox.Provider.Randomizer, NsfwBox.Provider.motherless, Motherless.types;
 
 type
 

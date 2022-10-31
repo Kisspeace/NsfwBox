@@ -1,10 +1,10 @@
 ﻿//♡2022 by Kisspeace. https://github.com/kisspeace
-unit NsfwBoxOriginRandomizer;
+unit NsfwBox.Provider.Randomizer;
 
 interface
 uses
-  System.SysUtils, System.Classes, XSuperObject, NsfwBoxInterfaces,
-  NsfwBoxOriginConst;
+  System.SysUtils, System.Classes, XSuperObject, NsfwBox.Interfaces,
+  NsfwBox.Consts;
 
 type
 

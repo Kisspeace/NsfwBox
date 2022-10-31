@@ -8,8 +8,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, Fmx.Objects,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, XSuperObject,
   FMX.Controls.Presentation, FMX.MultiView, FMX.Color, FMX.Edit, FMX.Layouts,
-  Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBoxFilesystem, NsfwXxx.Types,
-  NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox,
+  Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBox.FileSystem,
+  NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox, NsfwXxx.Types,
   System.Hash, FMX.Surfaces, System.Variants, System.Threading,
   system.NetEncoding, System.Net.URLClient,
   {$IFDEF ANDROID}
@@ -17,20 +17,20 @@ uses
   AndroidApi.JNI.GraphicsContentViewText,
   AndroidApi.JNI.JavaTypes,
   {$ELSE IF MSWINDOWS}
-  ShellApi, Windows, NsfwBoxWindowsTitlebar,
+  ShellApi, Windows, NsfwBox.WindowsTitlebar,
   {$ENDIF}
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections,
   { Alcinoe ---------- }
   AlFmxGraphics, AlFmxObjects,
   { NsfwBox ---------- }
-  NsfwBoxInterfaces, NsfwBoxSettings, NsfwBoxGraphics, NsfwBoxContentScraper,
-  NsfwBoxOriginPseudo, NsfwBoxOriginNsfwXxx, NsfwBoxOriginR34App,
-  NsfwBoxOriginR34JsonApi, NsfwBoxOriginBookmarks,
-  NsfwBoxOriginCoomerParty, NsfwBoxOrigin9HentaiToApi, NsfwBoxOriginConst,
-  NsfwBoxOriginRandomizer,
-  NsfwBoxGraphics.Browser, NsfwBoxStyling, NsfwBoxGraphics.Rectangle,
-  NsfwBoxDownloadManager, NsfwBoxBookmarks, NsfwBoxHelper,
+  NsfwBox.Interfaces, NsfwBox.Settings, NsfwBox.Graphics, NsfwBox.ContentScraper,
+  NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34App,
+  NsfwBox.Provider.R34JsonApi, NsfwBox.Provider.Bookmarks,
+  NsfwBox.Provider.CoomerParty, NsfwBox.Provider.NineHentaiToApi, NsfwBox.Consts,
+  NsfwBox.Provider.Randomizer,
+  NsfwBox.Graphics.Browser, NsfwBox.Styling, NsfwBox.Graphics.Rectangle,
+  NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
