@@ -199,7 +199,8 @@ type
     CheckSetBrowseNextPageByScrollDown,
     CheckSetImageCacheSave,
     CheckSetImageCacheLoad,
-    CheckSetAutoAcceptAllCertificates
+    CheckSetAutoAcceptAllCertificates,
+    CheckSetYDWSyncLoadFromFile
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -1140,6 +1141,7 @@ begin
     ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
     ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
     AutoAcceptAllCertificates := CheckSetAutoAcceptAllCertificates.IsChecked;
+    YDWSyncLoadFromFile := CheckSetYDWSyncLoadFromFile.IsChecked;
 
     IWUContentManager.EnableSaveToCache := ImageCacheSave;
     IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
@@ -2176,6 +2178,7 @@ begin
   CheckSetShowCaptions        := AddSettingsCheck('Show content caption');
   CheckSetImageCacheSave      := AddSettingsCheck('Cache thumbnails');
   CheckSetImageCacheLoad      := AddSettingsCheck('Load thumbnails from cache');
+  CheckSetYDWSyncLoadFromFile := AddSettingsCheck('YDW full sync load images from file');
 
   CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs');
   CheckSetAllowDuplicateTabs.Visible := false; // FIXME
@@ -2557,6 +2560,9 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   FAppStyle.Form.Apply(form1.Fill);
+  BrowsersIWUContentManager.SyncBitmapLoadFromFile := Settings.YDWSyncLoadFromFile;
+  IWUContentManager.SyncBitmapLoadFromFile := Settings.YDWSyncLoadFromFile;
+  IWUCacheManager.SyncBitmapLoadFromFile := Settings.YDWSyncLoadFromFile;
 end;
 
 function TForm1.GetAppFullscreen: boolean;
@@ -3617,6 +3623,7 @@ begin
   CheckSetImageCacheSave.IsChecked      := Settings.ImageCacheSave;
   CheckSetImageCacheLoad.IsChecked      := Settings.ImageCacheLoad;
   CheckSetAutoAcceptAllCertificates.IsChecked := Settings.AutoAcceptAllCertificates;
+  CheckSetYDWSyncLoadFromFile.IsChecked := Settings.YDWSyncLoadFromFile;
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;

@@ -525,7 +525,7 @@ begin
   if (LRequest is TNBoxSearchReqNsfwXxx) then begin
     LRequest.PageId := RandomRange(1, 50);
   end else if (LRequest is TNBoxSearchReqR34App) then
-    LRequest.PageId := RandomRange(0, 9999)
+    LRequest.PageId := RandomRange(0, 1000)
   else if (LRequest is TNBoxSearchReqGmpClub) then
     TNBoxSearchReqGmpClub(LRequest).SearchType := TGmpClubSearchType.Random
   else if (LRequest is TNBoxSearchReqCoomerParty) then begin
