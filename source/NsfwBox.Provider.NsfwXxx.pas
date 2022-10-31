@@ -226,7 +226,7 @@ constructor TNBoxSearchReqNsfwXxx.Create;
 begin
   inherited;
   FSearchtype := TNsfwUrlType.Default;
-  FSortType := TNsfwSort.Recommended;
+  FSortType := TNsfwSort.Newest;
   FOris := [Straight, Gay, Shemale, Cartoons];
   FTypes := [Image, video, Gallery];
   FSite := TNsfwXxxSite.NsfwXxx;
