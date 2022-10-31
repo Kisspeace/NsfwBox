@@ -5,16 +5,20 @@ unit NsfwBox.Provider.Randomizer;
 interface
 uses
   System.SysUtils, System.Classes, XSuperObject, NsfwBox.Interfaces,
-  NsfwBox.Consts;
+  NsfwBox.Consts, System.Generics.Collections;
 
 type
 
   TNBoxSearchReqRandomizer = class(TNBoxSearchRequestBase)
+    private
+      FProviders: TArray<Integer>;
     protected
       function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
+      property Providers: TArray<Integer> read FProviders write FProviders;
       property Origin;
+      constructor Create; override;
   end;
 
 
@@ -25,6 +29,22 @@ implementation
 function TNBoxSearchReqRandomizer.Clone: INBoxSearchRequest;
 begin
   Result := TNBoxSearchReqRandomizer.Create;
+  with (Result as TNBoxSearchReqRandomizer) do begin
+    Providers := Self.Providers;
+  end;
+end;
+
+constructor TNBoxSearchReqRandomizer.Create;
+begin
+  inherited;
+  Providers := [
+    ORIGIN_NSFWXXX,
+    ORIGIN_GIVEMEPORNCLUB,
+    ORIGIN_R34APP,
+    ORIGIN_COOMERPARTY,
+    ORIGIN_MOTHERLESS,
+    ORIGIN_9HENTAITO
+  ];
 end;
 
 function TNBoxSearchReqRandomizer.GetOrigin: integer;

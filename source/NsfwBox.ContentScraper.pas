@@ -15,7 +15,7 @@ uses
   NsfwBox.Provider.GivemepornClub, NsfwBox.Provider.NineHentaiToApi,
   NsfwBox.Provider.CoomerParty, CoomerParty.HTMLParser, CoomerParty.Scraper,
   CoomerParty.Types, motherless.types, motherless.scraper,
-  NsfwBox.Provider.motherless,
+  NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
   NsfwBox.Consts, NsfwBox.Bookmarks, NsfwBox.Provider.Bookmarks,
   IoUtils, NsfwBox.FileSystem, System.Classes, system.SyncObjs,
   System.Threading, NsfwBoxThreading, NsfwBox.Helper, System.Math;
@@ -46,7 +46,7 @@ type
       function GetContentMotherless(AList: INBoxHasOriginList; ARequest: string; APage: integer; AMediaType: TMotherlessMediaType; ASort: TMotherLessSort; ASize: TMotherlessMediaSize; AUploadDate: TMotherLessUploadDate): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
-      function GetContentRandomizer(AList: INBoxHasOriginList): boolean;
+      function GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
     public
       BookmarksDb: TNBoxBookmarksDb;
       HistoryDb: TNBoxBookmarksDb;
@@ -272,7 +272,9 @@ begin
 
     ORIGIN_RANDOMIZER:
     begin
-      Result := Self.GetContentRandomizer(AList);
+      with ( ARequest as TNBoxSearchReqRandomizer ) do begin
+        Result := Self.GetContentRandomizer(AList, Providers);
+      end;
     end;
 
   end;
@@ -509,26 +511,32 @@ begin
   end;
 end;
 
-function TNBoxScraper.GetContentRandomizer(AList: INBoxHasOriginList): boolean;
-const
-  PROVIDERS: array of integer = [ORIGIN_NSFWXXX, ORIGIN_R34APP,
-                                 ORIGIN_GIVEMEPORNCLUB, ORIGIN_COOMERPARTY];
+function TNBoxScraper.GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
 var
   LProvider: integer;
   LRequest: INBoxSearchRequest;
 begin
-  LProvider := System.Math.RandomFrom(PROVIDERS);
+  Result := False;
+  Randomize;
+  if (Length(AProviders) < 1) then exit;
+  LProvider := System.Math.RandomFrom(AProviders);
   LRequest := CreateReqByOrigin(LProvider);
 
-  if (LRequest is TNBoxSearchReqNsfwXxx) then
-    LRequest.PageId := RandomRange(1, 50)
-  else if (LRequest is TNBoxSearchReqR34App) then
-    LRequest.PageId := RandomRange(0, 1000)
+  if (LRequest is TNBoxSearchReqNsfwXxx) then begin
+    LRequest.PageId := RandomRange(1, 50);
+  end else if (LRequest is TNBoxSearchReqR34App) then
+    LRequest.PageId := RandomRange(0, 9999)
   else if (LRequest is TNBoxSearchReqGmpClub) then
     TNBoxSearchReqGmpClub(LRequest).SearchType := TGmpClubSearchType.Random
   else if (LRequest is TNBoxSearchReqCoomerParty) then begin
     TNBoxSearchReqCoomerParty(LRequest).PageId := RandomRange(0, 173628);
     TNBoxSearchReqCoomerParty(LRequest).Site := CoomerParty.Scraper.URL_COOMER_PARTY;
+  end else if ( LRequest is TNBoxSearchReqMotherless ) then begin
+    LRequest.PageId := RandomRange(0, 1500);
+    TNBoxSearchReqMotherless(LRequest).ContentType := TMotherlessMediaType(RandomRange(0, 1));
+    TNBoxSearchReqMotherless(LRequest).Sort := TMotherlessSort(RandomRange(0, 8));
+  end else if ( LRequest is TNBoxSearchReq9HentaiTo ) then begin
+    LRequest.PageId := RandomRange(0, 5119);
   end;
 
   try
