@@ -1,11 +1,11 @@
 ﻿//♡2022 by Kisspeace. https://github.com/kisspeace
-unit NsfwBoxOriginCoomerParty;
+unit NsfwBox.Provider.CoomerParty;
 
 interface
 uses
   System.SysUtils, System.Classes, XSuperObject,
   CoomerParty.Types, CoomerParty.Scraper,
-  NsfwBoxInterfaces, NsfwBoxOriginConst;
+  NsfwBox.Interfaces, NsfwBox.Consts;
 
 type
 
