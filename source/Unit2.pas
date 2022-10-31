@@ -31,6 +31,7 @@ type
       procedure ClickTapRef(Sender: TObject);
       {$ENDIF}
       procedure BtnOnTap(Sender: TObject; const Point: TPointF); virtual;
+      function BtnIndexByIntTag(AId: NativeInt): integer;
     public
       property SelectedBtn: TRectButton read FSelectedBtn;
       property Selected: NativeInt read FSelected write SetSelected;
@@ -620,12 +621,13 @@ begin
     MotherlessMediaChangeMenu := NewSelectMenu;
     with MotherlessMediaChangeMenu do begin
       OnSelected := OnMotherlessMediaChanged;
-      for I := Ord(TMotherlessMediaType.MediaImage) to Ord(TMotherlessMediaType.MediaVideo) do
-        Addbtn(MediaTypeToStr(TMotherlessMediaType(I)), I, IconPath);
+//      for I := Ord(TMotherlessMediaType.MediaImage) to Ord(TMotherlessMediaType.MediaVideo) do
+//        Addbtn(MediaTypeToStr(TMotherlessMediaType(I)), I, IconPath);
+      AddBtn(MediaTypeToStr(MediaImage), Ord(MediaImage), ICON_IMAGE, True);
+      AddBtn(MediaTypeToStr(MediaVideo), Ord(MediaVideo), ICON_VIDEO, True);
     end;
     BtnMotherlessChangeMedia := NewSelectBtn(MotherlessMenu, '', MotherlessMediaChangeMenu);
     MotherlessMediaChangeMenu.Selected := ord(TMotherlessMediaType.MediaImage);
-
 
     MotherlessSortChangeMenu := NewSelectMenu;
     with MotherlessSortChangeMenu do begin
@@ -640,7 +642,7 @@ begin
     with MotherlessUploadDateChangeMenu do begin
       OnSelected := OnMotherlessUploadDateChanged;
       for I := Ord(TMotherLessUploadDate.DateAll) to Ord(TMotherLessUploadDate.DateThisYear) do
-        Addbtn(UploadDateToStr(TMotherLessUploadDate(I)), I, IconPath);
+        Addbtn(UploadDateToStr(TMotherLessUploadDate(I)), I, ICON_HISTORY, True);
     end;
     BtnMotherlessChangeUploadDate := NewSelectBtn(MotherlessMenu, '', MotherlessUploadDateChangeMenu, BtnMotherlessChangeSort);
     MotherlessUploadDateChangeMenu.Selected := Ord(TMotherLessUploadDate.DateAll);
@@ -799,10 +801,15 @@ end;
 procedure TNBoxSearchMenu.OnMotherlessMediaChanged(Sender: TObject);
 var
   LSelected: TMotherlessMediaType;
+  LMenu: TNBoxSelectMenu;
 begin
   ShowMainMenu;
-  LSelected := TMotherlessMediaType((Sender as TNBoxSelectMenu).Selected);
+  LMenu := (Sender as TNBoxSelectMenu);
+  LSelected := TMotherlessMediaType(LMenu.Selected);
   BtnMotherlessChangeMedia.Text.Text := MediaTypeToStr(LSelected);
+
+  if Assigned(LMenu.SelectedBtn) then
+    BtnMotherlessChangeMedia.Image.ImageURL := LMenu.SelectedBtn.Image.ImageURL;
 end;
 
 procedure TNBoxSearchMenu.OnMotherlessMediaSizeChanged(Sender: TObject);
@@ -826,10 +833,15 @@ end;
 procedure TNBoxSearchMenu.OnMotherlessUploadDateChanged(Sender: TObject);
 var
   LSelected: TMotherlessUploadDate;
+  LMenu: TNBoxSelectMenu;
 begin
   ShowMainMenu;
-  LSelected := TMotherlessUploadDate((Sender as TNBoxSelectMenu).Selected);
+  LMenu := (Sender as TNBoxSelectMenu);
+  LSelected := TMotherlessUploadDate(LMenu.Selected);
   BtnMotherlessChangeUploadDate.Text.Text := UploadDateToStr(LSelected);
+
+  if Assigned(LMenu.SelectedBtn) then
+    BtnMotherlessChangeUploadDate.Image.ImageURL := LMenu.SelectedBtn.Image.ImageURL;
 end;
 
 procedure TNBoxSearchMenu.OnNsfwXxxHostChanged(Sender: TObject);
@@ -996,6 +1008,19 @@ begin
   Result.TagString := ATagStr;
 end;
 
+function TNBoxSelectMenu.BtnIndexByIntTag(AId: NativeInt): integer;
+var
+  I: integer;
+begin
+  for I := 0 to Content.Controls.Count - 1 do begin
+    if (Content.Controls[I].Tag = AId) then begin
+      Result := I;
+      Exit;
+    end;
+  end;
+  Result := -1;
+end;
+
 procedure TNBoxSelectMenu.BtnOnTap(Sender: TObject; const Point: TPointF);
 begin
   FSelectedBtn := (Sender As TRectButton);
@@ -1043,6 +1068,11 @@ var
   I: integer;
 begin
   FSelected := value;
+
+  I := BtnIndexByIntTag(value);
+  if ( I <> -1 ) then
+    Self.FSelectedBtn := (Content.Controls[I] as TRectButton);
+
   if Assigned(OnSelected) then
     OnSelected(self);
 end;
