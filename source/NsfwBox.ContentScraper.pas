@@ -18,7 +18,7 @@ uses
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
   NsfwBox.Consts, NsfwBox.Bookmarks, NsfwBox.Provider.Bookmarks,
   IoUtils, NsfwBox.FileSystem, System.Classes, system.SyncObjs,
-  System.Threading, NsfwBoxThreading, NsfwBox.Helper, System.Math;
+  NsfwBox.Helper, System.Math, YDW.Threading;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -59,20 +59,14 @@ type
       constructor Create;
   end;
 
-  TNBoxFetchManager = Class(TQueuedThreadComponentBase)
+  TNBoxFetchManager = Class(TInterfaceYDWQueuedThreadComponent<INBoxItem>)
     private
       FQueue: TList<INBoxItem>;
       FOnWebClientSet: TWebClientSetEvent;
       FOnFetched: TINBoxItemEvent;
+    protected
+      procedure SubThreadExecute(AItem: INBoxItem); override;
     public
-      // Critical section
-      property Queue: TList<INBoxItem> read FQueue;
-      // Critical section end
-      { this executes in locked criticalsec }
-      function QueueCondition: boolean; override;
-      //function AutoRestartCondition: boolean; override;
-      function NewSubTask: ITask; override;
-      { !! }
       property OnFetched: TINBoxItemEvent read FOnFetched write FOnFetched;
       property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
       procedure Add(AItem: INBoxItem);
@@ -649,21 +643,7 @@ end;
 
 procedure TNBoxFetchManager.Add(AItem: INBoxItem);
 begin
-  //synclog('Add begin.');
-  FLock.Enter;
-  try
-    FQueue.Add(AItem);
-  finally
-    FLock.Leave;
-  end;
-
- // SyncLog('Before if');
-
-  if ( not IsWorkingNow ) then begin
-    //synclog('Starting thread!!');
-    Self.StartTask;
-  end;
-  //synclog('Add end.');
+  Self.QueueAdd(AItem);
 end;
 
 constructor TNBoxFetchManager.Create(AOwner: TComponent);
@@ -678,54 +658,35 @@ begin
   FQueue.Free;
 end;
 
-function TNBoxFetchManager.NewSubTask: ITask;
+procedure TNBoxFetchManager.SubThreadExecute(AItem: INBoxItem);
 var
-  LItem: INBoxItem;
+  LScraper: TNBoxScraper;
 begin
-  LItem := FQueue.First.Clone;
-  FQueue.Delete(0);
-  //SyncLog('Deleted: ' + FQueue.Count.ToString);
-
-  Result := TTask.Create(
-  procedure
-  var
-    LScraper: TNBoxScraper;
-  begin
+  try
     try
-      try
-        LScraper := TNBoxScraper.Create;
-        LScraper.OnWebClientSet := Self.OnWebClientSet;
+      LScraper := TNBoxScraper.Create;
+      LScraper.OnWebClientSet := Self.OnWebClientSet;
 
-        while not LScraper.TryFetchContentUrls(LItem) do begin
-          TTask.CurrentTask.CheckCanceled;
-        end;
-
-        // Fetched
-        TTask.CurrentTask.CheckCanceled;
-        if ( Assigned(Self.OnFetched) ) then
-          Self.OnFetched(Self, LItem);
-
-      finally
-        //TObject(AItem).Free;
-        LScraper.Free;
-      end;
-    Except
-
-      On E: EOperationCancelled do begin
-        // ignore
+      while not LScraper.TryFetchContentUrls(AItem) do begin
+        TThread.Current.CheckTerminated;
       end;
 
-      On E: Exception do begin
-        SyncLog(E, 'TNBoxFetchManager.Execute.Task: ')
-      end;
+      // Fetched
+      TThread.Current.CheckTerminated;
+      if ( Assigned(Self.OnFetched) ) then
+        Self.OnFetched(Self, AItem);
 
+    finally
+      //TObject(AItem).Free;
+      LScraper.Free;
     end;
-  end);
-end;
+  Except
 
-function TNBoxFetchManager.QueueCondition: boolean;
-begin
-  Result := ( FQueue.Count > 0 );
+    On E: Exception do begin
+      SyncLog(E, 'TNBoxFetchManager.SubThreadExecute: ')
+    end;
+
+  end;
 end;
 
 end.

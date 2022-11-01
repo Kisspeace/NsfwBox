@@ -27,7 +27,6 @@ uses
   NsfwBox.FileSystem in 'source\NsfwBox.FileSystem.pas',
   FMX.Color in 'source\FMX.Color.pas',
   SimpleClipboard in 'source\SimpleClipboard.pas',
-  NsfwBoxThreading in 'source\NsfwBoxThreading.pas',
   NsfwBox.Provider.GivemepornClub in 'source\NsfwBox.Provider.GivemepornClub.pas',
   NsfwBox.Provider.NineHentaiToApi in 'source\NsfwBox.Provider.NineHentaiToApi.pas',
   NsfwBox.UpdateChecker in 'source\NsfwBox.UpdateChecker.pas',
