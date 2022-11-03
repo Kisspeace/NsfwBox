@@ -59,7 +59,7 @@ type
       constructor Create;
   end;
 
-  TNBoxFetchManager = Class(TInterfaceYDWQueuedThreadComponent<INBoxItem>)
+  TNBoxFetchManager = Class(TGenericYDWQueuedThreadInterface<INBoxItem>)
     private
       FQueue: TList<INBoxItem>;
       FOnWebClientSet: TWebClientSetEvent;
@@ -70,7 +70,7 @@ type
       property OnFetched: TINBoxItemEvent read FOnFetched write FOnFetched;
       property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
       procedure Add(AItem: INBoxItem);
-      constructor Create(AOwner: TComponent);
+      constructor Create; override;
       destructor Destroy; override;
   End;
 
@@ -646,7 +646,7 @@ begin
   Self.QueueAdd(AItem);
 end;
 
-constructor TNBoxFetchManager.Create(AOwner: TComponent);
+constructor TNBoxFetchManager.Create;
 begin
   Inherited;
   FQueue := TList<INBoxItem>.Create;

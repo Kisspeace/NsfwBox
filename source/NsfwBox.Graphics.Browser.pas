@@ -26,7 +26,7 @@ type
   TNBoxBrowser = class(TColumnsView)
     protected
       type
-        TBrowserWorker = Class(TInterfaceYDWQueuedThreadComponent<TNBoxSearchRequestBase>)
+        TBrowserWorker = Class(TGenericYDWQueuedThreadObject<TNBoxSearchRequestBase>)
           protected
             Browser: TNBoxBrowser;
             procedure SubThreadExecute(AItem: TNBoxSearchRequestBase); override;
@@ -72,7 +72,7 @@ implementation
 constructor TNBoxBrowser.Create(Aowner:Tcomponent);
 begin
   Inherited create(Aowner);
-  FWorker := TBrowserWorker.Create(Self);
+  FWorker := TBrowserWorker.Create;
   FWorker.Browser := Self;
   FOnScraperCreate      := nil;
   FBeforeBrowse         := nil;
@@ -222,7 +222,7 @@ begin
       Scraper.OnWebClientSet := Browser.OnWebClientCreate;
 
     if Assigned(Browser.OnScraperCreate) then
-      Browser.OnScraperCreate(Self.Owner, Scraper);
+      Browser.OnScraperCreate(Self.Browser, Scraper);
 
     if TThread.Current.CheckTerminated then exit;
 
