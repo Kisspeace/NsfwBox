@@ -292,8 +292,8 @@ type
     procedure BtnDialogNoOnTap(Sender: TObject; const Point: TPointF);
     { ----------------------------- }
     procedure DownloadFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
-    procedure OnCreateDownloader(Sender: Tobject; const ADownloader: TNetHttpDownloader);
-    procedure OnStartDownloader(Sender: Tobject; const ADownloader: TNetHttpDownloader);
+    procedure OnCreateDownloader(Sender: Tobject; const ADownloader: TNBoxDownloader);
+    procedure OnStartDownloader(Sender: Tobject; const ADownloader: TNBoxDownloader);
     procedure CloseDownloadTabOnTap(Sender: TObject; const Point: TPointF);
     procedure DownloaderOnCreateWebClient(const Sender: TObject; AWebClient: TNetHttpClient);
     procedure DownloaderOnReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
@@ -632,10 +632,9 @@ begin
       {$ENDIF}
     end;
 
-    DownloadItems.Add(Result);
-    Loader := Downloadmanager.AddDownload(Aurl, AFullFilename);
+    Loader := Downloadmanager.AddDownload(Aurl, AFullFilename, Result);
     Result.TagObject := Loader;
-    Loader.Tag := DownloadItems.Count - 1;
+    DownloadItems.Add(Result);
 
   end else begin
     Result := nil;
@@ -1122,7 +1121,7 @@ begin
     else
       MaxDownloadThreads := 2;
 
-    DownloadManager.MaxThreadCount := MaxDownloadThreads;
+    DownloadManager.ThreadsCount := MaxDownloadThreads;
 
     Fullscreen           := CheckSetFullscreen.IsChecked;
     ShowCaptions         := CheckSetShowCaptions.IsChecked;
@@ -1317,16 +1316,15 @@ end;
 
 procedure TForm1.CloseDownloadTabOnTap(Sender: TObject; const Point: TPointF);
 var
-  Tab: TNBoxTab;
-  Loader: TNetHttpDownloader;
+  LTab: TNBoxTab;
+  Loader: TNBoxDownloader;
 begin
   try
-    Tab := ( TControl(Sender).Parent as TNBoxTab );
-    if Assigned(Tab.TagObject) then begin
-      Loader := ( Tab.TagObject as TNetHttpDownloader );
-      if Loader.IsRunning or (not Loader.IsAborted) then begin
-        Loader.AbortRequest;
-        Tab.Visible := false;
+    LTab := ( TControl(Sender).Parent as TNBoxTab );
+    if Assigned(LTab.TagObject) then begin
+      Loader := ( LTab.TagObject as TNBoxDownloader );
+      if Loader.IsRunning And (not Loader.IsAborted) then begin
+        DownloadManager.AbortDownload(Loader);
       end;
     end;
   except
@@ -1973,7 +1971,7 @@ begin
   {$ENDIF}
 
   DownloadItems := TNBoxTabList.Create;
-  DownloadManager := TNBoxDownloadManager.Create(self);
+  DownloadManager := TNBoxDownloadManager.Create;
   with Downloadmanager do begin
     OnCreateDownloader := self.OnCreateDownloader;
     OnStartDownloader  := Self.OnStartDownloader;
@@ -2815,7 +2813,7 @@ begin
 end;
 
 procedure TForm1.OnCreateDownloader(Sender: Tobject;
-  const ADownloader: TNetHttpDownloader);
+  const ADownloader: TNBoxDownloader);
 begin
   with ADownloader do begin
     SynchronizeEvents := true;
@@ -2876,17 +2874,17 @@ end;
 procedure TForm1.DownloaderOnException(const Sender: TObject;
   const AError: Exception);
 var
-  Tab: TNBoxTab;
-  Loader: TNetHttpDownloader;
-  NewText: string;
+  Loader: TNBoxDownloader;
+  LNewText: string;
 begin
   try
-    Loader := ( Sender as TNetHttpDownloader );
+    Loader := ( Sender as TNBoxDownloader );
 
-    TThread.Synchronize(TThread.Current, procedure begin
-      Tab := DownloadItems.Items[Loader.Tag];
-      NewText := DownloadItemText(Loader) + ' ' + AError.Message + ' try: ' + Loader.RetriedCount.ToString;
-      Tab.Text.Text := newText;
+    TThread.Synchronize(nil, procedure begin
+      if Assigned(Loader.Tab) then begin
+        LNewText := DownloadItemText(Loader) + ' ' + AError.Message + ' try: ' + Loader.RetriedCount.ToString;
+        Loader.Tab.Text.Text := LNewText;
+      end;
     end);
   except
     On E: Exception do Log(E, 'TForm1.DownloaderOnException: ');
@@ -2895,24 +2893,27 @@ end;
 
 procedure TForm1.DownloaderOnFinish(Sender: TObject);
 var
-  Tab: TNBoxTab;
-  Loader: TNetHttpDownloader;
+  Loader: TNBoxDownloader;
+  LTab: TNBoxTab;
 begin
-  Loader := ( Sender as TNetHttpDownloader );
-  Tab := DownloadItems.Items[Loader.Tag];
-  Tab.Visible := false;
+  Loader := ( Sender as TNBoxDownloader );
+  LTab := Loader.Tab;
+  var LIndex: integer := DownloadItems.IndexOf(LTab);
+  if Assigned(Loader.Tab) then begin
+    DownloadItems.Delete(LIndex);
+    LTab.Free;
+  end;
 end;
 
 procedure TForm1.DownloaderOnReceiveData(const Sender: TObject; AContentLength,
   AReadCount: Int64; var AAbort: Boolean);
 var
-  Tab: TNBoxTab;
-  Loader: TNetHttpDownloader;
+  Loader: TNBoxDownloader;
 begin
-  Loader := ( Sender as TNetHttpDownloader );
+  Loader := ( Sender as TNBoxDownloader );
   if Loader.IsRunning then begin
-    Tab := DownloadItems.Items[Loader.Tag];
-    Tab.Text.Text := DownloadItemText(Loader);
+    if not Assigned(Loader.Tab) then exit;
+    Loader.Tab.Text.Text := DownloadItemText(Loader);
   end;
 end;
 
@@ -2989,7 +2990,7 @@ begin
 end;
 
 procedure TForm1.OnStartDownloader(Sender: Tobject;
-  const ADownloader: TNetHttpDownloader);
+  const ADownloader: TNBoxDownloader);
 begin
 
 end;
@@ -3173,41 +3174,65 @@ end;
 
 procedure TForm1.MenuBtnTestOnTap(Sender: TObject; const Point: TPointF);
 var
-  I, II: integer;
-  LBrowser: TNBoxBrowser;
-  LTab: TNBoxTab;
+  I: integer;
 begin
-  LTab := Self.AddBrowser(nil, false);
-  LTab.CloseBtn.Visible := false;
-  LBrowser := LTab.Owner as TNBoxBrowser;
-  Self.CurrentBrowser := LBrowser;
-  Application.ProcessMessages;
 
-  try
-    for I := 1 to 20 do begin
-      Lbrowser.GoNextPage;
+  Self.AddBrowser();
+  var LReq := TNBoxSearchReqBookmarks.Create;
+  LReq.Request := '1';
+  LReq.Path := NsfwBox.ContentScraper.REGULAR_BMRKDB;
+  LReq.PageId := 1;
+  Browsers.Last.Request := LReq;
+  Browsers.Last.GoBrowse;
+  for I := 1 to 6 do
+    Browsers.Last.GoNextPage;
 
-      Application.ProcessMessages;
-      CheckSynchronize(1);
+  CurrentBrowser := Browsers.Last;
 
-      {$IFDEF ANDROID}
-        sleep(random(230));
-      {$ELSE IF MSWINDOWS}
-        Sleep(random(100));
-      {$ENDIF}
-
-
-      if I mod 3 = 0 then begin
-        Lbrowser.Clear;
-      end;
-
-      Sleep(Random(1));
-    end;
-  except On E: Exception do
-      Log(E, 'TestButton: ');
+  while CurrentBrowser.IsBrowsingNow do begin
+    Sleep(10);
+    CheckSynchronize(10);
   end;
+  DoWithAllItems := TRUE;
+  self.BtnDownloadAll.OnTap(BtnDownloadAll, TPointF.Create(0, 0));
 
-  LTab.CloseBtn.Visible := True;
+  TThread.CreateAnonymousThread(
+  procedure
+  var
+    I: integer;
+  begin
+    try
+      try
+        I := 0;
+        var LNeedWork: boolean := TRUE;
+        while LNeedWork do begin
+          TThread.Synchronize(Nil, procedure begin
+            LNeedWork := (DownloadItems.Count > 0);
+            if LNeedWork then begin
+              var LIndex: integer := Random(DownloadItems.Count);
+              var LTab := DownloadItems[LIndex];
+              var hash: string := LTab.GetHashCode.ToString;
+//              Unit1.Log('Test before tap: ' + Hash);
+              try
+                LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
+              except On E: exception do Log(E, 'Test Downloaders: '); end;
+              Inc(I);
+//              Unit1.Log('Test after tap: ' + Hash);
+            end;
+            LNeedWork := TRUE;
+
+          end);
+
+          if TThread.Current.CheckTerminated then exit;
+            Sleep(Random(25));
+        end;
+      except
+        On E: exception do SyncLog(E, 'Test: ');
+      end;
+    finally
+      SyncLog('Test in anonymous thread finished!');
+    end;
+  end).Start;
 end;
 
 procedure TForm1.MenuChangeThemeOnSelected(Sender: TObject);
@@ -3620,7 +3645,7 @@ begin
   CheckSetAutoStartBrowse.IsChecked     := Settings.AutoStartBrowse;
   CheckSetAutoCloseItemMenu.IsChecked   := Settings.AutoCloseItemMenu;
   EditSetMaxDownloadThreads.Edit.Edit.Text := Settings.MaxDownloadThreads.ToString;
-  DownloadManager.MaxThreadCount        := Settings.MaxDownloadThreads;
+  DownloadManager.ThreadsCount        := Settings.MaxDownloadThreads;
   CheckSetDevMode.IsChecked             := Settings.DevMode;
   CheckSetAutoCheckUpdates.IsChecked    := Settings.AutoCheckUpdates;
   CheckSetShowScrollBars.IsChecked      := Settings.ShowScrollbars;

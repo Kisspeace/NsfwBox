@@ -5,45 +5,37 @@ unit NetHttpClient.Downloader;
 interface
 uses
   System.Net.URLClient, System.Net.HttpClient, System.SyncObjs,
-  System.Net.HttpClientComponent, SysUtils, classes, System.Threading;
+  System.Net.HttpClientComponent, SysUtils, classes, YDW.Threading;
 
 type
 
   TCreateWebClientEvent = procedure(const Sender: TObject; AWebClient: TNetHttpClient) of object;
 
-  TDownloader = Class(TComponent)
+  TDownloader = Class(TYdwReusableThread)
     protected
-      FTask: ITask;
-      FLock: TCriticalSection;
-      FIsRunning: boolean;
       FIsAborted: boolean;
       FAsynchronous: boolean;
       FSynchronizeEvents: boolean;
       FAutoRetry: boolean;
       FRetriedCount: int64;
-      FRetryTimeout: int64;        // Milliseconds Timeout before retry
-      FStream: TStream;            // ContentStream
+      FRetryTimeout: int64; { Milliseconds Timeout before retry }
+      FStream: TStream;     { ContentStream }
       FUrl: string;
-      FLostConnectionCount: int64;
       FContentLength: int64;
       FReadCount: int64;
-      procedure DoOnFinish; virtual;
-      procedure DoOnSendData(const Sender: TObject; AContentLength: Int64; AWriteCount: Int64; var AAbort: Boolean);
-      procedure DoOnReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean); virtual;
-    private
       FOnRecievData: TReceiveDataEvent;
       FOnSendData: TSendDataEvent;
       FOnRequestException: TRequestExceptionEvent;
       FOnFinish: TNotifyEvent;
       FOnCreateWebClient: TCreateWebClientEvent;
-      procedure SafeSet(var AVar: boolean; ANew: boolean); overload;
-      procedure SafeSet(var AVar: string; ANew: string);   overload;
-      procedure SafeSet(var AVar: int64; ANew: int64);     overload;
-      function SafeGet(var AVar: boolean): boolean;        overload;
-      function SafeGet(var AVar: string): string;          overload;
-      function SafeGet(var AVar: int64): int64;            overload;
-      //--setters getters--
-      function GetIsRunning: boolean;
+      procedure DoOnFinish; virtual;
+      procedure DoOnSendData(const Sender: TObject; AContentLength: Int64; AWriteCount: Int64; var AAbort: Boolean);
+      procedure DoOnReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean); virtual;
+      procedure DoOnCreateWebClient(AWebClient: TNetHttpClient);
+      procedure Execute; override;
+    private
+      function SafeGet<T>(var AVar: T): T;
+      procedure SafeSet<T>(var AVar: T; AValue: T);
       function GetIsAborted: boolean;
       procedure SetIsAborted(const Value: boolean);
       function GetAutoRetry: boolean;
@@ -58,7 +50,8 @@ type
       procedure SetContentLength(const Value: int64);
       function GetSynchronizeEvents: boolean;
       procedure SetSynchronizeEvents(const Value: boolean);
-    function GetRetriedCount: int64;
+      function GetRetriedCount: int64;
+      function GetIsRunning: boolean;
     public
       procedure Start; virtual;
       procedure AbortRequest;
@@ -77,7 +70,7 @@ type
       property OnRequestException: TRequestExceptionEvent read FOnRequestException write FOnRequestException;
       property OnCreateWebClient: TCreateWebClientEvent read FOnCreateWebClient write FOnCreateWebClient;
       property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
-      Constructor Create(AOwner: TComponent);
+      Constructor Create; override;
       Destructor Destroy; override;
   End;
 
@@ -96,29 +89,25 @@ type
   TNetHttpDownloader = TFileDownloader;
 
 implementation
-
+uses Unit1;
 { TDownloader }
 
 procedure TDownloader.AbortRequest;
 begin
-  IsAborted := true;
+  IsAborted := True;
 end;
 
-constructor TDownloader.Create(AOwner: TComponent);
+constructor TDownloader.Create;
 begin
   inherited;
-  FLock := TCriticalSection.Create;
-  FTask := nil;
   FStream := nil;
-  FIsRunning := false;
-  FIsAborted := false;
-  FAutoRetry := true;
-  FRetryTimeout := 1400;
+  FIsAborted := False;
+  FAutoRetry := True;
+  FRetryTimeout := 1000;
   FUrl := '';
   FContentLength := 0;
   FRetriedCount := 0;
   FReadCount := 0;
-  FLostConnectionCount := 0;
 end;
 
 destructor TDownloader.Destroy;
@@ -132,7 +121,6 @@ begin
     Sleep(10);
   end;
 
-  Flock.Free;
   inherited;
 end;
 
@@ -154,7 +142,7 @@ end;
 
 function TDownloader.GetIsRunning: boolean;
 begin
-  Result := SafeGet(FIsRunning);
+  Result := Inherited;
 end;
 
 function TDownloader.GetReadCount: int64;
@@ -182,109 +170,138 @@ begin
   Result := SafeGet(Furl);
 end;
 
+procedure TDownloader.DoOnCreateWebClient(AWebClient: TNetHttpClient);
+begin
+  if not Assigned(OnCreateWebClient) then exit;
+  if SynchronizeEvents then
+    TThread.Synchronize(nil, procedure begin OnCreateWebClient(Self, AWebClient); end)
+  else
+    OnCreateWebClient(Self, AWebClient);
+end;
+
 procedure TDownloader.DoOnFinish;
 begin
-  if Assigned(OnFinish) then begin
-    if SynchronizeEvents then
-      Tthread.Synchronize(TTHread.Current, procedure begin OnFinish(Self); end)
-    else
-      OnFinish(Self);
-  end;
+  if not Assigned(OnFinish) then exit;
+  if SynchronizeEvents then
+    Tthread.Synchronize(nil, procedure begin OnFinish(Self); end)
+  else
+    OnFinish(Self);
 end;
 
 procedure TDownloader.DoOnReceiveData(const Sender: TObject; AContentLength,
   AReadCount: Int64; var AAbort: Boolean);
 begin
-  Flock.Enter;
+  Flock.BeginWrite;
   try
     FReadCount := AReadCount;
     FContentLength := AContentLength;
-    Aabort := FIsAborted;
+    AAbort := FIsAborted;
   finally
-    FLock.Leave;
-    if Assigned(OnReceiveData) then begin
-      if SynchronizeEvents then begin
-        var PseudoAbort := AAbort;
-        TThread.Synchronize(Tthread.Current, procedure begin OnReceiveData(Self, AContentLength, AReadCount, PseudoAbort); end);
-      end else
-        OnReceiveData(Self, AContentLength, AReadCount, AAbort);
-    end;
+    FLock.EndWrite;
   end;
+
+  if not Assigned(OnReceiveData) then exit;
+  if SynchronizeEvents then begin
+    var PseudoAbort := AAbort;
+    TThread.Synchronize(nil, procedure begin OnReceiveData(Self, AContentLength, AReadCount, PseudoAbort); end);
+  end else
+    OnReceiveData(Self, AContentLength, AReadCount, AAbort);
 end;
 
 procedure TDownloader.DoOnSendData(const Sender: TObject; AContentLength,
   AWriteCount: Int64; var AAbort: Boolean);
 begin
   Aabort := IsAborted;
-  if Assigned(OnSendData) then begin
-    if SynchronizeEvents then begin
-      var PseudoAbort := AAbort;
-      TThread.Synchronize(Tthread.Current, procedure begin OnSendData(Self, AContentLength, AWriteCount, PseudoAbort); end);
-    end else
-      OnSendData(Self, AContentLength, AWriteCount, AAbort);
-  end;
+  if not Assigned(OnSendData) then exit;
+  if SynchronizeEvents then begin
+    var PseudoAbort := AAbort;
+    TThread.Synchronize(Tthread.Current, procedure begin OnSendData(Self, AContentLength, AWriteCount, PseudoAbort); end);
+  end else
+    OnSendData(Self, AContentLength, AWriteCount, AAbort);
 end;
 
-function TDownloader.SafeGet(var AVar: boolean): boolean;
+procedure TDownloader.Execute;
+var
+  LWebClient: TNetHttpClient;
 begin
-  FLock.Enter;
   try
-    Result := Avar;
-  finally
-    FLock.Leave;
+    LWebClient := TNetHttpClient.Create(Nil);
+    try
+      DoOnCreateWebClient(LWebClient);
+
+      with LWebClient do begin
+        Asynchronous := false;
+        SynchronizeEvents := false;
+        OnReceiveData := Self.DoOnReceiveData;
+        OnSendData := Self.DoOnSendData;
+      end;
+
+      while TRUE do begin
+
+        if IsAborted then
+          TThread.Current.Terminate;
+
+        if TThread.Current.CheckTerminated then exit;
+
+        try
+          LWebClient.GetRange(Url, FStream.Position, -1, FStream);
+        except
+          On E: Exception do begin
+
+            if Assigned(OnRequestException) then
+              OnRequestException(Self, E);
+
+            if AutoRetry and ( not IsAborted ) then begin
+
+              FLock.BeginWrite;
+              try
+                inc(FRetriedCount);
+              finally
+                FLock.EndWrite;
+              end;
+
+              Sleep(RetryTimeout);
+              Continue;
+            end;
+
+          end;
+
+        end;
+        Break;
+      end;
+
+    finally
+
+      LWebClient.Free;
+      DoOnFinish;
+      Self.ImFinished;
+
+    end;
+  except
+    On E: Exception do
+      Unit1.SyncLog(E, 'TDownloader.Execute: ');
   end;
 end;
 
-function TDownloader.SafeGet(var AVar: string): string;
+function TDownloader.SafeGet<T>(var AVar: T): T;
 begin
-  FLock.Enter;
+  FLock.BeginRead;
   try
-    Result := Avar;
+    Result := AVar;
   finally
-    FLock.Leave;
+    FLock.EndRead;
   end;
 end;
 
-function TDownloader.SafeGet(var AVar: int64): int64;
+procedure TDownloader.SafeSet<T>(var AVar: T; AValue: T);
 begin
-  FLock.Enter;
+  FLock.BeginWrite;
   try
-    Result := Avar;
+    AVar := AValue;
   finally
-    FLock.Leave;
+    FLock.EndWrite;
   end;
 end;
-
-procedure TDownloader.SafeSet(var AVar: boolean; ANew: boolean);
-begin
-  FLock.Enter;
-  try
-    AVar := ANew;
-  finally
-    FLock.Leave;
-  end;
-end;
-
-procedure TDownloader.SafeSet(var AVar: string; ANew: string);
-begin
-  FLock.Enter;
-  try
-    AVar := ANew;
-  finally
-    FLock.Leave;
-  end;
-end;
-
-procedure TDownloader.SafeSet(var AVar: int64; ANew: int64);
-begin
-  FLock.Enter;
-  try
-    AVar := ANew;
-  finally
-    FLock.Leave;
-  end;
-end;
-
 
 procedure TDownloader.SetAutoRetry(const Value: boolean);
 begin
@@ -318,109 +335,24 @@ end;
 
 procedure TDownloader.SetUrl(const Value: string);
 begin
-  FLock.Enter;
+  FLock.BeginWrite;
   try
-    if not FIsRunning then
-      Furl := Value;
+    FUrl := Value;
   finally
-    FLock.Leave;
+    FLock.EndWrite;
   end;
 end;
 
 procedure TDownloader.Start;
 begin
   if IsRunning then exit;
-  FLock.Enter;
+  FLock.BeginWrite;
   try
-    FIsRunning := true;
-    FIsAborted := false;
+    FIsAborted := False;
   finally
-    FLock.Leave;
+    FLock.EndWrite;
   end;
-
-  FTask := TTask.Create(
-  procedure
-  var
-    WebClient: TNetHttpClient;
-    GotError: boolean;
-  begin
-    try
-      try
-        WebClient := TNetHttpClient.Create(Self);
-
-        if Assigned(OnCreateWebClient) then begin
-          if SynchronizeEvents then
-            TThread.Synchronize(TThread.Current, procedure begin OnCreateWebClient(Self, WebClient); end)
-          else
-            OnCreateWebClient(Self, WebClient);
-        end;
-
-        with WebClient do begin
-          Asynchronous := false;
-          SynchronizeEvents := false;
-          OnReceiveData := Self.DoOnReceiveData;
-          OnSendData := Self.DoOnSendData;
-        end;
-
-        while true do begin
-          GotError := false;
-
-          if IsAborted then
-            FTask.Cancel;
-
-          FTask.CheckCanceled;
-          try
-//            var StartPos: int64;
-//
-//            if FStream.Size < 1 then
-//              StartPos := 0
-//            else begin
-//              StartPos := FStream.Size;
-//              FStream.Position := StartPos;
-//            end;
-
-            WebClient.GetRange(Url, FStream.Position, -1, FStream);
-          except
-            On E: Exception do begin
-              GotError := true;
-
-              if Assigned(OnRequestException) then
-                OnRequestException(Self, E);
-
-              if AutoRetry and ( not IsAborted ) then begin
-
-                Flock.Enter;
-                try
-                  inc(FRetriedCount);
-                finally
-                  Flock.Leave;
-                end;
-
-                Sleep(RetryTimeout);
-                Continue;
-              end;
-
-            end;
-            
-          end;
-          Break;
-        end;
-
-      finally
-        Flock.Enter;
-        try
-          FIsRunning := false;
-          FTask := nil;
-        finally
-          FLock.Leave;
-          DoOnFinish;
-        end;
-      end;
-    except
-
-    end;
-  end);
-  FTask.Start;
+  inherited Start;
 end;
 
 { TFileDownloader }
@@ -439,23 +371,22 @@ end;
 
 procedure TFileDownloader.SetFilename(const Value: string);
 begin
-  FLock.Enter;
+  FLock.BeginWrite;
   try
-    if not FIsRunning then
-      FFilename := Value;
+    FFilename := Value;
   finally
-    FLock.Leave;
+    FLock.EndWrite;
   end;
 end;
 
 procedure TFileDownloader.Start;
 begin
   if IsRunning then exit;
-  FLock.Enter;
+  FLock.BeginWrite;
   try
     FStream := TFileStream.Create(FFilename, FmCreate);
   finally
-    Flock.Leave;
+    Flock.EndWrite;
   end;
   inherited;
 end;
