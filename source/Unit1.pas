@@ -1979,7 +1979,7 @@ begin
     OnStartDownloader  := Self.OnStartDownloader;
   end;
 
-  DownloadFetcher := TNBoxFetchManager.Create(nil);
+  DownloadFetcher := TNBoxFetchManager.Create;
   DownloadFetcher.OnWebClientSet := Self.OnBrowserSetWebClient;
   DownloadFetcher.OnFetched := Self.DownloadFetcherOnFetched;
 
