@@ -32,6 +32,7 @@ uses
   NsfwBox.Graphics.Browser, NsfwBox.Styling, NsfwBox.Graphics.Rectangle,
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
+  NsfwBox.Tests,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces;
@@ -111,7 +112,7 @@ type
         MenuBtnBookmarks: TRectButton;
         MenuBtnSettings: TRectButton;
         MenuBtnNewTab: TRectButton;
-        MenuBtnTest: TRectButton;
+        MenuTestButtons: TList<TRectButton>;
     TabsScroll: TVertScrollBox;
     Browsers: TNBoxBrowserList;
     Tabs: TNBoxTabList;
@@ -247,7 +248,6 @@ type
     procedure MenuBtnNewTabOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnHistoryOnTap(Sender: TObject; const Point: TPointF);
-    procedure MenuBtnTestOnTap(Sender: TObject; const Point: TPointF);
     { -> Other -------------------- }
     procedure TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
     procedure TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
@@ -2123,13 +2123,8 @@ begin
     OnTap := MenuBtnNewTabOnTap;
   end;
 
-  MenuBtnTest := AddMenuBtn;
-  with MenuBtnTest do begin
-    image.ImageURL := AppStyle.GetImagePath(ICON_NSFWBOX);
-    Text.Text := 'Stress';
-    OnTap := MenuBtnTestOnTap;
-  end;
-  MenuBtnTest.Visible := Settings.DevMode;
+  MenuTestButtons := TList<TRectButton>.Create;
+  NsfwBox.Tests.Init();
 
   SearchMenu := TNBoxSearchMenu.Create(self);
   with Searchmenu do begin
@@ -3172,69 +3167,6 @@ begin
   ChangeInterface(MenuSettings);
 end;
 
-procedure TForm1.MenuBtnTestOnTap(Sender: TObject; const Point: TPointF);
-var
-  I: integer;
-begin
-
-  Self.AddBrowser();
-  var LReq := TNBoxSearchReqBookmarks.Create;
-  LReq.Request := '1';
-  LReq.Path := NsfwBox.ContentScraper.REGULAR_BMRKDB;
-  LReq.PageId := 1;
-  Browsers.Last.Request := LReq;
-  Browsers.Last.GoBrowse;
-  for I := 1 to 6 do
-    Browsers.Last.GoNextPage;
-
-  CurrentBrowser := Browsers.Last;
-
-  while CurrentBrowser.IsBrowsingNow do begin
-    Sleep(10);
-    CheckSynchronize(10);
-  end;
-  DoWithAllItems := TRUE;
-  self.BtnDownloadAll.OnTap(BtnDownloadAll, TPointF.Create(0, 0));
-
-  TThread.CreateAnonymousThread(
-  procedure
-  var
-    I: integer;
-  begin
-    try
-      try
-        I := 0;
-        var LNeedWork: boolean := TRUE;
-        while LNeedWork do begin
-          TThread.Synchronize(Nil, procedure begin
-            LNeedWork := (DownloadItems.Count > 0);
-            if LNeedWork then begin
-              var LIndex: integer := Random(DownloadItems.Count);
-              var LTab := DownloadItems[LIndex];
-              var hash: string := LTab.GetHashCode.ToString;
-//              Unit1.Log('Test before tap: ' + Hash);
-              try
-                LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
-              except On E: exception do Log(E, 'Test Downloaders: '); end;
-              Inc(I);
-//              Unit1.Log('Test after tap: ' + Hash);
-            end;
-            LNeedWork := TRUE;
-
-          end);
-
-          if TThread.Current.CheckTerminated then exit;
-            Sleep(Random(25));
-        end;
-      except
-        On E: exception do SyncLog(E, 'Test: ');
-      end;
-    finally
-      SyncLog('Test in anonymous thread finished!');
-    end;
-  end).Start;
-end;
-
 procedure TForm1.MenuChangeThemeOnSelected(Sender: TObject);
 begin
   FSettings.StyleName := (Sender as TNBoxSelectMenu).SelectedBtn.Text.Text;
@@ -3674,6 +3606,9 @@ begin
   CheckSetSaveDownloadHistory.IsChecked := Settings.SaveDownloadHistory;
   CheckSetSaveTapHistory.IsChecked      := Settings.SaveTapHistory;
   CheckSetSaveTabHistory.IsChecked      := Settings.SaveClosedTabHistory;
+
+  for I := 0 to MenuTestButtons.Count - 1 do
+    MenuTestButtons[I].Visible := Settings.DevMode;
 
   for I := 0 to Browsers.Count - 1 do begin
     with Browsers[I] do begin
