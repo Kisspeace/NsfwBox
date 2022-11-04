@@ -37,7 +37,8 @@ uses
   NsfwBox.Provider.CoomerParty in 'source\NsfwBox.Provider.CoomerParty.pas',
   FMX.ColumnsView in 'source\FMX.ColumnsView.pas',
   NsfwBox.Provider.Randomizer in 'source\NsfwBox.Provider.Randomizer.pas',
-  NsfwBox.Provider.motherless in 'source\NsfwBox.Provider.motherless.pas';
+  NsfwBox.Provider.motherless in 'source\NsfwBox.Provider.motherless.pas',
+  NsfwBox.Tests in 'source\NsfwBox.Tests.pas';
 
 {$R *.res}
 
