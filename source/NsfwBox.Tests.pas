@@ -54,12 +54,34 @@ var
   LBrowser: TNBoxBrowser;
   LTab: TNBoxTab;
   Form1: TForm1;
+  I: integer;
 begin
   Form1 := Unit1.Form1;
   LTab := Form1.AddBrowser(nil, False);
   LTab.CloseBtn.Visible := FALSE;
   LBrowser := LTab.Owner as TNBoxBrowser;
   Form1.CurrentBrowser := LBrowser;
+
+  try
+    for I := 1 to 20 do begin
+      LBrowser.GoNextPage;
+      Application.ProcessMessages;
+      sleep(1);
+//      {$IFDEF ANDROID}
+//        sleep(random(330));
+//      {$ELSE IF MSWINDOWS}
+//        Sleep(random(50));
+//      {$ENDIF}
+
+      if I mod 3 = 0 then begin
+        LBrowser.Clear;
+      end;
+
+    end;
+  finally
+    LTab.CloseBtn.Visible := TRUE;
+  end;
+  Exit;
 
   TThread.CreateAnonymousThread(
   procedure
@@ -71,6 +93,7 @@ begin
         for I := 1 to 20 do begin
           TThread.Synchronize(Nil, procedure begin
             LBrowser.GoNextPage;
+//            Application.ProcessMessages;
           end);
 
           {$IFDEF ANDROID}
@@ -79,11 +102,12 @@ begin
             Sleep(random(50));
           {$ENDIF}
 
-          if I mod 3 = 0 then begin
-            TThread.Synchronize(nil, procedure begin
-              LBrowser.Clear;
-            end);
-          end;
+//          if I mod 3 = 0 then begin
+//            TThread.Synchronize(nil, procedure begin
+//              LBrowser.Clear;
+//              Application.ProcessMessages;
+//            end);
+//          end;
 
           If TThread.Current.CheckTerminated then exit;
         end;
