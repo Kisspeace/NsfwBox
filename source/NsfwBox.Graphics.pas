@@ -13,8 +13,8 @@ uses
   FMX.ScrollBox, FMX.Memo, ALFmxObjects, ALFmxGraphics, NsfwXxx.Types,
   NsfwBox.Interfaces, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34JsonApi,
   NsfwBox.ContentScraper, NsfwBox.Graphics.Rectangle, Fmx.ActnList,
-  NsfwBox.Bookmarks, NsfwBox.Helper, NsfwBox.Provider.Bookmarks,
-  // you-did-well!
+  NsfwBox.Bookmarks, NsfwBox.Helper, NsfwBox.Provider.Bookmarks, NsfwBox.Logging,
+  { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle;
 
 type
@@ -369,7 +369,7 @@ begin
       inherited;
     except
       On E: Exception do
-        Synclog(E, 'TNBoxCardBase.Destroy inherited: ');
+        Log('TNBoxCardBase.Destroy inherited', E);
     end;
     if Assigned(FItem) then begin
       if Self.HasBookmark then
@@ -378,7 +378,7 @@ begin
     end;
   except
     On E: Exception do
-      Synclog(E, 'TNBoxCardBase.Destroy');
+      Log('TNBoxCardBase.Destroy', E);
   end;
 end;
 

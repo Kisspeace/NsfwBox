@@ -13,7 +13,7 @@ uses
   // NsfwBox
   NsfwBox.Interfaces, NsfwBox.ContentScraper, NsfwBox.Provider.Pseudo,
   NsfwBox.Provider.NsfwXxx, NsfwBox.Graphics, NsfwBox.Consts,
-  NsfwBox.Bookmarks, NsfwBox.Provider.R34App,
+  NsfwBox.Bookmarks, NsfwBox.Provider.R34App, NsfwBox.Logging,
   // you-did-well!
   YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.AlRectangle,
   YDW.FMX.ImageWithURLManager, YDW.Threading;
@@ -187,7 +187,7 @@ begin
     end;
   except
     On E:Exception do
-      SyncLog(E, 'TNBoxBrowser.clear: ');
+      Log('TNBoxBrowser.clear', E);
   end;
 end;
 
@@ -243,7 +243,7 @@ begin
 
     except
       on E: Exception do begin
-        SyncLog(E, 'Origin: ' + AItem.Origin.ToString + ' Browser Main thread -> Scraper.GetContent: ');
+        Log('Provider: ' + AItem.Origin.ToString + ' Browser Main thread -> Scraper.GetContent', E);
         exit;
       end;
     end;

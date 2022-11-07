@@ -5,7 +5,8 @@ unit NetHttpClient.Downloader;
 interface
 uses
   System.Net.URLClient, System.Net.HttpClient, System.SyncObjs,
-  System.Net.HttpClientComponent, SysUtils, classes, YDW.Threading;
+  System.Net.HttpClientComponent, SysUtils, classes, YDW.Threading,
+  NsfwBox.Logging;
 
 type
 
@@ -279,7 +280,7 @@ begin
     end;
   except
     On E: Exception do
-      Unit1.SyncLog(E, 'TDownloader.Execute: ');
+      Log('TDownloader.Execute', E);
   end;
 end;
 

@@ -18,7 +18,7 @@ uses
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
   NsfwBox.Consts, NsfwBox.Bookmarks, NsfwBox.Provider.Bookmarks,
   IoUtils, NsfwBox.FileSystem, System.Classes, system.SyncObjs,
-  NsfwBox.Helper, System.Math, YDW.Threading;
+  NsfwBox.Helper, System.Math, YDW.Threading, NsfwBox.Logging;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -683,7 +683,7 @@ begin
   Except
 
     On E: Exception do begin
-      SyncLog(E, 'TNBoxFetchManager.SubThreadExecute: ')
+      Log('TNBoxFetchManager.SubThreadExecute', E)
     end;
 
   end;
