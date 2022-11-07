@@ -32,7 +32,7 @@ uses
   NsfwBox.Graphics.Browser, NsfwBox.Styling, NsfwBox.Graphics.Rectangle,
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
-  NsfwBox.Tests,
+  NsfwBox.Tests, NsfwBox.Logging,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces;
@@ -394,9 +394,11 @@ var
   IWUContentManager: TIWUContentManager;
   BrowsersIWUContentManager: TIWUContentManager;
   IWUCacheManager: TIWUCacheManager;
+
   BookmarksDb: TNBoxBookmarksDb;
   HistoryDb: TNBoxBookmarksHistoryDb;
   Session: TNBoxBookmarksDb;
+
   NowLoadingSession: boolean   = false;
   NowUserSelect: boolean = false;
   DoWithAllItems: boolean = false;
@@ -420,12 +422,6 @@ const
   BUTTON_HEIGHT       = 50;
   TAB_DEF_HEIGHT      = 46;
   EDIT_DEF_HEIGHT     = 40;
-
-  procedure Log(A: string); overload;
-  procedure SyncLog(A: string); overload;
-  procedure SyncLog(AEx: Exception; Astr: string); overload;
-  procedure Log(AEx: Exception; Astr: string); overload;
-
 
 implementation
 
@@ -494,32 +490,6 @@ begin
   finally
     F.Free;
   end;
-end;
-
-procedure Log(A: string); overload;
-var
-  Date: String;
-begin
-  Date := '[ ' + DateTimeToStr(Now) + ' ]: ';
-  WriteToFile(LOG_FILENAME, Date + A + SLineBreak);
-end;
-
-procedure Log(AEx: Exception; Astr: string); overload;
-begin
-  Log(AStr + AEX.ClassName + ': ' + AEx.Message);
-end;
-
-procedure SyncLog(A: string);
-var
-  ThreadId: cardinal;
-begin
-  ThreadId := TThread.Current.ThreadID;
-  Tthread.Synchronize(nil, procedure begin Log(ThreadId.ToString + ': ' + A); end);
-end;
-
-procedure SyncLog(AEx: Exception; Astr: string);
-begin
-  SyncLog(AStr + AEX.ClassName + ': ' + AEx.Message);
 end;
 
 function TForm1.AddBMarksDoListButton(AText: string; AImageName: string = '';
@@ -733,7 +703,7 @@ end;
 
 procedure TForm1.AppOnException(Sender: TObject; E: Exception);
 begin
-  SyncLog(E, 'AppException ' + Sender.ClassName + ': ');
+  Log('AppException ' + Sender.ClassName, E);
 end;
 
 procedure TForm1.BookmarksControlOnTap(Sender: TObject; const Point: TPointF);
@@ -1329,7 +1299,7 @@ begin
     end;
   except
     On E: Exception do begin
-      Log(E, 'TForm1.CloseDownloadTabOnTap: ');
+      Log('TForm1.CloseDownloadTabOnTap', E);
     end;
   end;
 end;
@@ -1672,7 +1642,7 @@ var
         end;
       except
         On E: Exception do begin
-          Log(E, 'ExecItemInteraction TryFetchContent: ');
+          Log('ExecItemInteraction TryFetchContent', E);
           ShowMessage(E.Message);
         end;
       end;
@@ -1743,7 +1713,7 @@ begin
         if not urls.IsEmpty then
           WriteToFile(Settings.FilenameLogUrls, urls);
       except
-        on E: Exception do Log(E, 'ACTION_LOG_URLS: ');
+        on E: Exception do Log('ACTION_LOG_URLS', E);
       end;
     end;
 
@@ -1919,6 +1889,9 @@ begin
   TNBoxPath.CreateThumbnailsDir;
   FSettings := nil;
   FAppStyle := TNBoxGuiStyle.Create;
+
+  NsfwBox.Logging.LogFile := TNBoxLogFile.Create;
+  NsfwBox.Logging.LogFile.Filename := LOG_FILENAME;
 
   Application.OnException := AppOnException;
 
@@ -2467,7 +2440,7 @@ begin
           break;
         except
           On E: Exception do begin
-            SyncLog(E, 'OnUpdateCheck: ');
+            Log('OnUpdateCheck', E);
             LUpdateCheckTask.Wait(RETRY_TIMEOUT);
           end;
         end;
@@ -2477,7 +2450,7 @@ begin
         exit
       else begin
         LastVer := TSemVer.FromGhTagString(LastRelease.TagName);
-        SyncLog('Last release: ' + LastVer.ToGhTagString);
+        Log('Last release: ' + LastVer.ToGhTagString);
       end;
 
       if ( LastVer > APP_VERSION ) then begin
@@ -2636,7 +2609,7 @@ begin
       ChangeInterface(MenuHistory)
   except
     On E: Exception do
-      Log(E, 'GotoBookmarksMenu: ');
+      Log('GotoBookmarksMenu', E);
   end;
 end;
 
@@ -2826,7 +2799,7 @@ begin
   TThread.Synchronize(nil,
   procedure
   begin
-    Log(AException, 'OnIWUException ' + AUrl + ': ');
+    Log('OnIWUException ' + AUrl, AException);
   end);
 end;
 
@@ -2849,7 +2822,7 @@ var
       end;
     except
       On E: Exception do begin
-        Log(E, 'GetPercents: ');
+        Log('GetPercents', E);
       end;
     end;
   end;
@@ -2882,7 +2855,7 @@ begin
       end;
     end);
   except
-    On E: Exception do Log(E, 'TForm1.DownloaderOnException: ');
+    On E: Exception do Log('TForm1.DownloaderOnException', E);
   end;
 end;
 
@@ -2923,7 +2896,7 @@ begin
     try
       AddDownload(LItem.Clone);
     except
-      On E: Exception do Log(E, 'DownloadFetcherOnFetched: ');
+      On E: Exception do Log('DownloadFetcherOnFetched', E);
     end;
   end);
 end;
@@ -3071,7 +3044,7 @@ begin
         Result := true;
     except
       On E: Exception do begin
-        Log(E, 'LoadSession: ');
+        Log('LoadSession', E);
         Result := false;
       end;
     end;
@@ -3098,7 +3071,7 @@ begin
     except
       on E: Exception do begin
         Result := false;
-        Log(E, 'LoadSettings: ');
+        Log('LoadSettings', E);
       end;
     end;
   finally
@@ -3127,7 +3100,7 @@ begin
     except
       On E: Exception do begin
         Result := false;
-        Log(E, 'LoadStyle: ')
+        Log('LoadStyle', E);
       end;
     end;
   finally
@@ -3158,7 +3131,7 @@ begin
     GotoSearchSettings(CurrentBrowser);
   except
     on E: Exception do
-      Log(E, 'TForm1.MenuBtnNewTabOnTap: ');
+      Log('TForm1.MenuBtnNewTabOnTap', E);
   end;
 end;
 
@@ -3244,7 +3217,7 @@ begin
     end;
   except
     On E: Exception do
-      Log(E, 'ReloadBookmarks: ');
+      Log('ReloadBookmarks', E);
   end;
 end;
 
@@ -3691,7 +3664,7 @@ begin
     AfterUserEvent := AWhenSelected;
   except
     On E: Exception do
-      Log(E, 'UserSelectBookmarkList: ');
+      Log('UserSelectBookmarkList', E);
   end;
 end;
 

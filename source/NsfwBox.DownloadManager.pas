@@ -6,7 +6,7 @@ interface
 uses
   Classes, NetHttpClient.Downloader, Net.HttpClient, Net.HttpClientComponent,
   System.Threading, system.Generics.Collections, System.SysUtils, YDW.Threading,
-  NsfwBox.Graphics;
+  NsfwBox.Graphics, NsfwBox.Logging;
 
 type
 
@@ -115,7 +115,7 @@ begin
     end;
   Except
     On E: Exception do
-      Unit1.SyncLog(E, 'TNBoxDownloadManager.SubThreadExecute');
+      Log('TNBoxDownloadManager.SubThreadExecute', E);
   end;
 
 end;

@@ -9,7 +9,7 @@ uses
   { NsfwBox }
   NsfwBox.Provider.Bookmarks, NsfwBox.Interfaces, NsfwBox.Graphics,
   NsfwBox.Graphics.Browser, NsfwBox.ContentScraper,
-  NsfwBox.Graphics.Rectangle, NsfwBox.Styling;
+  NsfwBox.Graphics.Rectangle, NsfwBox.Styling, NsfwBox.Logging;
 
 type
 
@@ -117,7 +117,7 @@ begin
         end);
       end;
     except On E: Exception do
-        Log(E, 'TestButton: ');
+        Log('TestButton', E);
     end;
   end).Start;
 end;
@@ -165,7 +165,7 @@ begin
 //              Unit1.Log('Test before tap: ' + Hash);
               try
                 LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
-              except On E: exception do Log(E, 'Test Downloaders: '); end;
+              except On E: exception do Log('Test Downloaders', E); end;
               Inc(I);
 //              Unit1.Log('Test after tap: ' + Hash);
             end;
@@ -177,10 +177,10 @@ begin
             Sleep(Random(25));
         end;
       except
-        On E: exception do SyncLog(E, 'Test: ');
+        On E: exception do Log('Test', E);
       end;
     finally
-      SyncLog('Test in anonymous thread finished!');
+      Log('Test in anonymous thread finished!');
     end;
   end).Start;
 end;

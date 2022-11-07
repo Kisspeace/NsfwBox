@@ -7,7 +7,7 @@ uses
   SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
   DB, NsfwBox.Interfaces, NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx,
   NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi, NsfwBox.Consts,
-  NsfwBox.Helper, Math, system.Generics.Collections;
+  NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging;
 
 type
 
@@ -154,7 +154,7 @@ begin
 
     except
       On E: Exception do begin
-        Unit1.Log(E, 'SafeAssignFromJSON: ');
+        Log('SafeAssignFromJSON', E);
       end;
     end;
   end;
