@@ -2484,11 +2484,17 @@ end;
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
   log('Destroing app');
-  DownloadFetcher.Free;
-  DownloadManager.Free;
-  DeleteAllBrowsers(False);
-  BrowsersIWUContentManager.Free;
-  IWUContentManager.Free;
+  try
+    FreeAndNil(DownloadFetcher);
+    FreeAndNil(DownloadManager);
+    DeleteAllBrowsers(False);
+    FreeAndNil(BrowsersIWUContentManager);
+//    FreeAndNil(IWUContentManager);
+    FreeAndNil(IWUCacheManager);
+  except
+    On E: Exception do
+      Log('On Destroy', E);
+  end;
 end;
 
 procedure TForm1.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
