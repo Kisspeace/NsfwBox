@@ -275,7 +275,6 @@ begin
 
       LWebClient.Free;
       DoOnFinish;
-      Self.ImFinished;
 
     end;
   except

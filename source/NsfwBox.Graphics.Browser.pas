@@ -175,7 +175,7 @@ var
 begin
   try
     FWorker.Terminate;
-    FWorker.WaitForFinish;
+    FWorker.WaitFor;
 
     if items.Count > 0 then begin
       for I := 0 to Items.Count - 1 do begin
@@ -243,7 +243,7 @@ begin
 
     except
       on E: Exception do begin
-        Log('Provider: ' + AItem.Origin.ToString + ' Browser Main thread -> Scraper.GetContent', E);
+        Log('Provider: ' + AItem.Origin.ToString + ' Browser -> Scraper.GetContent', E);
         exit;
       end;
     end;
