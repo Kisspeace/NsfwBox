@@ -2532,6 +2532,21 @@ begin
       ChangeInterface(BrowserLayout);
     end;
 
+    VkF5:
+    begin
+      if Assigned(CurrentBrowser) and BrowserLayout.Visible then
+        CurrentBrowser.GoBrowse;
+    end;
+
+    vkReturn:
+    begin
+      if Assigned(Self.Focused) and (Self.Focused is TEdit) then begin
+        var LFocused := (Self.Focused as TObject);
+        if (LFocused = Self.SearchMenu.EditRequest.Edit)
+        or (LFocused = Self.SearchMenu.EditPageId.Edit) then
+          Self.TopBtnSearch.OnTap(TopBtnSearch, TPointF.Zero);
+      end;
+    end;
   end;
 end;
 
