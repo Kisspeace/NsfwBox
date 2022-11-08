@@ -26,6 +26,9 @@
 * <img src="default/cartoons.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/face-mask" title="face mask icons">Face mask icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/girl_2945419)
 * <img src="default/app-icon.png" width="24" align="left"> Kisspeace
 * <img src="default/add.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/add-button" title="add button icons">Add button icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/add-button_5501851)
+* <img src="default/files.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/folder" title="folder icons">Folder icons created by Kiranshastry - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/folder_760759)
+* <img src="default/avatar.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/user_3237472)
+* <img src="default/content-origin--3.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/dice" title="dice icons">Dice icons created by Hilmy Abiyyu A. - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/casino_8027947)
 * <img src="default/content-origin--2.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/code" title="code icons">Code icons created by riajulislam - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/coding_8220372)
 * <img src="default/content-origin--1.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/heart" title="heart icons">Heart icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/heart_210545)
 * <img src="default/content-origin-0.png" width="24" align="left"> https://nsfw.xxx -> [Item page](https://nsfw.xxx/favicon.ico)
@@ -34,6 +37,7 @@
 * <img src="default/content-origin-3.png" width="24" align="left"> https://givemeporn.club -> [Item page](https://givemeporn.club/static/images/favicon.png?v=1)
 * <img src="default/content-origin-4.png" width="24" align="left"> https://9hentai.to -> [Item page](ITEM_ICON)
 * <img src="default/content-origin-5.png" width="24" align="left"> https://kemono.party -> [Item page](https://kemono.party/static/favicon.ico)
+* <img src="default/content-origin-6.png" width="24" align="left"> motherless.com favicon -> [Item page](https://motherless.com)
 <!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON) -->
 
 
