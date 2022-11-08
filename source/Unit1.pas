@@ -1956,6 +1956,7 @@ begin
 
   Tabs := TNBoxTabList.Create;
   Browsers := TNBoxBrowserList.Create;
+  Browsers.OnNotify := OnBrowsersNotify;
   ButtonsItemMenu := TControlList.Create;
   ButtonsBMark    := TControlList.Create;
 
@@ -2735,7 +2736,7 @@ end;
 procedure TForm1.OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser;
   Action: TCollectionNotification);
 begin
-
+  form1.MenuBtnNewTab.Text.Text := 'Create new tab ( ' + Browsers.Count.ToString +  ' )';
 end;
 
 procedure TForm1.OnBrowserViewportPositionChange(Sender: TObject;
