@@ -2433,7 +2433,7 @@ begin
     begin
       Success := false;
       for I := 1 to RETRY_COUNT do begin
-        LUpdateCheckTask.CheckCanceled;
+        TTask.CurrentTask.CheckCanceled;
         try
           LastRelease := GetLastRealeaseFromGitHub;
           Success := true;
@@ -2441,7 +2441,7 @@ begin
         except
           On E: Exception do begin
             Log('OnUpdateCheck', E);
-            LUpdateCheckTask.Wait(RETRY_TIMEOUT);
+            TTask.CurrentTask.Wait(RETRY_TIMEOUT);
           end;
         end;
       end;
