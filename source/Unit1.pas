@@ -256,6 +256,7 @@ type
     procedure BtnPrevOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuItemTagsOnSelected(Sender: TObject);
     procedure LayoutDialogYesOrNoOnResize(Sender: TObject);
+    procedure OnIWUFilterResponse(Sender: TObject; const AUrl: string; const AResponse: IHttpResponse; var AAllow: boolean);
     procedure OnIWUException(Sender: TObject; AImage: IImageWithURL; const AUrl: string; const AException: Exception);
     procedure NetHttpOnValidateCertAutoAccept(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
     procedure SetDefToWebClient(AClient: TNetHttpClient);
@@ -368,7 +369,7 @@ type
     function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean = True);
     procedure DeleteAllBrowsers(ADeleteFromSession: boolean = True);
-        property Action;
+        property Action; { <- who write this ?? }
     { -> Properies ---------------- }
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
     property CurrentItem: TNBoxCardBase read FCurrentItem write SetCurrentItem;
@@ -1909,6 +1910,7 @@ begin
   // IWU content manager for browsers only
   BrowsersIWUContentManager := TIWUContentManager.Create(Self);
   BrowsersIWUContentManager.OnImageLoadException := OnIWUException;
+  BrowsersIWUContentManager.OnFilterResponse := OnIWUFilterResponse;
   BrowsersIWUContentManager.LoadThumbnailFromFile := True;
   BrowsersIWUContentManager.CacheManager := IWUCacheManager;
   BrowsersIWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
@@ -1917,6 +1919,7 @@ begin
   // IWU content manager for other app images (like buttons)
   IWUContentManager := TIWUContentManager.Create(Self);
   IWUContentManager.OnImageLoadException := OnIWUException;
+  IWUContentManager.OnFilterResponse := OnIWUFilterResponse;
   IWUContentManager.LoadThumbnailFromFile := False;
   IWUContentManager.CacheManager := IWUCacheManager;
   IWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
@@ -2823,6 +2826,17 @@ begin
   begin
     Log('OnIWUException ' + AUrl, AException);
   end);
+end;
+
+procedure TForm1.OnIWUFilterResponse(Sender: TObject; const AUrl: string;
+  const AResponse: IHttpResponse; var AAllow: boolean);
+begin
+  if AResponse.MimeType.StartsWith('image/', TRUE) then
+    AAllow := True
+  else begin
+    AAllow := False;
+    Log('Disallow MimeType: "' + AResponse.MimeType + '" from: ' + AUrl);
+  end;
 end;
 
 function DownloadItemText(A: TNetHttpDownloader): string;
