@@ -31,6 +31,7 @@ const
   ICON_HISTORY     = 'history.png';
   ICON_AVATAR      = 'avatar.png';
   ICON_FILES       = 'files.png';
+  ICON_WARNING     = 'warning-sign.png';
 
   ICON_IMAGE       = 'image.png';
   ICON_VIDEO       = 'video.png';

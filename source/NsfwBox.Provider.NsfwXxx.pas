@@ -227,7 +227,7 @@ begin
   inherited;
   FSearchtype := TNsfwUrlType.Default;
   FSortType := TNsfwSort.Newest;
-  FOris := [Straight, Gay, Shemale, Cartoons];
+  FOris := [Straight, Gay, Shemale, Cartoons, Bizarre];
   FTypes := [Image, video, Gallery];
   FSite := TNsfwXxxSite.NsfwXxx;
 end;

@@ -145,7 +145,8 @@ type
           CheckStraight,
           CheckTrans,
           CheckCartoons,
-          CheckGay
+          CheckGay,
+          CheckBizarre
           : TNBoxCheckButton;
         GmpClubMenu: TNBoxSearchSubMenuBase;
           BtnGmpChangeSearchType: TRectButton;
@@ -506,17 +507,11 @@ begin
 
     NsfwXxxMenu := NewProviderMenu;
     with NsfwXxxMenu do begin
-      CheckGallery  := NewCheck(ICON_IMAGE, 'Gallery (set of images)', NsfwXxxMenu);
-      with CheckGallery do begin
-        Align := TAlignlayout.Top;
-        Margins.Rect := M;
-      end;
 
       CheckGrid := TColumnsLayout.Create(NsfwXxxMenu);
       with CheckGrid do begin
         Parent := NsfwXxxMenu;
         Align := TAlignLayout.Top;
-        BeBottom(CheckGrid, CheckGallery);
 
         Margins.Rect := M;
         ItemsIndent := TPointF.Create(M.Top / 2, M.Top / 2);
@@ -525,12 +520,14 @@ begin
         Margins.Top := ItemsIndent.Y;
         ColumnsCount := 2;
 
+        CheckGallery  := NewCheck(ICON_IMAGE, 'Gallery (set of images)');
         CheckImage    := NewCheck(ICON_IMAGE, 'Image');
         CheckVideo    := NewCheck(ICON_VIDEO, 'Video');
         CheckStraight := NewCheck(ICON_STRAIGHT, 'Straight');
         CheckTrans    := NewCheck(ICON_TRANS, 'Transgender');
         CheckCartoons := NewCheck(ICON_CARTOONS, 'Cartoons');
         CheckGay      := NewCheck(ICON_GAY, 'Gay');
+        CheckBizarre  := NewCheck(ICON_WARNING, 'Bizarre');
 
         AutoSize := TRUE;
       end;
@@ -738,6 +735,8 @@ begin
           include(LOris, Cartoons);
         if CheckStraight.IsChecked then
           include(LOris, Straight);
+        if CheckBizarre.IsChecked then
+          include(LOris, NsfwXxx.Types.Bizarre);
 
         Oris := LOris;
         Types := LTypes;
@@ -988,6 +987,7 @@ begin
       CheckTrans.IsChecked := ( Shemale in Oris);
       CheckStraight.IsChecked := ( Straight in Oris );
       CheckCartoons.IsChecked := ( Cartoons in Oris );
+      CheckBizarre.IsChecked  := ( Bizarre in Oris );
     end;
 
   end else if ( Value is TNBoxSearchReqGmpClub ) then begin
