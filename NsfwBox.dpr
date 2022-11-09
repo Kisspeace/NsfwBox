@@ -3,6 +3,7 @@ program NsfwBox;
 uses
   System.StartUpCopy,
   FMX.Forms,
+  System.Hash,
   Unit1 in 'source\Unit1.pas' {Form1},
   NsfwBox.Settings in 'source\NsfwBox.Settings.pas',
   NsfwBox.Interfaces in 'source\NsfwBox.Interfaces.pas',
@@ -33,7 +34,8 @@ uses
   NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas',
   {$IFDEF MSWINDOWS}
   NsfwBox.WindowsTitlebar in 'source\NsfwBox.WindowsTitlebar.pas',
-  {$ENDIF }
+  Windows,
+  {$ENDIF}
   NsfwBox.Provider.CoomerParty in 'source\NsfwBox.Provider.CoomerParty.pas',
   FMX.ColumnsView in 'source\FMX.ColumnsView.pas',
   NsfwBox.Provider.Randomizer in 'source\NsfwBox.Provider.Randomizer.pas',
@@ -44,6 +46,10 @@ uses
 {$R *.res}
 
 begin
+  {$IFDEF MSWINDOWS}
+  var Mutex := CreateMutex(nil, True, PChar('Global\NsfwBox:' + THashMD5.GetHashString(TNBoxPath.GetAppPath)));
+  if (Mutex = 0) OR (GetLastError = ERROR_ALREADY_EXISTS) then exit;
+  {$ENDIF}
 //  GlobalUseSkia := True;
   Application.Initialize;
   Application.FormFactor.Orientations := [TFormOrientation.Portrait, TFormOrientation.InvertedPortrait, TFormOrientation.Landscape, TFormOrientation.InvertedLandscape];
