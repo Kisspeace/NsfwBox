@@ -35,7 +35,8 @@ uses
   NsfwBox.Tests, NsfwBox.Logging,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
-  YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces;
+  YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces,
+  YDW.FMX.ImageWithURL;
 
 type
 
@@ -348,6 +349,7 @@ type
     function CreateDefCheck(AOwner: TComponent): TRectTextCheck;
     function CreateDefCheckButton(AOwner: TComponent; AStyle: integer = 0): TNBoxCheckButton;
     function CreateDefRadioButton(AOwner: TComponent; AStyle: integer = 0): TNBoxRadioButton;
+    function CreateDefButtonC(AOwner: TComponent; AImageClass: TControlClass; AStyle: integer = 0): TRectButton;
     function CreateDefButton(AOwner: TComponent; AStyle: integer = 0): TRectButton;
     function CreateDefText(AOwner: TComponent; AStyle: integer = 0): TAlText;
     function CreateDefEdit(AOwner: TComponent; AStyle: integer = 0): TNBoxEdit;
@@ -361,6 +363,7 @@ type
     { ----------------------------- }
     function AddSettingsCheck(ACaption: string; AText: string = ''): TNBoxSettingsCheck;
     function AddSettingsEdit(ACaption: string; AText: string = ''; AStyle: integer = 0): TNBoxSettingsEdit;
+    function AddSettingsButtonC(AText: string; AImageName: string; AImageClass: TControlClass): TRectButton;
     function AddSettingsButton(AText: string; AImageName: string = ''): TRectButton;
     function AddBMarksDoListButton(AText: string; AImageName: string = ''; AOnTap: TTapEvent = nil; ATag: string = ''): TRectButton;
     function AddMenuBtn: TRectButton;
@@ -423,6 +426,8 @@ const
   BUTTON_HEIGHT       = 50;
   TAB_DEF_HEIGHT      = 46;
   EDIT_DEF_HEIGHT     = 40;
+
+  DEFAULT_IMAGE_CLASS: TControlClass = TImageWithUrl;
 
 implementation
 
@@ -527,7 +532,7 @@ begin
   T := Form1.CreateDefTab(B);
   Tabs.Add(T);
   with T do begin
-    image.Visible := false;
+    ImageControl.Visible := false;
     Align         := TAlignlayout.Top;
     Text.Text     := 'Empty tab';
     Position.Y    := Single.MaxValue; // to the bottom
@@ -595,7 +600,7 @@ begin
       margins.Rect := TRectF.Create(10, 10, 10, 0);
       Text.Text := AFullFilename;
       Parent := MenuDownloads;
-      Image.Visible := false;
+      ImageControl.Visible := false;
 
       Closebtn.OnTap := CloseDownloadTabOnTap;
       {$IFDEF MSWINDOWS}
@@ -677,7 +682,13 @@ end;
 
 function TForm1.AddSettingsButton(AText, AImageName: string): TRectButton;
 begin
-  Result := CreateDefButton(MenuSettings, BTN_STYLE_DEF2);
+  Result := AddSettingsButtonC(AText, AImageName, DEFAULT_IMAGE_CLASS);
+end;
+
+function TForm1.AddSettingsButtonC(AText, AImageName: string;
+  AImageClass: TControlClass): TRectButton;
+begin
+  Result := CreateDefButtonC(MenuSettings, AImageClass, BTN_STYLE_DEF2);
   with Result do begin
     _SetDefSettingsControl(Result);
     Text.Text := AText;
@@ -1339,7 +1350,13 @@ end;
 
 function TForm1.CreateDefButton(AOwner: TComponent; AStyle: integer): TRectButton;
 begin
-  Result := TRectButton.Create(AOwner);
+  Result := CreateDefButtonC(AOwner, DEFAULT_IMAGE_CLASS, AStyle);
+end;
+
+function TForm1.CreateDefButtonC(AOwner: TComponent; AImageClass: TControlClass;
+  AStyle: integer): TRectButton;
+begin
+  Result := TRectButton.Create(AOwner, AImageClass);
   with Result do begin
 
     case Astyle of
@@ -1371,11 +1388,11 @@ begin
 
     Text.Font.Size := 12;
     Text.Color := AppStyle.TextColors[0];
-    Image.WrapMode := TImageWrapMode.Stretch;
-    Image.OnResize := IconOnResize;
+    SetStretchImage(ImageControl);
+    ImageControl.OnResize := IconOnResize;
     Image.ImageManager := IWUContentManager;
     Height := BUTTON_HEIGHT;
-    Image.OnResize(Image);
+    ImageControl.OnResize(ImageControl);
   end;
 end;
 
@@ -1413,12 +1430,12 @@ begin
 
     Height := CONTROLS_DEF_HEIGHT;
     Check.OnResize := IconOnResize;
-    Image.OnResize := IconOnResize;
+    ImageControl.OnResize := IconOnResize;
     Text.Font.Size := 11;
     Text.Color := AppStyle.TextColors[0];
     Image.ImageManager := IWUContentManager;
-    Image.WrapMode := TImageWrapMode.Stretch;
-    Image.OnResize(Image);
+    SetStretchImage(ImageControl);
+    ImageControl.OnResize(ImageControl);
     Check.OnResize(Check);
   end;
 end;
@@ -1484,7 +1501,7 @@ end;
 procedure _CreateDefSettingsCheckDef(AValue: TNBoxSettingsCheck);
 begin
   with AValue do begin
-    Check.Image.Visible := false;
+    Check.ImageControl.Visible := false;
     Padding.Rect := TrectF.Create(7, 7, 7, 7);
     form1.AppStyle.SettingsRect.Apply(AValue);
     Check.Text.Color := Form1.AppStyle.TextColors[0];
@@ -1524,13 +1541,13 @@ function TForm1.CreateDefTab(AOwner: TComponent): TNBoxTab;
 begin
   Result := TNBoxTab.Create(AOwner);
   with Result do begin
-    Image.WrapMode := TImageWrapMode.Stretch;
-    Image.OnResize := IconOnResize;
+    SetStretchImage(ImageControl);
+    ImageControl.OnResize := IconOnResize;
     Image.ImageManager := IWUContentManager;
     with CloseBtn do begin
       Text.Color := AppStyle.TextColors[0];
-      Image.WrapMode := TImageWrapMode.Stretch;
-      Image.OnResize := IconOnResize;
+      SetStretchImage(ImageControl);
+      ImageControl.OnResize := IconOnResize;
       Image.ImageManager := IWUContentManager;
     end;
     AppStyle.tab.Apply(result);
@@ -1935,7 +1952,7 @@ begin
       TitleBar := TNBoxFormTitleBar.Create(Self);
       TitleBar.Stroke.Kind := TBrushKind.None;
       AppStyle.Topbar.Apply(TitleBar.Fill);
-      TitleBar.BtnTitle.Image.Visible := False;
+      TitleBar.BtnTitle.ImageControl.Visible := False;
       TitleBar.BtnTitle.Margins.Left := 5;
       TitleBar.BtnTitle.Text.Text := '  🌈 NsfwBox v' + APP_VERSION.ToString;
       TitleBar.BtnClose.Image.ImageURL := AppStyle.GetImagePath(ICON_CLOSETAB);
@@ -2057,7 +2074,7 @@ begin
     OnTap := BtnPrevOnTap;
     Width := Height;
     Image.ImageURL := AppStyle.GetImagePath(ICON_NEXT);
-    Image.RotationAngle := 180;
+//    ImageControl.RotationAngle := 180;
   end;
 
   MVMenuScroll := CreateDefScroll(MVRect);
@@ -2131,11 +2148,15 @@ begin
     Text.WordWrap := true;
   end;
 
-  BtnSetAnonMsg := AddSettingsButton('Anonymous message for developer', '');
+  BtnSetAnonMsg := AddSettingsButtonC('Anonymous message for developer', '', TNBoxImageTypes.AlRect);
   with BtnSetAnonMsg do begin
     OnTap := BtnSetAnonMsgOnTap;
     Height := Height * 1.25;
     Text.WordWrap := true;
+    with ImageControl as TNBoxImageTypes.AlRect do begin
+      XRadius := 10;
+      YRadius := XRadius;
+    end;
     Image.ImageURL := 'https://avatars.githubusercontent.com/u/101427274';
   end;
 
@@ -3223,8 +3244,8 @@ begin
       Control := Self.CreateDefSettingsCheck(ALayout);
       with Control do begin
         Parent := ALayout;
-        Check.Image.Visible := true;
-        Check.Image.Margins.Rect := TRectF.Create(0, 5, 0, 5);
+        Check.ImageControl.Visible := true;
+        Check.ImageControl.Margins.Rect := TRectF.Create(0, 5, 0, 5);
 
         if (ADataBase = BookmarksDb) then
           Check.Image.ImageURL := AppStyle.GetImagePath(ICON_BOOKMARKS)
@@ -3541,14 +3562,14 @@ var
 begin
   if Assigned(FCurrentBrowser) then begin
     Tab := self.GetTab(FCurrentBrowser);
-    Tab.Image.Visible := false;
-    ClearControlBitmap(Tab.Image);
+    Tab.ImageControl.Visible := false;
+    ClearControlBitmap(Tab.ImageControl);
     FCurrentBrowser.Visible := false;
   end;
 
   FCurrentBrowser := Value;
   Tab := self.GetTab(FCurrentBrowser);
-  Tab.Image.Visible := true;
+  Tab.ImageControl.Visible := true;
   Tab.Image.ImageURL := AppStyle.GetImagePath(FCurrentBrowser.Request.Origin);
   FCurrentBrowser.Visible := true;
 end;
@@ -3709,7 +3730,9 @@ begin
   if (AControl is TImage) then
     (AControl as TImage).Bitmap.SetSize(0, 0)
   else if (AControl is TAlRectangle) then
-    (AControl as TAlRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0);
+    (AControl as TAlRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0)
+  else if (AControl is TRectangle) then
+    (AControl as TRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0);
 end;
 
 procedure TForm1.SetStretchImage(AImage: TControl);
@@ -3717,7 +3740,9 @@ begin
   if (AImage is TImage) then
     (AImage as TImage).WrapMode := TImageWrapMode.Stretch
   else if (AImage is TAlRectangle) then
-    (AImage as TAlRectangle).Fill.Bitmap.WrapMode := TWrapMode.TileStretch;
+    (AImage as TAlRectangle).Fill.Bitmap.WrapMode := TWrapMode.TileStretch
+  else if (AImage is TRectangle) then
+    (AImage as TRectangle).Fill.Bitmap.WrapMode := TWrapMode.TileStretch;
 end;
 
 end.
