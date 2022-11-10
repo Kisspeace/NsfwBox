@@ -1,7 +1,7 @@
 program NsfwBox;
 
 uses
-  System.StartUpCopy,
+  System.StartUpCopy in 'source\tricks\System.StartUpCopy.pas',
   FMX.Forms,
   System.Hash,
   Unit1 in 'source\Unit1.pas' {Form1},

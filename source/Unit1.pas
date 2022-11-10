@@ -11,7 +11,7 @@ uses
   Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBox.FileSystem,
   NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox, NsfwXxx.Types,
   System.Hash, FMX.Surfaces, System.Variants, System.Threading,
-  system.NetEncoding, System.Net.URLClient,
+  system.NetEncoding, System.Net.URLClient, System.StartUpCopy,
   {$IFDEF ANDROID}
   Fmx.Helpers.Android, AndroidApi.Helpers,
   AndroidApi.JNI.GraphicsContentViewText,
@@ -1916,6 +1916,21 @@ begin
   if not loadSettings then begin
     form1.RestoreDefaultSettings;
     SaveSettings;
+  end else begin
+    {$IFDEF ANDROID}
+    try
+      if (Settings.SemVer < APP_VERSION) then begin
+        Log('Refreshing assets begin');
+        TDirectory.Delete(TNBoxPath.GetThemesPath, TRUE);
+        TDirectory.CreateDirectory(TNBoxPath.GetThemesPath);
+        System.StartUpCopy.CopyStartUpFiles;
+        Log('Refreshing assets end.');
+      end;
+    except
+      On E: Exception do
+        Log('Refreshing with StartUpCopy', E);
+    end;
+    {$ENDIF}
   end;
   LoadStyle;
 
@@ -3527,6 +3542,7 @@ end;
 
 procedure TForm1.SaveSettings;
 begin
+  Settings.SemVer := APP_VERSION;
   Settings.AsJSONObject.SaveTo(SETTINGS_FILENAME, true);
 end;
 
