@@ -431,8 +431,8 @@ begin
 
     NsfwXxxSortMenu := NewSelectMenu;
     with NsfwXxxSortMenu do begin
-      Addbtn('Newest', Ord(Newest), IconPath);
-      Addbtn('Popular', Ord(Popular), IconPath);
+      Addbtn('Newest', Ord(Newest), Form1.AppStyle.GetImagePath(ICON_HISTORY));
+      Addbtn('Popular', Ord(Popular), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
       Addbtn('Recommended', Ord(Recommended), IconPath);
       OnSelected := OnNsfwXxxSortChanged;
     end;
@@ -440,9 +440,9 @@ begin
     NsfwXxxSearchTypeMenu := NewSelectMenu;
     with NsfwXxxSearchTypeMenu do begin
       Addbtn('Text request', Ord(TNsfwUrlType.Default), IconPath);
-      Addbtn('User name', Ord(TNsfwUrlType.User), IconPath);
+      Addbtn('User name', Ord(TNsfwUrlType.User), Form1.AppStyle.GetImagePath(ICON_AVATAR));
       Addbtn('Category', Ord(TNsfwUrlType.Category), IconPath);
-      Addbtn('Related posts', Ord(TNsfwUrlType.Related), IconPath);
+      Addbtn('Related posts', Ord(TNsfwUrlType.Related), Form1.AppStyle.GetImagePath(ICON_COPY));
       OnSelected := OnNsfwXxxSearchTypeChanged;
     end;
 
@@ -451,7 +451,7 @@ begin
       Addbtn('Default navigate', Ord(TGmpclubSearchType.Empty), IconPath);
       Addbtn('Search by tag', Ord(TGmpclubSearchType.Tag), IconPath);
       Addbtn('Search by category', Ord(TGmpclubSearchType.Category), IconPath);
-      Addbtn('Random content', Ord(TGmpclubSearchType.Random), IconPath);
+      Addbtn('Random content', Ord(TGmpclubSearchType.Random), Form1.AppStyle.GetImagePath(ORIGIN_RANDOMIZER));
       OnSelected := OnGmpClubSearchTypeChanged;
     end;
 
@@ -840,6 +840,8 @@ begin
     TGmpclubSearchType.Category: BtnGmpChangeSearchType.Text.Text := 'Search by category';
     TGmpclubSearchType.Random:   BtnGmpChangeSearchType.Text.Text := 'Random content';
   end;
+  if Assigned(GmpClubSearchTypeMenu.SelectedBtn) then
+    BtnGmpChangeSearchType.Image.ImageURL := GmpClubSearchTypeMenu.SelectedBtn.Image.ImageURL;
 end;
 
 procedure TNBoxSearchMenu.OnMotherlessMediaChanged(Sender: TObject);
@@ -909,6 +911,8 @@ begin
     TNsfwUrlType.Category: BtnChangeUrlType.Text.Text := 'Category';
     TNsfwUrlType.Related:  BtnChangeUrlType.Text.Text := 'Related posts';
   end;
+  if Assigned(NsfwXxxSearchTypeMenu.SelectedBtn) then
+    BtnChangeUrlType.Image.ImageURL := NsfwXxxSearchTypeMenu.SelectedBtn.Image.ImageURL;
 end;
 
 procedure TNBoxSearchMenu.OnNsfwXxxSortChanged(Sender: TObject);
@@ -922,6 +926,8 @@ begin
     Popular:     BtnChangeSort.Text.Text := 'Popular';
     Recommended: BtnChangeSort.Text.Text := 'Recommended';
   end;
+  if Assigned(NsfwXxxSortMenu.SelectedBtn) then
+    BtnChangeSort.Image.ImageURL := NsfwXxxSortMenu.SelectedBtn.Image.ImageURL;
 end;
 
 procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
