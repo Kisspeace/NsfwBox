@@ -4,7 +4,7 @@ unit NsfwBox.Settings;
 
 interface
 uses
-  Classes, XSuperObject, system.Generics.Collections;
+  Classes, XSuperObject, system.Generics.Collections, NsfwBox.UpdateChecker;
 
 Const
 
@@ -33,7 +33,8 @@ type
   TNBoxItemInteractions = TArray<TNBoxItemInteraction>;
 
   TNsfwBoxSettings = class
-    Version: integer;
+    SemVer: TSemVer;
+//    Version: integer; { deprecated }
     DefaultUseragent: string;
     AllowCookies: boolean;
     DefDownloadPath: string;
@@ -89,7 +90,8 @@ end;
 
 constructor TNsfwBoxSettings.Create;
 begin
-  Version                := 6;
+  SemVer := TSemVer.Create(0, 0, 0);
+//  Version                := 6;
   DevMode                := false;
   DefDownloadPath        := '';
   DefaultUserAgent       := '';
