@@ -326,7 +326,7 @@ begin
       Self.Stroke.Apply(StrokeDef);
       Self.Fill2.Apply(FillMove);
       Self.Stroke2.Apply(StrokeMove);
-      Image.Margins.Rect := ImageMargins.AsRect;
+      ImageControl.Margins.Rect := ImageMargins.AsRect;
 
       if not ImageFilename.IsEmpty then begin
         if ( Self.Owner is TNBoxGUIStyle ) then begin

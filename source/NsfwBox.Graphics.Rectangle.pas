@@ -5,10 +5,11 @@ unit NsfwBox.Graphics.Rectangle;
 interface
 uses
   SysUtils, System.Types, System.UITypes, Classes,
-  FMX.Types, FMX.Controls, FMX.Graphics,
+  FMX.Types, FMX.Controls, FMX.Graphics, FMX.Objects,
   FMX.TextLayout, FMX.MultiResBitmap,
   FMX.ActnList, AlFmxObjects, AlFmxGraphics, system.generics.collections,
-  YDW.FMX.ImageWithURL;
+  YDW.FMX.ImageWithURL, YDW.FMX.ImageWithURL.AlRectangle, 
+  YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.Rectangle;
 
 type
 
@@ -18,6 +19,19 @@ type
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
   end;
+  
+  TNBoxImageTypes = Class
+    strict private type
+      TImageWithURLClass = Class of TImageWithURL;
+      TAlRectangleImageWithURLClass = Class of TAlRectangleImageWithURL;
+      TRectangleImageWithURLClass = Class of TRectangleImageWithURL;
+    public
+      class function Image: TImageWithURLClass; static;
+      class function AlRect: TAlRectangleImageWithURLClass; static;
+      class function Rect: TRectangleImageWithURLClass; static;
+  End;
+
+  TControlClass = Class of TControl;
 
   TRectButton = class(TRectText)
     protected
@@ -34,12 +48,14 @@ type
       procedure SetStrokeDef(const Value: TStrokeBrush);
       procedure SetStrokeMove(const Value: TStrokeBrush);
     public
-      Image: TImageWithURL;
+      Image: IImageWithURL;
+      ImageControl: TControl;
       property FillDef: Tbrush read FFillDef write SetFillDef;
       property StrokeDef: TStrokeBrush read FStrokeDef write SetStrokeDef;
       property FillMove: Tbrush read FFillMove write SetFillMove;
       property StrokeMove: TStrokeBrush read FStrokeMove write SetStrokeMove;
-      constructor Create(AOwner: TComponent); override;
+      constructor Create(AOwner: TComponent; AImageClass: TControlClass); overload;
+      constructor Create(AOwner: TComponent); overload; override;
       destructor Destroy; override;
   end;
 
@@ -200,19 +216,25 @@ end;
 
 constructor TRectButton.Create(AOwner: TComponent);
 begin
-  inherited;
+  Self.Create(AOwner, TNBoxImageTypes.Image);
+end;
+
+constructor TRectButton.Create(AOwner: TComponent; AImageClass: TControlClass);
+begin
+  inherited Create(AOwner);
   Cursor := CrhandPoint;
   FFillMove   := tbrush.Create(Fill.Kind, fill.Color);
   FStrokeMove := TStrokeBrush.Create(Fill.Kind, stroke.Color);
   FFillDef    := tbrush.Create(Fill.Kind, fill.Color);;
   FStrokeDef  := TStrokeBrush.Create(Fill.Kind, stroke.Color);
 
-  Image := TImageWithURL.Create(Self);
-  with Image do begin
+  ImageControl := (AImageClass).Create(Self);
+  with ImageControl do begin
     parent := Self;
     Hittest := false;
     Align := TAlignLayout.MostLeft;
   end;
+  Image := ImageControl as IImageWithUrl;
 end;
 
 destructor TRectButton.Destroy;
@@ -221,7 +243,7 @@ begin
   FFillDef.Free;
   FStrokeMove.Free;
   FStrokedef.Free;
-  Image.Free;
+  ImageControl.Free;
   inherited;
 end;
 
@@ -269,6 +291,23 @@ end;
 procedure TRectButton.SetStrokeMove(const Value: TStrokeBrush);
 begin
   FStrokeMove.Assign(value);
+end;
+
+{ TNBoxImageTypes }
+
+class function TNBoxImageTypes.AlRect: TAlRectangleImageWithURLClass;
+begin
+  Result := TAlRectangleImageWithURL;
+end;
+
+class function TNBoxImageTypes.Image: TImageWithURLClass;
+begin
+  Result := TImageWithUrl;
+end;
+
+class function TNBoxImageTypes.Rect: TRectangleImageWithURLClass;
+begin
+  Result := TRectangleImageWithURL;
 end;
 
 end.
