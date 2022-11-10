@@ -2074,7 +2074,8 @@ begin
     OnTap := BtnPrevOnTap;
     Width := Height;
     Image.ImageURL := AppStyle.GetImagePath(ICON_NEXT);
-//    ImageControl.RotationAngle := 180;
+    if (ImageControl is Timage) then
+      (ImageControl as TImage).RotationAngle := 180;
   end;
 
   MVMenuScroll := CreateDefScroll(MVRect);
@@ -2481,6 +2482,11 @@ begin
       if ( LastVer > APP_VERSION ) then begin
         { New version available }
         TThread.Synchronize(Nil, procedure begin
+          {$IFDEF MSWINDOWS}
+          if Settings.UseNewAppTitlebar then
+            TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( ' + LastRelease.Name + 'Available' + ' )';
+          {$ENDIF}
+
           Form1.UserBooleanDialog('Update available: ' + LastRelease.Name + SLineBreak +
                                   LastRelease.Body + SLineBreak +
                                   'Click `Yes` to open release page.',
@@ -2494,9 +2500,16 @@ begin
             Self.ChangeInterface(Self.BrowserLayout);
           end);
         end);
+      end else begin
+        TThread.Synchronize(Nil, procedure begin
+          {$IFDEF MSWINDOWS}
+          if Settings.UseNewAppTitlebar then
+            TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( current )';
+          {$ENDIF}
+        end);
       end;
 
-      end).Start;
+    end).Start;
   end;
 
   //var LStr, LEncStr: string;
