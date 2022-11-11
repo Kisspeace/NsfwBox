@@ -401,6 +401,10 @@ procedure TNBoxTabStyle.Apply(AValue: TNBoxCheckButton);
 begin
   inherited Apply(AValue);
   Item.Apply(AValue.check);
+  {$IFDEF MSWINDOWS}
+  AValue.Check.XRadius := 6.5;
+  AValue.Check.YRadius := AValue.Check.XRadius;
+  {$ENDIF}
 end;
 
 constructor TNBoxTabStyle.Create(AOwner: TObject);
