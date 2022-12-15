@@ -162,7 +162,7 @@ end;
 
 function TNBoxSearchReqCoomerParty.GetOrigin: integer;
 begin
-  Result := ORIGIN_COOMERPARTY;
+  Result := PROVIDERS.CoomerParty.Id;
 end;
 
 end.

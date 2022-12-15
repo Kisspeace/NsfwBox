@@ -85,7 +85,7 @@ end;
 
 constructor TNBox9HentaitoItem.Create(AWithItem: boolean);
 begin
-  FOrigin := ORIGIN_9HENTAITO;
+  FOrigin := PROVIDERS.NineHentaiTo.Id;
   if AWithItem then
     FItem := T9HentaiBook.Create;
 end;
@@ -151,7 +151,7 @@ end;
 
 function TNBoxSearchReq9Hentaito.GetOrigin: integer;
 begin
-  Result := ORIGIN_9HENTAITO;
+  Result := PROVIDERS.NineHentaiTo.Id;
 end;
 
 function TNBoxSearchReq9Hentaito.GetPageId: integer;

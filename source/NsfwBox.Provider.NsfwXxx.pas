@@ -112,7 +112,7 @@ begin
   inherited;
   Item := TNsfwXxxitem.New;
   Page := TNsfwXxxPostPage.New;
-  FOrigin := ORIGIN_NSFWXXX;
+  FOrigin := PROVIDERS.NsfwXxx.Id;
 end;
 
 function TNBoxNsfwXxxItem.GetAuthorName: string;
@@ -234,7 +234,7 @@ end;
 
 function TNBoxSearchReqNsfwXxx.GetOrigin: integer;
 begin
-  Result := ORIGIN_NSFWXXX;
+  Result := PROVIDERS.NsfwXxx.Id;
 end;
 
 procedure TNBoxSearchReqNsfwXxx.SetOris(const value: TNsfwOris);

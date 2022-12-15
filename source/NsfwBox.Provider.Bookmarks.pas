@@ -37,7 +37,7 @@ end;
 
 function TNBoxSearchReqBookmarks.GetOrigin: integer;
 begin
-  Result := ORIGIN_BOOKMARKS;
+  Result := PROVIDERS.Bookmarks.Id;
 end;
 
 end.

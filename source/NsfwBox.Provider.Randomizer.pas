@@ -38,18 +38,18 @@ constructor TNBoxSearchReqRandomizer.Create;
 begin
   inherited;
   Providers := [
-    ORIGIN_NSFWXXX,
-    ORIGIN_GIVEMEPORNCLUB,
-    ORIGIN_R34APP,
-    ORIGIN_COOMERPARTY,
-    ORIGIN_MOTHERLESS,
-    ORIGIN_9HENTAITO
+    NsfwBox.Consts.PROVIDERS.NsfwXxx.Id,
+    NsfwBox.Consts.PROVIDERS.GMPClub.Id,
+    NsfwBox.Consts.PROVIDERS.R34App.Id,
+    NsfwBox.Consts.PROVIDERS.CoomerParty.Id,
+    NsfwBox.Consts.PROVIDERS.Motherless.Id,
+    NsfwBox.Consts.PROVIDERS.NineHentaiTo.Id
   ];
 end;
 
 function TNBoxSearchReqRandomizer.GetOrigin: integer;
 begin
-  Result := ORIGIN_RANDOMIZER;
+  Result := NsfwBox.Consts.PROVIDERS.Randomizer.Id;
 end;
 
 end.

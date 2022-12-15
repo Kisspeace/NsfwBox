@@ -86,7 +86,7 @@ begin
   inherited;
   Item := TGmpclubItem.New;
   Page := TGmpclubFullPage.New;
-  FOrigin := ORIGIN_GIVEMEPORNCLUB;
+  FOrigin := PROVIDERS.GMPClub.Id;
 end;
 
 function TNBoxGmpClubItem.GetCaption: string;
@@ -177,7 +177,7 @@ end;
 
 function TNBoxSearchReqGmpClub.GetOrigin: integer;
 begin
-  Result := ORIGIN_GIVEMEPORNCLUB;
+  Result := PROVIDERS.GMPClub.Id;
 end;
 
 procedure TNBoxSearchReqGmpClub.SetSearchType(const value: TGmpClubSearchType);

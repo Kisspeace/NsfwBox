@@ -114,7 +114,7 @@ end;
 
 function TNBoxSearchReqPseudo.GetOrigin: integer;
 begin
-  Result := ORIGIN_PSEUDO;
+  Result := PROVIDERS.Pseudo.Id;
 end;
 
 end.
