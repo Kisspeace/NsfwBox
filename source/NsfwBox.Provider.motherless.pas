@@ -122,7 +122,7 @@ end;
 constructor TNBoxMotherlessItem.Create;
 begin
   FPage := TMotherlessPostPage.Create('');
-  FOrigin := ORIGIN_MOTHERLESS;
+  FOrigin := PROVIDERS.Motherless.Id;
 end;
 
 function TNBoxMotherlessItem.GetAuthorName: string;
@@ -199,7 +199,7 @@ end;
 
 function TNBoxSearchReqMotherless.GetOrigin: integer;
 begin
-  Result := ORIGIN_MOTHERLESS;
+  Result := PROVIDERS.Motherless.Id;
 end;
 
 end.

@@ -65,7 +65,7 @@ end;
 
 constructor TNBoxR34JsonApiItem.Create;
 begin
-  FOrigin := ORIGIN_R34JSONAPI;
+  FOrigin := PROVIDERS.R34JsonApi.Id;
 end;
 
 function TNBoxR34JsonApiItem.GetContentUrls: TArray<string>;
@@ -124,7 +124,7 @@ end;
 
 function TNBoxSearchReqR34JsonApi.GetOrigin: integer;
 begin
-  Result := ORIGIN_R34JSONAPI;
+  Result := PROVIDERS.R34JsonApi.Id;
 end;
 
 end.

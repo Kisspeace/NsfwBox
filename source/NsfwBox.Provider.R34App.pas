@@ -74,7 +74,7 @@ end;
 
 constructor TNBoxR34AppItem.Create;
 begin
-  FOrigin := ORIGIN_R34APP;
+  FOrigin := PROVIDERS.R34App.Id;
 end;
 
 function TNBoxR34AppItem.GetAuthorName: string;
@@ -160,7 +160,7 @@ end;
 
 function TNBoxSearchReqR34App.GetOrigin: integer;
 begin
-  Result := ORIGIN_R34APP;
+  Result := PROVIDERS.R34App.Id;
 end;
 
 
