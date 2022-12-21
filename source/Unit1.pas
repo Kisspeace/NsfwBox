@@ -2541,9 +2541,6 @@ begin
     FreeAndNil(DownloadFetcher);
     FreeAndNil(DownloadManager);
     DeleteAllBrowsers(False);
-    FreeAndNil(BrowsersIWUContentManager);
-//    FreeAndNil(IWUContentManager);
-    FreeAndNil(IWUCacheManager);
   except
     On E: Exception do
       Log('On Destroy', E);
