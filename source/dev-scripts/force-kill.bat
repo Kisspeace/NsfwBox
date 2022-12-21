@@ -1,0 +1,1 @@
+TaskKill /im "NsfwBox.exe" /f /t

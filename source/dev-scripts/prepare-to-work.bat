@@ -12,3 +12,8 @@ ECHO WIndows 64
 MKDIR %project_dir%\Win64\Release
 ROBOCOPY /S %project_dir%\assets\themes %project_dir%\Win64\Release\themes
 COPY %project_dir%\libs\win64\*.dll %project_dir%\Win64\Release\
+
+ECHO WIndows 64 debug
+MKDIR %project_dir%\Win64\Debug
+ROBOCOPY /S %project_dir%\assets\themes %project_dir%\Win64\Debug\themes
+COPY %project_dir%\libs\win64\*.dll %project_dir%\Win64\Debug\
