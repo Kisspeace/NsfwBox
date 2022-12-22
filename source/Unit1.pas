@@ -2522,8 +2522,10 @@ begin
       end else begin
         TThread.Synchronize(Nil, procedure begin
           {$IFDEF MSWINDOWS}
-          if Settings.UseNewAppTitlebar then
-            TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( current )';
+          if Settings.UseNewAppTitlebar and ( LastVer = APP_VERSION ) then
+            TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( current )'
+          else
+            TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( higher )';
           {$ENDIF}
         end);
       end;
