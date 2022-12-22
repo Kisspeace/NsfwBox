@@ -2369,6 +2369,7 @@ begin
     Text.Text := 'Yes';
     Text.TextSettings.HorzAlign := TTextAlign.Center;
     OnTap := BtnDialogYesOnTap;
+    Image.ImageURL := AppStyle.GetImagePath(ICON_DONE);
   end;
 
   BtnDialogNo := Self.CreateDefButton(LayoutDialogYesOrNo, BTN_STYLE_DEF2);
@@ -2379,6 +2380,7 @@ begin
     Text.Text := 'No';
     Text.TextSettings := BtnDialogYes.Text.TextSettings;
     OnTap := BtnDialogNoOnTap;
+    Image.ImageURL := AppStyle.GetImagePath(ICON_CLOSETAB);
   end;
 
   { MenuAnonMessage }

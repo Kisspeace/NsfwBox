@@ -32,6 +32,7 @@ const
   ICON_AVATAR      = 'avatar.png';
   ICON_FILES       = 'files.png';
   ICON_WARNING     = 'warning-sign.png';
+  ICON_DONE        = 'done.png';
 
   ICON_IMAGE       = 'image.png';
   ICON_VIDEO       = 'video.png';

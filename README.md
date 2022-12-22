@@ -33,6 +33,7 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="https://kemono.party/static/favicon.ico" width="24" align="left">[kemono.party](https://kemono.party), [coomer.party](https://coomer.party)
 * <img src="https://external-content.duckduckgo.com/ip3/9hentai.to.ico" width="24" align="left">[9hentai.to](https://9hentai.to)
 * <img src="assets/themes/default/content-origin-6.png" width="24" align="left">[motherless.com](https://motherless.com)
+* <img src="assets/themes/default/content-origin-7.png" width="24" align="left">[fapello.com](https://fapello.com)
 
 #### Dependencies:
 * [Alcinoe](https://github.com/Zeus64/alcinoe)
