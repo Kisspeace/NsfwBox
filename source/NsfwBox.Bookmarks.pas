@@ -612,7 +612,8 @@ begin
     Id := Query.FieldByName('id').AsLargeInt;
     Name := Query.FieldByName('name').AsString;
     About := Query.FieldByName('about').AsString;
-    Timestamp := StrToDateTime(Query.FieldByName('timestamp').AsString);
+    var LTimestamp := Query.FieldByName('timestamp').AsDateTime;
+    Timestamp := LTimestamp;
     FDb := Self;
   end;
 end;
