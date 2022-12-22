@@ -1813,15 +1813,15 @@ begin
       if not Assigned(LPost) then exit;
       LTryFetchIfEmpty;
 
-      var LBrowserTab: TNBoxTab;
-      var LBrowser: TNBoxBrowser;
-      LBrowserTab := self.AddBrowser(nil, false);
-      LBrowser := TNBoxBrowser(LBrowserTab.Owner);
-
       if (LPost.ContentUrlCount < 1) then begin
         showmessage('Have no files');
         exit;
       end;
+
+      var LBrowserTab: TNBoxTab;
+      var LBrowser: TNBoxBrowser;
+      LBrowserTab := self.AddBrowser(nil, false);
+      LBrowser := TNBoxBrowser(LBrowserTab.Owner);
 
       for I := 0 to LPost.ContentUrlCount - 1 do begin
         var LNewCard := LBrowser.NewItem;
