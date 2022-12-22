@@ -17,7 +17,8 @@ uses
   NsfwBox.Graphics.Rectangle, NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi,
   NsfwBox.Provider.GivemepornClub, NsfwBox.Styling, NsfwBox.Provider.Bookmarks,
   NsfwBox.Helper, CoomerParty.Scraper, NsfwBox.Provider.CoomerParty,
-  NsfwBox.Provider.Randomizer, NsfwBox.Provider.motherless, Motherless.types;
+  NsfwBox.Provider.Randomizer, NsfwBox.Provider.motherless, Motherless.types,
+  Fapello.Types, NsfwBox.Provider.Fapello;
 
 type
 
@@ -70,6 +71,7 @@ type
       BtnOriginCoomerParty: TRectButton;
       BtnOriginMotherless: TRectButton;
       BtnOriginRandomizer: TRectButton;
+      BtnPvrFapello: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -110,6 +112,7 @@ type
       procedure OnMotherlessSortChanged(Sender: TObject);
       procedure OnMotherlessUploadDateChanged(Sender: TObject);
       procedure OnMotherlessMediaSizeChanged(Sender: TObject);
+      procedure OnFapelloSearchTypeChanged(Sender: TObject);
       procedure BtnSelectMenuOnTap(Sender: TObject; const Point: TPointF);
       procedure SetRequest(const value: INBoxSearchRequest);
       function GetRequest: INBoxSearchRequest;
@@ -128,6 +131,7 @@ type
       MotherlessMediaChangeMenu: TNBoxSelectMenu;
       MotherlessUploadDateChangeMenu: TNBoxSelectMenu;
       MotherlessMediaSizeChangeMenu: TNBoxSelectMenu;
+      FapelloSearchTypeMenu: TNBoxSelectMenu;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -165,6 +169,8 @@ type
           BtnMotherlessChangeMediaSize: TRectButton;
         BookmarksMenu: TNBoxSearchSubMenuBase;
           EditBookmarksPath: TNBoxEdit;
+        FapelloMenu: TNBoxSearchSubMenuBase;
+          BtnFapelloChangeSearchType: TRectButton;
         RandomizerMenu: TNBoxSearchSubMenuBase;
           BtnRandNsfwXxx: TNBoxCheckButton;
           BtnRandR34App: TNBoxCheckButton;
@@ -229,6 +235,7 @@ begin
   BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
   BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
   BtnOriginMotherless := NewBtn(ORIGIN_MOTHERLESS);
+  BtnPvrFapello := NewBtn(PROVIDERS.Fapello.Id);
   BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
 end;
 
@@ -331,10 +338,11 @@ var
     FSelectMenus.Add(Result);
   end;
 
-  function NewProviderMenu: TNBoxSearchSubMenuBase;
+  function NewProviderMenu(AId: Integer): TNBoxSearchSubMenuBase;
   begin
     Result := TNBoxSearchSubMenuBase.Create(Self);
     with Result do begin
+      Tag := AId;
       Parent := MainMenu;
       Align := TAlignLayout.Top;
       Visible := false;
@@ -478,7 +486,7 @@ begin
       OnSelected := OnCoomerPartyHostChanged;
     end;
 
-    R34AppMenu := NewProviderMenu;
+    R34AppMenu := NewProviderMenu(PROVIDERS.R34App.Id);
     with R34AppMenu do begin
       BtnR34AppChangeBooru := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
       With BtnR34AppChangeBooru do begin
@@ -493,7 +501,7 @@ begin
 
     end;
 
-    BookmarksMenu := NewProviderMenu;
+    BookmarksMenu := NewProviderMenu(PROVIDERS.Bookmarks.id);
     With BookmarksMenu do begin
       EditBookmarksPath := Form1.CreateDefEdit(Self);
       with EditBookmarksPath do begin
@@ -505,7 +513,7 @@ begin
       end;
     end;
 
-    NsfwXxxMenu := NewProviderMenu;
+    NsfwXxxMenu := NewProviderMenu(PROVIDERS.NsfwXxx.Id);
     with NsfwXxxMenu do begin
 
       CheckGrid := TColumnsLayout.Create(NsfwXxxMenu);
@@ -571,7 +579,7 @@ begin
       OnResize := OnResizeEvent;
     end;
 
-    GmpClubMenu := NewProviderMenu;
+    GmpClubMenu := NewProviderMenu(PROVIDERS.GMPClub.Id);
     with GmpClubMenu do begin
 
       BtnGmpChangeSearchType := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
@@ -587,7 +595,7 @@ begin
 
     end;
 
-    CoomerPartyMenu := NewProviderMenu;
+    CoomerPartyMenu := NewProviderMenu(PROVIDERS.CoomerParty.Id);
     with CoomerPartyMenu do begin
 
       EditCoomerPartyHost := Form1.CreateDefEdit(Self);
@@ -635,7 +643,7 @@ begin
 
     { Motherless menu -------- }
 
-    MotherlessMenu := NewProviderMenu;
+    MotherlessMenu := NewProviderMenu(PROVIDERS.Motherless.Id);
     MotherlessMediaChangeMenu := NewSelectMenu;
     with MotherlessMediaChangeMenu do begin
       OnSelected := OnMotherlessMediaChanged;
@@ -675,9 +683,21 @@ begin
     MotherlessMediaSizeChangeMenu.Selected := Ord(TMotherLessMediaSize.SizeAll);
   end;
 
+  { Fapello menu ---------------- }
+
+  FapelloMenu := NewProviderMenu(PROVIDERS.Fapello.Id);
+  FapelloSearchTypeMenu := NewSelectMenu;
+  with FapelloSearchTypeMenu do begin
+    OnSelected := OnFapelloSearchTypeChanged;
+    AddBtn('Feed', Ord(TFapelloItemKind.FlFeed), Form1.AppStyle.GetImagePath(ICON_HISTORY));
+    AddBtn('Author', Ord(TFapelloItemKind.FlThumb), Form1.AppStyle.GetImagePath(ICON_AVATAR));
+  end;
+  BtnFapelloChangeSearchType := NewSelectBtn(FapelloMenu, '', FapelloSearchTypeMenu);
+  FapelloSearchTypeMenu.Selected := Ord(TFapelloItemKind.FlFeed);
+
   { Randomizer menu ------------- }
 
-  RandomizerMenu := NewProviderMenu;
+  RandomizerMenu := NewProviderMenu(PROVIDERS.Randomizer.id);
   BtnRandNsfwXxx := NewBtnCheck(OriginToStr(ORIGIN_NSFWXXX), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_NSFWXXX));
   BtnRandR34App := NewBtnCheck(OriginToStr(ORIGIN_R34APP), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_R34APP));
   BtnRandGmpClub := NewBtnCheck(OriginToStr(ORIGIN_GIVEMEPORNCLUB), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_GIVEMEPORNCLUB));
@@ -793,6 +813,12 @@ begin
       end;
     end;
 
+    PVR_FAPELLO: begin
+      With ( Result as TNBoxSearchReqFapello ) do begin
+        RequestKind := TFapelloItemKind(FapelloSearchTypeMenu.Selected);
+      end;
+    end;
+
   end;
 
   with Result do begin
@@ -826,6 +852,18 @@ procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
 begin
   ShowMainMenu;
   Self.EditCoomerPartyHost.Edit.Text := CoomerPartyHostChangeMenu.SelectedStr;
+end;
+
+procedure TNBoxSearchMenu.OnFapelloSearchTypeChanged(Sender: TObject);
+var
+  LMenu: TNBoxSelectMenu;
+begin
+  ShowMainMenu;
+  LMenu := (Sender as TNBoxSelectMenu);
+  if Assigned(LMenu.SelectedBtn) then begin
+    BtnFapelloChangeSearchType.Image.ImageURL := LMenu.SelectedBtn.Image.ImageURL;
+    BtnFapelloChangeSearchType.Text.Text := LMenu.SelectedBtn.Text.Text;
+  end;
 end;
 
 procedure TNBoxSearchMenu.OnGmpClubSearchTypeChanged(Sender: TObject);
@@ -931,6 +969,8 @@ begin
 end;
 
 procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
+var
+  I: integer;
 begin
   BtnChangeOrigin.Image.ImageURL := form1.AppStyle.GetImagePath(OriginSetMenu.Selected);
   BtnChangeOrigin.Text.Text := '( ' + OriginToStr(OriginSetMenu.Selected) + ' ) Change content provider';
@@ -939,14 +979,10 @@ begin
   MainMenu.Visible := True;
   self.HideOriginMenus;
 
-  case OriginSetMenu.Selected of
-    ORIGIN_NSFWXXX:        NsfwXxxMenu.Visible := True;
-    ORIGIN_GIVEMEPORNCLUB: GmpClubMenu.Visible := True;
-    ORIGIN_R34APP:         R34AppMenu.Visible := True;
-    ORIGIN_COOMERPARTY:    CoomerPartyMenu.Visible := True;
-    ORIGIN_BOOKMARKS:      BookmarksMenu.Visible := True;
-    ORIGIN_MOTHERLESS:     MotherlessMenu.Visible := True;
-    ORIGIN_RANDOMIZER:      RandomizerMenu.Visible := True;
+  for I := 0 to FProviderMenus.Count - 1 do
+  if OriginSetMenu.Selected = FProviderMenus[I].Tag then begin
+    FProviderMenus[I].Visible := True;
+    Break;
   end;
 end;
 
@@ -1040,6 +1076,11 @@ begin
       BtnRand9Hentaito.IsChecked := _IN(Providers, ORIGIN_9HENTAITO);
       BtnRandMotherless.IsChecked := _IN(Providers, ORIGIN_MOTHERLESS);
     end;
+
+  end else if ( Value is TNBoxSearchReqFapello ) then begin
+
+    with ( Value as TNBoxSearchReqFapello ) do
+      FapelloSearchTypeMenu.Selected := Ord(RequestKind);
 
   end;
 

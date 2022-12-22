@@ -17,6 +17,7 @@ const
   ORIGIN_9HENTAITO      = 4;
   ORIGIN_COOMERPARTY    = 5;
   ORIGIN_MOTHERLESS     = 6;
+  PVR_FAPELLO        = 7;
 
 type
 
@@ -52,10 +53,12 @@ type
       FGMPClub: TNBoxProviderInfo;
       FMotherless: TNBoxProviderInfo;
       F9HentaiTo: TNBoxProviderInfo;
+      FFapello: TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
     public
+      function ById(AId: Integer): TNBoxProviderInfo;
       property Items[I: Integer]: TNBoxProviderInfo read GetItem; default;
       property Count: integer read GetCount;
       { ------------------------- }
@@ -66,6 +69,7 @@ type
       property GMPClub: TNBoxProviderInfo read FGMPClub;
       property Motherless: TNBoxProviderInfo read FMotherless;
       property NineHentaiTo: TNBoxProviderInfo read F9HentaiTo;
+      property Fapello: TNBoxProviderInfo read FFapello;
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
       property Bookmarks: TNBoxProviderInfo read FBookmarks;
@@ -79,6 +83,18 @@ var
 
 implementation
 { TNBoxProviders }
+
+function TNBoxProviders.ById(AId: Integer): TNBoxProviderInfo;
+var
+  I: integer;
+begin
+  for I := 0 to Self.Count - 1 do
+    if Self.Items[I].Id = AId then begin
+      Result := Self.Items[I];
+      exit;
+    end;
+  Result := nil;
+end;
 
 constructor TNBoxProviders.Create;
 
@@ -106,6 +122,7 @@ begin
   FGMPClub    := Add(ORIGIN_GIVEMEPORNCLUB, 'givemeporn.club', 1);
   FMotherless := Add(ORIGIN_MOTHERLESS, 'motherless.com', 1);
   F9HentaiTo  := Add(ORIGIN_9HENTAITO, '9hentai.to', 0);
+  FFapello    := Add(PVR_FAPELLO, 'Fapello.com', 1);
 end;
 
 destructor TNBoxProviders.Destroy;
