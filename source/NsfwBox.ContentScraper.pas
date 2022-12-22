@@ -18,7 +18,8 @@ uses
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
   NsfwBox.Consts, NsfwBox.Bookmarks, NsfwBox.Provider.Bookmarks,
   IoUtils, NsfwBox.FileSystem, System.Classes, system.SyncObjs,
-  NsfwBox.Helper, System.Math, YDW.Threading, NsfwBox.Logging;
+  NsfwBox.Helper, System.Math, YDW.Threading, NsfwBox.Logging,
+  NsfwBox.Provider.Fapello, Fapello.Types, Fapello.Scraper;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -44,6 +45,7 @@ type
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string; ARequest, AUserId, AService: string; APageNum: integer): boolean;
       function GetContentMotherless(AList: INBoxHasOriginList; ARequest: string; APage: integer; AMediaType: TMotherlessMediaType; ASort: TMotherLessSort; ASize: TMotherlessMediaSize; AUploadDate: TMotherLessUploadDate): boolean;
+      function GetContentFapello(AList: INBoxHasOriginList; ARequest: string; APageNum: integer; ASearchType: TFapelloItemKind): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
       function GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
@@ -147,6 +149,22 @@ begin
       LItem.Page := LPage;
     finally
       LClient.Free;
+    end;
+
+  end else if ( APost is TNBoxFapelloItem ) then begin
+
+    var LItem := ( APost As TNBoxFapelloItem );
+    if Litem.Kind = FlFeed then
+      Exit;
+
+    var LClient := TFapelloScraper.Create;
+    SyncWebClientSet(LClient.Client, APost.origin);
+
+    try
+      var LFull := LClient.GetFullContent(LItem.ThumbItem);
+      LItem.Full := LFull;
+    finally
+      LClient.free;
     end;
 
   end;
@@ -268,6 +286,13 @@ begin
     begin
       with ( ARequest as TNBoxSearchReqRandomizer ) do begin
         Result := Self.GetContentRandomizer(AList, Providers);
+      end;
+    end;
+
+    PVR_FAPELLO:
+    begin
+      with ( ARequest as TNBoxSearchReqFapello ) do begin
+        Result := Self.GetContentFapello(AList, Request, PageId, RequestKind);
       end;
     end;
 
@@ -447,6 +472,51 @@ begin
       Item.UIdInt := Content.Posts[I].Id;
       Item.Item := TPartyPostToTPartyPostPage(Content.Posts[I]);
       AList.Add(Item);
+    end;
+
+  finally
+    Client.Free;
+  end;
+end;
+
+function TNBoxScraper.GetContentFapello(AList: INBoxHasOriginList;
+  ARequest: string; APageNum: integer; ASearchType: TFapelloItemKind): boolean;
+var
+  Client: TFapelloScraper;
+  I: integer;
+begin
+  Result := False;
+  Client := TFapelloScraper.Create;
+  try
+    SyncWebClientSet(Client.Client, PROVIDERS.Fapello.Id);
+
+    case ASearchType of
+      FlFeed:
+      begin
+        var LContent := Client.GetFeedItems(APageNum);
+        Result := ( Length(LContent) > 0 );
+        for I := 0 to High(LContent) do begin
+          var LItem := TNBoxFapelloItem.Create;
+          LItem.Kind := FlFeed;
+          LItem.FeedItem := LContent[I];
+          AList.Add(LItem);
+        end;
+      end;
+
+      FlThumb:
+      begin
+        var LContent := Client.GetAuthorContent(ARequest, APageNum);
+        Result := ( Length(LContent) > 0 );
+        for I := 0 to High(LContent) do begin
+          var LItem := TNBoxFapelloItem.Create;
+          var LFeedItem := TFapelloFeedItem.New;
+          LFeedItem.Author.Username := ARequest;
+          LItem.Kind := FlThumb;
+          LItem.FeedItem := LFeedItem;
+          LItem.ThumbItem := LContent[I];
+          AList.Add(LItem);
+        end;
+      end;
     end;
 
   finally

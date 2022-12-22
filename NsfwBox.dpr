@@ -35,13 +35,15 @@ uses
   {$IFDEF MSWINDOWS}
   NsfwBox.WindowsTitlebar in 'source\NsfwBox.WindowsTitlebar.pas',
   Windows,
-  {$ENDIF}
+  {$ENDIF }
   NsfwBox.Provider.CoomerParty in 'source\NsfwBox.Provider.CoomerParty.pas',
   FMX.ColumnsView in 'source\FMX.ColumnsView.pas',
   NsfwBox.Provider.Randomizer in 'source\NsfwBox.Provider.Randomizer.pas',
   NsfwBox.Provider.motherless in 'source\NsfwBox.Provider.motherless.pas',
   NsfwBox.Tests in 'source\NsfwBox.Tests.pas',
-  NsfwBox.Logging in 'source\NsfwBox.Logging.pas';
+  NsfwBox.Logging in 'source\NsfwBox.Logging.pas',
+  NsfwBox.Provider.Fapello in 'source\NsfwBox.Provider.Fapello.pas',
+  NsfwBox.Utils in 'source\NsfwBox.Utils.pas';
 
 {$R *.res}
 

@@ -11,6 +11,7 @@ uses
   NsfwBox.Provider.CoomerParty,
   NsfwBox.Provider.Randomizer,
   NsfwBox.Provider.motherless,
+  NsfwBox.Provider.Fapello,
   NsfwBox.Consts,
   classes, sysutils, NsfwXxx.Types;
 
@@ -35,6 +36,7 @@ begin
     ORIGIN_9HENTAITO:  Result := TNBox9HentaiToItem.Create;
     ORIGIN_COOMERPARTY: Result := TNBoxCoomerPartyItem.Create;
     ORIGIN_MOTHERLESS: Result := TNBoxMotherlessItem.Create;
+    PVR_FAPELLO:       Result := TNBoxFapelloItem.Create;
   end;
 end;
 
@@ -51,6 +53,7 @@ begin
     ORIGIN_COOMERPARTY: Result := TNBoxSearchReqCoomerParty.Create;
     ORIGIN_RANDOMIZER: Result := TNBoxSearchReqRandomizer.Create;
     ORIGIN_MOTHERLESS: Result := TNBoxSearchReqMotherless.Create;
+    PVR_FAPELLO:       Result := TNBoxSearchReqFapello.Create;
   end;
 end;
 
@@ -92,16 +95,22 @@ begin
 
   end else if ( APost is TNBoxCoomerPartyItem ) then begin
 
-    var LPost: TNBoxCoomerPartyItem;
-    var LReq: TNBoxSearchReqCoomerParty;
-    LReq := TNBoxSearchReqCoomerParty.Create;
-    LPost := ( APost as TNBoxCoomerPartyItem );
+    var LPost := ( APost as TNBoxCoomerPartyItem );
+    var LReq := TNBoxSearchReqCoomerParty.Create;
 
     LReq.Site := LPost.Site;
     LReq.UserId := LPost.Item.Author.Id;
     LReq.Service := LPost.Item.Author.Service;
-
     Result := LReq;
+
+  end else if ( APost is TNBoxFapelloItem ) then begin
+
+    var LPost := ( Apost As TNBoxFapelloItem);
+    var LReq := TNBoxSearchReqFapello.Create;
+    LReq.RequestKind := TFapelloItemKind.FlThumb;
+    LReq.Request := LPost.AuthorName;
+    Result := LReq;
+
   end;
 
 end;
@@ -120,20 +129,14 @@ begin
 end;
 
 function OriginToStr(AOrigin: integer): string;
+var
+  LProvider: TNBoxProviderInfo;
 begin
-  Case AOrigin of
-    ORIGIN_NSFWXXX: Result    := 'nsfw.xxx';
-    ORIGIN_R34JSONAPI: Result := 'R34-json-api';
-    ORIGIN_R34APP: Result     := 'R34.app';
-    ORIGIN_GIVEMEPORNCLUB: Result := 'givemeporn.club';
-    ORIGIN_9HENTAITO:  Result := '9hentai.to';
-    ORIGIN_COOMERPARTY: Result := '(coomer\kemono).party';
-    ORIGIN_MOTHERLESS: Result := 'motherless.com';
-
-    ORIGIN_BOOKMARKS: Result  := 'Bookmarks';
-    ORIGIN_PSEUDO: Result     := 'None';
-    ORIGIN_RANDOMIZER: Result := 'Randomizer';
-  end;
+  LProvider := PROVIDERS.ById(AOrigin);
+  if Assigned(LProvider) then
+    Result := LProvider.TitleName
+  else
+    Result := '';
 end;
 
 end.

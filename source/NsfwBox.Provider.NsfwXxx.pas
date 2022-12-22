@@ -5,7 +5,7 @@ unit NsfwBox.Provider.NsfwXxx;
 interface
 uses
   System.SysUtils, System.Classes, XSuperObject,
-  NsfwBox.Interfaces, NsfwBox.Consts, NsfwXxx.Types;
+  NsfwBox.Interfaces, NsfwBox.Consts, NsfwXxx.Types, NsfwBox.Utils;
 
 type
 
@@ -162,8 +162,7 @@ end;
 
 function TNBoxNsfwXxxItem.GetThumbnailUrl: string;
 begin
-  if Length(Item.Thumbnails) > 0 then
-    Result := Item.Thumbnails[0];
+  Result := GetFirstStr(Item.Thumbnails);
 end;
 
 function TNBoxNsfwXxxItem.GetUidInt: int64;
