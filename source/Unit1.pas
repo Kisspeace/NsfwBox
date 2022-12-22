@@ -1925,6 +1925,7 @@ begin
         TDirectory.CreateDirectory(TNBoxPath.GetThemesPath);
         System.StartUpCopy.CopyStartUpFiles;
         Log('Refreshing assets end.');
+        SaveSettings;
       end;
     except
       On E: Exception do
