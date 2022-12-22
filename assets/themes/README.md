@@ -1,5 +1,6 @@
 ## Assets list
 ### Default and Dark theme
+* <img src="default/done.png" width="24" align="left"> <a target="_blank" href="https://icons8.com/icon/83145/done">Done</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 * <img src="default/history.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/history" title="history icons">History icons created by kmg design - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/refresh_2530313)
 * <img src="default/bookmarks.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/favorite" title="favorite icons">Favorite icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/bookmark_2698202)
 * <img src="default/download.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/download" title="download icons">Download icons created by pancaza - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/download_3879019)
@@ -32,14 +33,15 @@
 * <img src="default/content-origin--3.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/dice" title="dice icons">Dice icons created by Hilmy Abiyyu A. - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/casino_8027947)
 * <img src="default/content-origin--2.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/code" title="code icons">Code icons created by riajulislam - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/coding_8220372)
 * <img src="default/content-origin--1.png" width="24" align="left"> <a href="https://www.flaticon.com/free-icons/heart" title="heart icons">Heart icons created by Freepik - Flaticon</a> -> [Item page](https://www.flaticon.com/free-icon/heart_210545)
-* <img src="default/content-origin-0.png" width="24" align="left"> https://nsfw.xxx -> [Item page](https://nsfw.xxx/favicon.ico)
-* <img src="default/content-origin-1.png" width="24" align="left"> http://rule34.xxx -> [Item page](http://rule34.xxx/favicon.ico)
-* <img src="default/content-origin-2.png" width="24" align="left"> https://r34.app -> [Item page](https://r34.app/_nuxt/icons/icon_512x512.307d7e.png)
-* <img src="default/content-origin-3.png" width="24" align="left"> https://givemeporn.club -> [Item page](https://givemeporn.club/static/images/favicon.png?v=1)
-* <img src="default/content-origin-4.png" width="24" align="left"> https://9hentai.to -> [Item page](ITEM_ICON)
-* <img src="default/content-origin-5.png" width="24" align="left"> https://kemono.party -> [Item page](https://kemono.party/static/favicon.ico)
-* <img src="default/content-origin-6.png" width="24" align="left"> motherless.com favicon -> [Item page](https://motherless.com)
-<!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON) -->
+* <img src="default/content-origin-0.png" width="24" align="left"> [nsfw.xxx](https://nsfw.xxx) -> [Item page](https://nsfw.xxx/favicon.ico)
+* <img src="default/content-origin-1.png" width="24" align="left"> [rule34.xxx](https://rule34.xxx) -> [Item page](http://rule34.xxx/favicon.ico)
+* <img src="default/content-origin-2.png" width="24" align="left"> [r34.app](https://r34.app) -> [Item page](https://r34.app/_nuxt/icons/icon_512x512.307d7e.png)
+* <img src="default/content-origin-3.png" width="24" align="left"> [givemeporn.club](https://givemeporn.club) -> [Item page](https://givemeporn.club/static/images/favicon.png?v=1)
+* <img src="default/content-origin-4.png" width="24" align="left"> [9hentai.to](https://9hentai.to) -> [Item page](ITEM_ICON)
+* <img src="default/content-origin-5.png" width="24" align="left"> [kemono.party](https://kemono.party) -> [Item page](https://kemono.party/static/favicon.ico)
+* <img src="default/content-origin-6.png" width="24" align="left"> [motherless.com](https://motherless.com) favicon -> [Item page](https://motherless.com)
+* <img src="default/content-origin-7.png" width="24" align="left"> [fapello.com](https://fapello.com) favicon -> [Item page](https://fapello.com)
+<!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON_URL) -->
 
 
 
