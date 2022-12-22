@@ -245,6 +245,7 @@ type
     procedure ClickTapRef(Sender: TObject);
     { -> Menu buttons ------------- }
     procedure MenuBtnDownloadsOnTap(Sender: TObject; const Point: TPointF);
+    procedure MenuBtnDownloadsOnDblClick(Sender: TObject);
     procedure MenuBtnSettingsOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnNewTabOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
@@ -1913,6 +1914,8 @@ begin
 
   Application.OnException := AppOnException;
 
+  Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
+
   if not loadSettings then begin
     form1.RestoreDefaultSettings;
     SaveSettings;
@@ -1933,9 +1936,8 @@ begin
     end;
     {$ENDIF}
   end;
-  LoadStyle;
 
-  Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
+  LoadStyle;
 
   IWUCacheManager := TIWUCacheManager.Create(Self);
   IWUCacheManager.SetSaveAndLoadPath(Tpath.Combine(TNBoxPath.GetCachePath, 'thumbnails'));
@@ -2104,6 +2106,7 @@ begin
     Text.Text := 'Downloads';
     IMage.ImageURL := AppStyle.GetImagePath(ICON_DOWNLOADS);
     OnTap := MenuBtnDownloadsOnTap;
+    OnDblClick := MenuBtnDownloadsOnDblClick;
   end;
 
   MenuBtnBookmarks := AddMenuBtn;
@@ -3199,6 +3202,13 @@ end;
 procedure TForm1.MenuBtnHistoryOnTap(Sender: TObject; const Point: TPointF);
 begin
   GotoBookmarksMenu(HistoryDb);
+end;
+
+procedure TForm1.MenuBtnDownloadsOnDblClick(Sender: TObject);
+begin
+  {$IFDEF MSWINDOWS}
+  ShellExecute(0, 'open', 'explorer', PChar(Settings.DefDownloadPath), nil, SW_SHOWNORMAL);
+  {$ENDIF}
 end;
 
 procedure TForm1.MenuBtnDownloadsOnTap(Sender: TObject; const Point: TPointF);
