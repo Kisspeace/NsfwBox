@@ -48,8 +48,9 @@ Developed on RAD Studio 11 Alexandria.
 * [delphi-9hentai.to-api-wrapper](https://github.com/Kisspeace/delphi-9hentai.to-api-wrapper)
 * [coomer.party-scraper](https://github.com/Kisspeace/coomer.party-scraper)
 * [motherless.com-scraper](https://github.com/Kisspeace/motherless.com-scraper)
+* [fapello.com-scraper](https://github.com/Kisspeace/fapello.com-scraper)
 
 #### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.0.0/Kisspeace.NsfwBox.v2.0.0.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.0.0/Kisspeace.NsfwBox-ins32.v2.0.0.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.0.0/Kisspeace.NsfwBox-ins64.v2.0.0.exe)  
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.1.0/Kisspeace.NsfwBox.v2.1.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.1.0/Kisspeace.NsfwBox-ins32.v2.1.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.1.0/Kisspeace.NsfwBox-ins64.v2.1.0.exe)  
