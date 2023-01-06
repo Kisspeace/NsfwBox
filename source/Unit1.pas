@@ -388,6 +388,7 @@ type
 var
   Form1: TForm1;
   APP_VERSION: TSemVer; // Current application version
+  AppDestroying: boolean; // True when app destroying.
 
   LOG_FILENAME         : string = 'log.txt';
   SETTINGS_FILENAME    : string = 'settings.json';
@@ -2513,6 +2514,8 @@ begin
 
       if ( LastVer > APP_VERSION ) then begin
         { New version available }
+        if AppDestroying then exit;
+
         TThread.Synchronize(Nil, procedure begin
           {$IFDEF MSWINDOWS}
           if Settings.UseNewAppTitlebar then
@@ -2556,6 +2559,7 @@ end;
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
   log('Destroing app');
+  AppDestroying := True;
   try
     FreeAndNil(DownloadFetcher);
     FreeAndNil(DownloadManager);
