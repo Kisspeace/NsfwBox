@@ -56,6 +56,7 @@ type
       Name: string;
       About: string;
       Timestamp: TDateTime;
+      ItemsCount: int64;
       procedure AddB(A: TNBoxBookmark);
       procedure Add(AValue: IHasOrigin);         overload;
       procedure Add(AValues: TArray<IHasOrigin>); overload;
@@ -323,7 +324,6 @@ begin
       Stop := ArPos + (MAX_ITEMS_COUNT - 1);
       if (Stop > High(AValues)) then
         Stop := High(AValues);
-//      unit1.SyncLog(ARPos.ToString + ' ' + Stop.ToString + ' len: ' + Length(AValues).ToString);
 
       Iter := 0;
       for I := ArPos to Stop do begin
@@ -578,7 +578,15 @@ begin
   if not Connection.Connected then
     Connection.Connect;
 
-  Query.SQL.Text := 'SELECT * FROM `groups`;';
+  Query.SQL.AddStrings([
+    'SELECT g.*, IFNULL(r.cnt, 0) items_count',
+    'FROM groups g',
+    'LEFT JOIN ( SELECT r.group_id, COUNT(*) cnt',
+    '	  FROM items r',
+    '	  GROUP BY r.group_id) AS r',
+    'ON r.group_id = g.id',
+    'GROUP BY g.id'
+  ]);
   Query.Open;
   Query.First;
 
@@ -621,22 +629,6 @@ begin
     Result := 0
 end;
 
-//
-//function TNBoxBookmarksDb.GetGroupById(AId: int64): TBookmarkGroupRec;
-//var
-//  Tables: TBookmarkTableRecAr;
-//  I: integer;
-//begin
-//  Tables := Self.GetBookmarksTables;
-//  for i := Low(Tables) to High(Tables) do begin
-//    if Tables[I].Id = AId then begin
-//      Result := Tables[I];
-//      exit;
-//    end;
-//  end;
-//  Result.Id := -1;
-//end;
-
 function TNBoxBookmarksDb.GetPage(AGroupId: int64; APageNum: integer): TBookmarkAr;
 var
   LStart, LEnd: integer;
@@ -656,8 +648,16 @@ begin
 end;
 
 function TNBoxBookmarksDb.ReadGroup: TBookmarkGroupRec;
+//var
+//  I: integer;
 begin
+//  for I := 0 to Query.Fields.Count - 1 do begin
+//    var LField := Query.Fields.Fields[I];
+//    log('Field "' + LField.FieldName + '" : "' + LField.AsString + '"')
+//  end;
+
   With Result do begin
+    ItemsCount := Query.FieldByName('items_count').AsLargeInt;
     Id := Query.FieldByName('id').AsLargeInt;
     Name := Query.FieldByName('name').AsString;
     About := Query.FieldByName('about').AsString;
@@ -673,7 +673,17 @@ begin
     Connection.Connect;
 
   with Query do begin
-    SQL.Text := 'SELECT * FROM `groups` WHERE ( `id` = :id );';
+    SQL.AddStrings([
+      'SELECT * FROM (',
+      '   SELECT g.*, IFNULL(r.cnt, 0) items_count',
+      ' 	FROM groups g',
+      '	  LEFT JOIN ( SELECT r.group_id, COUNT(*) cnt',
+      '		  FROM items r',
+      '		  GROUP BY r.group_id) AS r',
+      '	 ON r.group_id = g.id',
+      '	 GROUP BY g.id ) as g',
+      'WHERE g.id = :id'
+    ]);
     Params.ParamByName('id').AsInt64 := AGroupId;
     Open;
     try
@@ -697,7 +707,17 @@ begin
     Connection.Connect;
 
   with Query do begin
-    SQL.Text := 'SELECT * FROM `groups` WHERE (name = :name);';
+    SQL.AddStrings([
+      'SELECT * FROM (',
+      '   SELECT g.*, IFNULL(r.cnt, 0) items_count',
+      ' 	FROM groups g',
+      '	  LEFT JOIN ( SELECT r.group_id, COUNT(*) cnt',
+      '		  FROM items r',
+      '		  GROUP BY r.group_id) AS r',
+      '	 ON r.group_id = g.id',
+      '	 GROUP BY g.id ) as g',
+      'WHERE g.name = :name'
+    ]);
     Params[0].AsString := AGroupName;
     Open;
 
@@ -741,7 +761,17 @@ begin
     Connection.Connect;
 
   With Query do begin
-    SQL.Text := 'SELECT * FROM `groups` ORDER BY `id` DESC LIMIT 1;';
+    SQL.AddStrings([
+      'SELECT * FROM (',
+      '   SELECT g.*, IFNULL(r.cnt, 0) items_count',
+      ' 	FROM groups g',
+      '	  LEFT JOIN ( SELECT r.group_id, COUNT(*) cnt',
+      '		  FROM items r',
+      '		  GROUP BY r.group_id) AS r',
+      '	 ON r.group_id = g.id',
+      '	 GROUP BY g.id ) as g',
+      'ORDER BY g.id DESC LIMIT 1'
+    ]);
     Open;
     try
       First;

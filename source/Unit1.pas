@@ -3300,7 +3300,7 @@ var
       Result := '[ LastPage: ' + AGroup.GetMaxPage.ToString + ' ] ' + Result;
     end;
 
-    Result := '(' + AGroup.GetItemsCount.ToString + ') ' + Result;
+    Result := '(' + AGroup.ItemsCount.ToString + ') ' + Result;
   end;
 
 begin
