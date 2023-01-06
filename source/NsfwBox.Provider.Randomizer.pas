@@ -43,7 +43,9 @@ begin
     NsfwBox.Consts.PROVIDERS.R34App.Id,
     NsfwBox.Consts.PROVIDERS.CoomerParty.Id,
     NsfwBox.Consts.PROVIDERS.Motherless.Id,
-    NsfwBox.Consts.PROVIDERS.NineHentaiTo.Id
+    NsfwBox.Consts.PROVIDERS.NineHentaiTo.Id,
+    NsfwBox.Consts.PROVIDERS.Rule34xxx.Id,
+    NsfwBox.Consts.PROVIDERS.Gelbooru.Id
   ];
 end;
 

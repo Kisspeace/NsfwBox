@@ -4,7 +4,7 @@ unit NsfwBox.Helper;
 
 interface
 uses
-  NsfwBox.Interfaces,
+  NsfwBox.Interfaces, NsfwBox.Logging,
   NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34App,
   NsfwBox.Provider.Bookmarks, NsfwBox.Provider.R34JsonApi,
   NsfwBox.Provider.GivemepornClub, NsfwBox.Provider.NineHentaiToApi,
@@ -12,48 +12,38 @@ uses
   NsfwBox.Provider.Randomizer,
   NsfwBox.Provider.motherless,
   NsfwBox.Provider.Fapello,
+  NsfwBox.Provider.Gelbooru,
+  NsfwBox.Provider.Rule34xxx,
   NsfwBox.Consts,
   classes, sysutils, NsfwXxx.Types;
+
 
   function CreateItemByOrigin(AOrigin: integer): INBoxItem;
   function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
   function CreateRelatedReq(APost: INBoxItem): INBoxSearchRequest;
   function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
   function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
-
   function OriginToStr(AOrigin: integer): string;
 
 implementation
 
 function CreateItemByOrigin(AOrigin: integer): INBoxItem;
 begin
-  Case AOrigin of
-    ORIGIN_NSFWXXX:    Result := TNBoxNsfwXxxItem.Create;
-    ORIGIN_R34APP:     Result := TNBoxR34AppItem.Create;
-    ORIGIN_R34JSONAPI: Result := TNBoxR34JsonApiItem.Create;
-    ORIGIN_GIVEMEPORNCLUB: Result := TNBoxGmpClubItem.Create;
-    ORIGIN_PSEUDO:     Result := TNBoxPseudoItem.Create;
-    ORIGIN_9HENTAITO:  Result := TNBox9HentaiToItem.Create;
-    ORIGIN_COOMERPARTY: Result := TNBoxCoomerPartyItem.Create;
-    ORIGIN_MOTHERLESS: Result := TNBoxMotherlessItem.Create;
-    PVR_FAPELLO:       Result := TNBoxFapelloItem.Create;
+  try
+    Result := PROVIDERS.ById(AOrigin).ItemClass.Create;
+  except
+    On E: Exception do
+      Log('CreateItemByOrigin(' + AOrigin.ToString + ')', E);
   end;
 end;
 
 function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
 begin
-  Case AOrigin of
-    ORIGIN_NSFWXXX:    Result := TNBoxSearchReqNsfwXxx.Create;
-    ORIGIN_R34APP:     Result := TNBoxSearchReqR34App.Create;
-    ORIGIN_R34JSONAPI: Result := TNBoxSearchReqR34JsonApi.Create;
-    ORIGIN_GIVEMEPORNCLUB: Result := TNBoxSearchReqGmpClub.Create;
-    ORIGIN_PSEUDO:     Result := TNBoxSearchReqPseudo.Create;
-    ORIGIN_BOOKMARKS:  Result := TNBoxSearchReqBookmarks.Create;
-    ORIGIN_9HENTAITO:  Result := TNBoxSearchReq9HentaiTo.Create;
-    ORIGIN_COOMERPARTY: Result := TNBoxSearchReqCoomerParty.Create;
-    ORIGIN_RANDOMIZER: Result := TNBoxSearchReqRandomizer.Create;
-    ORIGIN_MOTHERLESS: Result := TNBoxSearchReqMotherless.Create;
-    PVR_FAPELLO:       Result := TNBoxSearchReqFapello.Create;
+  try
+    Result := PROVIDERS.ById(AOrigin).RequestClass.Create;
+  except
+    On E: Exception do
+      Log('CreateReqByOrigin(' + AOrigin.ToString + ')', E);
   end;
 end;
 
@@ -73,31 +63,35 @@ begin
 end;
 
 function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
+var
+  LAuthor: IHasAuthor;
+  LAuthorStr: string;
 begin
   Result := nil;
-  if Supports(APost, IHasAuthor)
-  and (APost as IHasAuthor).AuthorName.IsEmpty then
-    exit;
+
+  if Supports(APost, IHasAuthor, LAuthor) then begin
+    LAuthorStr := LAuthor.AuthorName;
+    if LAuthorStr.IsEmpty then Exit;
+  end else
+    Exit;
 
   if ( APost is TNBoxNsfwXxxItem ) then begin
 
     Result := TNBoxSearchReqNsfwXxx.create;
     with ( Result as TNBoxSearchReqNsfwXxx ) do begin
-      with ( APost as TNBoxNsfwXxxItem ) do
-        Result.Request := AuthorName;
+      Result.Request := LAuthorStr;
       SearchType := TNsfwUrlType.User;
     end;
 
   end else if ( APost is TNBoxR34AppItem ) then begin
 
     Result := TNBoxSearchReqR34App.Create;
-    Result.Request := TNBoxR34AppItem(APost).AuthorName;
+    Result.Request := LAuthorStr;
 
   end else if ( APost is TNBoxCoomerPartyItem ) then begin
 
     var LPost := ( APost as TNBoxCoomerPartyItem );
     var LReq := TNBoxSearchReqCoomerParty.Create;
-
     LReq.Site := LPost.Site;
     LReq.UserId := LPost.Item.Author.Id;
     LReq.Service := LPost.Item.Author.Service;
@@ -111,8 +105,19 @@ begin
     LReq.Request := LPost.AuthorName;
     Result := LReq;
 
-  end;
+  end else if ( APost is TNBoxGelbooruItem ) then begin
 
+    var LReq := TNBoxSearchReqGelbooru.Create;
+    LReq.Request := LAuthorStr;
+    Result := LReq;
+
+  end else if ( APost is TNBoxRule34xxxItem ) then begin
+
+    var LReq := TNBoxSearchReqRule34xxx.Create;
+    LReq.Request := LAuthorStr;
+    Result := LReq;
+
+  end;
 end;
 
 function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
@@ -120,12 +125,14 @@ begin
   Result := CreateReqByOrigin(AOrigin);
   Result.Request := ATag;
   case AOrigin of
+
     ORIGIN_NSFWXXX:
       ( Result as TNBoxSearchReqNsfwXxx ).SearchType := TNsfwUrlType.Category;
+
     ORIGIN_GIVEMEPORNCLUB:
       ( Result as TNBoxSearchReqGmpClub ).SearchType := TGmpClubSearchType.Tag;
-  end;
 
+  end;
 end;
 
 function OriginToStr(AOrigin: integer): string;

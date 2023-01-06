@@ -72,6 +72,8 @@ type
       BtnOriginMotherless: TRectButton;
       BtnOriginRandomizer: TRectButton;
       BtnPvrFapello: TRectButton;
+      BtnPvrGelbooru: TRectButton;
+      BtnPvrRule34xxx: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -178,6 +180,8 @@ type
           BtnRandCoomerParty: TNBoxCheckButton;
           BtnRandMotherless: TNBoxCheckButton;
           BtnRand9Hentaito: TNBoxCheckButton;
+          BtnRandRule34xxx: TNBoxCheckButton;
+          BtnRandGelbooru: TNBoxCheckButton;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -235,7 +239,9 @@ begin
   BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
   BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
   BtnOriginMotherless := NewBtn(ORIGIN_MOTHERLESS);
-  BtnPvrFapello := NewBtn(PROVIDERS.Fapello.Id);
+  BtnPvrFapello       := NewBtn(PROVIDERS.Fapello.Id);
+  BtnPvrGelbooru      := Newbtn(PROVIDERS.Gelbooru.Id);
+  BtnPvrRule34xxx     := NewBtn(PROVIDERS.Rule34xxx.Id);
   BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
 end;
 
@@ -704,6 +710,8 @@ begin
   BtnRandCoomerParty := NewBtnCheck(OriginToStr(ORIGIN_COOMERPARTY), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_COOMERPARTY));
   BtnRandMotherless := NewBtnCheck(OriginToStr(ORIGIN_MOTHERLESS), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_MOTHERLESS));
   BtnRand9Hentaito := NewBtnCheck(OriginToStr(ORIGIN_9HENTAITO), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_9HENTAITO));
+  BtnRandRule34xxx := NewBtnCheck(OriginToStr(PVR_RULE34XXX), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_RULE34XXX));
+  BtnRandGelbooru := NewBtnCheck(OriginToStr(PVR_GELBOORU), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_GELBOORU));
   RandomizerMenu.DoAutoSize;
   RandomizerMenu.OnResize := RandomizerMenu.OnResizeEvent;
 
@@ -810,6 +818,8 @@ begin
         if BtnRandCoomerParty.IsChecked then Providers := Providers + [ORIGIN_COOMERPARTY];
         if BtnRand9Hentaito.IsChecked then Providers := Providers + [ORIGIN_9HENTAITO];
         if BtnRandMotherless.IsChecked then Providers := Providers + [ORIGIN_MOTHERLESS];
+        if BtnRandGelbooru.IsChecked then Providers := Providers + [PVR_GELBOORU];
+        if BtnRandRule34xxx.IsChecked then Providers := Providers + [PVR_RULE34XXX];
       end;
     end;
 
@@ -971,9 +981,12 @@ end;
 procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
 var
   I: integer;
+  LProvider: TNBoxProviderInfo;
 begin
-  BtnChangeOrigin.Image.ImageURL := form1.AppStyle.GetImagePath(OriginSetMenu.Selected);
-  BtnChangeOrigin.Text.Text := '( ' + OriginToStr(OriginSetMenu.Selected) + ' ) Change content provider';
+  LProvider := PROVIDERS.ById(OriginSetMenu.Selected);
+  BtnChangeOrigin.Image.ImageURL := form1.AppStyle.GetImagePath(LProvider.Id);
+  BtnChangeOrigin.Text.Text := '( ' + LProvider.TitleName + ' ) Change content provider';
+  Self.EditPageId.Edit.Text := LProvider.FisrtPageId.ToString;
   self.HideMenus;
   //OriginSetMenu.Visible := False;
   MainMenu.Visible := True;
@@ -1075,6 +1088,8 @@ begin
       BtnRandCoomerParty.IsChecked := _IN(Providers, ORIGIN_COOMERPARTY);
       BtnRand9Hentaito.IsChecked := _IN(Providers, ORIGIN_9HENTAITO);
       BtnRandMotherless.IsChecked := _IN(Providers, ORIGIN_MOTHERLESS);
+      BtnRandRule34xxx.IsChecked := _IN(Providers, PVR_RULE34XXX);
+      BtnRandGelbooru.IsChecked := _IN(Providers, PVR_GELBOORU);
     end;
 
   end else if ( Value is TNBoxSearchReqFapello ) then begin

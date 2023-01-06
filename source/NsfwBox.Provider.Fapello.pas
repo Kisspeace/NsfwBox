@@ -38,7 +38,7 @@ type
       [DISABLE] property ContentUrls;
       [DISABLE] property AuthorName: string read GetAuthorName;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      constructor Create;
+      constructor Create; override;
   end;
 
   TNBoxSearchReqFapello = class(TNBoxSearchRequestBase)

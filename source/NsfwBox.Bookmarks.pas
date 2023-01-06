@@ -7,7 +7,9 @@ uses
   SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
   DB, NsfwBox.Interfaces, NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx,
   NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi, NsfwBox.Consts,
-  NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging;
+  NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging,
+  NsfwBox.Provider.Gelbooru, BooruScraper.Interfaces, BooruScraper.BaseTypes,
+  BooruScraper.Serialize.XSuperObject;
 
 type
 
@@ -126,8 +128,33 @@ type
   Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject); overload;
   Procedure SafeAssignFromJSON(AObject: TObject; AJsonString: string); overload;
 
+  function ToJson(AObject: TObject): ISuperObject;
+  function ToJsonStr(AObject: TObject): String;
+
 implementation
 uses unit1;
+
+function ToJson(AObject: TObject): ISuperObject;
+begin
+  if (AObject is TNBoxBooruItemBase) then begin
+
+    var LObj := (AObject as TNBoxBooruItemBase);
+    Result := SO;
+
+    with Result do begin
+      I['Origin'] := LObj.Origin;
+      O['ThumbItem'] := TJsonMom.ToJson(LObj.ThumbItem);
+      O['Full'] := TJsonMom.ToJson(LObj.Full);
+    end;
+
+  end else
+    Result := AObject.AsJSONObject;
+end;
+
+function ToJsonStr(AObject: TObject): String;
+begin
+  Result := ToJson(AObject).AsJSON(false);
+end;
 
 Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject);
 
@@ -143,6 +170,7 @@ Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject);
 
 begin
   if ( AObject is TNBoxR34AppItem ) then begin
+
     try
       // v1.0.1
       if ( JSON.O['item'].Ancestor['tags'].DataType = TDataType.dtArray ) then begin
@@ -154,9 +182,30 @@ begin
 
     except
       On E: Exception do begin
-        Log('SafeAssignFromJSON', E);
+        Log('SafeAssignFromJSON(TNBoxR34AppItem)', E);
       end;
     end;
+
+  end else if ( AObject is TNBoxBooruItemBase ) then begin
+
+    try
+      with (AObject as TNBoxBooruItemBase) do begin
+
+        if JSON.Null['ThumbItem'] = TMemberStatus.jAssigned then
+          ThumbItem := TjsonMom.FromJsonIBooruThumb(JSON.O['ThumbItem']);
+
+        if JSON.Null['Full'] = TMemberStatus.jAssigned then
+          Full := TjsonMom.FromJsonIBooruPost(JSON.O['Full']);
+
+      end;
+
+      Exit; { !! }
+    except
+       On E: Exception do begin
+        Log('SafeAssignFromJSON(TNBoxBooruItemBase)', E);
+      end;
+    end;
+
   end;
 
   AObject.AssignFromJSON(JSON);
@@ -288,7 +337,7 @@ begin
         params.Items[Pos + 1].AsInteger := AValues[I].Origin; // origin
         params.Items[Pos + 2].AsInteger := ord(AValues[I].FBookmarkType); // type
         params.Items[Pos + 3].AsString := AValues[I].About; // about
-        Params.Items[Pos + 4].AsString := AValues[I].Obj.AsJSON(false); // object
+        Params.Items[Pos + 4].AsString := ToJsonStr(AValues[I].Obj); // object
         inc(Iter);
       end;
 

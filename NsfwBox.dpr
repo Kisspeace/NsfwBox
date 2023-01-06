@@ -43,7 +43,9 @@ uses
   NsfwBox.Tests in 'source\NsfwBox.Tests.pas',
   NsfwBox.Logging in 'source\NsfwBox.Logging.pas',
   NsfwBox.Provider.Fapello in 'source\NsfwBox.Provider.Fapello.pas',
-  NsfwBox.Utils in 'source\NsfwBox.Utils.pas';
+  NsfwBox.Provider.Gelbooru in 'source\NsfwBox.Provider.Gelbooru.pas',
+  NsfwBox.Utils in 'source\NsfwBox.Utils.pas',
+  NsfwBox.Provider.Rule34xxx in 'source\NsfwBox.Provider.Rule34xxx.pas';
 
 {$R *.res}
 

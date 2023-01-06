@@ -78,6 +78,12 @@ type
     property TagsFetched: boolean read GetTagsFetched;
   end;
 
+  IFetchableAuthors = interface
+    ['{8CBBE794-58F3-4A64-8CE7-B85E86B69F77}']
+    { public }
+    function IsAuthorsFetched: boolean;
+  end;
+
   INBoxItem = interface(IHasOrigin)
     ['{8AB3F5DB-4DD1-4CD7-BD1C-EE6D35F98270}']
     //--Setters and Getters--//
@@ -115,7 +121,10 @@ type
       [DISABLE] property Origin: integer Read GetOrigin write SetOrigin;
       [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
       [DISABLE] property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
+      constructor Create; virtual;
   end;
+
+  TNBoxItemBaseClass = Class of TNBoxItemBase;
 
   INBoxSearchRequest = interface(IHasOrigin)
     ['{E4BFD2A5-6D0C-450C-A2F8-F43EE36EB998}']
@@ -149,6 +158,8 @@ type
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
       constructor Create; virtual;
   end;
+
+  TNBoxSearchRequestBaseClass = Class of TNBoxSearchRequestBase;
 
 implementation
 
@@ -198,6 +209,12 @@ end;
 function TNBoxItemBase.ContentUrlCount: integer;
 begin
   Result := Length(ContentUrls);
+end;
+
+constructor TNBoxItemBase.Create;
+begin
+  inherited;
+
 end;
 
 function TNBoxItemBase.GetOrigin: integer;

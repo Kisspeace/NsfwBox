@@ -261,7 +261,7 @@ type
     procedure OnIWUFilterResponse(Sender: TObject; const AUrl: string; const AResponse: IHttpResponse; var AAllow: boolean);
     procedure OnIWUException(Sender: TObject; AImage: IImageWithURL; const AUrl: string; const AException: Exception);
     procedure NetHttpOnValidateCertAutoAccept(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
-    procedure SetDefToWebClient(AClient: TNetHttpClient);
+    procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = -999);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -373,7 +373,6 @@ type
     function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean = True);
     procedure DeleteAllBrowsers(ADeleteFromSession: boolean = True);
-        property Action; { <- who write this ?? }
     { -> Properies ---------------- }
     property CurrentBrowser: TNBoxBrowser read FCurrentBrowser write SetCurrentBrowser;
     property CurrentItem: TNBoxCardBase read FCurrentItem write SetCurrentItem;
@@ -1748,9 +1747,15 @@ begin
     ACTION_OPEN_AUTHOR:
     begin
       if not AItem.HasPost then exit;
-      LTmpReq := CreateAuthorReq(LPost);
-      if Assigned(LTmpReq) then begin
-        AddBrowser(LTmpReq, Settings.AutoStartBrowse);
+      if supports(LPost, IHasAuthor) then begin
+        if Supports(LPost, IFetchableAuthors) then
+          LTryFetchIfEmpty;
+
+        LTmpReq := CreateAuthorReq(LPost);
+
+        if Assigned(LTmpReq) then begin
+          AddBrowser(LTmpReq, Settings.AutoStartBrowse);
+        end;
       end;
     end;
 
@@ -1787,7 +1792,8 @@ begin
       if not Aitem.HasPost then exit;
       if Supports(LPost, IHasTags) then begin
 
-        LTryFetchIfEmpty;
+        if Supports(LPost, IFetchableTags) then
+          LTryFetchIfEmpty;
 
         var tags_ar: TArray<string>;
         tags_ar := (LPost as IHasTags).Tags;
@@ -1821,7 +1827,12 @@ begin
 
       var LBrowserTab: TNBoxTab;
       var LBrowser: TNBoxBrowser;
-      LBrowserTab := self.AddBrowser(nil, false);
+
+      // FIXME
+      var LReq: TNBoxSearchReqRandomizer := TNBoxSearchReqRandomizer.Create;
+      LReq.Providers := [];
+
+      LBrowserTab := self.AddBrowser(LReq, false);
       LBrowser := TNBoxBrowser(LBrowserTab.Owner);
 
       for I := 0 to LPost.ContentUrlCount - 1 do begin
@@ -2638,6 +2649,16 @@ var
     result := Copy(AStr, Ms, Rp - Ms);
   end;
 
+  function GetBefore(const ASource: string; ASub: string): string;
+  var
+    LPos: integer;
+  begin
+    LPos := ASource.IndexOf(ASub);
+    if LPos <> -1 then begin
+      Result := ASource.Substring(0, LPos);
+    end;
+  end;
+
 begin
   FileExt := '';
   DefaultExt := '.mp4';
@@ -2650,6 +2671,9 @@ begin
 
   if FileExt.IsEmpty then
     FileExt := TPath.GetExtension(AFilename);
+
+  if FileExt.Contains('?') then
+    FileExt := GetBefore(FileExt, '?');
 
   if not Tpath.HasValidFileNameChars(FileExt, false) then
     FileExt := DefaultExt;
@@ -2761,7 +2785,7 @@ begin
   end;
 end;
 
-procedure TForm1.SetDefToWebClient(AClient: TNetHttpClient); //AOrigin: integer = 0
+procedure TForm1.SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer); //AOrigin: integer = 0
 begin
   with AClient do begin
     Useragent := Settings.DefaultUseragent;
@@ -2777,13 +2801,13 @@ begin
     if Settings.AutoAcceptAllCertificates then
       AClient.OnValidateServerCertificate := Form1.NetHttpOnValidateCertAutoAccept;
 
-//    case AOrigin of
-//      ORIGIN_9HENTAITO:
-//      begin
-//        CustomHeaders['Accept'] := 'application/json, text/plain, */*';
-//        CustomHeaders['Content-Type'] := 'application/json;charset=utf-8';
-//      end;
-//    end;
+    case AOrigin of
+      ORIGIN_9HENTAITO:
+      begin
+        CustomHeaders['Accept'] := 'application/json, text/plain, */*';
+        CustomHeaders['Content-Type'] := 'application/json;charset=utf-8';
+      end;
+    end;
   end;
 end;
 
@@ -2800,7 +2824,7 @@ begin
   tthread.Synchronize(Tthread.Current,
   procedure
   begin
-    SetDefToWebClient(AWebClient);
+    SetDefToWebClient(AWebClient, AOrigin);
 
   end);
 end;

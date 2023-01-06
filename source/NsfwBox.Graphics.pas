@@ -365,17 +365,28 @@ end;
 destructor TNBoxCardBase.Destroy;
 begin
   try
+
     try
       inherited;
     except
       On E: Exception do
         Log('TNBoxCardBase.Destroy inherited', E);
     end;
+
     if Assigned(FItem) then begin
-      if Self.HasBookmark then
-        FreeAndNil(TNBoxBookmark(FItem).Obj);
-      ( FItem as TObject ).Free;
+      if Self.HasBookmark then begin
+//        FreeAndNil(TNBoxBookmark(FItem).Obj);
+        var LBobj := TNBoxBookmark(FItem);
+        if Assigned(LBobj.Obj) then begin
+          LBobj.Obj.Free;
+          LBobj.Obj := nil;
+        end;
+      end;
+
+      FreeAndNil( ( FItem as TObject ));
+//     .Free;
     end;
+
   except
     On E: Exception do
       Log('TNBoxCardBase.Destroy', E);

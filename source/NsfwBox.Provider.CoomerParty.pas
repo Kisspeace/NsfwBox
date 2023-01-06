@@ -38,7 +38,7 @@ type
       [DISABLE] property UIdInt: int64 read GetUidInt write FId;
       [DISABLE] property Caption: string read GetCaption; // write SetCaption;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      constructor Create;
+      constructor Create; override;
   end;
 
   TNBoxSearchReqCoomerParty = class(TNBoxSearchRequestBase)

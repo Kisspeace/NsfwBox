@@ -25,7 +25,7 @@ type
     public
       procedure Assign(ASource: INBoxItem); override;
       function Clone: INBoxItem; override;
-      constructor Create;
+      constructor Create; override;
       { Properties ------- }
       property Origin;
       property Page: TMotherlessPostPage read FPage write FPage;

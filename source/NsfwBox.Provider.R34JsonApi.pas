@@ -31,7 +31,7 @@ type
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
       [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
-      constructor Create;
+      constructor Create; override;
   end;
 
   TNBoxSearchReqR34JsonApi = class(TNBoxSearchRequestBase)

@@ -32,7 +32,7 @@ type
       [DISABLE] property Caption: string read GetCaption;
       [ALIAS('ThumbnailUrl')] property _ThumbnailUrl: string read FThumb write FThumb; // serialize
       [ALIAS('ContentUrls')] property _ContentUrls: TArray<string> read FUrls write FUrls; // serialize
-      constructor Create;
+      constructor Create; override;
   end;
 
   TNBoxSearchReqPseudo = class(TNBoxSearchRequestBase)

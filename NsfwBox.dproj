@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Platform Condition="'$(Platform)'==''">Android64</Platform>
         <TargetedPlatforms>32787</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>NsfwBox.dpr</MainSource>
@@ -235,15 +235,14 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
-        <VerInfo_Build>7</VerInfo_Build>
+        <VerInfo_Build>8</VerInfo_Build>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
-        <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
         <AUP_READ_PHONE_STATE>false</AUP_READ_PHONE_STATE>
         <AUP_CAMERA>false</AUP_CAMERA>
         <AUP_CALL_PHONE>false</AUP_CALL_PHONE>
         <AUP_ACCESS_FINE_LOCATION>false</AUP_ACCESS_FINE_LOCATION>
         <AUP_ACCESS_COARSE_LOCATION>false</AUP_ACCESS_COARSE_LOCATION>
-        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=7;versionName=2.0.1;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=8;versionName=2.2.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <Android_LauncherIcon36>assets\android-icons\nsfwbox36.png</Android_LauncherIcon36>
         <Android_LauncherIcon48>assets\android-icons\nsfwbox48.png</Android_LauncherIcon48>
         <Android_LauncherIcon72>assets\android-icons\nsfwbox72.png</Android_LauncherIcon72>
@@ -252,7 +251,7 @@
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
-        <VerInfo_Build>7</VerInfo_Build>
+        <VerInfo_Build>8</VerInfo_Build>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <AUP_READ_PHONE_STATE>false</AUP_READ_PHONE_STATE>
         <AUP_CALL_PHONE>false</AUP_CALL_PHONE>
@@ -266,19 +265,19 @@
         <Android_LauncherIcon144>assets\android-icons\nsfwbox144.png</Android_LauncherIcon144>
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
-        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=7;versionName=2.1.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=8;versionName=2.2.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=Kisspeace.$(MSBuildProjectName);FileVersion=2.1.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.1.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=Kisspeace.$(MSBuildProjectName);FileVersion=2.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.2.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-        <VerInfo_MinorVer>1</VerInfo_MinorVer>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -288,7 +287,8 @@
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=2.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.2.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -333,7 +333,9 @@
         <DCCReference Include="source\NsfwBox.Tests.pas"/>
         <DCCReference Include="source\NsfwBox.Logging.pas"/>
         <DCCReference Include="source\NsfwBox.Provider.Fapello.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.Gelbooru.pas"/>
         <DCCReference Include="source\NsfwBox.Utils.pas"/>
+        <DCCReference Include="source\NsfwBox.Provider.Rule34xxx.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -406,7 +408,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Release" Class="File">
+                <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Debug" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>downloads.png</RemoteName>
@@ -446,22 +448,22 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Android\Release\libNsfwBox.so" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Android">
-                        <RemoteName>libNsfwBox.so</RemoteName>
+                <DeployFile LocalName="assets\themes\default\transgender.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>transgender.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Release\NsfwBox.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>NsfwBox.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Win32\Debug\NsfwBox.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>NsfwBox.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="assets\themes\default\transgender.png" Configuration="Release" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>transgender.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -504,9 +506,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Release\NsfwBox.exe" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>NsfwBox.exe</RemoteName>
+                <DeployFile LocalName="Android\Release\libNsfwBox.so" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteName>libNsfwBox.so</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -630,6 +632,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="assets\themes\default\copy.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>copy.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="assets\themes\default\search.png" Configuration="Release" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
@@ -644,13 +653,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\copy.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>copy.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="assets\themes\default\content-origin--1.png" Configuration="Release" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
@@ -662,6 +664,19 @@
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>content-origin--1.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\themes\default\content-origin-8.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>content-origin-8.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Release\NsfwBox.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win64">
+                        <RemoteName>NsfwBox.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -828,6 +843,13 @@
                 <DeployFile LocalName="assets\android-icons\nsfwbox72.png" Configuration="Release" Class="Android_LauncherIcon72">
                     <Platform Name="Android64">
                         <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\themes\default\content-origin-9.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>content-origin-9.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1364,12 +1386,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\android-icons\nsfwbox48.png" Configuration="Release" Class="Android_LauncherIcon48">
-                    <Platform Name="Android">
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="assets\themes\default\download.png" Configuration="Release" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
@@ -1384,9 +1400,16 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\android-icons\nsfwbox96.png" Configuration="Release" Class="Android_LauncherIcon96">
+                <DeployFile LocalName="assets\android-icons\nsfwbox48.png" Configuration="Release" Class="Android_LauncherIcon48">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>downloads.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1403,10 +1426,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>downloads.png</RemoteName>
+                <DeployFile LocalName="assets\android-icons\nsfwbox96.png" Configuration="Release" Class="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteName>ic_launcher.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -2211,8 +2233,8 @@
                 </DeployClass>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>

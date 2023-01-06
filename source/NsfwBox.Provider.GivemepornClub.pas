@@ -44,7 +44,7 @@ type
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
-      constructor Create;
+      constructor Create; override;
   end;
 
   TNBoxSearchReqGmpClub = class(TNBoxSearchRequestBase)

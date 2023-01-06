@@ -41,6 +41,8 @@
 * <img src="default/content-origin-5.png" width="24" align="left"> [kemono.party](https://kemono.party) -> [Item page](https://kemono.party/static/favicon.ico)
 * <img src="default/content-origin-6.png" width="24" align="left"> [motherless.com](https://motherless.com) favicon -> [Item page](https://motherless.com)
 * <img src="default/content-origin-7.png" width="24" align="left"> [fapello.com](https://fapello.com) favicon -> [Item page](https://fapello.com)
+* <img src="default/content-origin-8.png" width="24" align="left"> [rule34.xxx](https://rule34.xxx) -> [Item page](http://rule34.xxx/favicon.ico)
+* <img src="default/content-origin-9.png" width="24" align="left"> [gelbooru.com](https://gelbooru.com) -> [Item page](https://gelbooru.com/layout/gelbooru-logo.svg)
 <!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON_URL) -->
 
 

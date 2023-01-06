@@ -31,7 +31,8 @@ type
       [DISABLE] property UIdInt: int64 read GetUidInt;
       [DISABLE] property Caption: string read GetCaption;
       [DISABLE] property Tags: TArray<string> read GetTags;
-      constructor Create(AWithItem: boolean = true);
+      constructor Create(AWithItem: boolean); overload;
+      constructor Create; overload; override;
       destructor Destroy; override;
   end;
 
@@ -81,6 +82,11 @@ function TNBox9HentaitoItem.Clone: INBoxItem;
 begin
   Result := TNBox9HentaitoItem.Create;
   Result.Assign(Self);
+end;
+
+constructor TNBox9HentaitoItem.Create;
+begin
+  Create(True);
 end;
 
 constructor TNBox9HentaitoItem.Create(AWithItem: boolean);

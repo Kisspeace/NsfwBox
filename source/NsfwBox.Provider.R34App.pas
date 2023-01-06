@@ -37,7 +37,7 @@ type
       [DISABLE] property AuthorName: string read GetAuthorName;
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      constructor Create;
+      constructor Create; override;
   end;
 
   TNBoxSearchReqR34App = class(TNBoxSearchRequestBase)
