@@ -177,6 +177,7 @@ type
 
     { Bookmarks menu }
     BookmarksControls: TControlObjList;
+    HistoryDbControls: TControlObjList;
 
     { Menu log }
     MemoLog: TNBoxMemo;
@@ -792,7 +793,12 @@ begin
         for I := 0 to Length(Groups) - 1 do begin
           Groups[I].DeleteGroup;
         end;
-        BookmarksControls.Clear;
+
+        if CurrentBookmarksDb = BookmarksDb then
+          BookmarksControls.Clear
+        else if CurrentBookmarksDb = HistoryDb then
+          HistoryDbControls.Clear;
+
       end;
       GotoBookmarksMenu(CurrentBookmarksDb);
       AfterUserEvent := nil;
@@ -811,10 +817,13 @@ begin
     procedure
     begin
       if UserSayYes then begin
-        if (CurrentBookmarksDb = HistoryDb) then
-          CurrentBookmarkGroup.ClearGroup
-        else
+
+        if (CurrentBookmarksDb = HistoryDb) then begin
+          CurrentBookmarkGroup.ClearGroup;
+        end else if (CurrentBookmarksDb = BookmarksDb) then begin
           CurrentBookmarkGroup.DeleteGroup;
+          BookmarksControls.Clear;
+        end;
 
         CurrentBookmarkControl := nil;
       end;
@@ -2434,6 +2443,7 @@ begin
   MenuItemTags.OnSelected := MenuItemTagsOnSelected;
 
   BookmarksControls := TControlObjList.Create;
+  HistoryDbControls := TControlObjList.Create;
   ChangeInterface(BrowserLayout);
 
   FFormCreated := true;
@@ -3289,8 +3299,10 @@ end;
 procedure TForm1.ReloadBookmarks(ADataBase: TNBoxBookmarksDb; ALayout: TControl);
 var
   I: Integer;
-  Groups: TBookmarkGroupRecAr;
-  Control: TNBoxSettingsCheck;
+  LGroups: TBookmarkGroupRecAr;
+  LGroup: TBookmarkGroupRec;
+  LControl: TNBoxSettingsCheck;
+  LControls: TControlObjList;
 
   function _getName(AGroup: TBookmarkGroupRec): string;
   begin
@@ -3303,42 +3315,74 @@ var
     Result := '(' + AGroup.ItemsCount.ToString + ') ' + Result;
   end;
 
+  function BookmarkControlById(AId: nativeint): TNBoxSettingsCheck;
+  var
+    I: integer;
+  begin
+    for I := 0 to LControls.Count - 1 do begin
+      if (LControls[I].Tag = AId) then begin
+        Result := LControls[I] as TNBoxSettingsCheck;
+        Exit;
+      end;
+    end;
+    Result := nil;
+  end;
+
 begin
   try
-    Groups := ADataBase.GetBookmarksGroups;
-    BookmarksControls.Clear;
+    if ADataBase = BookmarksDb then
+      LControls := BookmarksControls
+    else if ADataBase = HistoryDb then
+      LControls := HistoryDbControls;
 
-    for I := Low(Groups) to High(Groups) do begin
-      Control := Self.CreateDefSettingsCheck(ALayout);
-      with Control do begin
-        Parent := ALayout;
-        Check.ImageControl.Visible := true;
-        Check.ImageControl.Margins.Rect := TRectF.Create(0, 5, 0, 5);
+    LGroups := ADataBase.GetBookmarksGroups;
 
-        if (ADataBase = BookmarksDb) then
-          Check.Image.ImageURL := AppStyle.GetImagePath(ICON_BOOKMARKS)
-        else if (ADataBase = HistoryDb) then
-          Check.Image.ImageURL := AppStyle.GetImagePath(ICON_HISTORY);
+    for I := Low(LGroups) to High(LGroups) do begin
+      LGroup := LGroups[I];
+      LControl := BookmarkControlById(LGroup.Id);
 
-        Align := TAlignLayout.Top;
-        Position.Y := Single.MaxValue;
-        Check.Text.Text := _getName(Groups[I]);
-        Text.Text := Groups[I].About;
-        Tag := Groups[I].Id;
-        Check.HitTest := false;
-        Text.HitTest := false;
-        Text.VertTextAlign := TTextAlign.Leading;
-        Check.Check.Visible := false;
-        Check.Height := Control.Check.Height * 0.8;
-        Height := Control.Height * 1.5;
-        Margins.Rect := TRectF.Create(5, 5, 5, 0);
-        OnTap := BookmarksControlOnTap;
-        {$IFDEF MSWINDOWS}
-        Control.OnClick := ClickTapRef;
-        {$ENDIF}
+      if assigned(LControl) then begin
+      { Changing already exists control }
+        with LControl do begin
+          Check.Text.Text := _getName(LGroup);
+          Text.Text := LGroup.About;
+        end;
+
+      end else begin
+      { Making new control }
+        LControl := Self.CreateDefSettingsCheck(ALayout);
+        with LControl do begin
+          Parent := ALayout;
+          Check.ImageControl.Visible := true;
+          Check.ImageControl.Margins.Rect := TRectF.Create(0, 5, 0, 5);
+
+          if (ADataBase = BookmarksDb) then
+            Check.Image.ImageURL := AppStyle.GetImagePath(ICON_BOOKMARKS)
+          else if (ADataBase = HistoryDb) then
+            Check.Image.ImageURL := AppStyle.GetImagePath(ICON_HISTORY);
+
+          Align := TAlignLayout.Top;
+          Position.Y := Single.MaxValue;
+          Check.Text.Text := _getName(LGroup);
+          Text.Text := LGroup.About;
+          Tag := LGroup.Id;
+          Check.HitTest := false;
+          Text.HitTest := false;
+          Text.VertTextAlign := TTextAlign.Leading;
+          Check.Check.Visible := false;
+          Check.Height := LControl.Check.Height * 0.8;
+          Height := LControl.Height * 1.5;
+          Margins.Rect := TRectF.Create(5, 5, 5, 0);
+          OnTap := BookmarksControlOnTap;
+          {$IFDEF MSWINDOWS}
+          LControl.OnClick := ClickTapRef;
+          {$ENDIF}
+
+        end;
+
+        LControls.Add(LControl);
       end;
 
-      BookmarksControls.Add(Control);
     end;
   except
     On E: Exception do
