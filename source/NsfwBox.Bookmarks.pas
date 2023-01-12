@@ -5,7 +5,7 @@ unit NsfwBox.Bookmarks;
 interface
 uses
   SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
-  DB, NsfwBox.Interfaces, NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx,
+  NsfwBox.Interfaces, NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx,
   NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi, NsfwBox.Consts,
   NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging,
   NsfwBox.Provider.Gelbooru, BooruScraper.Interfaces, BooruScraper.BaseTypes,

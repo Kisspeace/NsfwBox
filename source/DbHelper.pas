@@ -4,7 +4,7 @@ unit DbHelper;
 
 interface
 uses
-  ZConnection, DB, classes, system.sysutils,
+  ZConnection, classes, system.sysutils,
   ZDataset, System.IOUtils, NsfwBox.Filesystem;
 
 type
