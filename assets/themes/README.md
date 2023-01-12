@@ -43,6 +43,7 @@
 * <img src="default/content-origin-7.png" width="24" align="left"> [fapello.com](https://fapello.com) favicon -> [Item page](https://fapello.com)
 * <img src="default/content-origin-8.png" width="24" align="left"> [rule34.xxx](https://rule34.xxx) -> [Item page](http://rule34.xxx/favicon.ico)
 * <img src="default/content-origin-9.png" width="24" align="left"> [gelbooru.com](https://gelbooru.com) -> [Item page](https://gelbooru.com/layout/gelbooru-logo.svg)
+* <img src="default/content-origin-10.png" width="24" align="left"> [realbooru.com](https://realbooru.com) favicon (upscaled) -> [Item page](https://realbooru.com/favicon.ico)
 <!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON_URL) -->
 
 

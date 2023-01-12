@@ -21,6 +21,7 @@ const
   PVR_FAPELLO           = 7; { PVR = provider }
   PVR_RULE34XXX         = 8;
   PVR_GELBOORU          = 9;
+  PVR_REALBOORU         = 10;
 
 type
 
@@ -63,6 +64,7 @@ type
       FFapello: TNBoxProviderInfo;
       FRule34xxx: TNBoxProviderInfo;
       FGelbooru: TNBoxProviderInfo;
+      FRealbooru: TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
@@ -81,6 +83,7 @@ type
       property Fapello: TNBoxProviderInfo read FFapello;
       property Rule34xxx: TNBoxProviderInfo read FRule34xxx;
       property Gelbooru: TNBoxProviderInfo read FGelbooru;
+      property Realbooru: TNBoxProviderInfo read FRealbooru;
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
       property Bookmarks: TNBoxProviderInfo read FBookmarks;
@@ -100,7 +103,7 @@ uses
   NsfwBox.Provider.NineHentaiToApi, NsfwBox.Provider.CoomerParty,
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
   NsfwBox.Provider.Fapello, NsfwBox.Provider.Gelbooru,
-  NsfwBox.Provider.Rule34xxx;
+  NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru;
 
 { TNBoxProviders }
 
@@ -148,6 +151,7 @@ begin
   FFapello     := Add(PVR_FAPELLO, 'Fapello.com', 1, TNBoxSearchReqFapello, TNBoxFapelloItem);
   FRule34xxx   := Add(PVR_RULE34XXX, 'Rule34.xxx', 0, TNBoxSearchReqRule34xxx, TNBoxRule34xxxItem);
   FGelbooru    := Add(PVR_GELBOORU, 'Gelbooru.com', 0, TNBoxSearchReqGelbooru, TNBoxGelbooruItem);
+  FRealbooru   := Add(PVR_REALBOORU, 'Realbooru.com', 0, TNBoxSearchReqRealbooru, TNBoxRealbooruItem);
 end;
 
 destructor TNBoxProviders.Destroy;

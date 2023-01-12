@@ -21,8 +21,9 @@ uses
   NsfwBox.Provider.Fapello, Fapello.Types, Fapello.Scraper,
   BooruScraper.Interfaces, BooruScraper.Client.CompatibleGelbooru,
   BooruScraper.Parser.rule34xxx, BooruScraper.Parser.gelbooru,
+  BooruScraper.Parser.Realbooru,
   BooruScraper.ClientBase, BooruScraper, NsfwBox.Provider.Gelbooru,
-  NsfwBox.Provider.Rule34xxx;
+  NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -50,6 +51,7 @@ type
       function GetContentBooruScraper(AClientClass: TBooruClientBaseClass; AParser: TBooruParserClass; AItemClass: TNBoxBooruItemBaseClass; AHost: string; AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentGelbooru(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRule34xxx(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
+      function GetContentRealbooru(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
       function GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
@@ -183,7 +185,9 @@ begin
     if (APost is TNBoxGelbooruItem) then
       LClient := BooruScraper.NewClientGelbooru
     else if (APost is TNBoxRule34xxxItem) then
-      LClient := BooruScraper.NewClientRule34xxx;
+      LClient := BooruScraper.NewClientRule34xxx
+    else if (APost is TNBoxRealbooruItem) then
+      LClient := BooruScraper.NewClientRealbooru;
 
     if Assigned(LClient) then begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.origin);
@@ -331,6 +335,13 @@ begin
     begin
       with ( ARequest as TNBoxSearchReqRule34xxx ) do begin
         Result := Self.GetContentRule34xxx(AList, Request, PageId);
+      end;
+    end;
+
+    PVR_REALBOORU:
+    begin
+      with ( ARequest as TNBoxSearchReqRealbooru ) do begin
+        Result := Self.GetContentRealbooru(AList, Request, PageId);
       end;
     end;
 
@@ -707,6 +718,15 @@ begin
     (LRequest as TObject).Free;
   end;
 end;
+function TNBoxScraper.GetContentRealbooru(AList: INBoxHasOriginList;
+  ARequest: string; APageNum: integer): boolean;
+begin
+  Result := Self.GetContentBooruScraper(
+    TGelbooruLikeClient, TRealbooruParser,
+    TNBoxRealbooruItem, REALBOORU_URL,
+    AList, ARequest, APageNum);
+end;
+
 function TNBoxScraper.GetContentRule34xxx(AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
 begin

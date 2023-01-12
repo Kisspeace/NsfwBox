@@ -74,6 +74,7 @@ type
       BtnPvrFapello: TRectButton;
       BtnPvrGelbooru: TRectButton;
       BtnPvrRule34xxx: TRectButton;
+      BtnPvrRealbooru: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -231,8 +232,10 @@ begin
   inherited;
   FSelected := ORIGIN_NSFWXXX;
   BtnOriginNsfwxxx    := NewBtn(ORIGIN_NSFWXXX);
+  BtnPvrGelbooru      := Newbtn(PROVIDERS.Gelbooru.Id);
+  BtnPvrRule34xxx     := NewBtn(PROVIDERS.Rule34xxx.Id);
+  BtnPvrRealbooru     := NewBtn(PROVIDERS.Realbooru.Id);
   BtnOriginR34App     := NewBtn(ORIGIN_R34APP);
-  BtnOriginR34JsonApi := NewBtn(ORIGIN_R34JSONAPI);
   BtnOriginGivemepornClub := NewBtn(ORIGIN_GIVEMEPORNCLUB);
   BtnOriginBookmarks  := NewBtn(ORIGIN_BOOKMARKS);
   BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
@@ -240,8 +243,7 @@ begin
   BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
   BtnOriginMotherless := NewBtn(ORIGIN_MOTHERLESS);
   BtnPvrFapello       := NewBtn(PROVIDERS.Fapello.Id);
-  BtnPvrGelbooru      := Newbtn(PROVIDERS.Gelbooru.Id);
-  BtnPvrRule34xxx     := NewBtn(PROVIDERS.Rule34xxx.Id);
+  BtnOriginR34JsonApi := NewBtn(ORIGIN_R34JSONAPI);
   BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
 end;
 

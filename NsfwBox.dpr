@@ -45,7 +45,8 @@ uses
   NsfwBox.Provider.Fapello in 'source\NsfwBox.Provider.Fapello.pas',
   NsfwBox.Provider.Gelbooru in 'source\NsfwBox.Provider.Gelbooru.pas',
   NsfwBox.Utils in 'source\NsfwBox.Utils.pas',
-  NsfwBox.Provider.Rule34xxx in 'source\NsfwBox.Provider.Rule34xxx.pas';
+  NsfwBox.Provider.Rule34xxx in 'source\NsfwBox.Provider.Rule34xxx.pas',
+  NsfwBox.Provider.Realbooru in 'source\NsfwBox.Provider.Realbooru.pas';
 
 {$R *.res}
 

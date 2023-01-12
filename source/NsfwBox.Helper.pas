@@ -105,15 +105,9 @@ begin
     LReq.Request := LPost.AuthorName;
     Result := LReq;
 
-  end else if ( APost is TNBoxGelbooruItem ) then begin
+  end else if ( APost is TNBoxBooruItemBase ) then begin
 
-    var LReq := TNBoxSearchReqGelbooru.Create;
-    LReq.Request := LAuthorStr;
-    Result := LReq;
-
-  end else if ( APost is TNBoxRule34xxxItem ) then begin
-
-    var LReq := TNBoxSearchReqRule34xxx.Create;
+    var LReq := CreateReqByOrigin(APost.Origin);
     LReq.Request := LAuthorStr;
     Result := LReq;
 
