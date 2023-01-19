@@ -62,7 +62,7 @@ type
   TNBoxOriginSetMenu = class(TNBoxSelectMenu)
     public
       BtnOriginNsfwXxx: TRectButton;
-      BtnOriginR34App: TRectButton;
+//      BtnOriginR34App: TRectButton;
       BtnOriginR34JsonApi: TRectButton;
       BtnOriginGivemepornClub: TRectButton;
       BtnOrigin9Hentaito: TRectButton;
@@ -237,7 +237,7 @@ begin
   BtnPvrRule34xxx     := NewBtn(PROVIDERS.Rule34xxx.Id);
   BtnPvrRealbooru     := NewBtn(PROVIDERS.Realbooru.Id);
   BtnPvrRule34us      := NewBtn(PROVIDERS.Rule34us.Id);
-  BtnOriginR34App     := NewBtn(ORIGIN_R34APP);
+//  BtnOriginR34App     := NewBtn(ORIGIN_R34APP);
   BtnOriginGivemepornClub := NewBtn(ORIGIN_GIVEMEPORNCLUB);
   BtnOriginBookmarks  := NewBtn(ORIGIN_BOOKMARKS);
   BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
@@ -251,11 +251,6 @@ end;
 
 destructor TNBoxOriginSetMenu.Destroy;
 begin
-  BtnOriginNsfwxxx.Free;
-  BtnOriginR34App.Free;
-  BtnOriginR34JsonApi.Free;
-  BtnOriginGivemepornClub.Free;
-  BtnOriginPseudo.Free;
   inherited;
 end;
 
@@ -709,7 +704,7 @@ begin
 
   RandomizerMenu := NewProviderMenu(PROVIDERS.Randomizer.id);
   BtnRandNsfwXxx := NewBtnCheck(OriginToStr(ORIGIN_NSFWXXX), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_NSFWXXX));
-  BtnRandR34App := NewBtnCheck(OriginToStr(ORIGIN_R34APP), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_R34APP));
+//  BtnRandR34App := NewBtnCheck(OriginToStr(ORIGIN_R34APP), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_R34APP));
   BtnRandGmpClub := NewBtnCheck(OriginToStr(ORIGIN_GIVEMEPORNCLUB), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_GIVEMEPORNCLUB));
   BtnRandCoomerParty := NewBtnCheck(OriginToStr(ORIGIN_COOMERPARTY), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_COOMERPARTY));
   BtnRandMotherless := NewBtnCheck(OriginToStr(ORIGIN_MOTHERLESS), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_MOTHERLESS));
@@ -1058,7 +1053,10 @@ begin
   end else if ( Value is TNBoxSearchReqR34App ) then begin
 
     With ( Value as TNBoxSearchReqR34App ) do begin
-      Self.R34AppBooruChangeMenu.Selected := Ord(Booru);
+      Case Booru of
+        TR34AppFreeBooru.rule34xxx: OriginSetMenu.Selected := PROVIDERS.Rule34xxx.Id;
+        TR34AppFreeBooru.gelboorucom: OriginSetMenu.Selected := PROVIDERS.Gelbooru.Id;
+      end;
     end;
 
   end else if ( Value is TNBoxSearchReqCoomerParty ) then begin
@@ -1102,7 +1100,6 @@ begin
       FapelloSearchTypeMenu.Selected := Ord(RequestKind);
 
   end;
-
 end;
 
 procedure TNBoxSearchMenu.ShowMainMenu;

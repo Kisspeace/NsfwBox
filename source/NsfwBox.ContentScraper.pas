@@ -5,7 +5,7 @@ unit NsfwBox.ContentScraper;
 interface
 uses
   System.SysUtils, System.Generics.Collections,
-  NetHttp.R34AppApi, R34App.Types,
+  R34App.Types,
   Nethttp.R34JsonApi, R34JsonAPi.Types, NetHttp.Scraper.NsfwXxx,
   NsfwXxx.Types, givemeporn.club.types, givemeporn.club.scraper,
   NineHentaito.APITypes, NineHentaito.API, Net.HttpClientComponent,
@@ -44,7 +44,7 @@ type
       function GetContentPseudo(AList: INBoxHasOriginList; ARequest: string ): boolean;
       function GetContentNsfwXxx(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer; Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris; ASite: TNsfwXxxSite): boolean;
       function GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string = ''; APageId: integer = 1; ALimit: integer = 20): boolean;
-      function GetContentR34App(AList: INBoxHasOriginList; ATags: string; APageId: integer; ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
+//      function GetContentR34App(AList: INBoxHasOriginList; ATags: string; APageId: integer; ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
       function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string; ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
       function GetContent9Hentaito(AList: INBoxHasOriginList; const ASearch: T9HentaiBookSearchRec): boolean;
       function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string; ARequest, AUserId, AService: string; APageNum: integer): boolean;
@@ -231,18 +231,6 @@ begin
             Types,
             Oris,
             Site );
-      end;
-    end;
-
-    ORIGIN_R34APP:
-    begin
-      with ( ARequest As TNBoxSearchReqR34App ) do begin
-        Result := self.GetContentR34App
-        ( AList,
-          Request,
-          PageId,
-          20,
-          Booru );
       end;
     end;
 
@@ -790,34 +778,6 @@ end;
 function TNBoxScraper.TryFetchTags(var APost: INBoxItem): boolean;
 begin
   Self.TryFetchContentUrls(APost);
-end;
-
-function TNBoxScraper.GetContentR34App(AList: INBoxHasOriginList; ATags: string;
-  APageId, ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
-var
-  Client: TR34AppClient;
-  i: integer;
-  content: TR34AppItems;
-begin
-  try
-    Result := false;
-    Content := nil;
-    Client := TR34AppClient.Create;
-    SyncWebClientSet(Client.WebClient, ORIGIN_R34APP);
-    Content := Client.GetPosts(ATags, APageId, ALimit, ABooru);
-    Result := ( length(Content) > 0 )
-    ;
-    for I := 0 to Length(Content) - 1 do begin
-      var item: TNBoxR34AppItem;
-
-      item := TNBoxR34AppItem.Create;
-      item.Item := Content[i];
-      Alist.Add(item);
-    end;
-
-  finally
-    Client.Free;
-  end;
 end;
 
 function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
