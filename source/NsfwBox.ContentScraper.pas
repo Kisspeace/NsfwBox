@@ -21,9 +21,11 @@ uses
   NsfwBox.Provider.Fapello, Fapello.Types, Fapello.Scraper,
   BooruScraper.Interfaces, BooruScraper.Client.CompatibleGelbooru,
   BooruScraper.Parser.rule34xxx, BooruScraper.Parser.gelbooru,
-  BooruScraper.Parser.Realbooru,
+  BooruScraper.Parser.Realbooru, BooruScraper.Parser.rule34us,
+  BooruScraper.Client.Rule34us,
   BooruScraper.ClientBase, BooruScraper, NsfwBox.Provider.Gelbooru,
-  NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru;
+  NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru,
+  NsfwBox.Provider.Rule34us;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -52,6 +54,7 @@ type
       function GetContentGelbooru(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRule34xxx(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRealbooru(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
+      function GetContentRule34us(Alist: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
       function GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
@@ -64,7 +67,7 @@ type
       function TryFetchContentUrls(var APost: INBoxItem): boolean;
       function TryFetchTags(var APost: INBoxItem): boolean;
       function TryFetchAuthors(var APost: INBoxItem): boolean;
-      function GetContent(ARequest: INBoxSearchRequest; AList: INBoxHasOriginList): boolean;
+      function GetContent(ARequest: INBoxSearchRequest; AList: INBoxHasOriginList): boolean; { DONT FORGET ! }
       property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
       constructor Create;
   end;
@@ -187,7 +190,9 @@ begin
     else if (APost is TNBoxRule34xxxItem) then
       LClient := BooruScraper.NewClientRule34xxx
     else if (APost is TNBoxRealbooruItem) then
-      LClient := BooruScraper.NewClientRealbooru;
+      LClient := BooruScraper.NewClientRealbooru
+    else if (APost is TNBoxRule34UsItem) then
+      LClient := BooruScraper.NewClientRule34us;
 
     if Assigned(LClient) then begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.origin);
@@ -342,6 +347,13 @@ begin
     begin
       with ( ARequest as TNBoxSearchReqRealbooru ) do begin
         Result := Self.GetContentRealbooru(AList, Request, PageId);
+      end;
+    end;
+
+    PVR_RULE34US:
+    begin
+      with ( ARequest as TNBoxSearchReqRule34us ) do begin
+        Result := Self.GetContentRule34us(AList, Request, PageId);
       end;
     end;
 
@@ -724,6 +736,15 @@ begin
   Result := Self.GetContentBooruScraper(
     TGelbooruLikeClient, TRealbooruParser,
     TNBoxRealbooruItem, REALBOORU_URL,
+    AList, ARequest, APageNum);
+end;
+
+function TNBoxScraper.GetContentRule34us(Alist: INBoxHasOriginList;
+  ARequest: string; APageNum: integer): boolean;
+begin
+  Result := Self.GetContentBooruScraper(
+    TRule34usClient, TRule34usParser,
+    TNBoxRule34usItem, RULE34US_URL,
     AList, ARequest, APageNum);
 end;
 

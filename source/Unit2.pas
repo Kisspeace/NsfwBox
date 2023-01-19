@@ -75,6 +75,7 @@ type
       BtnPvrGelbooru: TRectButton;
       BtnPvrRule34xxx: TRectButton;
       BtnPvrRealbooru: TRectButton;
+      BtnPvrRule34us: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -235,6 +236,7 @@ begin
   BtnPvrGelbooru      := Newbtn(PROVIDERS.Gelbooru.Id);
   BtnPvrRule34xxx     := NewBtn(PROVIDERS.Rule34xxx.Id);
   BtnPvrRealbooru     := NewBtn(PROVIDERS.Realbooru.Id);
+  BtnPvrRule34us      := NewBtn(PROVIDERS.Rule34us.Id);
   BtnOriginR34App     := NewBtn(ORIGIN_R34APP);
   BtnOriginGivemepornClub := NewBtn(ORIGIN_GIVEMEPORNCLUB);
   BtnOriginBookmarks  := NewBtn(ORIGIN_BOOKMARKS);
