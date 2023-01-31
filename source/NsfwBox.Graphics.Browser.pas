@@ -8,13 +8,13 @@ uses
   System.Variants, FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics,
   FMX.ColumnsView, System.Threading, System.Generics.Collections, Net.HttpClient,
   Net.HttpClientComponent, NsfwBox.FileSystem,
-  // Alcinoe
-  AlFmxGraphics, AlFmxObjects,
-  // NsfwBox
+  { Alcinoe }
+  Alcinoe.FMX.Objects, Alcinoe.FMX.Graphics,
+  { NsfwBox }
   NsfwBox.Interfaces, NsfwBox.ContentScraper, NsfwBox.Provider.Pseudo,
   NsfwBox.Provider.NsfwXxx, NsfwBox.Graphics, NsfwBox.Consts,
   NsfwBox.Bookmarks, NsfwBox.Provider.R34App, NsfwBox.Logging,
-  // you-did-well!
+  { you-did-well! }
   YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.AlRectangle,
   YDW.FMX.ImageWithURLManager, YDW.Threading;
 

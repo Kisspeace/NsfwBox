@@ -10,7 +10,7 @@ uses
   NetHttpClient.Downloader, FMX.EditBox, FMX.NumberBox, NetHttp.Scraper.NsfwXxx,
   system.IOUtils, System.Net.URLClient, System.Net.HttpClient,
   System.Net.HttpClientComponent, system.Generics.Collections, FMX.Memo.Types,
-  FMX.ScrollBox, FMX.Memo, ALFmxObjects, ALFmxGraphics, NsfwXxx.Types,
+  FMX.ScrollBox, FMX.Memo, Alcinoe.FMX.Objects, Alcinoe.FMX.Graphics, NsfwXxx.Types,
   NsfwBox.Interfaces, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34JsonApi,
   NsfwBox.ContentScraper, NsfwBox.Graphics.Rectangle, Fmx.ActnList,
   NsfwBox.Bookmarks, NsfwBox.Helper, NsfwBox.Provider.Bookmarks, NsfwBox.Logging,

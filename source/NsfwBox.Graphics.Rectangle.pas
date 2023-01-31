@@ -7,7 +7,8 @@ uses
   SysUtils, System.Types, System.UITypes, Classes,
   FMX.Types, FMX.Controls, FMX.Graphics, FMX.Objects,
   FMX.TextLayout, FMX.MultiResBitmap,
-  FMX.ActnList, AlFmxObjects, AlFmxGraphics, system.generics.collections,
+  FMX.ActnList, Alcinoe.FMX.Objects, Alcinoe.FMX.Graphics,
+  system.generics.collections,
   YDW.FMX.ImageWithURL, YDW.FMX.ImageWithURL.AlRectangle, 
   YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.Rectangle;
 

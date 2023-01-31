@@ -9,9 +9,9 @@ uses
   FMX.ColumnsView, System.Threading, System.Generics.Collections, Net.HttpClient,
   Net.HttpClientComponent, Fmx.Layouts, NsfwXxx.Types, Fmx.ActnList, FMX.Memo,
   NetHttp.R34AppApi,
-  // Alcinoe
-  AlFmxGraphics, AlFmxObjects,
-  // NsfwBox
+  { Alcinoe }
+  Alcinoe.FMX.Objects, Alcinoe.FMX.Graphics,
+  { NsfwBox }
   NsfwBox.Interfaces, NsfwBox.ContentScraper, NsfwBox.Provider.Pseudo,
   NsfwBox.Provider.NsfwXxx, NsfwBox.Graphics, NsfwBox.Consts,
   NsfwBox.Graphics.Rectangle, NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi,

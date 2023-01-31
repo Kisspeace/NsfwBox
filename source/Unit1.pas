@@ -22,7 +22,7 @@ uses
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections,
   { Alcinoe ---------- }
-  AlFmxGraphics, AlFmxObjects,
+  Alcinoe.FMX.Graphics, Alcinoe.FMX.Objects,
   { NsfwBox ---------- }
   NsfwBox.Interfaces, NsfwBox.Settings, NsfwBox.Graphics, NsfwBox.ContentScraper,
   NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34App,
