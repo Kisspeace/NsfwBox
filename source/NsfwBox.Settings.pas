@@ -34,7 +34,6 @@ type
 
   TNsfwBoxSettings = class
     SemVer: TSemVer;
-//    Version: integer; { deprecated }
     DefaultUseragent: string;
     AllowCookies: boolean;
     DefDownloadPath: string;
@@ -42,7 +41,6 @@ type
     ThreadsCount: integer;
     ContentLayoutsCount: integer;
     ItemIndent: single;
-    //Language: string;
     Fullscreen: boolean;
     AutoSaveSession: boolean;
     SaveSearchHistory: boolean;
@@ -54,10 +52,7 @@ type
     ImageCacheLoad: boolean;
     AutoAcceptAllCertificates: boolean;
     YDWSyncLoadFromFile: boolean;
-    //HighlightsDownloaded: boolean;
     ShowCaptions: boolean;
-    //AutoRenameExistsFile: boolean;
-    //DownloadDuplicates: boolean;
     MaxDownloadThreads: integer;
     AutoStartBrowse: boolean;
     AllowDuplicateTabs: boolean;
@@ -91,7 +86,6 @@ end;
 constructor TNsfwBoxSettings.Create;
 begin
   SemVer := TSemVer.Create(0, 0, 0);
-//  Version                := 6;
   DevMode                := false;
   DefDownloadPath        := '';
   DefaultUserAgent       := '';
@@ -102,17 +96,13 @@ begin
   ContentLayoutsCount    := 2;
   MaxDownloadThreads     := 4;
   ItemIndent             := 2;
-  //Language               := 'EN';
   AutoSaveSession        := true;
   SaveSearchHistory      := true;
   SaveDownloadHistory    := true;
   SaveClosedTabHistory   := true;
   SaveTapHistory         := false;
   BrowseNextPageByScrollDown := True;
-  //HighlightsDownloaded   := false;
   ShowCaptions           := true;
-  //AutoRenameExistsFile   := false;
-  //DownloadDuplicates     := false;
   AutoStartBrowse        := false;
   AllowDuplicateTabs     := true;
   AutoCloseItemMenu      := true;
