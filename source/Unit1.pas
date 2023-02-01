@@ -1221,6 +1221,10 @@ var
   end;
 
 begin
+  { Need to free bitmap on image viewer }
+  if MenuImageViewer.Visible then
+    Form1.ClearControlBitmap(MenuImageViewer);
+
   Form1.MVMenu.HideMaster;
   for I := 0 to MainLayout.Controls.Count - 1 do begin
     MainLayout.Controls.Items[I].Visible := false;
