@@ -32,7 +32,7 @@ uses
   NsfwBox.Graphics.Browser, NsfwBox.Styling, NsfwBox.Graphics.Rectangle,
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
-  NsfwBox.Tests, NsfwBox.Logging,
+  NsfwBox.Tests, NsfwBox.Logging, NsfwBox.Graphics.ImageViewer,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces,
@@ -93,6 +93,7 @@ type
     procedure SetSubHeader(const Value: string);
     function GetAppFullscreen: boolean;
     procedure SetAppFullscreen(const Value: boolean);
+    procedure GotoSeePicture(APictureUrl: string);
   public
     { Public declarations }
     {$IFDEF MSWINDOWS}
@@ -132,7 +133,8 @@ type
     BtnBrowse,
     BtnDownloadAll,
     BtnDownloadMenu,
-    BtnPlay,
+    BtnPlayInternaly,
+    BtnPlayExternaly,
     BtnAddBookmark,
     BtnOpenRelated,
     BtnOpenAuthor,
@@ -234,6 +236,9 @@ type
     MenuItemTags: TNBoxSelectMenu;
     MenuItemTagsOrigin: integer;
 
+    { Image viewer menu }
+    MenuImageViewer: TNBoxImageViewer;
+
     { Anonymous message menu (MenuAnonMessage) }
     EditNickMsgForDev: TNBoxEdit;
     MemoMsgForDev: TNBoxMemo;
@@ -323,6 +328,7 @@ type
     procedure GotoDownloadsMenu;
     procedure GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
     procedure GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
+    procedure GotoImageViewer(AImageUrl: string);
     { -> Browsers ----------------- }
     procedure OnBrowserViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean);
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient; AOrigin: integer);
@@ -1711,6 +1717,13 @@ begin
       AddDownload(LPost);
     end;
 
+    ACTION_PLAY_INTERNALY:
+    begin
+      if not AItem.HasPost then exit;
+      LTryFetchIfEmpty;
+      GotoImageViewer(LPost.ContentUrl);
+    end;
+
     ACTION_PLAY_EXTERNALY:
     begin
       if not AItem.HasPost then exit;
@@ -1984,6 +1997,15 @@ begin
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
   DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
 
+  MenuImageViewer := TNBoxImageViewer.Create(Form1.MainLayout);
+  MenuImageViewer.Align := TAlignLayout.Client;
+  MenuImageViewer.Parent := Form1.MainLayout;
+
+  with MenuImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
+  begin
+    SetSaveAndLoadPath(TPath.Combine(TNBoxPath.GetCachePath, 'previewed'));
+  end;
+
   {$IFDEF ANDROID}
     Form1.MVMenu.Mode := TMultiviewMode.Drawer;
   {$ELSE IF MSWINDOWS}
@@ -2170,12 +2192,13 @@ begin
   BtnBrowse       := AddItemMenuBtn('Browse', ACTION_BROWSE, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
   BtnDownloadAll  := AddItemMenuBtn('Download content', ACTION_DOWNLOAD_ALL, ICON_DOWNLOAD, TAG_CAN_USE_MORE_THAN_ONE);
   BtnDownloadMenu := AddItemMenuBtn('Show available files', ACTION_SHOW_FILES, ICON_FILES);
-  BtnPlay         := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
-  BtnAddBookmark  := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnOpenRelated  := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnOpenAuthor   := AddItemMenuBtn('Open author', ACTION_OPEN_AUTHOR, ICON_AVATAR, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnCopyFullUrl  := AddItemMenuBtn('Copy content url', ACTION_COPY_CONTENT_URLS, ICON_COPY);
-  BtnCopyThumbUrl := AddItemMenuBtn('Copy thumbnail url', ACTION_COPY_THUMB_URL, ICON_COPY);
+  BtnPlayInternaly := AddItemMenuBtn('Play / show content', ACTION_PLAY_INTERNALY, ICON_CURRENT_TAB);
+  BtnPlayExternaly := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
+  BtnAddBookmark   := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnOpenRelated   := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnOpenAuthor    := AddItemMenuBtn('Open author', ACTION_OPEN_AUTHOR, ICON_AVATAR, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnCopyFullUrl   := AddItemMenuBtn('Copy content url', ACTION_COPY_CONTENT_URLS, ICON_COPY);
+  BtnCopyThumbUrl  := AddItemMenuBtn('Copy thumbnail url', ACTION_COPY_THUMB_URL, ICON_COPY);
   BtnLogContentUrls := AddItemMenuBtn('Log content urls to file', ACTION_LOG_URLS, ICON_SAVE, TAG_CAN_USE_MORE_THAN_ONE);
   BtnShowTags       := AddItemMenuBtn('Show tags\categories', ACTION_SHOW_TAGS, ICON_TAG);
   //BtnShareContent := AddItemMenuBtn('Share content', ACTION_SHARE_CONTENT, ICON_COPY);
@@ -2250,6 +2273,7 @@ begin
     AddCheck('Open menu', ACTION_OPEN_MENU);
     AddCheck('Download content', ACTION_DOWNLOAD_ALL);
     AddCheck('Show available files', ACTION_SHOW_FILES);
+    AddCheck('Play / show content', ACTION_PLAY_INTERNALY);
     AddCheck('Play externaly', ACTION_PLAY_EXTERNALY);
     AddCheck('Add to bookmarks', ACTION_ADD_BOOKMARK);
     AddCheck('Delete from bookmarks', ACTION_DELETE_BOOKMARK);
@@ -2485,6 +2509,8 @@ begin
       TCustomScrollBox(FmxObj).ShowScrollBars := Settings.ShowScrollBars;
   end;
   {$ENDIF}
+
+
 
   { Update checker thread creates and starts here }
   if Settings.AutoCheckUpdates then begin
@@ -2735,6 +2761,13 @@ begin
   ChangeInterface(MenuDownloads);
 end;
 
+procedure TForm1.GotoImageViewer(AImageUrl: string);
+begin
+  Self.ClearControlBitmap(MenuImageViewer);
+  ChangeInterface(MenuImageViewer);
+  MenuImageViewer.ImageURL := AImageUrl;
+end;
+
 procedure TForm1.GotoItemMenu(AItem: TNBoxCardBase);
 begin
   CurrentItem := AItem;
@@ -2765,6 +2798,11 @@ begin
   if Assigned(ABrowser) then begin
     SearchMenu.Request := ABrowser.Request;
   end;
+end;
+
+procedure TForm1.GotoSeePicture(APictureUrl: string);
+begin
+
 end;
 
 procedure TForm1.OnBrowserReqChanged(Sender: TObject);

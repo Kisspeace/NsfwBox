@@ -47,7 +47,8 @@ uses
   NsfwBox.Utils in 'source\NsfwBox.Utils.pas',
   NsfwBox.Provider.Rule34xxx in 'source\NsfwBox.Provider.Rule34xxx.pas',
   NsfwBox.Provider.Realbooru in 'source\NsfwBox.Provider.Realbooru.pas',
-  NsfwBox.Provider.Rule34us in 'source\NsfwBox.Provider.Rule34us.pas';
+  NsfwBox.Provider.Rule34us in 'source\NsfwBox.Provider.Rule34us.pas',
+  NsfwBox.Graphics.ImageViewer in 'source\NsfwBox.Graphics.ImageViewer.pas';
 
 {$R *.res}
 
