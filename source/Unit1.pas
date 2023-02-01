@@ -308,6 +308,7 @@ type
     procedure DownloaderOnReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
     procedure DownloaderOnException(const Sender: TObject; const AError: Exception);
     procedure DownloaderOnFinish(Sender: TObject);
+    procedure OnMenuImageViewerFinished(Sender: TObject; ASuccess: boolean);
     { ----------------------------- }
     procedure ExecItemInteraction(AItem: TNBoxCardBase; AInteraction: TNBoxItemInteraction);
     procedure OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser; Action: TCollectionNotification);
@@ -2004,6 +2005,7 @@ begin
   MenuImageViewer := TNBoxImageViewer.Create(Form1.MainLayout);
   MenuImageViewer.Align := TAlignLayout.Client;
   MenuImageViewer.Parent := Form1.MainLayout;
+  MenuImageViewer.OnLoadingFinished := OnMenuImageViewerFinished;
 
   with MenuImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
   begin
@@ -2971,6 +2973,11 @@ begin
     AAllow := False;
     Log('Disallow MimeType: "' + AResponse.MimeType + '" from: ' + AUrl);
   end;
+end;
+
+procedure TForm1.OnMenuImageViewerFinished(Sender: TObject; ASuccess: boolean);
+begin
+  MenuImageViewer.BestFit;
 end;
 
 function DownloadItemText(A: TNetHttpDownloader): string;
