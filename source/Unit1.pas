@@ -3877,13 +3877,17 @@ begin
 end;
 
 procedure TForm1.ClearControlBitmap(AControl: TControl);
+var
+  IWU: IImageWithUrl;
 begin
   if (AControl is TImage) then
     (AControl as TImage).Bitmap.SetSize(0, 0)
   else if (AControl is TAlRectangle) then
     (AControl as TAlRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0)
   else if (AControl is TRectangle) then
-    (AControl as TRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0);
+    (AControl as TRectangle).Fill.Bitmap.Bitmap.SetSize(0, 0)
+  else if Supports(AControl, IImageWithUrl, IWU) then
+    IWU.BitmapIWU.SetSize(0, 0);
 end;
 
 procedure TForm1.SetStretchImage(AImage: TControl);
