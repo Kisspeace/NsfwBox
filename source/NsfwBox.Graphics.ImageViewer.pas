@@ -40,6 +40,7 @@ implementation
 constructor TNBoxImageViewer.Create(AOwner: TComponent);
 begin
   inherited;
+  Self.StyleLookup := 'ImageViewer';
   FImgManager := TImageWithUrlManager.Create(Self);
   FImgManager.EnableSaveToCache := True;
   FImgManager.EnableLoadFromCache := True;

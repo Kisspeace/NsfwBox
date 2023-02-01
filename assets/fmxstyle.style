@@ -6,7 +6,7 @@ object TStyleContainer
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    TabOrder = 6
+    TabOrder = 4
     FixedHeight = 32
     object TLayout
       StyleName = 'content'
@@ -83,7 +83,7 @@ object TStyleContainer
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    TabOrder = 94
+    TabOrder = 68
     FixedWidth = 24
     FixedHeight = 24
     object TStyleObject
@@ -130,7 +130,7 @@ object TStyleContainer
     Size.Height = 32.000000000000000000
     Size.PlatformDefault = False
     Visible = False
-    TabOrder = 96
+    TabOrder = 72
     FixedWidth = 24
     FixedHeight = 24
     object TStyleObject
@@ -192,7 +192,8 @@ object TStyleContainer
   object TLayout
     StyleName = 'Memostyle'
     Align = Center
-    TabOrder = 66
+    Visible = False
+    TabOrder = 57
     object TColorObject
       StyleName = 'caretcolor'
       Color = xFF222222
@@ -382,6 +383,7 @@ object TStyleContainer
   end
   object TButtonStyleObject
     StyleName = 'htrackhthumbstyle1'
+    Align = Center
     SourceLookup = 'AndroidL Lightstyle.png'
     Visible = False
     HotLink = <
@@ -800,7 +802,7 @@ object TStyleContainer
   object TLayout
     StyleName = 'MemostyleSmallScrollBarStyle1'
     Visible = False
-    TabOrder = 65
+    TabOrder = 63
     object TTrack
       StyleName = 'htrack'
       Align = Client
@@ -939,7 +941,7 @@ object TStyleContainer
   object TLayout
     StyleName = 'Memostyleleftselectionpointstyle1'
     Visible = False
-    TabOrder = 99
+    TabOrder = 92
     FixedWidth = 24
     FixedHeight = 24
     object TStyleObject
@@ -983,7 +985,7 @@ object TStyleContainer
   object TLayout
     StyleName = 'Memostylerightselectionpointstyle1'
     Visible = False
-    TabOrder = 101
+    TabOrder = 98
     FixedWidth = 24
     FixedHeight = 24
     object TStyleObject
@@ -1021,6 +1023,89 @@ object TStyleContainer
           SourceRect.Right = 261.000000000000000000
           SourceRect.Bottom = 367.000000000000000000
         end>
+    end
+  end
+  object TLayout
+    StyleName = 'ImageViewer'
+    Align = Center
+    Visible = False
+    TabOrder = 67
+    object TLayout
+      StyleName = 'content'
+      Align = Client
+      ClipChildren = True
+      Size.Width = 45.000000000000000000
+      Size.Height = 45.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+    end
+    object TScrollBar
+      StyleName = 'vscrollbar'
+      Align = Right
+      SmallChange = 0.000000000000000000
+      Orientation = Vertical
+      Position.X = 45.000000000000000000
+      Size.Width = 5.000000000000000000
+      Size.Height = 45.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'framedscrollboxstyleScrollBarStyle1'
+      TabOrder = 1
+    end
+    object TScrollBar
+      StyleName = 'hscrollbar'
+      Align = Bottom
+      SmallChange = 0.000000000000000000
+      Orientation = Horizontal
+      Position.Y = 45.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 5.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+    end
+    object TLayout
+      Align = Client
+      Size.Width = 45.000000000000000000
+      Size.Height = 45.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      object TSmallScrollBar
+        StyleName = 'vsmallscrollbar'
+        Align = Right
+        SmallChange = 0.000000000000000000
+        Orientation = Vertical
+        Size.Width = 5.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'framedscrollboxstyleSmallScrollBarStyle1'
+        Visible = False
+      end
+      object TSmallScrollBar
+        StyleName = 'hsmallscrollbar'
+        Align = Bottom
+        SmallChange = 0.000000000000000000
+        Orientation = Horizontal
+        Size.Width = 150.000000000000000000
+        Size.Height = 5.000000000000000000
+        Size.PlatformDefault = False
+        Visible = False
+      end
+    end
+    object TLayout
+      Align = Contents
+      TabOrder = 4
+      object TLayout
+        Align = Bottom
+        object TSizeGrip
+          StyleName = 'sizegrip'
+          Align = Right
+          Locked = True
+          Position.X = 30.000000000000000000
+          Size.Width = 20.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          StyleLookup = 'framedscrollboxstyleSizeGripStyle1'
+        end
+      end
     end
   end
 end
