@@ -13,7 +13,8 @@ call :download_license "zeoslib" "https://sourceforge.net/p/zeoslib/code-0/HEAD/
 call :download_license "HTMLp" "https://raw.githubusercontent.com/RomanYankovsky/HTMLp/modern/LICENSE"
 call :download_license "htmlparser" "https://raw.githubusercontent.com/ying32/htmlparser/master/LICENSE"
 
-pause
+echo https://www.sqlite.org/copyright.html>>"SQLite.license.txt"
+
 EXIT /B 0
 
 :download_license
