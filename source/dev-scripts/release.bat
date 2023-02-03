@@ -1,6 +1,5 @@
 @echo off
-
-echo Release tag: %~1 
+@REM requirements: curl, 7-Zip.
 
 SET dir_backup=%cd%
 SET tag=%~1
@@ -9,6 +8,11 @@ SET project_dir=%script_dir%..\..
 SET work_dir=%project_dir%\release
 SET archivedir=%work_dir%\NsfwBox
 SET tool="C:\Program Files\7-Zip\7zG.exe"
+
+IF NOT DEFINED tag (set /p tag=Enter the release tag:)
+@REM if %tag%!="" goto execute
+
+echo Release tag: %tag%
 
 MKDIR %work_dir%
 cd %work_dir%
@@ -24,7 +28,10 @@ EXIT /B 0
 	MKDIR %archivedir%
 	ROBOCOPY /S %project_dir%\assets\themes %archivedir%\themes
 	COPY %project_dir%\%~1\Release\NsfwBox.exe %archivedir%
+	
+	COPY %work_dir%\licenses\* %archivedir%\
 	COPY %project_dir%\LICENSE.md %archivedir%
+
 	COPY %project_dir%\libs\%~1\*.dll %archivedir%
 	SET filename=Kisspeace.NsfwBox-%~2.%tag%.exe
 	%tool% a -sfx "%filename%" "%archivedir%"
