@@ -23,6 +23,10 @@ uses
   DbHelper, System.Generics.Collections,
   { Alcinoe ---------- }
   Alcinoe.FMX.Graphics, Alcinoe.FMX.Objects,
+  { Kastri ----------- }
+  {$IFDEF ANDROID}
+  DW.Toast.Android,
+  {$ENDIF}
   { NsfwBox ---------- }
   NsfwBox.Interfaces, NsfwBox.Settings, NsfwBox.Graphics, NsfwBox.ContentScraper,
   NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34App,
@@ -268,6 +272,7 @@ type
     procedure OnIWUException(Sender: TObject; AImage: IImageWithURL; const AUrl: string; const AException: Exception);
     procedure NetHttpOnValidateCertAutoAccept(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
     procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = -999);
+    procedure ToastMessage(const AMessage: string; AShort: boolean);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -952,6 +957,7 @@ begin
           if Assigned(CurrentBookmarkControl) then begin
             Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
             if ( Table.Id <> -1 ) then begin
+              ToastMessage(CurrentBrowser.Items.Count.ToString + ' items to ' + Table.Name, True);
               SetLength(Items, CurrentBrowser.Items.Count);
               for I := 0 to ( CurrentBrowser.Items.Count - 1 ) do begin
                 var Card := CurrentBrowser.Items[I];
@@ -1796,6 +1802,7 @@ begin
       begin
         if Assigned(CurrentBookmarkControl) then begin
           Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
+          ToastMessage(Table.Name + ' choosed.', True);
           if ( Table.Id <> -1 ) then begin
             if Assigned(LRequest) then
               Table.Add(LRequest)
@@ -3823,6 +3830,13 @@ begin
   B := ((Sender as TControl).Owner as TNBoxBrowser);
   CurrentBrowser := B;
   Form1.MVMenu.HideMaster;
+end;
+
+procedure TForm1.ToastMessage(const AMessage: string; AShort: boolean);
+begin
+ {$IFDEF ANDROID}
+ TToast.Make(AMessage, AShort);
+ {$ENDIF}
 end;
 
 procedure TForm1.TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
