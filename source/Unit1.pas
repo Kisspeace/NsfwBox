@@ -5,13 +5,6 @@ unit Unit1;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, Fmx.Objects,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, XSuperObject,
-  FMX.Controls.Presentation, FMX.MultiView, FMX.Color, FMX.Edit, FMX.Layouts,
-  Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBox.FileSystem,
-  NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox, NsfwXxx.Types,
-  System.Hash, FMX.Surfaces, System.Variants, System.Threading,
-  system.NetEncoding, System.Net.URLClient, System.StartUpCopy,
   {$IFDEF ANDROID}
   Fmx.Helpers.Android, AndroidApi.Helpers,
   AndroidApi.JNI.GraphicsContentViewText,
@@ -19,6 +12,13 @@ uses
   {$ELSE IF MSWINDOWS}
   ShellApi, Windows, NsfwBox.WindowsTitlebar,
   {$ENDIF}
+  System.SysUtils, System.Types, System.UITypes, System.Classes, Fmx.Objects,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, XSuperObject,
+  FMX.Controls.Presentation, FMX.MultiView, FMX.Color, FMX.Edit, FMX.Layouts,
+  Net.HttpClient, Net.HttpClientComponent, IoUtils, NsfwBox.FileSystem,
+  NethttpClient.Downloader, FMX.Memo, FMX.Memo.Types, FMX.ScrollBox, NsfwXxx.Types,
+  System.Hash, FMX.Surfaces, System.Variants, System.Threading,
+  system.NetEncoding, System.Net.URLClient, System.StartUpCopy,
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections,
   { Alcinoe ---------- }
@@ -2794,12 +2794,25 @@ end;
 procedure TForm1.GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
 var
   I: integer;
+  LNewBtn: TRectButton;
+  LIconBmp: TBitmap;
 begin
   MenuItemTagsOrigin := AOrigin;
   MenuItemTags.ClearButtons;
 
-  for I := low(ATags) to high(ATags) do begin
-    MenuItemTags.AddBtn(ATags[I], 0, ICON_TAG, true);
+  try
+    LIconBmp := TBitmap.Create;
+    var LImagePath: string := Form1.AppStyle.GetImagePath(ICON_TAG);
+    if FileExists(LImagePath) then
+      LIconBmp.LoadFromFile(Form1.AppStyle.GetImagePath(ICON_TAG));
+
+    for I := low(ATags) to high(ATags) do begin
+      LNewBtn := MenuItemTags.AddBtn(ATags[I], 0, '', true);
+      LNewBtn.Image.BitmapIWU.Assign(LIconBmp);
+    end;
+
+  finally
+    LIconBmp.Free;
   end;
 
   ChangeInterface(MenuItemTags);

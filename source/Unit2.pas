@@ -1115,15 +1115,20 @@ function TNBoxSelectMenu.AddBtn(AText: string; AId: NativeInt = 0;
 begin
   Result := form1.CreateDefButton(Self);
   with Result do begin
+
     Parent := Self;
     Align := TAlignLayout.Top;
     Position.Y := 0;
     Text.Text := AText;
 
-    if AShortImageName then
-      Image.ImageURL := Form1.AppStyle.GetImagePath(AImageFilename)
-    else
-      Image.ImageURL := AImageFilename;
+    if not AImageFilename.IsEmpty then begin
+
+      if AShortImageName then
+        Image.ImageURL := Form1.AppStyle.GetImagePath(AImageFilename)
+      else
+        Image.ImageURL := AImageFilename;
+
+    end;
 
     Tag := AId;
     OnTap := self.BtnOnTap;
