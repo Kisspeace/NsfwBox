@@ -436,10 +436,17 @@ const
   EDIT_STYLE_INT       = 1;
 
   TOPRECT_HEIGHT      = 48;
-  CONTROLS_DEF_HEIGHT = 45;
-  BUTTON_HEIGHT       = 50;
-  TAB_DEF_HEIGHT      = 46;
-  EDIT_DEF_HEIGHT     = 40;
+  {$IFDEF MSWINDOWS}
+    CONTROLS_DEF_HEIGHT = 40;
+    BUTTON_HEIGHT       = 40;
+    TAB_DEF_HEIGHT      = 40;
+    EDIT_DEF_HEIGHT     = 35;
+  {$ELSE}
+    CONTROLS_DEF_HEIGHT = 45;
+    BUTTON_HEIGHT       = 50;
+    TAB_DEF_HEIGHT      = 46;
+    EDIT_DEF_HEIGHT     = 40;
+  {$ENDIF}
 
   DEFAULT_IMAGE_CLASS: TControlClass = TImageWithUrl;
 
