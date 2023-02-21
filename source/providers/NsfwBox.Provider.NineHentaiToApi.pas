@@ -53,7 +53,7 @@ type
       property SearchRec: T9HentaiBookSearchRec read FSearchRec write FSearchRec;
       [DISABLE] property Request: string read GetRequest write SetRequest;
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
-      constructor Create;
+      constructor Create; override;
   end;
 
 implementation
