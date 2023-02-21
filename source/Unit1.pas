@@ -250,7 +250,6 @@ type
 
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
-    function GetBetterFilename(AFilename: string; AOrigin: integer = -2): string;
     procedure AppOnException(Sender: TObject; E: Exception);
     procedure ClickTapRef(Sender: TObject);
     { -> Menu buttons ------------- }
@@ -261,6 +260,8 @@ type
     procedure MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnHistoryOnTap(Sender: TObject; const Point: TPointF);
     { -> Other -------------------- }
+    function GetHashedDownloadFullFilename(AFilename: string; AOrigin: integer = -2; AWithExtension: boolean = True): string;
+    function FindDownloadedFullFilename(AUrl: string): string;
     procedure TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
     procedure TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
     procedure TopBtnPopMenuOnTap(Sender: TObject; const Point: TPointF);
@@ -578,7 +579,7 @@ end;
 
 function TForm1.AddDownload(AItem: INBoxItem): TNBoxTab;
 var
-  full, Filename, url: string;
+  LFull, LFilename, LUrl: string;
   I: integer;
 begin
   if Supports(AItem, IFetchableContent)
@@ -594,17 +595,33 @@ begin
   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   for I := 0 to high(AItem.ContentUrls) do begin
-    url := AItem.ContentUrls[I];
-    Filename := GetBetterFilename(url, AItem.Origin);
-    full := Settings.DefDownloadPath;
+    LUrl := AItem.ContentUrls[I];
+    LFull := Settings.DefDownloadPath;
 
-    if not DirectoryExists(Full) then
-      CreateDir(Full);
+    if not DirectoryExists(LFull) then
+      CreateDir(LFull);
 
-    full := TPath.Combine(full, Filename);
+    var LPreviewed: string;
+    with MenuImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
+    begin
+      LPreviewed := FindCachedFilename(LUrl);
+    end;
 
-    if not fileexists(full) then
-      AddDownload(Url, full);
+    LFull := GetHashedDownloadFullFilename(LUrl, AItem.Origin);
+
+    if not fileexists(LFull) then begin
+
+      if (not LPreviewed.IsEmpty) then begin
+        try
+          TFile.Move(PChar(LPreviewed), PChar(LFull));
+        except on E: Exception do
+          Log('TForm1.AddDownload. Moving previewed.', E);
+        end;
+      end else
+        AddDownload(LUrl, LFull);
+
+    end;
+
   end;
 end;
 
@@ -1920,6 +1937,19 @@ begin
   end;
 end;
 
+function TForm1.FindDownloadedFullFilename(AUrl: string): string;
+var
+  LFiles: TSearchRecAr;
+  LPartialFilename: string;
+begin
+  LPartialFilename := Self.GetHashedDownloadFullFilename(AUrl, ORIGIN_PSEUDO, False);
+  LFiles := GetFiles(LPartialFilename + '*', faNormal);
+  if Length(LFiles) > 0 then
+    Result := TPath.Combine(Settings.DefDownloadPath, LFiles[0].name)
+  else
+    Result := '';
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 var
   I: integer;
@@ -2530,8 +2560,6 @@ begin
   end;
   {$ENDIF}
 
-
-
   { Update checker thread creates and starts here }
   if Settings.AutoCheckUpdates then begin
     var LUpdateCheckTask: ITask;
@@ -2696,49 +2724,11 @@ begin
   Result := FAppStyle;
 end;
 
-function TForm1.GetBetterFilename(AFilename: string; AOrigin: integer): string;
-var
-  FileExt, DefaultExt: string;
-  function MidN(const AStr: string; ALeft, ARight: string): string;
-  var
-    Lp, Rp, Ms : integer;
-  begin
-    Lp := Pos(ALeft, AStr);
-    Ms := ALeft.Length + Lp;
-    Rp := Pos(ARight, AStr, Ms);
-    result := Copy(AStr, Ms, Rp - Ms);
-  end;
-
-  function GetBefore(const ASource: string; ASub: string): string;
-  var
-    LPos: integer;
-  begin
-    LPos := ASource.IndexOf(ASub);
-    if LPos <> -1 then begin
-      Result := ASource.Substring(0, LPos);
-    end;
-  end;
-
+function TForm1.GetHashedDownloadFullFilename(AFilename: string;
+  AOrigin: integer; AWithExtension: boolean): string;
 begin
-  FileExt := '';
-  DefaultExt := '.mp4';
-
-  if AOrigin = ORIGIN_NSFWXXX then begin
-    FileExt := trim(MidN(AFilename, '?format=', '&'));
-    if Not FileExt.IsEmpty then
-      FileExt := '.' + FileExt;
-  end;
-
-  if FileExt.IsEmpty then
-    FileExt := TPath.GetExtension(AFilename);
-
-  if FileExt.Contains('?') then
-    FileExt := GetBefore(FileExt, '?');
-
-  if not Tpath.HasValidFileNameChars(FileExt, false) then
-    FileExt := DefaultExt;
-
-  Result := THashMD5.GetHashString(AFilename) + FileExt;
+  var LFilename := TNBoxPath.GetHashedDownloadedFilename(AFilename, AOrigin, AWithExtension);
+  Result := TPath.Combine(Settings.DefDownloadPath, LFilename);
 end;
 
 function TForm1.GetSettings: TNsfwBoxSettings;
@@ -2782,9 +2772,27 @@ begin
 end;
 
 procedure TForm1.GotoImageViewer(AImageUrl: string);
+const
+  FILE_EXTS: TArray<string> = ['.jpg', '.jpeg', '.png', '.gif'];
+var
+  LDownloadedFilename: string;
+  LExt: string;
+  I: integer;
 begin
   Self.ClearControlBitmap(MenuImageViewer);
   ChangeInterface(MenuImageViewer);
+  LDownloadedFilename := Self.FindDownloadedFullFilename(AImageUrl);
+
+  if (not LDownloadedFilename.IsEmpty) then begin
+    LExt := TPath.GetExtension(LDownloadedFilename);
+    for I := 0 to High(FILE_EXTS) do begin
+      if (LExt = FILE_EXTS[I]) then begin
+        MenuImageViewer.ImageURL := LDownloadedFilename;
+        exit;
+      end;
+    end;
+  end;
+
   MenuImageViewer.ImageURL := AImageUrl;
 end;
 
