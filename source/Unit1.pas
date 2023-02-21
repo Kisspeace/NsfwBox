@@ -274,6 +274,7 @@ type
     procedure NetHttpOnValidateCertAutoAccept(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
     procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = -999);
     procedure ToastMessage(const AMessage: string; AShort: boolean);
+    procedure OnIWUManagerCreateWebClient(Sender: TObject; AClient: TNetHttpClient);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -2033,6 +2034,7 @@ begin
   BrowsersIWUContentManager.CacheManager := IWUCacheManager;
   BrowsersIWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
   BrowsersIWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
+  BrowsersIWUContentManager.OnWebClientCreate := OnIWUManagerCreateWebClient;
 
   // IWU content manager for other app images (like buttons)
   IWUContentManager := TIWUContentManager.Create(Self);
@@ -2042,6 +2044,7 @@ begin
   IWUContentManager.CacheManager := IWUCacheManager;
   IWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
   IWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
+  IWUContentManager.OnWebClientCreate := OnIWUManagerCreateWebClient;
 
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
   DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
@@ -2050,6 +2053,10 @@ begin
   MenuImageViewer.Align := TAlignLayout.Client;
   MenuImageViewer.Parent := Form1.MainLayout;
   MenuImageViewer.OnLoadingFinished := OnMenuImageViewerFinished;
+
+  with MenuImageViewer.ImageManager as TIWUContentManager do begin
+    OnWebClientCreate := OnIWUManagerCreateWebClient;
+  end;
 
   with MenuImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
   begin
@@ -2987,6 +2994,12 @@ begin
     OnRequestException := DownloaderOnException;
     OnFinish := Self.DownloaderOnFinish;
   end;
+end;
+
+procedure TForm1.OnIWUManagerCreateWebClient(Sender: TObject;
+  AClient: TNetHttpClient);
+begin
+  AClient.OnValidateServerCertificate := Form1.NetHttpOnValidateCertAutoAccept;
 end;
 
 procedure TForm1.OnIWUException(Sender: TObject; AImage: IImageWithURL;
