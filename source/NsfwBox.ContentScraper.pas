@@ -379,7 +379,7 @@ function TNBoxScraper.GetContentGelbooru(AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
 begin
   Result := Self.GetContentBooruScraper(
-    TGelbooruLikeClient, TGelbooruParser,
+    TGelbooruClient, TGelbooruParser,
     TNBoxGelbooruItem, GELBOORU_URL,
     AList, ARequest, APageNum);
 end;
@@ -515,9 +515,12 @@ var
   LClient: IBooruClient;
   I: integer;
   LContent: TBooruThumbAr;
+  LContentSwitch: IEnableAllContent;
 begin
   Result := False;
   LClient := BooruScraper.NewClient(AClientClass, AParser, AHost);
+  if Supports(LClient, IEnableAllContent, LContentSwitch) then
+    LContentSwitch.EnableAllContent := Form1.Settings.EnableAllContent;
 
   with TBooruClientBase(LClient) do
     SyncWebClientSet(Client, PROVIDERS.Gelbooru.Id);

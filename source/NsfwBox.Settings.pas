@@ -64,6 +64,7 @@ type
     AutoCheckUpdates: boolean;
     ShowScrollBars: boolean;
     ShowNavigateBackButton: boolean;
+    EnableAllContent: boolean;
     {$IFDEF MSWINDOWS}
       UseNewAppTitlebar: boolean;
       ContentPlayApp: string;
@@ -111,6 +112,7 @@ begin
   AutoCheckUpdates       := true;
   ShowScrollBars         := true;
   ShowNavigateBackButton := True;
+  EnableAllContent       := True;
   {$IFDEF MSWINDOWS}
     ShowScrollBars       := false;
     ContentPlayApp       := 'C:\Program Files\VideoLAN\VLC\vlc.exe';

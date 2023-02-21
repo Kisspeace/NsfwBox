@@ -192,6 +192,7 @@ type
     BtnOpenAppRep: TRectButton;
     CheckSetFullscreen,
     CheckSetAllowCookies,
+    CheckSetEnableAllContent,
     CheckSetAutoSaveSession,
     CheckSetSaveSearchHistory,
     CheckSetSaveTapHistory,
@@ -1172,6 +1173,7 @@ begin
     ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
     ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
     AutoAcceptAllCertificates := CheckSetAutoAcceptAllCertificates.IsChecked;
+    EnableAllContent     := CheckSetEnableAllContent.IsChecked;
     YDWSyncLoadFromFile := CheckSetYDWSyncLoadFromFile.IsChecked;
 
     IWUContentManager.EnableSaveToCache := ImageCacheSave;
@@ -2287,6 +2289,7 @@ begin
   {$ENDIF}
   CheckSetAllowCookies        := AddSettingsCheck('Allow cookies');
   CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates'); { issues on ANDROID }
+  CheckSetEnableAllContent    := AddSettingsCheck('Enable all content (Gelbooru)');
   CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session');
   CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history');
   CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history');
@@ -3826,6 +3829,7 @@ begin
   CheckSetImageCacheSave.IsChecked      := Settings.ImageCacheSave;
   CheckSetImageCacheLoad.IsChecked      := Settings.ImageCacheLoad;
   CheckSetAutoAcceptAllCertificates.IsChecked := Settings.AutoAcceptAllCertificates;
+  CheckSetEnableAllContent.IsChecked    := Settings.EnableAllContent;
   CheckSetYDWSyncLoadFromFile.IsChecked := Settings.YDWSyncLoadFromFile;
 
   {$IFDEF MSWINDOWS}
