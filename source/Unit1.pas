@@ -37,6 +37,7 @@ uses
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
   NsfwBox.Tests, NsfwBox.Logging, NsfwBox.Graphics.ImageViewer,
+  NsfwBox.Utils,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces,
@@ -97,7 +98,6 @@ type
     procedure SetSubHeader(const Value: string);
     function GetAppFullscreen: boolean;
     procedure SetAppFullscreen(const Value: boolean);
-    procedure GotoSeePicture(APictureUrl: string);
   public
     { Public declarations }
     {$IFDEF MSWINDOWS}
@@ -458,19 +458,33 @@ implementation
 {$R *.fmx}
 
 {$IFDEF ANDROID}
-procedure StartActivity(AUri: string; AAction: JString);
+procedure StartActivity(AUri: string; AAction: JString; AType: string = '');
 var
   Intent: JIntent;
 begin
-  Intent := TJintent.Create;
-  Intent.setAction(AAction);
-  Intent.setData(StrToJURI(AUri));
-  TAndroidHelper.Activity.startActivity(Intent);
+  try
+    Intent := TJintent.Create;
+    Intent.setAction(AAction);
+
+    if not AType.IsEmpty then
+      Intent.setDataAndType(StrToJURI(AUri), StringToJString(AType))
+    else
+      Intent.setData(StrToJURI(AUri));
+
+    TAndroidHelper.Activity.startActivity(Intent);
+  except On E: Exception do
+    Log('StartActivity: ', E);
+  end;
 end;
 
 procedure StartActivityView(AUri: string);
 begin
-  StartActivity(AUri, TJintent.JavaClass.ACTION_VIEW)
+  StartActivity(AUri, TJintent.JavaClass.ACTION_VIEW);
+end;
+
+procedure StartActivityViewVideo(AUri: string);
+begin
+  StartActivity(AUri, TJintent.JavaClass.ACTION_VIEW, 'video/*');
 end;
 {$ENDIF}
 
@@ -1768,7 +1782,7 @@ begin
       LTryFetchIfEmpty;
       {$IFDEF ANDROID}
       if ( LPost.ContentUrlCount > 0 ) then
-        StartActivityView(LPost.ContentUrl);
+        StartActivityViewVideo(LPost.ContentUrl);
       {$ELSE IF MSWINDOWS}
       if ( LPost.ContentUrlCount > 0 ) then begin
         var LParams: string;
@@ -2794,13 +2808,23 @@ begin
   LDownloadedFilename := Self.FindDownloadedFullFilename(AImageUrl);
 
   if (not LDownloadedFilename.IsEmpty) then begin
+
     LExt := TPath.GetExtension(LDownloadedFilename);
-    for I := 0 to High(FILE_EXTS) do begin
-      if (LExt = FILE_EXTS[I]) then begin
-        MenuImageViewer.ImageURL := LDownloadedFilename;
-        exit;
-      end;
+    if StrIn(FILE_EXTS, LExt) then
+      MenuImageViewer.ImageURL := LDownloadedFilename;
+
+  end else begin
+
+    LExt := TPath.GetExtension(AImageUrl);
+    if not StrIn(FILE_EXTS, LExt) then begin
+      { Looks like not a picture }
+      Log('Cant preview Extension: "' + LExt + '";');
+      ChangeInterface(BrowserLayout);
+      ShowMessage(AImageUrl + ': unsupported image format.');
+
+      Exit;
     end;
+
   end;
 
   MenuImageViewer.ImageURL := AImageUrl;
@@ -2849,11 +2873,6 @@ begin
   if Assigned(ABrowser) then begin
     SearchMenu.Request := ABrowser.Request;
   end;
-end;
-
-procedure TForm1.GotoSeePicture(APictureUrl: string);
-begin
-
 end;
 
 procedure TForm1.OnBrowserReqChanged(Sender: TObject);
