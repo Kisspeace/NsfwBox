@@ -49,7 +49,8 @@ uses
   NsfwBox.Provider.Realbooru in 'source\providers\NsfwBox.Provider.Realbooru.pas',
   NsfwBox.Provider.Rule34us in 'source\providers\NsfwBox.Provider.Rule34us.pas',
   NsfwBox.Provider.Rule34xxx in 'source\providers\NsfwBox.Provider.Rule34xxx.pas',
-  NsfwBox.Provider.Rule34PahealNet in 'source\providers\NsfwBox.Provider.Rule34PahealNet.pas';
+  NsfwBox.Provider.Rule34PahealNet in 'source\providers\NsfwBox.Provider.Rule34PahealNet.pas',
+  NsfwBox.Provider.Xbooru in 'source\providers\NsfwBox.Provider.Xbooru.pas';
 
 {$R *.res}
 

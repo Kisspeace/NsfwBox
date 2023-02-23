@@ -1,7 +1,6 @@
 ﻿{ ❤ 2022 by Kisspeace - https://github.com/Kisspeace --------- }
 { ❤ Part of NsfwBox ❤- https://github.com/101427274/505234915 }
 unit NsfwBox.ContentScraper;
-
 interface
 uses
   System.SysUtils, System.Generics.Collections,
@@ -27,17 +26,14 @@ uses
   BooruScraper.Parser.rule34PahealNet,
   BooruScraper.ClientBase, BooruScraper, NsfwBox.Provider.Gelbooru,
   NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru,
-  NsfwBox.Provider.Rule34us, NsfwBox.Provider.Rule34PahealNet;
-
+  NsfwBox.Provider.Rule34us, NsfwBox.Provider.Rule34PahealNet,
+  NsfwBox.Provider.XBooru;
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
   HISTORY_BMRKDB: string = '<HISTORY>';
-
 type
-
   TWebClientSetEvent = procedure(Sender: TObject; AWebClient: TNetHttpClient; AOrigin: integer) of object;
   TINBoxItemEvent = procedure(Sender: TObject; var AItem: INBoxItem) of object;
-
   TNBoxScraper = class(TObject)
     private
       FOnWebClientSet: TWebClientSetEvent;
@@ -58,6 +54,7 @@ type
       function GetContentRealbooru(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRule34us(Alist: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRule34PahealNet(Alist: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
+      function GetContentXBooru(Alist: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
       function GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
@@ -74,7 +71,6 @@ type
       property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
       constructor Create;
   end;
-
   TNBoxFetchManager = Class(TGenericYDWQueuedThreadInterface<INBoxItem>)
     private
       FQueue: TList<INBoxItem>;
@@ -89,30 +85,23 @@ type
       constructor Create; override;
       destructor Destroy; override;
   End;
-
 implementation
 uses unit1;
-
 { TNBoxScraper }
-
 constructor TNBoxScraper.Create;
 begin
   Self.FOnWebClientSet := nil;
   Self.BookmarksDb := nil;
 end;
-
 procedure TNBoxScraper.FetchAuthors(var APost: INBoxItem);
 begin
   Self.FetchTags(APost);
 end;
-
 procedure TNBoxScraper.FetchContentUrls(var APost: INBoxItem);
 begin
   if ( APost is TNBoxNsfwXxxItem ) then begin
-
     var Client: TNsfwXxxScraper;
     var Item: TNBoxNsfwXxxitem;
-
     Item := ( APost as TNBoxNsfwXxxitem );
     Client := TNsfwXxxScraper.Create;
     SyncWebClientSet(Client.WebClient, APost.Origin);
@@ -121,12 +110,9 @@ begin
     finally
       Client.Free;
     end;
-
   end else if ( APost is TNBoxGmpClubItem ) then begin
-
     var Client: TGmpClubScraper;
     var Item: TNBoxGmpClubItem;
-
     Item := ( APost as TNBoxGmpClubItem );
     Client := TGmpClubScraper.Create;
     SyncWebClientSet(Client.WebClient, APost.Origin);
@@ -135,12 +121,9 @@ begin
     finally
       Client.Free;
     end;
-
   end else if ( APost is TNBoxCoomerPartyItem ) then begin
-
     var Client: TCoomerPartyScraper;
     var Item: TNBoxCoomerPartyItem;
-
     Item := ( APost as TNBoxCoomerPartyItem );
     Client := TCoomerPartyScraper.Create;
     Client.Host := Item.Site;
@@ -150,13 +133,10 @@ begin
     finally
       Client.Free;
     end;
-
   end else if ( APost is TNBoxMotherlessItem ) then begin
-
     var LClient := TMotherlessScraper.Create;
     var LItem := (APost as TNBoxMotherlessItem);
     SyncWebClientSet(LClient.WebClient, APost.Origin);
-
     try
       var LPage: TMotherlessPostPage;
       LPage := LClient.FetchFullPost(LItem.Page.Item.GetPageUrl);
@@ -166,28 +146,22 @@ begin
     finally
       LClient.Free;
     end;
-
   end else if ( APost is TNBoxFapelloItem ) then begin
-
     var LItem := ( APost As TNBoxFapelloItem );
     if LItem.Kind = FlFeed then
       Exit;
-
     var LClient := TFapelloScraper.Create;
     SyncWebClientSet(LClient.Client, APost.origin);
-
     try
       var LFull := LClient.GetFullContent(LItem.ThumbItem);
       LItem.Full := LFull;
     finally
       LClient.free;
     end;
-
   end else if ( APost is TNBoxBooruItemBase ) then begin
 
     var LItem := ( APost as TNBoxBooruItemBase );
     var LClient: IBooruClient;
-
     if (APost is TNBoxGelbooruItem) then
       LClient := BooruScraper.NewClientGelbooru
     else if (APost is TNBoxRule34xxxItem) then
@@ -197,22 +171,21 @@ begin
     else if (APost is TNBoxRule34UsItem) then
       LClient := BooruScraper.NewClientRule34us
     else if (Apost is TNBoxRule34PahealNetItem) then
-      LClient := BooruScraper.NewClientRule34PahealNet;
+      LClient := BooruScraper.NewClientRule34PahealNet
+    else if (APost is TNBoxXBooruItem) then
+      LClient := BooruScraper.NewClientXbooru;
 
     if Assigned(LClient) then begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.origin);
       var LFull := LClient.GetPost(LItem.ThumbItem);
       LItem.Full := LFull;
     end;
-
   end;
 end;
-
 procedure TNBoxScraper.FetchTags(var APost: INBoxItem);
 begin
   self.FetchContentUrls(APost);
 end;
-
 function TNBoxScraper.GetContent(ARequest: INBoxSearchRequest;
   AList: INBoxHasOriginList): boolean;
 var
@@ -221,9 +194,7 @@ begin
   Result := false;
   if not TryStrToInt64(ARequest.Request, RequestAsInt) then
     RequestAsInt := 1;
-
   case ARequest.Origin of
-
     ORIGIN_NSFWXXX:
     begin
       with ( ARequest As TNBoxSearchReqNsfwXxx ) do begin
@@ -238,7 +209,6 @@ begin
             Site );
       end;
     end;
-
     ORIGIN_R34JSONAPI:
     begin
       Result := self.GetContentR34JsonApi
@@ -246,7 +216,6 @@ begin
         ARequest.Request,
         ARequest.PageId );
     end;
-
     ORIGIN_GIVEMEPORNCLUB:
     begin
       with ( ARequest As TNBoxSearchReqGmpClub ) do begin
@@ -257,7 +226,6 @@ begin
           PageId );
       end;
     end;
-
     ORIGIN_9HENTAITO:
     begin
       with ( ARequest As TNBoxSearchReq9Hentaito ) do begin
@@ -266,7 +234,6 @@ begin
           SearchRec);
       end;
     end;
-
     ORIGIN_COOMERPARTY:
     begin
       with ( ARequest As TNBoxSearchReqCoomerParty ) do begin
@@ -280,7 +247,6 @@ begin
         );
       end;
     end;
-
     ORIGIN_MOTHERLESS:
     begin
       with ( ARequest As TNBoxSearchReqMotherless ) do begin
@@ -295,68 +261,64 @@ begin
         );
       end;
     end;
-
     ORIGIN_PSEUDO:
     begin
       Result := Self.GetContentPseudo(AList, ARequest.Request);
     end;
-
     ORIGIN_BOOKMARKS:
     begin
       with ( ARequest As TNBoxSearchReqBookmarks ) do begin
         Result := Self.GetContentBookmarks(Alist, Path, RequestAsInt, ARequest.PageId);
       end;
     end;
-
     ORIGIN_RANDOMIZER:
     begin
       with ( ARequest as TNBoxSearchReqRandomizer ) do begin
         Result := Self.GetContentRandomizer(AList, Providers);
       end;
     end;
-
     PVR_FAPELLO:
     begin
       with ( ARequest as TNBoxSearchReqFapello ) do begin
         Result := Self.GetContentFapello(AList, Request, PageId, RequestKind);
       end;
     end;
-
     PVR_GELBOORU:
     begin
       with ( ARequest as TNBoxSearchReqGelbooru ) do begin
         Result := Self.GetContentGelbooru(AList, Request, PageId);
       end;
     end;
-
     PVR_RULE34XXX:
     begin
       with ( ARequest as TNBoxSearchReqRule34xxx ) do begin
         Result := Self.GetContentRule34xxx(AList, Request, PageId);
       end;
     end;
-
     PVR_REALBOORU:
     begin
       with ( ARequest as TNBoxSearchReqRealbooru ) do begin
         Result := Self.GetContentRealbooru(AList, Request, PageId);
       end;
     end;
-
     PVR_RULE34US:
     begin
       with ( ARequest as TNBoxSearchReqRule34us ) do begin
         Result := Self.GetContentRule34us(AList, Request, PageId);
       end;
     end;
-
     PVR_RULE34PAHEALNET:
     begin
       with ( ARequest as TNBoxSearchReqRule34PahealNet ) do begin
         Result := Self.GetContentRule34PahealNet(AList, Request, PageId);
       end;
     end;
-
+    PVR_XBOORU:
+    begin
+      with ( ARequest as TNBoxSearchReqXBooru ) do begin
+        Result := Self.GetContentXBooru(AList, Request, PageId);
+      end;
+    end;
   end;
 end;
 function TNBoxScraper.GetContent9Hentaito(AList: INBoxHasOriginList;
@@ -368,25 +330,20 @@ var
 begin
   Result := false;
   Client := T9HentaiClient.Create;
-
   try
     SyncWebClientSet(Client.WebClient, ORIGIN_9HENTAITO);
     Content := Client.GetBook(ASearch);
     Result := (length(Content) > 0);
-
     for i := 0 to high(Content) do begin
       var Item: TNBox9HentaitoItem;
-
       Item := TNBox9HentaitoItem.Create(false);
       Item.Item := Content[I];
       AList.Add(Item);
     end;
-
   finally
     Client.Free;
   end;
 end;
-
 function TNBoxScraper.GetContentGelbooru(AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
 begin
@@ -395,7 +352,6 @@ begin
     TNBoxGelbooruItem, GELBOORU_URL,
     AList, ARequest, APageNum);
 end;
-
 function TNBoxScraper.GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string;
   ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
 var
@@ -405,46 +361,36 @@ var
 begin
   Result := false;
   Client := TGmpclubScraper.create;
-
   try
     SyncWebClientSet(Client.WebClient, ORIGIN_GIVEMEPORNCLUB);
-
     case ASearchType of
       TGmpClubSearchType.Empty:
       begin
         Content := Client.GetItems(APageNum);
       end;
-
       TGmpClubSearchType.Random:
       begin
         Content := Client.GetRandomItems;
       end;
-
       TGmpClubSearchType.Tag:
       begin
         Content := Client.GetItemsByTag(AReqParam, APageNum);
       end;
-
       TGmpClubSearchType.Category:
       begin
         Content := Client.GetItemsByCategory(AReqParam, APageNum);
       end;
-
     end;
-
     Result := (length(Content) > 0);
-
     for i := 0 to high(Content) do begin
       var Item: TNBoxGmpClubItem;
       Item := TNBoxGmpClubItem.Create;
       Item.Item := Content[I];
       AList.Add(Item);
     end;
-
   finally
     Client.Free;
   end;
-
 end;
 function TNBoxScraper.GetContentMotherless(AList: INBoxHasOriginList;
   ARequest: string; APage: integer; AMediaType: TMotherlessMediaType;
@@ -457,22 +403,17 @@ var
 begin
   Result := False;
   LClient := TMotherlessScraper.Create;
-
   try
-
     SyncWebClientSet(LClient.WebClient, ORIGIN_MOTHERLESS);
     LContent := LClient.Search(ARequest, APage, AMediaType, ASort, ASize, AUploadDate);
     Result := (Length(LContent) > 0);
-
     for I := 0 to High(LContent) do begin
       var Item := TNBoxMotherlessItem.Create;
       var LTmp := Item.Page;
-
       LTmp.Item := LContent[I];
       Item.Page := LTmp;
       AList.Add(Item);
     end;
-
   finally
     LContent := nil;
     LClient.Free;
@@ -488,17 +429,13 @@ var
   TargetDb: TNBoxBookmarksDb;
 begin
   Result := false;
-
   if (ADbPath = REGULAR_BMRKDB) or ADbPath.IsEmpty then
     TargetDb := Self.BookmarksDb
   else if (ADbPath = HISTORY_BMRKDB) then
     TargetDb := Self.HistoryDb;
-
   if not Assigned(TargetDb) then
     exit;
-
   C := AList.Count;
-
   Groups := TargetDb.GetBookmarksGroups;
   for I := low(Groups) to high(Groups) do begin
     if Groups[i].Id = ABookmarksListId then begin
@@ -506,19 +443,15 @@ begin
       break;
     end;
   end;
-
   Bookmarks := Group.GetPage(APageId);
-
   for I := low(bookmarks) to high(bookmarks) do begin
    // if Bookmarks[I].BookmarkType = Content then
       AList.Add(Bookmarks[I]);
 //    Bookmarks[I].Free;
   end;
-
   Bookmarks := nil;
   Result := (AList.Count > C);
 end;
-
 function TNBoxScraper.GetContentBooruScraper(
   AClientClass: TBooruClientBaseClass; AParser: TBooruParserClass;
   AItemClass: TNBoxBooruItemBaseClass; AHost: string; AList: INBoxHasOriginList;
@@ -533,20 +466,16 @@ begin
   LClient := BooruScraper.NewClient(AClientClass, AParser, AHost);
   if Supports(LClient, IEnableAllContent, LContentSwitch) then
     LContentSwitch.EnableAllContent := Form1.Settings.EnableAllContent;
-
   with TBooruClientBase(LClient) do
     SyncWebClientSet(Client, PROVIDERS.Gelbooru.Id);
-
   LContent := LClient.GetPosts(ARequest, APageNum);
   Result := (length(LContent) > 0);
-
   for I := 0 to high(LContent) do begin
     var LItem := AItemClass.Create;
     LItem.ThumbItem := LContent[I];
     AList.Add(LItem);
   end;
 end;
-
 function TNBoxScraper.GetContentCoomerParty(AList: INBoxHasOriginList;
   ASite: string; ARequest, AUserId, AService: string;
   APageNum: integer): boolean;
@@ -567,9 +496,7 @@ begin
       // Search by artist posts
       Content := Client.GetArtistPostsByPageNum(ARequest, AUserId, AService, APageNum);
     end;
-
     Result := ( length(Content.Posts) > 0 );
-
     for I := 0 to High(Content.Posts) do begin
       var Item: TNBoxCoomerPartyItem;
       Item := TNBoxCoomerPartyItem.Create;
@@ -578,12 +505,10 @@ begin
       Item.Item := TPartyPostToTPartyPostPage(Content.Posts[I]);
       AList.Add(Item);
     end;
-
   finally
     Client.Free;
   end;
 end;
-
 function TNBoxScraper.GetContentFapello(AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer; ASearchType: TFapelloItemKind): boolean;
 var
@@ -594,31 +519,25 @@ begin
   Client := TFapelloScraper.Create;
   try
     SyncWebClientSet(Client.Client, PROVIDERS.Fapello.Id);
-
     case ASearchType of
       FlFeed:
       begin
         var LContent := Client.GetFeedItems(APageNum);
         Result := ( Length(LContent) > 0 );
-
         for I := 0 to High(LContent) do begin
           var LItem := TNBoxFapelloItem.Create;
-
           LItem.Kind := FlFeed;
           LItem.FeedItem := LContent[I];
           AList.Add(LItem);
         end;
       end;
-
       FlThumb:
       begin
         var LContent := Client.GetAuthorContent(ARequest, APageNum);
         Result := ( Length(LContent) > 0 );
-
         for I := 0 to High(LContent) do begin
           var LItem := TNBoxFapelloItem.Create;
           var LFeedItem := TFapelloFeedItem.New;
-
           LFeedItem.Author.Username := ARequest;
           LItem.Kind := FlThumb;
           LItem.FeedItem := LFeedItem;
@@ -627,12 +546,10 @@ begin
         end;
       end;
     end;
-
   finally
     Client.Free;
   end;
 end;
-
 function TNBoxScraper.GetContentPseudo(AList: INBoxHasOriginList;
   ARequest: string): boolean;
 var
@@ -641,20 +558,16 @@ var
 begin
   C := AList.Count;
   Files := GetFiles(ARequest);
-
   for I := Low(Files) to High(Files) do begin
     if Files[I].Attr = faDirectory then
       continue;
-
     var item: TNBoxPseudoItem;
     item := TNBoxPseudoItem.Create;
     item.ThumbnailUrl := IoUtils.TPath.Combine(TPAth.GetDirectoryName(ARequest), Files[i].Name);
     AList.Add(Item);
   end;
-
   Result := (AList.Count > C);
 end;
-
 function TNBoxScraper.GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string;
   APageId, ALimit: integer): boolean;
 var
@@ -665,7 +578,6 @@ begin
   Result := false;
   Client := TR34Client.Create;
   Content := nil;
-
   try
     SyncWebClientSet(Client.WebClient, ORIGIN_R34JSONAPI);
     Content := Client.GetPosts
@@ -673,19 +585,16 @@ begin
         APageId,
         ALimit );
     Result := (length(Content) > 0);
-
     for I := 0 to length(Content) - 1 do begin
       var item: TNBoxR34JsonApiItem;
       item := TNBoxR34JsonApiItem.Create;
       item.Item := Content[i];
       Alist.Add(item);
     end;
-
   finally
     Client.Free;
   end;
 end;
-
 function TNBoxScraper.GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
 var
   LProvider: integer;
@@ -694,39 +603,24 @@ begin
   Result := False;
   Randomize;
   if (Length(AProviders) < 1) then exit;
-
   LProvider := System.Math.RandomFrom(AProviders);
   LRequest := CreateReqByOrigin(LProvider);
-
   if (LRequest is TNBoxSearchReqNsfwXxx) then begin
-
     LRequest.PageId := RandomRange(1, 50);
-
   end else if (LRequest.Origin in [PROVIDERS.R34App.Id, PROVIDERS.Rule34xxx.Id, PROVIDERS.Gelbooru.Id]) then begin
-
     LRequest.PageId := RandomRange(0, 1000);
-
   end else if (LRequest is TNBoxSearchReqGmpClub) then begin
-
     TNBoxSearchReqGmpClub(LRequest).SearchType := TGmpClubSearchType.Random
-
   end else if (LRequest is TNBoxSearchReqCoomerParty) then begin
-
     TNBoxSearchReqCoomerParty(LRequest).PageId := RandomRange(0, 173628);
     TNBoxSearchReqCoomerParty(LRequest).Site := CoomerParty.Scraper.URL_COOMER_PARTY;
-
   end else if ( LRequest is TNBoxSearchReqMotherless ) then begin
-
     LRequest.PageId := RandomRange(0, 1500);
     TNBoxSearchReqMotherless(LRequest).ContentType := TMotherlessMediaType(RandomRange(0, 1));
     TNBoxSearchReqMotherless(LRequest).Sort := TMotherlessSort(RandomRange(0, 8));
-
   end else if ( LRequest is TNBoxSearchReq9HentaiTo ) then begin
-
     LRequest.PageId := RandomRange(0, 5119);
-
   end;
-
   try
     Result := Self.GetContent(LRequest, AList);
   finally
@@ -741,7 +635,6 @@ begin
     TNBoxRealbooruItem, REALBOORU_URL,
     AList, ARequest, APageNum);
 end;
-
 function TNBoxScraper.GetContentRule34PahealNet(Alist: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
 begin
@@ -759,7 +652,6 @@ begin
     TNBoxRule34usItem, RULE34US_URL,
     AList, ARequest, APageNum);
 end;
-
 function TNBoxScraper.GetContentRule34xxx(AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
 begin
@@ -768,17 +660,23 @@ begin
     TNBoxRule34XxxItem, RULE34XXX_URL,
     AList, ARequest, APageNum);
 end;
+function TNBoxScraper.GetContentXBooru(Alist: INBoxHasOriginList;
+  ARequest: string; APageNum: integer): boolean;
+begin
+  Result := Self.GetContentBooruScraper(
+    TGelbooruLikeClient, TRule34xxxParser,
+    TNBoxXBooruItem, XBOORU_URL,
+    AList, ARequest, APageNum);
+end;
 
 procedure TNBoxScraper.SyncWebClientSet(AClient: TNetHttpClient; AOrigin: integer);
 begin
   if Not Assigned(self.OnWebClientSet) then
     exit;
-
   TThread.Synchronize(Nil, procedure begin
     OnWebClientSet(Self, AClient, AOrigin);
   end);
 end;
-
 function TNBoxScraper.TryFetchAuthors(var APost: INBoxItem): boolean;
 begin
   try
@@ -788,7 +686,6 @@ begin
     Result := false;
   end;
 end;
-
 function TNBoxScraper.TryFetchContentUrls(var APost: INBoxItem): boolean;
 begin
   try
@@ -798,12 +695,10 @@ begin
     Result := false;
   end;
 end;
-
 function TNBoxScraper.TryFetchTags(var APost: INBoxItem): boolean;
 begin
   Self.TryFetchContentUrls(APost);
 end;
-
 function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
   AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer;
   Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
@@ -814,13 +709,11 @@ var
   Content: TNsfwXXXItemList;
 begin
   Result := false;
-
   try
     Client := TNsfwXxxScraper.Create;
     Client.Host := TNsfwXxxSiteToUrl(ASite);
     Content := TNsfwXXXItemList.Create;
     SyncWebClientSet(Client.WebClient, ORIGIN_NSFWXXX);
-
     Result := Client.GetItems
       ( Content,
         AReqParam,
@@ -829,14 +722,12 @@ begin
         ASort,
         ATypes,
         AOrientations );
-
     UploadItems(Content, Alist);
   finally
     Client.Free;
     Content.Free;
   end;
 end;
-
 procedure TNBoxScraper.UploadItems(A: TNsfwXXXItemList;
   AList: INBoxHasOriginList);
 var
@@ -849,55 +740,44 @@ begin
     Alist.Add(item);
   end;
 end;
-
 { TNBoxFetchManager }
-
 procedure TNBoxFetchManager.Add(AItem: INBoxItem);
 begin
   Self.QueueAdd(AItem);
 end;
-
 constructor TNBoxFetchManager.Create;
 begin
   Inherited;
   FQueue := TList<INBoxItem>.Create;
 end;
-
 destructor TNBoxFetchManager.Destroy;
 begin
   inherited;
   FQueue.Free;
 end;
-
 procedure TNBoxFetchManager.SubThreadExecute(AItem: INBoxItem);
 var
   LScraper: TNBoxScraper;
 begin
   try
-
     try
       LScraper := TNBoxScraper.Create;
       LScraper.OnWebClientSet := Self.OnWebClientSet;
-
       while not LScraper.TryFetchContentUrls(AItem) do begin
         TThread.Current.CheckTerminated;
       end;
-
       // Fetched
       TThread.Current.CheckTerminated;
       if ( Assigned(Self.OnFetched) ) then
         Self.OnFetched(Self, AItem);
-
     finally
       //TObject(AItem).Free;
       LScraper.Free;
     end;
-
   Except
     On E: Exception do begin
       Log('TNBoxFetchManager.SubThreadExecute', E)
     end;
   end;
 end;
-
 end.
