@@ -23,6 +23,7 @@ const
   PVR_GELBOORU          = 9;
   PVR_REALBOORU         = 10;
   PVR_RULE34US          = 11;
+  PVR_RULE34PAHEALNET   = 12;
 
 type
 
@@ -67,6 +68,7 @@ type
       FGelbooru: TNBoxProviderInfo;
       FRealbooru: TNBoxProviderInfo;
       FRule34us: TNBoxProviderInfo;
+      FRule34PahealNet: TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
@@ -87,6 +89,7 @@ type
       property Gelbooru: TNBoxProviderInfo read FGelbooru;
       property Realbooru: TNBoxProviderInfo read FRealbooru;
       property Rule34us: TNBoxProviderInfo read FRule34us;
+      property Rule34PahealNet: TNBoxProviderInfo read FRule34PahealNet;
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
       property Bookmarks: TNBoxProviderInfo read FBookmarks;
@@ -107,7 +110,7 @@ uses
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
   NsfwBox.Provider.Fapello, NsfwBox.Provider.Gelbooru,
   NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru,
-  NsfwBox.Provider.Rule34us;
+  NsfwBox.Provider.Rule34us, NsfwBox.Provider.Rule34PahealNet;
 
 { TNBoxProviders }
 
@@ -157,6 +160,7 @@ begin
   FGelbooru    := Add(PVR_GELBOORU, 'Gelbooru.com', 0, TNBoxSearchReqGelbooru, TNBoxGelbooruItem);
   FRealbooru   := Add(PVR_REALBOORU, 'Realbooru.com', 0, TNBoxSearchReqRealbooru, TNBoxRealbooruItem);
   FRule34us    := Add(PVR_RULE34US, 'Rule34.us', 0, TNBoxSearchReqRule34us, TNBoxRule34usItem);
+  FRule34PahealNet := Add(PVR_RULE34PAHEALNET, 'Rule34.paheal.net', 0, TNBoxSearchReqRule34PahealNet, TNBoxRule34PahealNetItem);
 end;
 
 destructor TNBoxProviders.Destroy;

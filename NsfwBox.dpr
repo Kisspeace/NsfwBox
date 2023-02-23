@@ -28,7 +28,7 @@ uses
   {$IFDEF MSWINDOWS}
   NsfwBox.WindowsTitlebar in 'source\NsfwBox.WindowsTitlebar.pas',
   Windows,
-  {$ENDIF}
+  {$ENDIF }
   FMX.ColumnsView in 'source\FMX.ColumnsView.pas',
   NsfwBox.Tests in 'source\NsfwBox.Tests.pas',
   NsfwBox.Logging in 'source\NsfwBox.Logging.pas',
@@ -48,7 +48,8 @@ uses
   NsfwBox.Provider.Randomizer in 'source\providers\NsfwBox.Provider.Randomizer.pas',
   NsfwBox.Provider.Realbooru in 'source\providers\NsfwBox.Provider.Realbooru.pas',
   NsfwBox.Provider.Rule34us in 'source\providers\NsfwBox.Provider.Rule34us.pas',
-  NsfwBox.Provider.Rule34xxx in 'source\providers\NsfwBox.Provider.Rule34xxx.pas';
+  NsfwBox.Provider.Rule34xxx in 'source\providers\NsfwBox.Provider.Rule34xxx.pas',
+  NsfwBox.Provider.Rule34PahealNet in 'source\providers\NsfwBox.Provider.Rule34PahealNet.pas';
 
 {$R *.res}
 

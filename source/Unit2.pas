@@ -76,6 +76,7 @@ type
       BtnPvrRule34xxx: TRectButton;
       BtnPvrRealbooru: TRectButton;
       BtnPvrRule34us: TRectButton;
+      BtnPvrRule34PahealNet: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -246,6 +247,7 @@ begin
   BtnOriginMotherless := NewBtn(ORIGIN_MOTHERLESS);
   BtnPvrFapello       := NewBtn(PROVIDERS.Fapello.Id);
   BtnOriginR34JsonApi := NewBtn(ORIGIN_R34JSONAPI);
+  BtnPvrRule34PahealNet := NewBtn(PVR_RULE34PAHEALNET);
   BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
 end;
 

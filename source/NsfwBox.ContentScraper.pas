@@ -23,9 +23,11 @@ uses
   BooruScraper.Parser.rule34xxx, BooruScraper.Parser.gelbooru,
   BooruScraper.Parser.Realbooru, BooruScraper.Parser.rule34us,
   BooruScraper.Client.Rule34us,
+  BooruScraper.Client.rule34PahealNet,
+  BooruScraper.Parser.rule34PahealNet,
   BooruScraper.ClientBase, BooruScraper, NsfwBox.Provider.Gelbooru,
   NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru,
-  NsfwBox.Provider.Rule34us;
+  NsfwBox.Provider.Rule34us, NsfwBox.Provider.Rule34PahealNet;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -55,6 +57,7 @@ type
       function GetContentRule34xxx(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRealbooru(AList: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentRule34us(Alist: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
+      function GetContentRule34PahealNet(Alist: INBoxHasOriginList; ARequest: string; APageNum: integer): boolean;
       function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string; ABookmarksListId: int64; APageId: integer = 1): boolean;
       { ------------------------------------- }
       function GetContentRandomizer(AList: INBoxHasOriginList; AProviders: TArray<integer>): boolean;
@@ -192,7 +195,9 @@ begin
     else if (APost is TNBoxRealbooruItem) then
       LClient := BooruScraper.NewClientRealbooru
     else if (APost is TNBoxRule34UsItem) then
-      LClient := BooruScraper.NewClientRule34us;
+      LClient := BooruScraper.NewClientRule34us
+    else if (Apost is TNBoxRule34PahealNetItem) then
+      LClient := BooruScraper.NewClientRule34PahealNet;
 
     if Assigned(LClient) then begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.origin);
@@ -342,6 +347,13 @@ begin
     begin
       with ( ARequest as TNBoxSearchReqRule34us ) do begin
         Result := Self.GetContentRule34us(AList, Request, PageId);
+      end;
+    end;
+
+    PVR_RULE34PAHEALNET:
+    begin
+      with ( ARequest as TNBoxSearchReqRule34PahealNet ) do begin
+        Result := Self.GetContentRule34PahealNet(AList, Request, PageId);
       end;
     end;
 
@@ -727,6 +739,15 @@ begin
   Result := Self.GetContentBooruScraper(
     TGelbooruLikeClient, TRealbooruParser,
     TNBoxRealbooruItem, REALBOORU_URL,
+    AList, ARequest, APageNum);
+end;
+
+function TNBoxScraper.GetContentRule34PahealNet(Alist: INBoxHasOriginList;
+  ARequest: string; APageNum: integer): boolean;
+begin
+  Result := Self.GetContentBooruScraper(
+    TRule34pahealnetClient, TRule34pahealnetParser,
+    TNBoxRule34PahealNetItem, RULE34PAHEALNET_URL,
     AList, ARequest, APageNum);
 end;
 
