@@ -243,7 +243,7 @@ begin
 
   with text do begin
     Align := talignlayout.Client;
-    Font.Size := 11;
+    Font.Size := 10;
     AutoSize := false;
     WordWrap := false;
     Margins.Left := 8;
