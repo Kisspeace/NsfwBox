@@ -10,7 +10,8 @@ uses
   FMX.ActnList, Alcinoe.FMX.Objects, Alcinoe.FMX.Graphics,
   system.generics.collections,
   YDW.FMX.ImageWithURL, YDW.FMX.ImageWithURL.AlRectangle, 
-  YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.Rectangle;
+  YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.Rectangle,
+  NsfwBox.Logging;
 
 type
 
@@ -68,7 +69,7 @@ type
       FCheckedStrokeBrush: TStrokeBrush;
       FUnCheckedStrokeBrush: TStrokeBrush;
       FIsChecked: boolean;
-      procedure OnTapOverride(sender: TObject; const APoint: TPointF);
+      procedure Tap(const Point: TPointF); override;
       procedure SetCheckedBrush(const A: Tbrush);
       procedure SetUnCheckedBrush(const A: Tbrush);
       procedure SetCheckedStokeBrush(const A: TStrokeBrush);
@@ -107,7 +108,6 @@ begin
   FUnCheckedStrokeBrush.OnChanged := self.OnBrushChanged;
   FCheckedBrush.OnChanged := self.OnBrushChanged;
   FUnCheckedBrush.OnChanged := Self.OnBrushChanged;
-  OnTap := OnTapOverride;
   ISChecked := false;
   Cursor := CrHandPoint;
 end;
@@ -155,14 +155,6 @@ begin
   Result := FiSChecked;
 end;
 
-procedure TRectTextCheck.OnTapOverride(sender: TObject; const APoint: tpointf);
-begin
-  {$IFDEF ANDROID}
-    if Enabled then
-      IsChecked := (Not IsChecked);
-  {$ENDIF}
-end;
-
 procedure TRectTextCheck.SetCheckedBrush(const A: Tbrush);
 begin
   FCheckedBrush.Assign(A);
@@ -185,6 +177,15 @@ procedure TRectTextCheck.SetUnCheckedStokeBrush(const A: TStrokeBrush);
 begin
   FUnCheckedStrokeBrush.Assign(A);
   UpdateBrush;
+end;
+
+procedure TRectTextCheck.Tap(const Point: TPointF);
+begin
+  {$IFDEF ANDROID}
+    if Enabled then
+      IsChecked := (Not IsChecked);
+  {$ENDIF}
+  inherited;
 end;
 
 procedure TRectTextCheck.Click;

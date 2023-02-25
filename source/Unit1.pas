@@ -289,6 +289,7 @@ type
     procedure BtnSetSaveOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetChangeOnItemTapOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetSaveOnItemTapOnTap(Sender: TObject; const Point: TPointF);
+    procedure SettingsCheckOnTap(Sender: TObject; const Point: TPointF);
     procedure CardOnTap(Sender: TObject; const Point: TPointF);
     procedure IconOnResize(Sender: TObject);
     procedure BookmarksControlOnTap(Sender: TObject; const Point: TPointF);
@@ -350,6 +351,7 @@ type
     procedure OnCardAutoLook(Sender: TObject);
     { ----------------------------- }
     procedure SaveSettings;
+    procedure SaveSettingsChanges;
     function LoadSettings: boolean;
     function LoadStyle: boolean;
     procedure ConnectSession;
@@ -1128,81 +1130,8 @@ begin
 end;
 
 procedure TForm1.BtnSetSaveOnTap(Sender: TObject; const Point: TPointF);
-var
-  NewSet: TNsfwBoxSettings;
-  tmp: integer;
 begin
-  NewSet := TNsfwBoxSettings.Create;
-  with NewSet do begin
-    StyleName        := Settings.StyleName;
-    ItemInteractions := Settings.ItemInteractions;
-    DefaultUseragent := EditSetDefUseragent.Edit.Edit.Text;
-    AllowCookies     := CheckSetAllowCookies.IsChecked;
-    DefDownloadPath  := EditSetDefDownloadPath.Edit.Edit.Text;
-    FilenameLogurls  := EditSetFilenameLogUrls.Edit.Edit.Text;
-    {$IFDEF MSWINDOWS}
-    ContentPlayApp    := EditSetPlayApp.Edit.Edit.Text;
-    ContentPlayParams := EditSetPlayParams.Edit.Edit.Text;
-    UseNewAppTitlebar   := CheckSetUseNewAppTitlebar.IsChecked;
-    {$ENDIF}
-
-    if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
-      ThreadsCount := tmp
-    else
-      ThreadsCount := 6;
-
-    if tryStrtoint(Self.EditSetLayoutsCount.Edit.Edit.Text, tmp) then
-      ContentLayoutsCount := tmp
-    else
-      ContentLayoutsCount := 2;
-
-    if tryStrToInt(Self.EditSetItemIndent.Edit.Edit.Text, tmp) then
-      ItemIndent := tmp
-    else
-      ItemIndent := 2;
-
-    if tryStrtoint(Self.EditSetMaxDownloadThreads.Edit.Edit.Text, tmp) then
-      MaxDownloadThreads := tmp
-    else
-      MaxDownloadThreads := 2;
-
-    DownloadManager.ThreadsCount := MaxDownloadThreads;
-
-    Fullscreen           := CheckSetFullscreen.IsChecked;
-    ShowCaptions         := CheckSetShowCaptions.IsChecked;
-    AutoStartBrowse      := CheckSetAutoStartBrowse.IsChecked;
-    AutoCloseItemMenu    := CheckSetAutoCloseItemMenu.IsChecked;
-    AllowDuplicateTabs   := CheckSetAllowDuplicateTabs.IsChecked;
-    DevMode              := CheckSetDevMode.IsChecked;
-    AutoSaveSession      := CheckSetAutoSaveSession.IsChecked;
-    SaveSearchHistory    := CheckSetSaveSearchHistory.IsChecked;
-    SaveDownloadHistory  := CheckSetSaveDownloadHistory.IsChecked;
-    SaveTapHistory       := CheckSetSaveTapHistory.IsChecked;
-    SaveClosedTabHistory := CheckSetSaveTabHistory.IsChecked;
-    AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
-    ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
-    ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
-    BrowseNextPageByScrollDown := CheckSetBrowseNextPageByScrollDown.IsChecked;
-
-    ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
-    ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
-    AutoAcceptAllCertificates := CheckSetAutoAcceptAllCertificates.IsChecked;
-    EnableAllContent     := CheckSetEnableAllContent.IsChecked;
-    YDWSyncLoadFromFile := CheckSetYDWSyncLoadFromFile.IsChecked;
-
-    IWUContentManager.EnableSaveToCache := ImageCacheSave;
-    IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
-
-    BrowsersIWUContentManager.EnableSaveToCache := ImageCacheSave;
-    BrowsersIWUContentManager.EnableLoadFromCache := ImageCacheLoad;
-
-    if AutoSaveSession then
-      ConnectSession;
-  end;
-
-  Settings := NewSet;
-  NewSet.Free;
-  SaveSettings;
+  SaveSettingsChanges;
   ChangeInterface(BrowserLayout);
 end;
 
@@ -1584,6 +1513,7 @@ function TForm1.CreateDefSettingsCheck(AOwner: TComponent): TNBoxSettingsCheck;
 begin
   Result := TNBoxSettingsCheck.Create(AOwner);
   _CreateDefSettingsCheckDef(Result);
+  Result.Check.OnTap := SettingsCheckOnTap;
 end;
 
 function TForm1.CreateDefSettingsEdit(AOwner: TComponent; AStyle: integer): TNBoxSettingsEdit;
@@ -3749,6 +3679,84 @@ begin
   Settings.AsJSONObject.SaveTo(SETTINGS_FILENAME, true);
 end;
 
+procedure TForm1.SaveSettingsChanges;
+var
+  NewSet: TNsfwBoxSettings;
+  tmp: integer;
+begin
+  NewSet := TNsfwBoxSettings.Create;
+  with NewSet do begin
+    StyleName        := Settings.StyleName;
+    ItemInteractions := Settings.ItemInteractions;
+    DefaultUseragent := EditSetDefUseragent.Edit.Edit.Text;
+    AllowCookies     := CheckSetAllowCookies.IsChecked;
+    DefDownloadPath  := EditSetDefDownloadPath.Edit.Edit.Text;
+    FilenameLogurls  := EditSetFilenameLogUrls.Edit.Edit.Text;
+    {$IFDEF MSWINDOWS}
+    ContentPlayApp    := EditSetPlayApp.Edit.Edit.Text;
+    ContentPlayParams := EditSetPlayParams.Edit.Edit.Text;
+    UseNewAppTitlebar   := CheckSetUseNewAppTitlebar.IsChecked;
+    {$ENDIF}
+
+    if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
+      ThreadsCount := tmp
+    else
+      ThreadsCount := 6;
+
+    if tryStrtoint(Self.EditSetLayoutsCount.Edit.Edit.Text, tmp) then
+      ContentLayoutsCount := tmp
+    else
+      ContentLayoutsCount := 2;
+
+    if tryStrToInt(Self.EditSetItemIndent.Edit.Edit.Text, tmp) then
+      ItemIndent := tmp
+    else
+      ItemIndent := 2;
+
+    if tryStrtoint(Self.EditSetMaxDownloadThreads.Edit.Edit.Text, tmp) then
+      MaxDownloadThreads := tmp
+    else
+      MaxDownloadThreads := 2;
+
+    DownloadManager.ThreadsCount := MaxDownloadThreads;
+
+    Fullscreen           := CheckSetFullscreen.IsChecked;
+    ShowCaptions         := CheckSetShowCaptions.IsChecked;
+    AutoStartBrowse      := CheckSetAutoStartBrowse.IsChecked;
+    AutoCloseItemMenu    := CheckSetAutoCloseItemMenu.IsChecked;
+    AllowDuplicateTabs   := CheckSetAllowDuplicateTabs.IsChecked;
+    DevMode              := CheckSetDevMode.IsChecked;
+    AutoSaveSession      := CheckSetAutoSaveSession.IsChecked;
+    SaveSearchHistory    := CheckSetSaveSearchHistory.IsChecked;
+    SaveDownloadHistory  := CheckSetSaveDownloadHistory.IsChecked;
+    SaveTapHistory       := CheckSetSaveTapHistory.IsChecked;
+    SaveClosedTabHistory := CheckSetSaveTabHistory.IsChecked;
+    AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
+    ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
+    ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
+    BrowseNextPageByScrollDown := CheckSetBrowseNextPageByScrollDown.IsChecked;
+
+    ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
+    ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
+    AutoAcceptAllCertificates := CheckSetAutoAcceptAllCertificates.IsChecked;
+    EnableAllContent     := CheckSetEnableAllContent.IsChecked;
+    YDWSyncLoadFromFile := CheckSetYDWSyncLoadFromFile.IsChecked;
+
+    IWUContentManager.EnableSaveToCache := ImageCacheSave;
+    IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
+
+    BrowsersIWUContentManager.EnableSaveToCache := ImageCacheSave;
+    BrowsersIWUContentManager.EnableLoadFromCache := ImageCacheLoad;
+
+    if AutoSaveSession then
+      ConnectSession;
+  end;
+
+  Settings := NewSet;
+  NewSet.Free;
+  SaveSettings;
+end;
+
 procedure TForm1.SetAppFullscreen(const Value: boolean);
 begin
   Form1.FullScreen := Value;
@@ -3832,7 +3840,10 @@ begin
   EditSetItemIndent.Edit.Edit.Text      := Settings.ItemIndent.ToString;
   EditSetFilenameLogUrls.Edit.Edit.Text := Settings.FilenameLogUrls;
   CheckSetFullscreen.IsChecked          := settings.Fullscreen;
-  Form1.AppFullScreen                      := FSettings.Fullscreen;
+
+  if Form1.AppFullscreen <> FSettings.Fullscreen then
+    Form1.AppFullScreen                   := FSettings.Fullscreen;
+
   CheckSetAllowCookies.IsChecked        := Settings.AllowCookies;
   CheckSetShowCaptions.IsChecked        := Settings.ShowCaptions;
   CheckSetAllowDuplicateTabs.IsChecked  := Settings.AllowDuplicateTabs;
@@ -3884,6 +3895,11 @@ end;
 procedure TForm1.SetSubHeader(const Value: string);
 begin
   TopBottomText.Text := Value;
+end;
+
+procedure TForm1.SettingsCheckOnTap(Sender: TObject; const Point: TPointF);
+begin
+  SaveSettingsChanges;
 end;
 
 procedure TForm1.TabOnTap(Sender: TObject; const Point: TPointF);
