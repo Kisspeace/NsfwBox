@@ -607,7 +607,7 @@ begin
   LRequest := CreateReqByOrigin(LProvider);
   if (LRequest is TNBoxSearchReqNsfwXxx) then begin
     LRequest.PageId := RandomRange(1, 50);
-  end else if (LRequest.Origin in [PROVIDERS.R34App.Id, PROVIDERS.Rule34xxx.Id, PROVIDERS.Gelbooru.Id]) then begin
+  end else if (LRequest.Origin in [PROVIDERS.R34App.Id, PROVIDERS.Rule34xxx.Id, PROVIDERS.Gelbooru.Id, PROVIDERS.Rule34PahealNet.Id, PROVIDERS.XBooru.Id]) then begin
     LRequest.PageId := RandomRange(0, 1000);
   end else if (LRequest is TNBoxSearchReqGmpClub) then begin
     TNBoxSearchReqGmpClub(LRequest).SearchType := TGmpClubSearchType.Random

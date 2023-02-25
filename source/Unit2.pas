@@ -179,13 +179,15 @@ type
           BtnFapelloChangeSearchType: TRectButton;
         RandomizerMenu: TNBoxSearchSubMenuBase;
           BtnRandNsfwXxx: TNBoxCheckButton;
-          BtnRandR34App: TNBoxCheckButton;
+//          BtnRandR34App: TNBoxCheckButton;
           BtnRandGmpClub: TNBoxCheckButton;
           BtnRandCoomerParty: TNBoxCheckButton;
           BtnRandMotherless: TNBoxCheckButton;
           BtnRand9Hentaito: TNBoxCheckButton;
           BtnRandRule34xxx: TNBoxCheckButton;
           BtnRandGelbooru: TNBoxCheckButton;
+          BtnRandXBooru: TNBoxCheckButton;
+          BtnRandRule34PahealNet: TNBoxCheckButton;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -715,6 +717,8 @@ begin
   BtnRand9Hentaito := NewBtnCheck(OriginToStr(ORIGIN_9HENTAITO), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_9HENTAITO));
   BtnRandRule34xxx := NewBtnCheck(OriginToStr(PVR_RULE34XXX), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_RULE34XXX));
   BtnRandGelbooru := NewBtnCheck(OriginToStr(PVR_GELBOORU), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_GELBOORU));
+  BtnRandRule34PahealNet := NewBtnCheck(OriginToStr(PVR_RULE34PAHEALNET), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_RULE34PAHEALNET));
+  BtnRandXBooru := NewBtnCheck(OriginToStr(PVR_XBOORU), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_XBOORU));
   RandomizerMenu.DoAutoSize;
   RandomizerMenu.OnResize := RandomizerMenu.OnResizeEvent;
 
@@ -816,13 +820,15 @@ begin
       with ( Result as TNBoxSearchReqRandomizer ) do begin
         Providers := [];
         if BtnRandNsfwXxx.IsChecked then Providers := Providers + [ORIGIN_NSFWXXX];
-        if BtnRandR34App.IsChecked then Providers := Providers + [ORIGIN_R34APP];
+//        if BtnRandR34App.IsChecked then Providers := Providers + [ORIGIN_R34APP];
         if BtnRandGmpClub.IsChecked then Providers := Providers + [ORIGIN_GIVEMEPORNCLUB];
         if BtnRandCoomerParty.IsChecked then Providers := Providers + [ORIGIN_COOMERPARTY];
         if BtnRand9Hentaito.IsChecked then Providers := Providers + [ORIGIN_9HENTAITO];
         if BtnRandMotherless.IsChecked then Providers := Providers + [ORIGIN_MOTHERLESS];
         if BtnRandGelbooru.IsChecked then Providers := Providers + [PVR_GELBOORU];
         if BtnRandRule34xxx.IsChecked then Providers := Providers + [PVR_RULE34XXX];
+        if BtnRandRule34PahealNet.IsChecked then Providers := Providers + [PVR_RULE34PAHEALNET];
+        if BtnRandXBooru.IsChecked then Providers := Providers + [PVR_XBOORU];
       end;
     end;
 
@@ -1089,7 +1095,7 @@ begin
 
     with ( Value as TNBoxSearchReqRandomizer ) do begin
       BtnRandNsfwXxx.IsChecked := _IN(Providers, ORIGIN_NSFWXXX);
-      BtnRandR34App.IsChecked := _IN(Providers, ORIGIN_R34APP);
+//      BtnRandR34App.IsChecked := _IN(Providers, ORIGIN_R34APP);
       BtnRandGmpClub.IsChecked := _IN(Providers, ORIGIN_GIVEMEPORNCLUB);
       BtnRandCoomerParty.IsChecked := _IN(Providers, ORIGIN_COOMERPARTY);
       BtnRand9Hentaito.IsChecked := _IN(Providers, ORIGIN_9HENTAITO);
