@@ -37,6 +37,8 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="assets/themes/default/content-origin-9.png" width="24" align="left">[gelbooru.com](https://gelbooru.com)
 * <img src="assets/themes/default/content-origin-10.png" width="24" align="left">[realbooru.com](https://realbooru.com)
 * <img src="assets/themes/default/content-origin-11.png" width="24" align="left">[rule34.us](https://rule34.us)
+* <img src="assets/themes/default/content-origin-12.png" width="24" align="left">[rule34.paheal.net](https://rule34.paheal.net)
+* <img src="assets/themes/default/content-origin-13.png" width="24" align="left">[xbooru.com](https://xbooru.com)
 <!-- * <img src="assets/themes/default/" width="24" align="left">[]() -->
 
 #### Dependencies:
@@ -54,8 +56,9 @@ Developed on RAD Studio 11 Alexandria.
 * [motherless.com-scraper](https://github.com/Kisspeace/motherless.com-scraper)
 * [fapello.com-scraper](https://github.com/Kisspeace/fapello.com-scraper)
 * [BooruScraper](https://github.com/Kisspeace/BooruScraper)
+* [Kastri](https://github.com/DelphiWorlds/Kastri)
 
 #### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.2.0/Kisspeace.NsfwBox.v2.2.0.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.2.0/Kisspeace.NsfwBox-ins32.v2.2.0.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.2.0/Kisspeace.NsfwBox-ins64.v2.2.0.exe)  
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.3.0/Kisspeace.NsfwBox.v2.3.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.3.0/Kisspeace.NsfwBox-ins32.v2.3.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.3.0/Kisspeace.NsfwBox-ins64.v2.3.0.exe)  
