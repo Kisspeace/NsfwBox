@@ -65,6 +65,7 @@ type
     ShowScrollBars: boolean;
     ShowNavigateBackButton: boolean;
     EnableAllContent: boolean;
+    FetchAllBeforeAddBookmark: boolean;
     {$IFDEF MSWINDOWS}
       UseNewAppTitlebar: boolean;
       ContentPlayApp: string;
@@ -113,6 +114,7 @@ begin
   ShowScrollBars         := true;
   ShowNavigateBackButton := True;
   EnableAllContent       := True;
+  FetchAllBeforeAddBookmark := False;
   {$IFDEF MSWINDOWS}
     ShowScrollBars       := false;
     ContentPlayApp       := 'C:\Program Files\VideoLAN\VLC\vlc.exe';

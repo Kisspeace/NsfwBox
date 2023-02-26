@@ -211,7 +211,8 @@ type
     CheckSetImageCacheLoad,
     CheckSetAutoAcceptAllCertificates,
     CheckSetYDWSyncLoadFromFile,
-    CheckSetUseNewAppTitlebar
+    CheckSetUseNewAppTitlebar,
+    CheckSetFetchAllBeforeAddBookmark
     : TNBoxSettingsCheck;
 
     EditSetDefUseragent,
@@ -735,6 +736,7 @@ begin
     if not ATExt.IsEmpty then begin
       Text.Visible := true;
       Text.Text := AText;
+      Height := Height + 20;
     end;
   end;
 end;
@@ -1776,6 +1778,10 @@ begin
 
     ACTION_ADD_BOOKMARK:
     begin
+
+      if Settings.FetchAllBeforeAddBookmark then
+        LTryFetchIfEmpty;
+
       UserSelectBookmarkList(
       procedure
       var
@@ -2260,6 +2266,7 @@ begin
   CheckSetBrowseNextPageByScrollDown := AddSettingsCheck('Browse next page by scrolling down');
   CheckSetAutoStartBrowse     := AddSettingsCheck('Auto start browse');
   CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu');
+  CheckSetFetchAllBeforeAddBookmark := AddSettingsCheck('Fetch data before add to bookmarks', 'Not work in bulk mode.');
   CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars');
   CheckSetShowNavigateBackButton := AddSettingsCheck('Show navigate back button');
   EditSetDefUseragent         := AddSettingsEdit('Default Useragent string');
@@ -2271,9 +2278,7 @@ begin
   EditSetFilenameLogUrls      := AddSettingsEdit('Urls log filename');
   {$IFDEF MSWINDOWS}
   EditSetPlayApp              := AddSettingsEdit('Player application path');
-  EditSetPlayParams           := AddSettingsEdit('Player params');
-    EditSetPlayParams.Text.Text := FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.';
-    EditSetPlayParams.Size.Height := EditSetPlayParams.Height + 30;
+  EditSetPlayParams           := AddSettingsEdit('Player params', FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.');
   {$ENDIF}
   CheckSetDevMode             := AddSettingsCheck('Developer mode');
   CheckSetAutoCheckUpdates    := AddSettingsCheck('Auto check updates');
@@ -3760,6 +3765,7 @@ begin
     ShowCaptions         := CheckSetShowCaptions.IsChecked;
     AutoStartBrowse      := CheckSetAutoStartBrowse.IsChecked;
     AutoCloseItemMenu    := CheckSetAutoCloseItemMenu.IsChecked;
+    FetchAllBeforeAddBookmark := CheckSetFetchAllBeforeAddBookmark.IsChecked;
     AllowDuplicateTabs   := CheckSetAllowDuplicateTabs.IsChecked;
     DevMode              := CheckSetDevMode.IsChecked;
     AutoSaveSession      := CheckSetAutoSaveSession.IsChecked;
@@ -3885,6 +3891,7 @@ begin
   CheckSetAllowDuplicateTabs.IsChecked  := Settings.AllowDuplicateTabs;
   CheckSetAutoStartBrowse.IsChecked     := Settings.AutoStartBrowse;
   CheckSetAutoCloseItemMenu.IsChecked   := Settings.AutoCloseItemMenu;
+  CheckSetFetchAllBeforeAddBookmark.IsChecked := Settings.FetchAllBeforeAddBookmark;
   EditSetMaxDownloadThreads.Edit.Edit.Text := Settings.MaxDownloadThreads.ToString;
   DownloadManager.ThreadsCount        := Settings.MaxDownloadThreads;
   CheckSetDevMode.IsChecked             := Settings.DevMode;
