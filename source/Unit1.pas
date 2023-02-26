@@ -345,6 +345,9 @@ type
     procedure OnBrowserScraperCreate(Sender: TObject; var AScraper: TNBoxScraper);
     procedure OnBrowserReqChanged(Sender: TObject);
     procedure BrowserBeforeBrowse(Sender: TObject);
+    procedure OnBrowserDblClick(Sender: TObject);
+    procedure OnBrowserGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
+//    procedure OnBrowser
     { -> Cards events ------------- }
     procedure OnNewItem(Sender: TObject; var AItem: TNBoxCardBase);
     procedure OnSimpleCardResize(Sender: TObject);
@@ -1339,6 +1342,13 @@ begin
     visible                  := false;
     ImageManager             := BrowsersIWUContentManager;
     OnViewportPositionChange := OnBrowserViewportPositionChange;
+    {$IFDEF MSWINDOWS}
+    OnDblClick               := OnBrowserDblClick;
+    {$ENDIF} {$IFDEF ANDROID}
+    Touch.InteractiveGestures := [TInteractiveGesture.DoubleTap,
+                                  TInteractiveGesture.Pan];
+    OnGesture                := OnBrowserGesture;
+    {$ENDIF}
 
     if Self.FFormCreated then
       ShowScrollBars := Settings.ShowScrollBars;
@@ -2748,9 +2758,14 @@ begin
     LExt := TPath.GetExtension(AImageUrl);
     if not StrIn(FILE_EXTS, LExt) then begin
       { Looks like not a picture }
-      Log('Cant preview Extension: "' + LExt + '";');
+//      Log('Cant preview Extension: "' + LExt + '";');
       ChangeInterface(BrowserLayout);
-      ShowMessage(AImageUrl + ': unsupported image format.');
+      var LMsgForUser := 'Unsupported image format: ' + AImageUrl;
+      {$IFDEF MSWINDOWS}
+      ShowMessage(LMsgForUser);
+      {$ENDIF} {$IFDEF ANDROID}
+      ToastMessage(LMsgForUser, False);
+      {$ENDIF}
 
       Exit;
     end;
@@ -2802,6 +2817,27 @@ begin
   ChangeInterface(MenuSearchSettings);
   if Assigned(ABrowser) then begin
     SearchMenu.Request := ABrowser.Request;
+  end;
+end;
+
+procedure TForm1.OnBrowserDblClick(Sender: TObject);
+begin
+  { Reload page if items count zero }
+  with (Sender as TNBoxBrowser) do begin
+    if Items.Count = 0 then
+      GoBrowse;
+  end;
+end;
+
+procedure TForm1.OnBrowserGesture(Sender: TObject;
+  const EventInfo: TGestureEventInfo; var Handled: Boolean);
+begin
+  case EventInfo.GestureID of
+    igiDoubleTap:
+    begin
+      Handled := True;
+      OnBrowserDblClick(Sender);
+    end;
   end;
 end;
 
