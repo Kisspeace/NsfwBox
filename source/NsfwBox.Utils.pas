@@ -7,8 +7,25 @@ uses
 
   function GetFirstStr(Ar: TArray<string>): string;
   function StrIn(const Ar: TArray<string>; AStr: string; AIgnoreCase: boolean = True): boolean;
+  function BytesCountToSizeStr(ABytesCount: int64): string;
 
 implementation
+
+function BytesCountToSizeStr(ABytesCount: int64): string;
+const
+  UNITS: Tarray<string> = ['Kb', 'Mb', 'Gb'];
+var
+  I: integer;
+  LValue: int64;
+begin
+  LValue := ABytesCount;
+  for I := 0 to High(UNITS) do begin
+    LValue := Round(LValue / 1024);
+    if LValue < 1024 then
+      Break;
+  end;
+  Result := LValue.ToString + ' ' + UNITS[I];
+end;
 
 function GetFirstStr(Ar: TArray<string>): string;
 begin

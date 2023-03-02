@@ -3049,7 +3049,6 @@ end;
 function DownloadItemText(A: TNetHttpDownloader): string;
 var
   ContentSize: int64;
-  Kb: int64;
   FileSizeStr: string;
 
   function GetPercents: integer;
@@ -3072,14 +3071,12 @@ var
 
 begin
   ContentSize := A.ContentLength;
-  Kb := Round(ContentSize / 1024);
 
-  if Kb < 1024 then
-    FileSizeStr := Kb.ToString + ' Kb.'
-  else
-    FileSizeStr := Round(Kb / 1024).ToString + ' Mb.';
-
-  Result := '[ ' + GetPercents.ToString + '% ] of ' + FileSizeStr;
+  if ContentSize > 0 then begin
+    FileSizeStr := BytesCountToSizeStr(ContentSize);
+    Result := '[ ' + GetPercents.ToString + '% ] of ' + FileSizeStr;
+  end else
+    Result := 'Unknown size. Ready: ' + BytesCountToSizeStr(A.ReadCount);
 end;
 
 procedure TForm1.DownloaderOnException(const Sender: TObject;
