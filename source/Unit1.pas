@@ -2768,8 +2768,10 @@ end;
 procedure TForm1.GotoImageViewer(AImageUrl: string);
 const
   FILE_EXTS: TArray<string> = ['.jpg', '.jpeg', '.png', '.gif'];
+  DENY_HOSTS: TArray<string> = ['external-preview.redd.it', 'preview.redd.it'];
 var
   LDownloadedFilename: string;
+  LUri: TURI;
   LExt: string;
   I: integer;
 begin
@@ -2785,10 +2787,17 @@ begin
 
   end else begin
 
-    LExt := TPath.GetExtension(AImageUrl);
-    if not StrIn(FILE_EXTS, LExt) then begin
+    try
+      LUri := TURI.Create(AImageUrl);
+      LExt := TPath.GetExtension(LUri.Path);
+    except
+      LExt := '';
+    end;
+
+    if not StrIn(FILE_EXTS, LExt)
+    or StrIn(DENY_HOSTS, LUri.Host) then begin
       { Looks like not a picture }
-//      Log('Cant preview Extension: "' + LExt + '";');
+
       ChangeInterface(BrowserLayout);
       var LMsgForUser := 'Unsupported image format: ' + AImageUrl;
       {$IFDEF MSWINDOWS}
