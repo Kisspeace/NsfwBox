@@ -17,7 +17,7 @@ type
       FPage: TNsfwXxxPostPage;
       FItem: TNsfwXxxItem;
       //procedure SetTags(const Value: TArray<string>);
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
@@ -46,7 +46,7 @@ type
       [DISABLE] property Caption: string read GetCaption; // write SetCaption;
       [DISABLE] property AuthorName: string read GetAuthorName; // write SetAuthorName;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create; override;
   end;
@@ -142,12 +142,12 @@ begin
   Result := true;
 end;
 
-function TNBoxNsfwXxxItem.GetTags: TArray<string>;
+function TNBoxNsfwXxxItem.GetTags: TNBoxItemTagAr;
 begin
-  if ( ContentFetched ) then
-    Result := FPage.Items[0].Categories
+  if ContentFetched then
+    Result := TNBoxItemTagBase.Convert(FPage.Items[0].Categories)
   else
-    Result := FItem.Categories;
+    Result := TNBoxItemTagBase.Convert(FItem.Categories);
 end;
 
 function TNBoxNsfwXxxItem.GetTagsCount: integer;

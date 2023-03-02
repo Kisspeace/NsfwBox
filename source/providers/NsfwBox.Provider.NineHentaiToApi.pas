@@ -9,11 +9,25 @@ uses
 
 type
 
-  TNBox9HentaitoItem = class(TNBoxItemBase, IUIdAsInt, IHasTags, IHasCaption) //IBook
+  TNBoxItemTag9HentaiTo = Class(TInterfacedObject, INBoxItemTag, INBoxItemTag9HentaiTo)
+    protected
+      FTag: T9HentaiTag;
+      function GetValue: string;
+      procedure SetTag(const value: T9HentaiTag);
+      function GetTag: T9HentaiTag;
+    public
+      property Tag: T9HentaiTag read GetTag write SetTag;
+      property Value: string read GetValue;
+      constructor Create(ATag: T9HentaiTag);
+      class function Convert(ATags: T9HentaiTagAr): TNBoxItemTagAr;
+  End;
+
+
+  TNBox9HentaitoItem = class(TNBoxItemBase, IUIdAsInt, IHasTags, IHasCaption)
     private
       FItem: T9HentaiBook;
       //FCurrentPage: integer; // default = -1 display cover image
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetCaption: string;
       function GetContentUrls: TArray<string>;               override;
@@ -30,7 +44,7 @@ type
       [DISABLE] property ContentUrls;
       [DISABLE] property UIdInt: int64 read GetUidInt;
       [DISABLE] property Caption: string read GetCaption;
-      [DISABLE] property Tags: TArray<string> read GetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       constructor Create(AWithItem: boolean); overload;
       constructor Create; overload; override;
       destructor Destroy; override;
@@ -117,13 +131,11 @@ begin
   end;
 end;
 
-function TNBox9HentaitoItem.GetTags: TArray<string>;
+function TNBox9HentaitoItem.GetTags: TNBoxItemTagAr;
 var
   I: integer;
 begin
-  SetLength(Result, Length(Item.Tags));
-  for I := 0 to High(Result) do
-    Result[i] := Item.Tags[I].Name;
+  Result := TNBoxItemTag9HentaiTo.Convert(Item.Tags);
 end;
 
 function TNBox9HentaitoItem.GetTagsCount: integer;
@@ -178,6 +190,38 @@ end;
 procedure TNBoxSearchReq9Hentaito.SetRequest(const value: string);
 begin
   FSearchRec.text := value;
+end;
+
+{ TNBoxItemTag9HentaiTo }
+
+class function TNBoxItemTag9HentaiTo.Convert(
+  ATags: T9HentaiTagAr): TNBoxItemTagAr;
+var
+  I: integer;
+begin
+  SetLength(Result, Length(ATags));
+  for I := 0 to High(ATags) do
+    Result[I] := TNBoxItemTag9HentaiTo.Create(ATags[I]);
+end;
+
+constructor TNBoxItemTag9HentaiTo.Create(ATag: T9HentaiTag);
+begin
+  Tag := ATag;
+end;
+
+function TNBoxItemTag9HentaiTo.GetTag: T9HentaiTag;
+begin
+  Result := FTag;
+end;
+
+function TNBoxItemTag9HentaiTo.GetValue: string;
+begin
+  Result := Tag.Name;
+end;
+
+procedure TNBoxItemTag9HentaiTo.SetTag(const value: T9HentaiTag);
+begin
+  FTag := Value;
 end;
 
 end.

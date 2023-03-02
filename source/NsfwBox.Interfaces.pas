@@ -5,7 +5,8 @@ unit NsfwBox.Interfaces;
 interface
 
 uses
-  System.SysUtils, Classes, System.Generics.Collections, XSuperObject;
+  System.SysUtils, Classes, System.Generics.Collections, XSuperObject,
+  BooruScraper.Interfaces, Ninehentaito.APITypes;
 
 type
 {*
@@ -35,13 +36,39 @@ type
     property UIdInt: int64 read GetUIdInt; // write SetUIdInt;
   end;
 
+  INBoxItemTag = interface
+    ['{461DACE2-B4A1-4DB4-925F-C7B16F06CF75}']
+    { private \ protected }
+    function GetValue: string;
+    { public }
+    property Value: string read GetValue;
+  end;
+
+  INBoxItemTagGeneric<T> = interface(INBoxItemTag)
+    ['{55A4C160-BCA1-41F4-AD90-7D014DE7D3BD}']
+    { private \ protected }
+    function GetTag: T;
+    { public }
+    property Tag: T read GetTag;
+  end;
+
+  INBoxItemTagBooru = interface(INBoxItemTagGeneric<IBooruTag>)
+    ['{36D76E9D-D237-4CB8-89A4-F6106F7080AE}']
+  end;
+
+  INBoxItemTag9HentaiTo = interface(INBoxItemTagGeneric<T9HentaiTag>)
+    ['{2216B559-84B4-4D1B-8675-78D250BF2F7D}']
+  end;
+
+  TNBoxItemTagAr = TArray<INBoxItemTag>;
+
   IHasTags = interface
     ['{598FEFF0-4DAD-425D-9480-4B78EA3B98FE}']
     //--Setters and Getters--//
     // procedure SetTags(const Value: TArray<string>);
-    function GetTags: TArray<string>;
+    function GetTags: TNBoxItemTagAr;
     //--Properties--//
-    property Tags: TArray<string> read GetTags; // write SetTags;
+    property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
   end;
 
   IHasAuthor = interface
@@ -161,6 +188,16 @@ type
 
   TNBoxSearchRequestBaseClass = Class of TNBoxSearchRequestBase;
 
+  TNBoxItemTagBase = Class(TInterfacedObject, INBoxItemTag)
+    protected
+      FValue: string;
+      function GetValue: string;
+    public
+      property Value: string read GetValue;
+      Constructor Create(AValue: string);
+      class function Convert(ATags: TArray<string>): TNBoxItemTagAr; static;
+  End;
+
 implementation
 
 { TNBoxSearchRequestBase }
@@ -227,5 +264,26 @@ begin
   //FOrigin := Value;
 end;
 
+
+{ TNBoxItemTagBase }
+
+class function TNBoxItemTagBase.Convert(ATags: TArray<string>): TNBoxItemTagAr;
+var
+  I: integer;
+begin
+  SetLength(Result, Length(ATags));
+  for I := 0 to High(ATags) do
+    Result[I] := TNBoxItemTagBase.Create(ATags[I]);
+end;
+
+constructor TNBoxItemTagBase.Create(AValue: string);
+begin
+  FValue := AValue;
+end;
+
+function TNBoxItemTagBase.GetValue: string;
+begin
+  Result := FValue;
+end;
 
 end.

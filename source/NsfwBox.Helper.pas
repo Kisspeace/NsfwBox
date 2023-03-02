@@ -22,7 +22,7 @@ uses
   function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
   function CreateRelatedReq(APost: INBoxItem): INBoxSearchRequest;
   function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
-  function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
+  function CreateTagReq(AOrigin: integer; ATag: INBoxItemTag): INBoxSearchRequest;
   function OriginToStr(AOrigin: integer): string;
 
 implementation
@@ -114,19 +114,27 @@ begin
   end;
 end;
 
-function CreateTagReq(AOrigin: integer; ATag: string = ''): INBoxSearchRequest;
+function CreateTagReq(AOrigin: integer; ATag: INBoxItemTag): INBoxSearchRequest;
+var
+  L9HentaiTag: INBoxItemTag9HentaiTo;
 begin
   Result := CreateReqByOrigin(AOrigin);
-  Result.Request := ATag;
   case AOrigin of
 
     ORIGIN_NSFWXXX:
       ( Result as TNBoxSearchReqNsfwXxx ).SearchType := TNsfwUrlType.Category;
 
     ORIGIN_GIVEMEPORNCLUB:
-      ( Result as TNBoxSearchReqGmpClub ).SearchType := TGmpClubSearchType.Tag;
+      ( Result as TNBoxSearchReqGmpClub ).SearchType := TGmpClubSearchType.Tag; 
 
   end;
+
+  if Supports(ATag, INBoxItemTag9HentaiTo, L9HentaiTag) 
+  and (Result.Origin = ORIGIN_9HENTAITO) then begin
+    ( Result as TNBoxSearchReq9HentaiTo ).SearchRec.AddIncludedTag(L9HentaiTag.Tag)
+  end else 
+    Result.Request := ATag.Value;
+    
 end;
 
 function OriginToStr(AOrigin: integer): string;

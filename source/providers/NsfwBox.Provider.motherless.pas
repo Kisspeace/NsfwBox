@@ -13,7 +13,7 @@ type
    IHasCaption, IFetchableContent, IFetchableTags)
     protected
       FPage: TMotherlessPostPage;
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
@@ -153,9 +153,9 @@ begin
   Result := (not FPage.Item.Author.IsEmpty);
 end;
 
-function TNBoxMotherlessItem.GetTags: TArray<string>;
+function TNBoxMotherlessItem.GetTags: TNBoxItemTagAr;
 begin
-  Result := FPage.Tags;
+  Result := TNBoxItemTagBase.Convert(FPage.Tags);
 end;
 
 function TNBoxMotherlessItem.GetTagsCount: integer;

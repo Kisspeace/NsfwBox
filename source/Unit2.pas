@@ -40,6 +40,8 @@ type
       property SelectedStr: string read FSelectedStr;
       property OnSelected: TNotifyEvent read FOnSelect write FOnSelect;
       {}
+      function AddBtn(ABtnClass: TRectButtonClass; AText: string): TRectButton; overload;
+      {}
       function AddBtn(AText: string;
        AId: NativeInt = 0;
        AImageFilename: string = '';
@@ -1123,13 +1125,9 @@ end;
 function TNBoxSelectMenu.AddBtn(AText: string; AId: NativeInt = 0;
   AImageFilename: string = ''; AShortImageName: boolean = false): TRectButton;
 begin
-  Result := form1.CreateDefButton(Self);
+  Result := Self.AddBtn(TRectButton, AText);
   with Result do begin
-
-    Parent := Self;
-    Align := TAlignLayout.Top;
-    Position.Y := 0;
-    Text.Text := AText;
+    Tag := AId;
 
     if not AImageFilename.IsEmpty then begin
 
@@ -1139,12 +1137,25 @@ begin
         Image.ImageURL := AImageFilename;
 
     end;
+  end;
+end;
 
-    Tag := AId;
+function TNBoxSelectMenu.AddBtn(ABtnClass: TRectButtonClass;
+  AText: string): TRectButton;
+begin
+  Result := Form1.CreateDefButtonC(Self, ABtnClass, DEFAULT_IMAGE_CLASS);
+  with Result do begin
+
+    Parent := Self;
+    Align := TAlignLayout.Top;
+    Position.Y := 0;
+    Text.Text := AText;
+
     OnTap := self.BtnOnTap;
     {$IFDEF MSWINDOWS}
     OnClick := Self.ClickTapRef;
     {$ENDIF}
+
   end;
 end;
 

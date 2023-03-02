@@ -20,7 +20,8 @@ uses
   System.Hash, FMX.Surfaces, System.Variants, System.Threading,
   system.NetEncoding, System.Net.URLClient, System.StartUpCopy,
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
-  DbHelper, System.Generics.Collections,
+  DbHelper, System.Generics.Collections, BooruScraper.Interfaces,
+  NinehentaiTo.APITypes,
   { Alcinoe ---------- }
   Alcinoe.FMX.Graphics, Alcinoe.FMX.Objects,
   { Kastri ----------- }
@@ -340,7 +341,7 @@ type
     procedure GotoSearchSettings(ABrowser: TNBoxBrowser = nil);
     procedure GotoItemMenu(AItem: TNBoxCardBase);
     procedure GotoDownloadsMenu;
-    procedure GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
+    procedure GotoItemTagsMenu(ATags: TNBoxItemTagAr; AOrigin: integer);
     procedure GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
     procedure GotoImageViewer(AImageUrl: string);
     { -> Browsers ----------------- }
@@ -351,7 +352,6 @@ type
     procedure BrowserBeforeBrowse(Sender: TObject);
     procedure OnBrowserDblClick(Sender: TObject);
     procedure OnBrowserGesture(Sender: TObject; const EventInfo: TGestureEventInfo; var Handled: Boolean);
-//    procedure OnBrowser
     { -> Cards events ------------- }
     procedure OnNewItem(Sender: TObject; var AItem: TNBoxCardBase);
     procedure OnSimpleCardResize(Sender: TObject);
@@ -375,7 +375,7 @@ type
     function CreateDefCheck(AOwner: TComponent): TRectTextCheck;
     function CreateDefCheckButton(AOwner: TComponent; AStyle: integer = 0): TNBoxCheckButton;
     function CreateDefRadioButton(AOwner: TComponent; AStyle: integer = 0): TNBoxRadioButton;
-    function CreateDefButtonC(AOwner: TComponent; AImageClass: TControlClass; AStyle: integer = 0): TRectButton;
+    function CreateDefButtonC(AOwner: TComponent; AClass: TRectButtonClass; AImageClass: TControlClass; AStyle: integer = 0): TRectButton;
     function CreateDefButton(AOwner: TComponent; AStyle: integer = 0): TRectButton;
     function CreateDefText(AOwner: TComponent; AStyle: integer = 0): TAlText;
     function CreateDefEdit(AOwner: TComponent; AStyle: integer = 0): TNBoxEdit;
@@ -461,6 +461,7 @@ const
   {$ENDIF}
 
   DEFAULT_IMAGE_CLASS: TControlClass = TImageWithUrl;
+  DEFAULT_BUTTON_CLASS: TRectButtonClass = TRectButton;
 
 implementation
 
@@ -752,7 +753,7 @@ end;
 function TForm1.AddSettingsButtonC(AText, AImageName: string;
   AImageClass: TControlClass): TRectButton;
 begin
-  Result := CreateDefButtonC(MenuSettings, AImageClass, BTN_STYLE_DEF2);
+  Result := CreateDefButtonC(MenuSettings, DEFAULT_BUTTON_CLASS, AImageClass, BTN_STYLE_DEF2);
   with Result do begin
     _SetDefSettingsControl(Result);
     Text.Text := AText;
@@ -1362,13 +1363,13 @@ end;
 
 function TForm1.CreateDefButton(AOwner: TComponent; AStyle: integer): TRectButton;
 begin
-  Result := CreateDefButtonC(AOwner, DEFAULT_IMAGE_CLASS, AStyle);
+  Result := CreateDefButtonC(AOwner, DEFAULT_BUTTON_CLASS, DEFAULT_IMAGE_CLASS, AStyle);
 end;
 
-function TForm1.CreateDefButtonC(AOwner: TComponent; AImageClass: TControlClass;
+function TForm1.CreateDefButtonC(AOwner: TComponent; AClass: TRectButtonClass; AImageClass: TControlClass;
   AStyle: integer): TRectButton;
 begin
-  Result := TRectButton.Create(AOwner, AImageClass);
+  Result := AClass.Create(AOwner, AImageClass);
   with Result do begin
 
     case Astyle of
@@ -1820,9 +1821,9 @@ begin
         if Supports(LPost, IFetchableTags) then
           LTryFetchIfEmpty;
 
-        var tags_ar: TArray<string>;
-        tags_ar := (LPost as IHasTags).Tags;
-        GotoItemTagsMenu(tags_ar, LPost.Origin);
+        var LTags: TNBoxItemTagAr;
+        LTags := (LPost as IHasTags).Tags;
+        GotoItemTagsMenu(LTags, LPost.Origin);
 
       end;
     end;
@@ -2824,7 +2825,45 @@ begin
   ChangeInterface(MenuItem);
 end;
 
-procedure TForm1.GotoItemTagsMenu(ATags: TArray<string>; AOrigin: integer);
+function ItemTagToCaption(ATag: INBoxItemTag): string;
+var
+  LColorHex: string;
+  LOtherStr: string;
+  LTagBooru: INBoxItemTagBooru;
+  LTag9HentaiTo: INBoxItemTag9HentaiTo;
+begin
+  if Supports(ATag, INBoxItemTagBooru, LTagBooru) then begin
+
+    case LTagBooru.Tag.Kind of
+      TagGeneral:   LColorHex := COLOR_TAG_GENERAL;
+      TagCopyright: LColorHex := COLOR_TAG_COPYRIGHT;
+      TagMetadata:  LColorHex := COLOR_TAG_METADATA;
+      TagCharacter: LColorHex := COLOR_TAG_CHARACTER;
+      TagArtist:    LColorHex := COLOR_TAG_ARTIST;
+    end;
+
+    if ( LTagBooru.Tag.Count > 0 ) then
+      LOtherStr := '<font color="' + COLOR_TAG_TOTAL_COUNT + '">'
+      + LTagBooru.Tag.Count.ToString + '</font>'
+
+  end else if Supports(ATag, INBoxItemTag9HentaiTo, LTag9HentaiTo) then begin
+
+    case LTag9HentaiTo.Tag.Typ of
+      TAG_TAG: LColorHex       := COLOR_TAG_GENERAL;
+      TAG_PARODY: LColorHex    := COLOR_TAG_COPYRIGHT;
+      TAG_GROUP: LColorHex     := COLOR_TAG_METADATA;
+      TAG_CHARACTER: LColorHex := COLOR_TAG_CHARACTER;
+      TAG_ARTIST: LColorHex    := COLOR_TAG_ARTIST;
+    end;
+
+  end else
+    LColorHex := COLOR_TAG_GENERAL;
+
+  Result := '<font color="' + LColorHex + '">'
+    + THTMLEncoding.HTML.Encode(ATag.Value) + '</font> ' + LOtherStr;
+end;
+
+procedure TForm1.GotoItemTagsMenu(ATags: TNBoxItemTagAr; AOrigin: integer);
 var
   I: integer;
   LNewBtn: TRectButton;
@@ -2840,8 +2879,12 @@ begin
       LIconBmp.LoadFromFile(Form1.AppStyle.GetImagePath(ICON_TAG));
 
     for I := low(ATags) to high(ATags) do begin
-      LNewBtn := MenuItemTags.AddBtn(ATags[I], 0, '', true);
+      LNewBtn := MenuItemTags.AddBtn(TRectButtonWithTag, ItemTagToCaption(ATags[I]));
+      LNewBtn.Text.TextIsHtml := True;
       LNewBtn.Image.BitmapIWU.Assign(LIconBmp);
+
+      with LNewBtn as TRectButtonWithTag do
+        ContainedData := ATags[I];
     end;
 
   finally
@@ -3405,9 +3448,12 @@ begin
 end;
 
 procedure TForm1.MenuItemTagsOnSelected(Sender: TObject);
+var
+  LBtnTag: TRectButtonWithTag;
 begin
+  LBtnTag := MenuItemTags.SelectedBtn as TRectButtonWithTag;
   self.AddBrowser(CreateTagReq(MenuItemTagsOrigin,
-                  MenuItemTags.SelectedBtn.Text.Text),
+                  LBtnTag.ContainedData),
                   Settings.AutoStartBrowse);
 end;
 

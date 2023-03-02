@@ -10,6 +10,20 @@ uses
 
 type
 
+  TNBoxItemTagBooru = Class(TInterfacedObject, INBoxItemTag, INBoxItemTagBooru)
+    protected
+      FTag: IBooruTag;
+      function GetValue: string;
+      procedure SetTag(value: IBooruTag);
+      function GetTag: IBooruTag;
+    public
+      property Tag: IBooruTag read GetTag write SetTag;
+      property Value: string read GetValue;
+      constructor Create(ATag: IBooruTag);
+      class function Convert(ATag: IBooruTag): INBoxItemTag; overload; static;
+      class function Convert(ATags: TBooruTagList): TNBoxItemTagAr; overload; static;
+  End;
+
   TNBoxBooruItemBase = class(TNBoxItemBase,
    IHasAuthor, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     private
@@ -20,7 +34,7 @@ type
       function GetAuthorName: string;
       function GetContentFetched: boolean;
       function GetTagsFetched: boolean;
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       procedure SetThumbItem(const value: IBooruThumb); virtual;
       function GetThumbItem: IBooruThumb; virtual;
       procedure SetFull(const value: IBooruPost); virtual;
@@ -36,7 +50,7 @@ type
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
       [DISABLE] property AuthorName: string read GetAuthorName;
-      [DISABLE] property Tags: TArray<string> read GetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create; override;
@@ -116,12 +130,12 @@ begin
   Result := Self.FFull;
 end;
 
-function TNBoxBooruItemBase.GetTags: TArray<string>;
+function TNBoxBooruItemBase.GetTags: TNBoxItemTagAr;
 begin
   if TagsFetched then
-    Result := Self.Full.TagsValues
+    Result := TNBoxItemTagBooru.Convert(Self.Full.Tags)
   else
-    Result := Self.ThumbItem.TagsValues;
+    Result := TNBoxItemTagBase.Convert(Self.ThumbItem.TagsValues);
 end;
 
 function TNBoxBooruItemBase.GetTagsFetched: boolean;
@@ -188,6 +202,45 @@ end;
 function TNBoxSearchReqGelbooru.GetOrigin: integer;
 begin
   Result := PROVIDERS.Gelbooru.Id;
+end;
+
+{ TNBoxItemTagBooru }
+
+class function TNBoxItemTagBooru.Convert(ATags: TBooruTagList): TNBoxItemTagAr;
+var
+  I: integer;
+begin
+  SetLength(Result, ATags.Count);
+  for I := 0 to ATags.Count - 1 do
+    Result[I] := Convert(ATags[I]);
+end;
+
+class function TNBoxItemTagBooru.Convert(ATag: IBooruTag): INBoxItemTag;
+var
+  LTagCopy: IBooruTag;
+begin
+  supports(ATag.Clone, IBooruTag, LTagCopy);
+  Result := TNBoxItemTagBooru.Create(LTagCopy);
+end;
+
+constructor TNBoxItemTagBooru.Create(ATag: IBooruTag);
+begin
+  Tag := ATag;
+end;
+
+function TNBoxItemTagBooru.GetTag: IBooruTag;
+begin
+  Result := FTag;
+end;
+
+function TNBoxItemTagBooru.GetValue: string;
+begin
+  Result := Tag.Value;
+end;
+
+procedure TNBoxItemTagBooru.SetTag(value: IBooruTag);
+begin
+  FTag := value;
 end;
 
 end.

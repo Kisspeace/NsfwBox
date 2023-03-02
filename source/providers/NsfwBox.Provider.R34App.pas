@@ -14,7 +14,7 @@ type
     protected
       FItem: TR34AppItem;
       //procedure SetTags(const Value: TArray<string>);
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetUidInt: int64;
       //procedure SetUIdInt(const Value: int64);
@@ -32,7 +32,7 @@ type
       [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
       [DISABLE] property ThumbnailUrl read GetThumbnailUrl; // write SetThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
       [DISABLE] property TagsCount: integer read GetTagsCount;
       [DISABLE] property AuthorName: string read GetAuthorName;
       procedure Assign(ASource: INBoxItem);                  override;
@@ -96,9 +96,9 @@ begin
   Result := [Item.HighResFile.Url];
 end;
 
-function TNBoxR34AppItem.GetTags: TArray<string>;
+function TNBoxR34AppItem.GetTags: TNBoxItemTagAr;
 begin
-  Result := Item.Tags.ToStringAr;
+  Result := TNBoxItemTagBase.Convert(Item.Tags.ToStringAr);
 end;
 
 function TNBoxR34AppItem.GetTagsCount: integer;

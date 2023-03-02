@@ -13,7 +13,7 @@ type
     protected
       FItem: TR34Item;
       //procedure SetTags(const Value: TArray<string>);
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       function GetUidInt: int64;
       //procedure SetUIdInt(const Value: int64);
       //procedure SetContentUrls(const Value: TArray<string>); override;
@@ -30,7 +30,7 @@ type
       [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
       constructor Create; override;
   end;
 
@@ -73,9 +73,9 @@ begin
   Result := [FItem.file_url];
 end;
 
-function TNBoxR34JsonApiItem.GetTags: TArray<string>;
+function TNBoxR34JsonApiItem.GetTags: TNBoxItemTagAr;
 begin
-  Result := FItem.tags;
+  Result := TNBoxItemTagBase.Convert(FItem.tags);
 end;
 
 function TNBoxR34JsonApiItem.GetThumbnailUrl: string;

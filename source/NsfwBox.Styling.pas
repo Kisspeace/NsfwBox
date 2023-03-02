@@ -46,6 +46,15 @@ const
   IMAGE_LOADING    = 'image-loading.jpg';
   IMAGE_REQUEST_ITEM = 'request-item.png';
 
+  { HTML COLORS }
+  COLOR_TAG_GENERAL   = '#FFFFFF';
+  COLOR_TAG_COPYRIGHT = '#FFC0F3';
+  COLOR_TAG_METADATA  = '#FFF9C0';
+  COLOR_TAG_CHARACTER = '#C0FFC8';
+  COLOR_TAG_ARTIST    = '#FFC0C0';
+
+  COLOR_TAG_TOTAL_COUNT = '#90A4AE';
+
 
 type
 

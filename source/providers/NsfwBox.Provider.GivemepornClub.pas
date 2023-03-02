@@ -17,7 +17,7 @@ type
       FPage: TGmpclubFullPage;
       FItem: TGmpclubItem;
       //procedure SetTags(const Value: TArray<string>);
-      function GetTags: TArray<string>;
+      function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
@@ -42,7 +42,7 @@ type
       [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
       [DISABLE] property Caption: string read GetCaption; // write SetCaption;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      [DISABLE] property Tags: TArray<string> read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create; override;
   end;
@@ -106,9 +106,9 @@ begin
     Result := [ FPage.ContentUrl ];
 end;
 
-function TNBoxGmpClubItem.GetTags: TArray<string>;
+function TNBoxGmpClubItem.GetTags: TNBoxItemTagAr;
 begin
-  Result := FPage.Tags;
+  Result := TNBoxItemTagBase.Convert(FPage.Tags);
 end;
 
 function TNBoxGmpClubItem.GetTagsCount: integer;
