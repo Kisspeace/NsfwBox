@@ -9,7 +9,8 @@ uses
   { NsfwBox }
   NsfwBox.Provider.Bookmarks, NsfwBox.Interfaces, NsfwBox.Graphics,
   NsfwBox.Graphics.Browser, NsfwBox.ContentScraper,
-  NsfwBox.Graphics.Rectangle, NsfwBox.Styling, NsfwBox.Logging;
+  NsfwBox.Graphics.Rectangle, NsfwBox.Styling, NsfwBox.Logging,
+  NsfwBox.Consts;
 
 type
 
@@ -57,7 +58,7 @@ var
   I: integer;
 begin
   Form1 := Unit1.Form1;
-  LTab := Form1.AddBrowser(nil, False);
+  LTab := Form1.AddBrowser(PROVIDERS.GMPClub.RequestClass.Create, False);
   LTab.CloseBtn.Visible := FALSE;
   LBrowser := LTab.Owner as TNBoxBrowser;
   Form1.CurrentBrowser := LBrowser;
@@ -66,7 +67,7 @@ begin
     for I := 1 to 20 do begin
       LBrowser.GoNextPage;
       Application.ProcessMessages;
-      sleep(1);
+      sleep(Random(550));
 //      {$IFDEF ANDROID}
 //        sleep(random(330));
 //      {$ELSE IF MSWINDOWS}
@@ -155,27 +156,27 @@ begin
       try
         I := 0;
         var LNeedWork: boolean := TRUE;
-        while LNeedWork do begin
-          TThread.Synchronize(Nil, procedure begin
-            LNeedWork := (Form1.DownloadItems.Count > 0);
-            if LNeedWork then begin
-              var LIndex: integer := Random(Form1.DownloadItems.Count);
-              var LTab := Form1.DownloadItems[LIndex];
-              var hash: string := LTab.GetHashCode.ToString;
-//              Unit1.Log('Test before tap: ' + Hash);
-              try
-                LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
-              except On E: exception do Log('Test Downloaders', E); end;
-              Inc(I);
-//              Unit1.Log('Test after tap: ' + Hash);
-            end;
-            LNeedWork := TRUE;
-
-          end);
-
-          if TThread.Current.CheckTerminated then exit;
-            Sleep(Random(25));
-        end;
+//        while LNeedWork do begin
+//          TThread.Synchronize(Nil, procedure begin
+//            LNeedWork := (Form1.DownloadItems.Count > 0);
+//            if LNeedWork then begin
+//              var LIndex: integer := Random(Form1.DownloadItems.Count);
+//              var LTab := Form1.DownloadItems[LIndex];
+//              var hash: string := LTab.GetHashCode.ToString;
+////              Unit1.Log('Test before tap: ' + Hash);
+//              try
+//                LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
+//              except On E: exception do Log('Test Downloaders', E); end;
+//              Inc(I);
+////              Unit1.Log('Test after tap: ' + Hash);
+//            end;
+//            LNeedWork := TRUE;
+//
+//          end);
+//
+//          if TThread.Current.CheckTerminated then exit;
+//            Sleep(Random(25));
+//        end;
       except
         On E: exception do Log('Test', E);
       end;

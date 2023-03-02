@@ -78,6 +78,8 @@ type
     procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
+    FLock: TMREWSync;
+    FAppDestroying: boolean;
     FSettings: TNsfwBoxSettings;
     FAppStyle: TNBoxGUIStyle;
     FFormCreated: boolean;
@@ -86,6 +88,7 @@ type
     FCurrentBookmarksDb: TNBoxBookmarksDb;
     FCurrentBookmarkControl: TNBoxSettingsCheck;
     FCurrentBookmarkGroup: TBookmarkGroupRec;
+    function GetAppDestroying: boolean;
     procedure SetSettings(const value: TNsfwBoxSettings);
     function GetSettings: TNsfwBoxSettings;
     function GetAppStyle: TNBoxGUIStyle;
@@ -405,12 +408,12 @@ type
     property Settings: TNsfwBoxSettings read GetSettings write SetSettings;
     property SubHeader: string read GetSubHeader write SetSubHeader;
     property AppFullscreen: boolean read GetAppFullscreen write SetAppFullscreen;
+    property AppDestroying: boolean read GetAppDestroying; // True when app destroying.
   end;
 
 var
   Form1: TForm1;
   APP_VERSION: TSemVer; // Current application version
-  AppDestroying: boolean; // True when app destroying.
 
   LOG_FILENAME         : string = 'log.txt';
   SETTINGS_FILENAME    : string = 'settings.json';
@@ -1942,6 +1945,7 @@ var
 
 begin
   FFormCreated := false;
+  FLock := TMREWSync.Create;
 
   APP_VERSION := GetAppVersion;
   FCurrentBrowser := nil;
@@ -2570,6 +2574,8 @@ begin
         if AppDestroying then exit;
 
         TThread.Synchronize(Nil, procedure begin
+          if AppDestroying then exit;
+
           {$IFDEF MSWINDOWS}
           if Settings.UseNewAppTitlebar then
             TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( ' + LastRelease.Name + 'Available' + ' )';
@@ -2590,6 +2596,8 @@ begin
         end);
       end else begin
         TThread.Synchronize(Nil, procedure begin
+          if AppDestroying then exit;
+
           {$IFDEF MSWINDOWS}
           if Settings.UseNewAppTitlebar and ( LastVer = APP_VERSION ) then
             TitleBar.BtnTitle.Text.Text := TitleBar.BtnTitle.Text.Text + ' ( current )'
@@ -2611,8 +2619,15 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
+  FLock.BeginWrite;
+  try
+    FAppDestroying := True;
+  finally
+    FLock.EndWrite;
+  end;
+
   log('Destroing app');
-  AppDestroying := True;
+
   try
     FreeAndNil(DownloadFetcher);
     FreeAndNil(DownloadManager);
@@ -2681,6 +2696,16 @@ begin
   BrowsersIWUContentManager.SyncBitmapLoadFromFile := Settings.YDWSyncLoadFromFile;
   IWUContentManager.SyncBitmapLoadFromFile := Settings.YDWSyncLoadFromFile;
   IWUCacheManager.SyncBitmapLoadFromFile := Settings.YDWSyncLoadFromFile;
+end;
+
+function TForm1.GetAppDestroying: boolean;
+begin
+  FLock.BeginRead;
+  try
+    Result := FAppDestroying;
+  finally
+    FLock.EndRead;
+  end;
 end;
 
 function TForm1.GetAppFullscreen: boolean;
@@ -3112,7 +3137,8 @@ begin
   TThread.Synchronize(TThread.Current,
   procedure begin
     try
-      AddDownload(LItem.Clone);
+      if not AppDestroying then
+        AddDownload(LItem.Clone);
     except
       On E: Exception do Log('DownloadFetcherOnFetched', E);
     end;
