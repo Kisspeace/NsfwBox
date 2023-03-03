@@ -9,7 +9,7 @@ uses
 
 type
 
-  TNBoxMotherlessItem = class(TNBoxItemBase, IHasTags, IHasAuthor,
+  TNBoxMotherlessItem = class(TNBoxItemBase, IHasTags, IHasArtists,
    IHasCaption, IFetchableContent, IFetchableTags)
     protected
       FPage: TMotherlessPostPage;
@@ -17,7 +17,7 @@ type
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
-      function GetAuthorName: string;
+      function GetArtists: TNBoxItemArtisAr;
       function GetCaption: string;
       function GetContentUrls: TArray<string>; override;
       function GetThumbnailUrl: string; override;
@@ -125,9 +125,9 @@ begin
   FOrigin := PROVIDERS.Motherless.Id;
 end;
 
-function TNBoxMotherlessItem.GetAuthorName: string;
+function TNBoxMotherlessItem.GetArtists: TNBoxItemArtisAr;
 begin
-  Result := FPage.Item.Author;
+  Result := [TNBoxItemArtistBase.Create(FPage.Item.Author, '')];
 end;
 
 function TNBoxMotherlessItem.GetCaption: string;

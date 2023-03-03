@@ -10,7 +10,7 @@ uses
 type
 
   TNBoxRealbooruItem = class(TNBoxBooruItemBase,
-   IHasAuthor, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
+   IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     public
       //--Properties--//
       property Origin;

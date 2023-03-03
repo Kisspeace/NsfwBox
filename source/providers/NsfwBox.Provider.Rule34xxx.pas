@@ -12,7 +12,7 @@ uses
 type
 
   TNBoxRule34xxxItem = class(TNBoxBooruItemBase,
-   IHasAuthor, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
+   IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     public
       //--Properties--//
       property Origin;

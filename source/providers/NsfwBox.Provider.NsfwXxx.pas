@@ -11,7 +11,7 @@ type
 
   TNsfwXxxSite = (NsfwXxx, PornpicXxx, HdpornPics);
 
-  TNBoxNsfwXxxItem = class( TNBoxItemBase, IUIdAsInt, IHasTags, IHasAuthor,
+  TNBoxNsfwXxxItem = class( TNBoxItemBase, IUIdAsInt, IHasTags, IHasArtists,
    IHasCaption, IFetchableContent, IFetchableTags)
     private
       FPage: TNsfwXxxPostPage;
@@ -21,7 +21,7 @@ type
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
-      function GetAuthorName: string;
+      function GetArtists: TNBoxItemArtisAr;
       //procedure SetAuthorName(const Value: string);
       function GetUidInt: int64;
       //procedure SetUIdInt(const Value: int64);
@@ -44,7 +44,7 @@ type
       [DISABLE] property ContentUrls;
       [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
       [DISABLE] property Caption: string read GetCaption; // write SetCaption;
-      [DISABLE] property AuthorName: string read GetAuthorName; // write SetAuthorName;
+      [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
@@ -115,9 +115,12 @@ begin
   FOrigin := PROVIDERS.NsfwXxx.Id;
 end;
 
-function TNBoxNsfwXxxItem.GetAuthorName: string;
+function TNBoxNsfwXxxItem.GetArtists: TNBoxItemArtisAr;
 begin
-  Result := Item.Username;
+//  if ContentFetched then
+//    Result := [TNBoxItemArtistBase.Create(FPage.Items[0].Username, FPage.Items[0].UserAvatarUrl)]
+//  else
+  Result := [TNBoxItemArtistBase.Create(FItem.Username, FItem.UserAvatarUrl)];
 end;
 
 function TNBoxNsfwXxxItem.GetCaption: string;

@@ -10,7 +10,7 @@ uses
 type
 
   TNBoxR34AppItem = class(TNBoxItemBase, INBoxitem, IUIdAsInt,
-    IHasTags, IHasAuthor)
+    IHasTags, IHasArtists)
     protected
       FItem: TR34AppItem;
       //procedure SetTags(const Value: TArray<string>);
@@ -23,7 +23,7 @@ type
       function GetContentUrls: TArray<string>;               override;
       //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
-      function GetAuthorName: string;
+      function GetArtists: TNBoxItemArtisAr;
     public
       //--New--//
       property Item: TR34Appitem read FItem write FItem;
@@ -34,7 +34,7 @@ type
       [DISABLE] property ContentUrls;
       [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
       [DISABLE] property TagsCount: integer read GetTagsCount;
-      [DISABLE] property AuthorName: string read GetAuthorName;
+      [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
       constructor Create; override;
@@ -77,12 +77,12 @@ begin
   FOrigin := PROVIDERS.R34App.Id;
 end;
 
-function TNBoxR34AppItem.GetAuthorName: string;
+function TNBoxR34AppItem.GetArtists: TNBoxItemArtisAr;
 begin
   if ( Length(Item.Tags.Artist) > 0 ) then
-    Result := Item.Tags.Artist[0]
+    Result := [TNBoxItemArtistBase.Create(Item.Tags.Artist[0], '')]
   else
-    Result := '';
+    Result := [];
 end;
 
 function TNBoxR34AppItem.GetCaption: string;

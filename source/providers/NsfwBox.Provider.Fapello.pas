@@ -13,8 +13,22 @@ type
 
   TFapelloItemKind = (FlFeed, FlThumb);
 
-  TNBoxFapelloItem = class(TNBoxItemBase,
-   IHasAuthor, IFetchableContent)
+  TNBoxItemArtistFapello = Class(TInterfacedObject, INBoxItemArtist, INBoxItemArtistFapello)
+    protected
+      FArtist: TFapelloAuthor;
+      function GetArtist: TFapelloAuthor;
+      function GetDisplayName: string;
+      function GetAvatarUrl: string;
+      function GetContentCount: integer;
+    public
+      property Artist: TFapelloAuthor read GetArtist;
+      property DisplayName: string read GetDisplayName;
+      property AvatarUrl: string read GetAvatarUrl;
+      property ContentCount: integer read GetContentCount;
+      constructor Create(AArtist: TFapelloAuthor);
+  End;
+
+  TNBoxFapelloItem = class(TNBoxItemBase, IHasArtists, IFetchableContent)
     private
       FKind: TFapelloItemKind;
       FFeedItem: TFapelloFeedItem;
@@ -22,7 +36,7 @@ type
       FFull: TFapelloContentPage;
       function GetContentUrls: TArray<string>; override;
       function GetThumbnailUrl: string; override;
-      function GetAuthorName: string;
+      function GetArtists: TNBoxItemArtisAr;
       function GetContentFetched: boolean;
     public
       procedure Assign(ASource: INBoxItem);                  override;
@@ -36,7 +50,7 @@ type
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property AuthorName: string read GetAuthorName;
+      [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       constructor Create; override;
   end;
@@ -88,11 +102,12 @@ begin
   Full := TFapelloContentPage.New;
 end;
 
-function TNBoxFapelloItem.GetAuthorName: string;
+function TNBoxFapelloItem.GetArtists: TNBoxItemArtisAr;
 begin
-  Result := FFeedItem.Author.Username;
-  if Result.IsEmpty then
-    Result := FFull.Author.Username;
+  if ContentFetched then
+    Result := [TNBoxItemArtistFapello.Create(FFull.Author)]
+  else
+    Result := [TNBoxItemArtistFapello.Create(FFeedItem.Author)];
 end;
 
 function TNBoxFapelloItem.GetContentFetched: boolean;
@@ -135,6 +150,33 @@ end;
 function TNBoxSearchReqFapello.GetOrigin: integer;
 begin
   Result := PROVIDERS.Fapello.Id;
+end;
+
+{ TNBoxItemArtistFapello }
+
+constructor TNBoxItemArtistFapello.Create(AArtist: TFapelloAuthor);
+begin
+  FArtist := AArtist;
+end;
+
+function TNBoxItemArtistFapello.GetArtist: TFapelloAuthor;
+begin
+  Result := FArtist;
+end;
+
+function TNBoxItemArtistFapello.GetAvatarUrl: string;
+begin
+  Result := FArtist.AvatarUrl;
+end;
+
+function TNBoxItemArtistFapello.GetContentCount: integer;
+begin
+  Result := FArtist.Media;
+end;
+
+function TNBoxItemArtistFapello.GetDisplayName: string;
+begin
+  Result := FArtist.DisplayName;
 end;
 
 end.

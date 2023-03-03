@@ -10,10 +10,23 @@ uses
 
 type
 
-  //TCoomerPartySite = (CoomerParty, KemonoParty);
+  TNBoxArtistCoomerParty = Class(TInterfacedObject, INBoxItemArtist, INBoxItemArtistCoomerParty)
+    protected
+      FArtist: TPartyArtist;
+      function GetArtist: TPartyArtist;
+      function GetDisplayName: string;
+      function GetAvatarUrl: string;
+      function GetContentCount: integer;
+    public
+      property Artist: TPartyArtist read GetArtist;
+      property DisplayName: string read GetDisplayName;
+      property AvatarUrl: string read GetAvatarUrl;
+      property ContentCount: integer read GetContentCount;
+      constructor Create(AArtist: TPartyArtist);
+  End;
 
   TNBoxCoomerPartyItem = class(TNBoxItemBase, IUIdAsInt, IHasCaption,
-   IHasAuthor, IFetchableContent)
+   IHasArtists, IFetchableContent)
     private
       FSite: String;
       FId: int64;
@@ -23,7 +36,7 @@ type
       function GetContentFetched: boolean;
       function GetCaption: string;
       function GetUidInt: int64;
-      function GetAuthorName: string;
+      function GetArtists: TNBoxItemArtisAr;
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
@@ -34,7 +47,7 @@ type
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property AuthorName: string read GetAuthorName;
+      [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       property UIdInt: int64 read GetUidInt write FId;
       [DISABLE] property Caption: string read GetCaption; // write SetCaption;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
@@ -103,9 +116,9 @@ begin
   FItem := TPartyPostPage.New;
 end;
 
-function TNBoxCoomerPartyItem.GetAuthorName: string;
+function TNBoxCoomerPartyItem.GetArtists: TNBoxItemArtisAr;
 begin
-  Result := FItem.Author.Id;
+  Result := [TNBoxArtistCoomerParty.Create(FItem.Author)];
 end;
 
 function TNBoxCoomerPartyItem.GetCaption: string;
@@ -163,6 +176,33 @@ end;
 function TNBoxSearchReqCoomerParty.GetOrigin: integer;
 begin
   Result := PROVIDERS.CoomerParty.Id;
+end;
+
+{ TNBoxArtistCoomerParty }
+
+constructor TNBoxArtistCoomerParty.Create(AArtist: TPartyArtist);
+begin
+  FArtist := AArtist;
+end;
+
+function TNBoxArtistCoomerParty.GetArtist: TPartyArtist;
+begin
+  Result := FArtist;
+end;
+
+function TNBoxArtistCoomerParty.GetAvatarUrl: string;
+begin
+  Result := '';
+end;
+
+function TNBoxArtistCoomerParty.GetContentCount: integer;
+begin
+  Result := -1;
+end;
+
+function TNBoxArtistCoomerParty.GetDisplayName: string;
+begin
+  Result := FArtist.Name;
 end;
 
 end.

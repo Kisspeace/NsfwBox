@@ -1273,7 +1273,7 @@ begin
         _SetVisible(ButtonsItemMenu, true);
         Post := CurrentItem.Post;
         BtnShowTags.Visible    := Supports(Post, IHasTags);
-        BtnOpenAuthor.Visible  := Supports(Post, IHasAuthor);
+        BtnOpenAuthor.Visible  := Supports(Post, IHasArtists);
         BtnOpenRelated.Visible := ( Post is TNBoxNsfwXxxItem );
         BtnBrowse.Visible      := false;
       end else if CurrentItem.Bookmark.IsRequest then begin
@@ -1768,15 +1768,22 @@ begin
     ACTION_OPEN_AUTHOR:
     begin
       if not AItem.HasPost then exit;
-      if supports(LPost, IHasAuthor) then begin
+      var LPostArtists: IHasArtists;
+      if Supports(LPost, IHasArtists, LPostArtists) then begin
+
         if Supports(LPost, IFetchableAuthors) then
           LTryFetchIfEmpty;
 
-        LTmpReq := CreateAuthorReq(LPost);
+        var LArtists := LPostArtists.Artists;
 
-        if Assigned(LTmpReq) then begin
-          AddBrowser(LTmpReq, Settings.AutoStartBrowse);
+        for i := 0 to High(LArtists) do begin
+          LTmpReq := CreateArtistReq(LPost, LArtists[I]);
+
+          if Assigned(LTmpReq) then begin
+            AddBrowser(LTmpReq, Settings.AutoStartBrowse);
+          end;
         end;
+
       end;
     end;
 
@@ -2220,7 +2227,7 @@ begin
   BtnPlayExternaly := AddItemMenuBtn('Play externaly', ACTION_PLAY_EXTERNALY, ICON_PLAY);
   BtnAddBookmark   := AddItemMenuBtn('Add bookmark', ACTION_ADD_BOOKMARK, ICON_BOOKMARKS, TAG_CAN_USE_MORE_THAN_ONE);
   BtnOpenRelated   := AddItemMenuBtn('Open related', ACTION_OPEN_RELATED, ICON_NEWTAB, TAG_CAN_USE_MORE_THAN_ONE);
-  BtnOpenAuthor    := AddItemMenuBtn('Open author', ACTION_OPEN_AUTHOR, ICON_AVATAR, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnOpenAuthor    := AddItemMenuBtn('Open artists', ACTION_OPEN_AUTHOR, ICON_AVATAR, TAG_CAN_USE_MORE_THAN_ONE);
   BtnCopyFullUrl   := AddItemMenuBtn('Copy content url', ACTION_COPY_CONTENT_URLS, ICON_COPY);
   BtnCopyThumbUrl  := AddItemMenuBtn('Copy thumbnail url', ACTION_COPY_THUMB_URL, ICON_COPY);
   BtnLogContentUrls := AddItemMenuBtn('Log content urls to file', ACTION_LOG_URLS, ICON_SAVE, TAG_CAN_USE_MORE_THAN_ONE);

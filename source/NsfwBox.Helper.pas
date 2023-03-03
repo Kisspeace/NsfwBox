@@ -21,7 +21,7 @@ uses
   function CreateItemByOrigin(AOrigin: integer): INBoxItem;
   function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
   function CreateRelatedReq(APost: INBoxItem): INBoxSearchRequest;
-  function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
+  function CreateArtistReq(APost: INBoxItem; AArtist: INBoxItemArtist): INBoxSearchRequest;
   function CreateTagReq(AOrigin: integer; ATag: INBoxItemTag): INBoxSearchRequest;
   function OriginToStr(AOrigin: integer): string;
 
@@ -62,31 +62,22 @@ begin
   end;
 end;
 
-function CreateAuthorReq(APost: INBoxItem): INBoxSearchRequest;
-var
-  LAuthor: IHasAuthor;
-  LAuthorStr: string;
+function CreateArtistReq(APost: INBoxItem; AArtist: INBoxItemArtist): INBoxSearchRequest;
 begin
   Result := nil;
-
-  if Supports(APost, IHasAuthor, LAuthor) then begin
-    LAuthorStr := LAuthor.AuthorName;
-    if LAuthorStr.IsEmpty then Exit;
-  end else
-    Exit;
 
   if ( APost is TNBoxNsfwXxxItem ) then begin
 
     Result := TNBoxSearchReqNsfwXxx.create;
     with ( Result as TNBoxSearchReqNsfwXxx ) do begin
-      Result.Request := LAuthorStr;
+      Result.Request := AArtist.DisplayName;
       SearchType := TNsfwUrlType.User;
     end;
 
   end else if ( APost is TNBoxR34AppItem ) then begin
 
     Result := TNBoxSearchReqR34App.Create;
-    Result.Request := LAuthorStr;
+    Result.Request := AArtist.DisplayName;
 
   end else if ( APost is TNBoxCoomerPartyItem ) then begin
 
@@ -101,14 +92,17 @@ begin
 
     var LPost := ( Apost As TNBoxFapelloItem);
     var LReq := TNBoxSearchReqFapello.Create;
+    var LArtist: INBoxItemArtistFapello;
+    Supports(AArtist, INBoxItemArtistFapello, LArtist);
+
     LReq.RequestKind := TFapelloItemKind.FlThumb;
-    LReq.Request := LPost.AuthorName;
+    LReq.Request := LArtist.Artist.Username;
     Result := LReq;
 
   end else if ( APost is TNBoxBooruItemBase ) then begin
 
     var LReq := CreateReqByOrigin(APost.Origin);
-    LReq.Request := LAuthorStr;
+    LReq.Request := AArtist.DisplayName;
     Result := LReq;
 
   end;

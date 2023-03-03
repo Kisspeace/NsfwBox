@@ -24,14 +24,27 @@ type
       class function Convert(ATags: TBooruTagList): TNBoxItemTagAr; overload; static;
   End;
 
+  TNBoxItemArtistBooru = Class(TNBoxItemTagBooru, INBoxItemArtist, INBoxItemArtistBooru)
+    protected
+      function GetArtist: IBooruTag;
+      function GetDisplayName: string;
+      function GetAvatarUrl: string;
+      function GetContentCount: integer;
+    public
+      property Artist: IBooruTag read GetArtist;
+      property DisplayName: string read GetDisplayName;
+      property AvatarUrl: string read GetAvatarUrl;
+      property ContentCount: integer read GetContentCount;
+  End;
+
   TNBoxBooruItemBase = class(TNBoxItemBase,
-   IHasAuthor, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
+   IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     private
       FThumbItem: IBooruThumb;
       FFull: IBooruPost;
       function GetContentUrls: TArray<string>; override;
       function GetThumbnailUrl: string; override;
-      function GetAuthorName: string;
+      function GetArtists: TNBoxItemArtisAr;
       function GetContentFetched: boolean;
       function GetTagsFetched: boolean;
       function GetTags: TNBoxItemTagAr;
@@ -49,7 +62,7 @@ type
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property AuthorName: string read GetAuthorName;
+      [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
@@ -59,7 +72,7 @@ type
   TNBoxBooruItemBaseClass = Class of TNBoxBooruItemBase;
 
   TNBoxGelbooruItem = class(TNBoxBooruItemBase,
-   IHasAuthor, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
+   IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     public
       //--Properties--//
       property Origin;
@@ -99,14 +112,24 @@ begin
   Self.FFull := TBooruPostBase.Create;
 end;
 
-function TNBoxBooruItemBase.GetAuthorName: string;
+function TNBoxBooruItemBase.GetArtists: TNBoxItemArtisAr;
+var
+  I: integer;
+  LArtistTags: TBooruTagAr;
+  LTagCopy: IBooruTag;
 begin
   if TagsFetched then begin
-    var LArtists := Self.Full.GetTagsByType(TBooruTagType.TagArtist);
-    if Length(LArtists) > 0 then
-      Result := LArtists[0].Value;
+
+    LArtistTags := Full.GetTagsByType(TBooruTagType.TagArtist);
+    SetLength(Result, Length(LArtistTags));
+
+    for I := 0 to High(Result) do begin
+      supports(LArtistTags[I].Clone, IBooruTag, LTagCopy);
+      Result[I] := TNBoxItemArtistBooru.Create(LTagCopy);
+    end;
+
   end else
-    Result := '';
+    Result := [];
 end;
 
 function TNBoxBooruItemBase.GetContentFetched: boolean;
@@ -241,6 +264,29 @@ end;
 procedure TNBoxItemTagBooru.SetTag(value: IBooruTag);
 begin
   FTag := value;
+end;
+
+{ TNBoxItemArtistBooru }
+
+
+function TNBoxItemArtistBooru.GetArtist: IBooruTag;
+begin
+  Result := Tag;
+end;
+
+function TNBoxItemArtistBooru.GetAvatarUrl: string;
+begin
+  Result := '';
+end;
+
+function TNBoxItemArtistBooru.GetContentCount: integer;
+begin
+  Result := Tag.Count;
+end;
+
+function TNBoxItemArtistBooru.GetDisplayName: string;
+begin
+  Result := Value;
 end;
 
 end.

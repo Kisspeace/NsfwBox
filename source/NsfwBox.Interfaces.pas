@@ -6,7 +6,8 @@ interface
 
 uses
   System.SysUtils, Classes, System.Generics.Collections, XSuperObject,
-  BooruScraper.Interfaces, Ninehentaito.APITypes;
+  BooruScraper.Interfaces, Ninehentaito.APITypes, CoomerParty.Types,
+  Fapello.Types;
 
 type
 {*
@@ -71,13 +72,46 @@ type
     property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
   end;
 
-  IHasAuthor = interface
+  INBoxItemArtist = interface
+    ['{076240E9-6DFD-4567-9FBC-0BE73E74A419}']
+    { privite \ protected }
+    function GetDisplayName: string;
+    function GetAvatarUrl: string;
+    function GetContentCount: integer;
+    { public }
+    property DisplayName: string read GetDisplayName;
+    property AvatarUrl: string read GetAvatarUrl;
+    property ContentCount: integer read GetContentCount;
+  end;
+
+  INBoxItemArtistGeneric<T> = interface(INBoxItemArtist)
+    ['{4AAC263B-1BA5-4F11-88B7-5337F04E067C}']
+    { privite \ protected }
+    function GetArtist: T;
+    { public }
+    property Artist: T read GetArtist;
+  end;
+
+  INBoxItemArtistCoomerParty = interface(INBoxItemArtistGeneric<TPartyArtist>)
+    ['{757AC0B0-7FEE-4138-8DAD-2824C16C59E1}']
+  end;
+
+  INBoxItemArtistFapello = interface(INBoxItemArtistGeneric<TFapelloAuthor>)
+    ['{95518658-B53F-468F-8FF7-53B81020A425}']
+  end;
+
+  INBoxItemArtistBooru = interface(INBoxItemArtistGeneric<IBooruTag>)
+    ['{46F2C3D6-46B2-47CA-B06A-9EDA7891C773}']
+  end;
+
+  TNBoxItemArtisAr = TArray<INBoxItemArtist>;
+
+  IHasArtists = interface
     ['{6DD3C056-7BB6-4022-8AB4-217B2CB4777B}']
-    //--Setters and Getters--//
-    function GetAuthorName: string;
-    //procedure SetAuthorName(const Value: string);
-    //--Properties--//
-    property AuthorName: string read GetAuthorName; // write SetAuthorName;
+    { private \ protected }
+    function GetArtists: TNBoxItemArtisAr;
+    { public }
+    property Artists: TNBoxItemArtisAr read GetArtists;
   end;
 
   IHasCaption = interface
@@ -198,6 +232,21 @@ type
       class function Convert(ATags: TArray<string>): TNBoxItemTagAr; static;
   End;
 
+  TNBoxItemArtistBase = Class(TInterfacedObject, INBoxItemArtist)
+    protected
+      FDisplayName: string;
+      FAvatarUrl: string;
+      FContentCount: integer;
+      function GetDisplayName: string;
+      function GetAvatarUrl: string;
+      function GetContentCount: integer;
+    public
+      property DisplayName: string read GetDisplayName;
+      property AvatarUrl: string read GetAvatarUrl;
+      property ContentCount: integer read GetContentCount;
+      constructor Create(ADisplayName: string; AAvatarUrl: string; AContentCount: integer = -1);
+  End;
+
 implementation
 
 { TNBoxSearchRequestBase }
@@ -284,6 +333,31 @@ end;
 function TNBoxItemTagBase.GetValue: string;
 begin
   Result := FValue;
+end;
+
+{ TNBoxItemArtistBase }
+
+constructor TNBoxItemArtistBase.Create(ADisplayName, AAvatarUrl: string;
+  AContentCount: integer);
+begin
+  FDisplayName := ADisplayName;
+  FAvatarUrl := AAvatarUrl;
+  FContentCount := AContentCount;
+end;
+
+function TNBoxItemArtistBase.GetAvatarUrl: string;
+begin
+  Result := FAvatarUrl;
+end;
+
+function TNBoxItemArtistBase.GetContentCount: integer;
+begin
+  Result := FContentCount;
+end;
+
+function TNBoxItemArtistBase.GetDisplayName: string;
+begin
+  Result := FDisplayName;
 end;
 
 end.
