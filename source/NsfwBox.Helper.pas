@@ -12,8 +12,7 @@ uses
   NsfwBox.Provider.Randomizer,
   NsfwBox.Provider.motherless,
   NsfwBox.Provider.Fapello,
-  NsfwBox.Provider.Gelbooru,
-  NsfwBox.Provider.Rule34xxx,
+  NsfwBox.Provider.BooruScraper,
   NsfwBox.Consts,
   classes, sysutils, NsfwXxx.Types;
 
@@ -28,9 +27,16 @@ uses
 implementation
 
 function CreateItemByOrigin(AOrigin: integer): INBoxItem;
+var
+  LItemClass: TNBoxItemBaseClass;
 begin
   try
-    Result := PROVIDERS.ById(AOrigin).ItemClass.Create;
+    LItemClass := PROVIDERS.ById(AOrigin).ItemClass;
+
+    if (LItemClass = TNBoxBooruItemBase) then
+      Result := TNBoxBooruItemBase.Create(AOrigin)
+    else
+      Result := LItemClass.Create;
   except
     On E: Exception do
       Log('CreateItemByOrigin(' + AOrigin.ToString + ')', E);
@@ -38,9 +44,16 @@ begin
 end;
 
 function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
+var
+  LRequestClass: TNBoxSearchRequestBaseClass;
 begin
   try
-    Result := PROVIDERS.ById(AOrigin).RequestClass.Create;
+    LRequestClass := PROVIDERS.ById(AOrigin).RequestClass;
+
+    if (LRequestClass = TNBoxSearchReqBooru) then
+      Result := TNBoxSearchReqBooru.Create(AOrigin)
+    else
+      Result := LRequestClass.Create;
   except
     On E: Exception do
       Log('CreateReqByOrigin(' + AOrigin.ToString + ')', E);

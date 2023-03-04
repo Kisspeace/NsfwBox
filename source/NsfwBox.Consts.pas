@@ -111,10 +111,7 @@ uses
   NsfwBox.Provider.Bookmarks, NsfwBox.Provider.GivemepornClub,
   NsfwBox.Provider.NineHentaiToApi, NsfwBox.Provider.CoomerParty,
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
-  NsfwBox.Provider.Fapello, NsfwBox.Provider.Gelbooru,
-  NsfwBox.Provider.Rule34xxx, NsfwBox.Provider.Realbooru,
-  NsfwBox.Provider.Rule34us, NsfwBox.Provider.Rule34PahealNet,
-  NsfwBox.Provider.XBooru;
+  NsfwBox.Provider.Fapello, NsfwBox.Provider.BooruScraper;
 
 { TNBoxProviders }
 
@@ -160,12 +157,12 @@ begin
   FMotherless  := Add(ORIGIN_MOTHERLESS, 'motherless.com', 1, TNBoxSearchReqMotherless, TNBoxMotherlessItem);
   F9HentaiTo   := Add(ORIGIN_9HENTAITO, '9hentai.to', 0, TNBoxSearchReq9Hentaito, TNBox9HentaitoItem);
   FFapello     := Add(PVR_FAPELLO, 'Fapello.com', 1, TNBoxSearchReqFapello, TNBoxFapelloItem);
-  FRule34xxx   := Add(PVR_RULE34XXX, 'Rule34.xxx', 0, TNBoxSearchReqRule34xxx, TNBoxRule34xxxItem);
-  FGelbooru    := Add(PVR_GELBOORU, 'Gelbooru.com', 0, TNBoxSearchReqGelbooru, TNBoxGelbooruItem);
-  FRealbooru   := Add(PVR_REALBOORU, 'Realbooru.com', 0, TNBoxSearchReqRealbooru, TNBoxRealbooruItem);
-  FRule34us    := Add(PVR_RULE34US, 'Rule34.us', 0, TNBoxSearchReqRule34us, TNBoxRule34usItem);
-  FRule34PahealNet := Add(PVR_RULE34PAHEALNET, 'Rule34.paheal.net', 0, TNBoxSearchReqRule34PahealNet, TNBoxRule34PahealNetItem);
-  FXBooru      := Add(PVR_XBOORU, 'Xbooru.com', 0, TNBoxSearchReqXBooru, TNBoxXBooruItem);
+  FRule34xxx   := Add(PVR_RULE34XXX, 'Rule34.xxx', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FGelbooru    := Add(PVR_GELBOORU, 'Gelbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FRealbooru   := Add(PVR_REALBOORU, 'Realbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FRule34us    := Add(PVR_RULE34US, 'Rule34.us', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FRule34PahealNet := Add(PVR_RULE34PAHEALNET, 'Rule34.paheal.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FXBooru      := Add(PVR_XBOORU, 'Xbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
 end;
 
 destructor TNBoxProviders.Destroy;

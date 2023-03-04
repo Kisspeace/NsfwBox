@@ -8,7 +8,7 @@ uses
   NsfwBox.Interfaces, NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx,
   NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi, NsfwBox.Consts,
   NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging,
-  NsfwBox.Provider.Gelbooru, BooruScraper.Interfaces, BooruScraper.BaseTypes,
+  NsfwBox.Provider.BooruScraper, BooruScraper.Interfaces, BooruScraper.BaseTypes,
   BooruScraper.Serialize.XSuperObject;
 
 type

@@ -1,6 +1,6 @@
 ﻿{ ❤ 2022 by Kisspeace - https://github.com/Kisspeace --------- }
 { ❤ Part of NsfwBox ❤- https://github.com/101427274/505234915 }
-unit NsfwBox.Provider.Gelbooru;
+unit NsfwBox.Provider.BooruScraper;
 
 interface
 uses
@@ -54,11 +54,12 @@ type
       function GetFull: IBooruPost; virtual;
     public
       function IsAuthorsFetched: boolean;
+      function Clone: INBoxItem; override;
       procedure Assign(ASource: INBoxItem); override;
-      //--New--//
+      { new }
       [DISABLE] property ThumbItem: IBooruThumb read GetThumbItem write SetThumbItem; { Cant be written correctly by XSuperJson }
       [DISABLE] property Full: IBooruPost read GetFull write SetFull; { Cant be written correctly by XSuperJson }
-      //--Properties--//
+      { properties }
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
@@ -66,30 +67,21 @@ type
       [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
-      constructor Create; override;
+      constructor Create(AOrigin: integer);
   end;
 
   TNBoxBooruItemBaseClass = Class of TNBoxBooruItemBase;
 
-  TNBoxGelbooruItem = class(TNBoxBooruItemBase,
-   IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
-    public
-      //--Properties--//
-      property Origin;
-      { -------------- }
-      function Clone: INBoxItem; override;
-      constructor Create; override;
-  end;
-
-  TNBoxSearchReqGelbooru = class(TNBoxSearchRequestBase)
+  TNBoxSearchReqBooru = class(TNBoxSearchRequestBase)
     protected
+      FOrigin: integer;
       function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
       property PageId;
-      constructor Create; override;
+      constructor Create(AOrigin: integer);
   end;
 
 implementation
@@ -99,15 +91,16 @@ implementation
 procedure TNBoxBooruItemBase.Assign(ASource: INBoxItem);
 begin
   inherited;
-  if (not (ASource is TNBoxBooruItemBase) ) then exit;
+  if not (ASource is Self.ClassType) then exit;
   var LSource := ( ASource as TNBoxBooruItemBase );
 
   Self.ThumbItem := LSource.ThumbItem;
   Self.Full := LSource.Full;
 end;
 
-constructor TNBoxBooruItemBase.Create;
+constructor TNBoxBooruItemBase.Create(AOrigin: integer);
 begin
+  Self.FOrigin := AOrigin;
   Self.FThumbItem := TBooruThumbBase.Create;
   Self.FFull := TBooruPostBase.Create;
 end;
@@ -191,40 +184,36 @@ begin
   Self.FThumbItem.Assign(value);
 end;
 
-{ TNBoxGelbooruItem }
+{ TNBoxBooruItem }
 
-function TNBoxGelbooruItem.Clone: INBoxItem;
+function TNBoxBooruItemBase.Clone: INBoxItem;
 begin
-  Result := TNBoxGelbooruItem.Create;
+  Result := TNBoxBooruItemBase.Create(FOrigin);
   Result.Assign(Self);
-end;
-
-constructor TNBoxGelbooruItem.Create;
-begin
-  inherited;
-  Self.FOrigin := PVR_GELBOORU;
 end;
 
 { TNBoxSearchReqGelbooru }
 
-function TNBoxSearchReqGelbooru.Clone: INBoxSearchRequest;
+function TNBoxSearchReqBooru.Clone: INBoxSearchRequest;
+var
+  LRes: TNBoxSearchReqBooru;
 begin
-  Result := TNBoxSearchReqGelbooru.Create;
-  with Result as TNBoxSearchReqGelbooru do begin
-    PageId := self.FPageId;
-    Request := Self.FRequest;
-  end;
+  LRes := TNBoxSearchReqBooru.Create(FOrigin);
+  LRes.FOrigin := FOrigin;
+  LRes.PageId := self.FPageId;
+  LRes.Request := Self.FRequest;
+  Result := LRes;
 end;
 
-constructor TNBoxSearchReqGelbooru.Create;
+constructor TNBoxSearchReqBooru.Create(AOrigin: integer);
 begin
-  inherited;
-  Self.FPageId := PROVIDERS.Gelbooru.FisrtPageId;
+  Self.FOrigin := AOrigin;
+  Self.FPageId := PROVIDERS.ById(AOrigin).FisrtPageId;
 end;
 
-function TNBoxSearchReqGelbooru.GetOrigin: integer;
+function TNBoxSearchReqBooru.GetOrigin: integer;
 begin
-  Result := PROVIDERS.Gelbooru.Id;
+  Result := FOrigin;
 end;
 
 { TNBoxItemTagBooru }
@@ -267,7 +256,6 @@ begin
 end;
 
 { TNBoxItemArtistBooru }
-
 
 function TNBoxItemArtistBooru.GetArtist: IBooruTag;
 begin

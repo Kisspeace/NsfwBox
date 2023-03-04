@@ -37,7 +37,7 @@ uses
   NsfwBox.Provider.Bookmarks in 'source\providers\NsfwBox.Provider.Bookmarks.pas',
   NsfwBox.Provider.CoomerParty in 'source\providers\NsfwBox.Provider.CoomerParty.pas',
   NsfwBox.Provider.Fapello in 'source\providers\NsfwBox.Provider.Fapello.pas',
-  NsfwBox.Provider.Gelbooru in 'source\providers\NsfwBox.Provider.Gelbooru.pas',
+  NsfwBox.Provider.BooruScraper in 'source\providers\NsfwBox.Provider.BooruScraper.pas',
   NsfwBox.Provider.GivemepornClub in 'source\providers\NsfwBox.Provider.GivemepornClub.pas',
   NsfwBox.Provider.motherless in 'source\providers\NsfwBox.Provider.motherless.pas',
   NsfwBox.Provider.NineHentaiToApi in 'source\providers\NsfwBox.Provider.NineHentaiToApi.pas',
@@ -45,12 +45,7 @@ uses
   NsfwBox.Provider.Pseudo in 'source\providers\NsfwBox.Provider.Pseudo.pas',
   NsfwBox.Provider.R34App in 'source\providers\NsfwBox.Provider.R34App.pas',
   NsfwBox.Provider.R34JsonApi in 'source\providers\NsfwBox.Provider.R34JsonApi.pas',
-  NsfwBox.Provider.Randomizer in 'source\providers\NsfwBox.Provider.Randomizer.pas',
-  NsfwBox.Provider.Realbooru in 'source\providers\NsfwBox.Provider.Realbooru.pas',
-  NsfwBox.Provider.Rule34us in 'source\providers\NsfwBox.Provider.Rule34us.pas',
-  NsfwBox.Provider.Rule34xxx in 'source\providers\NsfwBox.Provider.Rule34xxx.pas',
-  NsfwBox.Provider.Rule34PahealNet in 'source\providers\NsfwBox.Provider.Rule34PahealNet.pas',
-  NsfwBox.Provider.Xbooru in 'source\providers\NsfwBox.Provider.Xbooru.pas';
+  NsfwBox.Provider.Randomizer in 'source\providers\NsfwBox.Provider.Randomizer.pas';
 
 {$R *.res}
 

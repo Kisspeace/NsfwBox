@@ -11,42 +11,36 @@ type
 
   TNsfwXxxSite = (NsfwXxx, PornpicXxx, HdpornPics);
 
-  TNBoxNsfwXxxItem = class( TNBoxItemBase, IUIdAsInt, IHasTags, IHasArtists,
+  TNBoxNsfwXxxItem = class(TNBoxItemBase, IUIdAsInt, IHasTags, IHasArtists,
    IHasCaption, IFetchableContent, IFetchableTags)
     private
       FPage: TNsfwXxxPostPage;
       FItem: TNsfwXxxItem;
-      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
       function GetArtists: TNBoxItemArtisAr;
-      //procedure SetAuthorName(const Value: string);
       function GetUidInt: int64;
-      //procedure SetUIdInt(const Value: int64);
-      //procedure SetCaption(const Value: String);
       function GetCaption: string;
-      //procedure SetContentUrls(const Value: TArray<string>); override;
-      function GetContentUrls: TArray<string>;               override;
-      //procedure SetThumbnailUrl(const Value: string);        override;
-      function GetThumbnailUrl: string;                      override;
+      function GetContentUrls: TArray<string>; override;
+      function GetThumbnailUrl: string; override;
       function GetHasAuthorName: boolean;
     public
-      procedure Assign(ASource: INBoxItem);                  override;
-      function Clone: INBoxItem;                             override;
-      //--New--//
+      procedure Assign(ASource: INBoxItem); override;
+      function Clone: INBoxItem; override;
+      { new }
       property Item: TNsfwXxxitem read Fitem write Fitem;
       property Page: TNsfwXxxPostPage read Fpage write Fpage;
-      //--Properties--//
+      { properties }
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
-      [DISABLE] property Caption: string read GetCaption; // write SetCaption;
+      [DISABLE] property UIdInt: int64 read GetUidInt;
+      [DISABLE] property Caption: string read GetCaption;
       [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create; override;
   end;
@@ -58,13 +52,13 @@ type
       FOris: TNsfwOris;
       FTypes: TNsfwItemTypes;
       FSite: TNsfwXxxSite;
-      function GetOrigin: integer;                        override;
+      function GetOrigin: integer; override;
       procedure SetSearchType(const value: TNsfwUrlType);
       procedure SetSortType(const value: TNsfwSort);
       procedure SetOris(const value: TNsfwOris);
       procedure SetTypes(const value: TNsfwItemTypes);
     public
-      function Clone: INBoxSearchRequest;                 override;
+      function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
       property PageId;
@@ -93,7 +87,7 @@ end;
 
 procedure TNBoxNsfwXxxItem.Assign(ASource: INBoxItem);
 begin
-  if not ( ASource is TNBoxNsfwXxxItem ) then
+  if not ( ASource is Self.ClassType ) then
     Exit;
   with ( ASource as TNBoxNsfwXxxItem ) do begin
     Self.Item := Item;
@@ -172,41 +166,6 @@ function TNBoxNsfwXxxItem.GetUidInt: int64;
 begin
   Result := FItem.Id;
 end;
-
-//procedure TNBoxNsfwXxxItem.SetAuthorName(const Value: string);
-//begin
-//  Fitem.Username := Value;
-//end;
-//
-//procedure TNBoxNsfwXxxItem.SetCaption(const Value: String);
-//begin
-//  FItem.Caption := Value;
-//end;
-
-//procedure TNBoxNsfwXxxItem.SetContentUrls(const Value: TArray<string>);
-//begin
-//  if Length(FPage.Items) < 1 then
-//    FPage.Items := [TNsfwXxxItem.New];
-//  FPage.Items[0].Thumbnails := Value;
-//end;
-
-//procedure TNBoxNsfwXxxItem.SetTags(const Value: TArray<string>);
-//begin
-//  FItem.Categories := Value;
-//end;
-//
-//procedure TNBoxNsfwXxxItem.SetThumbnailUrl(const Value: string);
-//begin
-//  if Length(FItem.Thumbnails) > 0 then
-//    FItem.Thumbnails[0] := Value
-//  else
-//    Fitem.Thumbnails := [Value];
-//end;
-
-//procedure TNBoxNsfwXxxItem.SetUIdInt(const Value: int64);
-//begin
-//  FItem.Id := Value;
-//end;
 
 { TNBoxSearchReqXxx }
 
