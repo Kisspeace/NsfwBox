@@ -3997,11 +3997,11 @@ begin
   {$ENDIF}
 
   With SearchMenu.OriginSetMenu do begin
-    BtnOriginPseudo.Visible := Settings.DevMode;
-    BtnOriginBookmarks.Visible := Settings.DevMode;
-//    BtnOrigin9Hentaito.Visible := Settings.DevMode;
+    var LBtn: TRectButton := GetBtnByTag(PROVIDERS.Pseudo.id);
+    if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
+    LBtn := GetBtnByTag(PROVIDERS.Bookmarks.id);
+    if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
   end;
-
 
   CheckSetAutoSaveSession.IsChecked     := Settings.AutoSaveSession;
   CheckSetSaveSearchHistory.IsChecked   := Settings.SaveSearchHistory;

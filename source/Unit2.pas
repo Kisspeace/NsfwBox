@@ -35,6 +35,7 @@ type
       procedure BtnOnTap(Sender: TObject; const Point: TPointF); virtual;
       function BtnIndexByIntTag(AId: NativeInt): integer;
     public
+      function GetBtnByTag(AId: NativeInt): TRectButton;
       property SelectedBtn: TRectButton read FSelectedBtn;
       property Selected: NativeInt read FSelected write SetSelected;
       property SelectedStr: string read FSelectedStr;
@@ -63,23 +64,6 @@ type
 
   TNBoxOriginSetMenu = class(TNBoxSelectMenu)
     public
-      BtnOriginNsfwXxx: TRectButton;
-//      BtnOriginR34App: TRectButton;
-      BtnOriginR34JsonApi: TRectButton;
-      BtnOriginGivemepornClub: TRectButton;
-      BtnOrigin9Hentaito: TRectButton;
-      BtnOriginPseudo: TRectButton;
-      BtnOriginBookmarks: TRectButton;
-      BtnOriginCoomerParty: TRectButton;
-      BtnOriginMotherless: TRectButton;
-      BtnOriginRandomizer: TRectButton;
-      BtnPvrFapello: TRectButton;
-      BtnPvrGelbooru: TRectButton;
-      BtnPvrRule34xxx: TRectButton;
-      BtnPvrRealbooru: TRectButton;
-      BtnPvrRule34us: TRectButton;
-      BtnPvrRule34PahealNet: TRectButton;
-      BtnPvrXBooru: TRectButton;
       constructor Create(AOwner: TComponent);
       destructor Destroy; override;
   end;
@@ -228,33 +212,23 @@ uses Unit1;
 { TNBoxOriginSetMenu }
 
 constructor TNBoxOriginSetMenu.Create(AOwner: TComponent);
+var
+  I: integer;
 
   function NewBtn(AOrigin: integer): TRectButton;
   begin
     Result := AddBtn(OriginToStr(AOrigin), AOrigin, Form1.AppStyle.GetImagePath(AOrigin));
   end;
 
-
 begin
   inherited;
   FSelected := ORIGIN_NSFWXXX;
-  BtnOriginNsfwxxx    := NewBtn(ORIGIN_NSFWXXX);
-  BtnPvrGelbooru      := Newbtn(PROVIDERS.Gelbooru.Id);
-  BtnPvrRule34xxx     := NewBtn(PROVIDERS.Rule34xxx.Id);
-  BtnPvrRealbooru     := NewBtn(PROVIDERS.Realbooru.Id);
-  BtnPvrRule34us      := NewBtn(PROVIDERS.Rule34us.Id);
-//  BtnOriginR34App     := NewBtn(ORIGIN_R34APP);
-  BtnOriginGivemepornClub := NewBtn(ORIGIN_GIVEMEPORNCLUB);
-  BtnOriginBookmarks  := NewBtn(ORIGIN_BOOKMARKS);
-  BtnOriginPseudo     := NewBtn(ORIGIN_PSEUDO);
-  BtnOrigin9Hentaito  := NewBtn(ORIGIN_9HENTAITO);
-  BtnOriginCoomerParty := NewBtn(ORIGIN_COOMERPARTY);
-  BtnOriginMotherless := NewBtn(ORIGIN_MOTHERLESS);
-  BtnPvrFapello       := NewBtn(PROVIDERS.Fapello.Id);
-  BtnOriginR34JsonApi := NewBtn(ORIGIN_R34JSONAPI);
-  BtnPvrRule34PahealNet := NewBtn(PVR_RULE34PAHEALNET);
-  BtnPvrXBooru := NewBtn(PVR_XBOORU);
-  BtnOriginRandomizer  := NewBtn(ORIGIN_RANDOMIZER);
+
+  for I := 0 to PROVIDERS.Count - 1 do begin
+    var LProvider := PROVIDERS[I];
+    if (LProvider <> PROVIDERS.R34App) then
+      NewBtn(LProvider.Id);
+  end;
 end;
 
 destructor TNBoxOriginSetMenu.Destroy;
@@ -1219,6 +1193,15 @@ end;
 destructor TNBoxSelectMenu.Destroy;
 begin
   inherited;
+end;
+
+function TNBoxSelectMenu.GetBtnByTag(AId: NativeInt): TRectButton;
+var
+  LIndex: integer;
+begin
+  LIndex := BtnIndexByIntTag(AId);
+  if LIndex <> -1 then
+    Result := Content.Controls[LIndex] as TRectButton;
 end;
 
 procedure TNBoxSelectMenu.SetSelected(const value: NativeInt);
