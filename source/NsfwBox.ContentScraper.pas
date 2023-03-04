@@ -218,6 +218,7 @@ begin
       PVR_RULE34PAHEALNET: LClient := BooruScraper.NewClientRule34PahealNet;
       PVR_XBOORU: LClient := BooruScraper.NewClientXbooru;
       PVR_HYPNOHUBNET: LClient := BooruScraper.NewClientHypnohubnet;
+      PVR_TBIB: LClient := BooruScraper.NewClientTbib;
     end;
 
     if Assigned(LClient) then
@@ -369,6 +370,11 @@ begin
         ARequest.Origin, HYPNOHUBNET_URL, AList, ARequest.Request, ARequest.PageId);
     end;
 
+    PVR_TBIB:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientTbib,
+        ARequest.Origin, TBIBORG_URL, AList, ARequest.Request, ARequest.PageId);
+    end;
   end;
 end;
 

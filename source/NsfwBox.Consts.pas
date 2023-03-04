@@ -26,6 +26,7 @@ const
   PVR_RULE34PAHEALNET   = 12;
   PVR_XBOORU            = 13;
   PVR_HYPNOHUBNET       = 14;
+  PVR_TBIB              = 15;
 
 type
 
@@ -73,6 +74,7 @@ type
       FRule34PahealNet: TNBoxProviderInfo;
       FXBooru: TNBoxProviderInfo;
       FHypnohub: TNBoxProviderInfo;
+      FTbib: TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
@@ -96,6 +98,7 @@ type
       property Rule34PahealNet: TNBoxProviderInfo read FRule34PahealNet;
       property XBooru: TNBoxProviderInfo read FXBooru;
       property Hypnohub: TNBoxProviderInfo read FHypnohub;
+      property TBib: TNBoxProviderInfo read FTbib;
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
       property Bookmarks: TNBoxProviderInfo read FBookmarks;
@@ -161,6 +164,7 @@ begin
   FRule34xxx   := Add(PVR_RULE34XXX, 'Rule34.xxx', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FGelbooru    := Add(PVR_GELBOORU, 'Gelbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FRealbooru   := Add(PVR_REALBOORU, 'Realbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FTbib        := Add(PVR_TBIB, 'Tbib.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FRule34us    := Add(PVR_RULE34US, 'Rule34.us', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FRule34PahealNet := Add(PVR_RULE34PAHEALNET, 'Rule34.paheal.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FXBooru      := Add(PVR_XBOORU, 'Xbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
