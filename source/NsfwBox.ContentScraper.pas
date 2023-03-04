@@ -217,6 +217,7 @@ begin
       PVR_RULE34US: LClient := BooruScraper.NewClientRule34us;
       PVR_RULE34PAHEALNET: LClient := BooruScraper.NewClientRule34PahealNet;
       PVR_XBOORU: LClient := BooruScraper.NewClientXbooru;
+      PVR_HYPNOHUBNET: LClient := BooruScraper.NewClientHypnohubnet;
     end;
 
     if Assigned(LClient) then
@@ -250,14 +251,14 @@ begin
     begin
       with (ARequest As TNBoxSearchReqNsfwXxx) do
       begin
-        Result := Self.GetContentNsfwXxx(AList, Request, SearchType, Pageid,
+        Result := GetContentNsfwXxx(AList, Request, SearchType, Pageid,
           SortType, Types, Oris, Site);
       end;
     end;
 
     ORIGIN_R34JSONAPI:
     begin
-      Result := Self.GetContentR34JsonApi(AList, ARequest.Request,
+      Result := GetContentR34JsonApi(AList, ARequest.Request,
         ARequest.Pageid);
     end;
 
@@ -265,7 +266,7 @@ begin
     begin
       with (ARequest As TNBoxSearchReqGmpClub) do
       begin
-        Result := Self.GetContentGmpClub(AList, Request, SearchType, Pageid);
+        Result := GetContentGmpClub(AList, Request, SearchType, Pageid);
       end;
     end;
 
@@ -273,7 +274,7 @@ begin
     begin
       with (ARequest As TNBoxSearchReq9Hentaito) do
       begin
-        Result := Self.GetContent9Hentaito(AList, SearchRec);
+        Result := GetContent9Hentaito(AList, SearchRec);
       end;
     end;
 
@@ -281,7 +282,7 @@ begin
     begin
       with (ARequest As TNBoxSearchReqCoomerParty) do
       begin
-        Result := Self.GetContentCoomerParty(AList, Site, Request, UserId,
+        Result := GetContentCoomerParty(AList, Site, Request, UserId,
           Service, Pageid);
       end;
     end;
@@ -290,21 +291,21 @@ begin
     begin
       with (ARequest As TNBoxSearchReqMotherless) do
       begin
-        Result := Self.GetContentMotherless(AList, Request, Pageid,
+        Result := GetContentMotherless(AList, Request, Pageid,
           ContentType, Sort, MediaSize, UploadDate);
       end;
     end;
 
     ORIGIN_PSEUDO:
     begin
-      Result := Self.GetContentPseudo(AList, ARequest.Request);
+      Result := GetContentPseudo(AList, ARequest.Request);
     end;
 
     ORIGIN_BOOKMARKS:
     begin
       with (ARequest As TNBoxSearchReqBookmarks) do
       begin
-        Result := Self.GetContentBookmarks(AList, Path, RequestAsInt,
+        Result := GetContentBookmarks(AList, Path, RequestAsInt,
           ARequest.Pageid);
       end;
     end;
@@ -313,7 +314,7 @@ begin
     begin
       with (ARequest as TNBoxSearchReqRandomizer) do
       begin
-        Result := Self.GetContentRandomizer(AList, Providers);
+        Result := GetContentRandomizer(AList, Providers);
       end;
     end;
 
@@ -321,46 +322,53 @@ begin
     begin
       with (ARequest as TNBoxSearchReqFapello) do
       begin
-        Result := Self.GetContentFapello(AList, Request, Pageid, RequestKind);
+        Result := GetContentFapello(AList, Request, Pageid, RequestKind);
       end;
     end;
 
     PVR_GELBOORU:
     begin
-      Result := Self.GetContentBooruScraper(BooruScraper.NewClientGelbooru,
+      Result := GetContentBooruScraper(BooruScraper.NewClientGelbooru,
         ARequest.Origin, GELBOORU_URL, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_RULE34XXX:
     begin
-      Result := Self.GetContentBooruScraper(BooruScraper.NewClientRule34xxx,
+      Result := GetContentBooruScraper(BooruScraper.NewClientRule34xxx,
         ARequest.Origin, RULE34XXX_URL, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_REALBOORU:
     begin
-      Result := Self.GetContentBooruScraper(BooruScraper.NewClientRealbooru,
+      Result := GetContentBooruScraper(BooruScraper.NewClientRealbooru,
         ARequest.Origin, REALBOORU_URL, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_RULE34US:
     begin
-      Result := Self.GetContentBooruScraper(BooruScraper.NewClientRule34us,
+      Result := GetContentBooruScraper(BooruScraper.NewClientRule34us,
         ARequest.Origin, RULE34US_URL, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_RULE34PAHEALNET:
     begin
-      Result := Self.GetContentBooruScraper(BooruScraper.NewClientRule34PahealNet,
+      Result := GetContentBooruScraper(BooruScraper.NewClientRule34PahealNet,
         ARequest.Origin, RULE34PAHEALNET_URL,
         AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_XBOORU:
     begin
-      Result := Self.GetContentBooruScraper(BooruScraper.NewClientXbooru,
+      Result := GetContentBooruScraper(BooruScraper.NewClientXbooru,
         ARequest.Origin, XBOORU_URL, AList, ARequest.Request, ARequest.PageId);
     end;
+
+    PVR_HYPNOHUBNET:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientHypnohubnet,
+        ARequest.Origin, HYPNOHUBNET_URL, AList, ARequest.Request, ARequest.PageId);
+    end;
+
   end;
 end;
 

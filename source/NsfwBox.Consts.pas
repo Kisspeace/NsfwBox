@@ -25,6 +25,7 @@ const
   PVR_RULE34US          = 11;
   PVR_RULE34PAHEALNET   = 12;
   PVR_XBOORU            = 13;
+  PVR_HYPNOHUBNET       = 14;
 
 type
 
@@ -71,6 +72,7 @@ type
       FRule34us: TNBoxProviderInfo;
       FRule34PahealNet: TNBoxProviderInfo;
       FXBooru: TNBoxProviderInfo;
+      FHypnohub: TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
@@ -93,6 +95,7 @@ type
       property Rule34us: TNBoxProviderInfo read FRule34us;
       property Rule34PahealNet: TNBoxProviderInfo read FRule34PahealNet;
       property XBooru: TNBoxProviderInfo read FXBooru;
+      property Hypnohub: TNBoxProviderInfo read FHypnohub;
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
       property Bookmarks: TNBoxProviderInfo read FBookmarks;
@@ -148,10 +151,8 @@ begin
   FItems := TObjectList<TNBoxProviderInfo>.Create;
   FBookmarks   := Add(ORIGIN_BOOKMARKS, 'Bookmarks', 1, TNBoxSearchReqBookmarks, nil, False, False);
   FPseudo      := Add(ORIGIN_PSEUDO, 'Files', 1, TNBoxSearchReqPseudo, TNBoxPseudoItem, False, False);
-  FRandomizer  := Add(ORIGIN_RANDOMIZER, 'Randomizer', 0, TNBoxSearchReqRandomizer, nil, True, True);
+
   FNsfwXxx     := Add(ORIGIN_NSFWXXX, 'nsfw.xxx', 1, TNBoxSearchReqNsfwXxx, TNBoxNsfwXxxItem);
-  FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);
-  FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
   FCoomerParty := Add(ORIGIN_COOMERPARTY, 'coomer.party \ kemono.party', 1, TNBoxSearchReqCoomerParty, TNBoxCoomerPartyItem);
   FGMPClub     := Add(ORIGIN_GIVEMEPORNCLUB, 'givemeporn.club', 1, TNBoxSearchReqGmpClub, TNBoxGmpClubItem);
   FMotherless  := Add(ORIGIN_MOTHERLESS, 'motherless.com', 1, TNBoxSearchReqMotherless, TNBoxMotherlessItem);
@@ -163,6 +164,11 @@ begin
   FRule34us    := Add(PVR_RULE34US, 'Rule34.us', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FRule34PahealNet := Add(PVR_RULE34PAHEALNET, 'Rule34.paheal.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FXBooru      := Add(PVR_XBOORU, 'Xbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FHypnohub    := Add(PVR_HYPNOHUBNET, 'Hypnohub.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+
+  FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
+  FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);
+  FRandomizer  := Add(ORIGIN_RANDOMIZER, 'Randomizer', 0, TNBoxSearchReqRandomizer, nil, True, True);
 end;
 
 destructor TNBoxProviders.Destroy;
