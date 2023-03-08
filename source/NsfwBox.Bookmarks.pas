@@ -144,7 +144,7 @@ begin
 
     with Result do begin
       I['Origin'] := LObj.Origin;
-      O['ThumbItem'] := TJsonMom.ToJson(LObj.ThumbItem);
+//      O['ThumbItem'] := TJsonMom.ToJson(LObj.ThumbItem);
       O['Full'] := TJsonMom.ToJson(LObj.Full);
     end;
 
@@ -192,11 +192,25 @@ begin
     try
       with (AObject as TNBoxBooruItemBase) do begin
 
+        var LThumb: IBooruThumb;
         if JSON.Null['ThumbItem'] = TMemberStatus.jAssigned then
-          ThumbItem := TjsonMom.FromJsonIBooruThumb(JSON.O['ThumbItem']);
+        begin
+          LThumb := TjsonMom.FromJsonIBooruThumb(JSON.O['ThumbItem']);
+          Full.Assign(LThumb);
+        end;
 
         if JSON.Null['Full'] = TMemberStatus.jAssigned then
-          Full := TjsonMom.FromJsonIBooruPost(JSON.O['Full']);
+        begin
+          var LFull: IBooruPost := TjsonMom.FromJsonIBooruPost(JSON.O['Full']);
+
+          { v2.3.0 }
+          if Assigned(LThumb) then begin
+            LFull.SampleUrl := LFull.Thumbnail;
+            LFull.Thumbnail := '';
+          end;
+
+          MergeFull(LFull);
+        end;
 
       end;
 

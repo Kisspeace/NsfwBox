@@ -40,7 +40,6 @@ type
   TNBoxBooruItemBase = class(TNBoxItemBase,
    IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     private
-      FThumbItem: IBooruThumb;
       FFull: IBooruPost;
       function GetContentUrls: TArray<string>; override;
       function GetThumbnailUrl: string; override;
@@ -48,16 +47,14 @@ type
       function GetContentFetched: boolean;
       function GetTagsFetched: boolean;
       function GetTags: TNBoxItemTagAr;
-      procedure SetThumbItem(const value: IBooruThumb); virtual;
-      function GetThumbItem: IBooruThumb; virtual;
       procedure SetFull(const value: IBooruPost); virtual;
       function GetFull: IBooruPost; virtual;
     public
+      procedure MergeFull(const APost: IBooruPost);
       function IsAuthorsFetched: boolean;
       function Clone: INBoxItem; override;
       procedure Assign(ASource: INBoxItem); override;
       { new }
-      [DISABLE] property ThumbItem: IBooruThumb read GetThumbItem write SetThumbItem; { Cant be written correctly by XSuperJson }
       [DISABLE] property Full: IBooruPost read GetFull write SetFull; { Cant be written correctly by XSuperJson }
       { properties }
       property Origin;
@@ -94,14 +91,12 @@ begin
   if not (ASource is Self.ClassType) then exit;
   var LSource := ( ASource as TNBoxBooruItemBase );
 
-  Self.ThumbItem := LSource.ThumbItem;
   Self.Full := LSource.Full;
 end;
 
 constructor TNBoxBooruItemBase.Create(AOrigin: integer);
 begin
   Self.FOrigin := AOrigin;
-  Self.FThumbItem := TBooruThumbBase.Create;
   Self.FFull := TBooruPostBase.Create;
 end;
 
@@ -148,10 +143,7 @@ end;
 
 function TNBoxBooruItemBase.GetTags: TNBoxItemTagAr;
 begin
-  if TagsFetched then
-    Result := TNBoxItemTagBooru.Convert(Self.Full.Tags)
-  else
-    Result := TNBoxItemTagBase.Convert(Self.ThumbItem.TagsValues);
+  Result := TNBoxItemTagBooru.Convert(Self.Full.Tags);
 end;
 
 function TNBoxBooruItemBase.GetTagsFetched: boolean;
@@ -159,14 +151,9 @@ begin
   Result := ContentFetched;
 end;
 
-function TNBoxBooruItemBase.GetThumbItem: IBooruThumb;
-begin
-  Result := Self.FThumbItem;
-end;
-
 function TNBoxBooruItemBase.GetThumbnailUrl: string;
 begin
-  Result := Self.ThumbItem.Thumbnail;
+  Result := Self.FFull.Thumbnail;
 end;
 
 function TNBoxBooruItemBase.IsAuthorsFetched: boolean;
@@ -174,15 +161,22 @@ begin
   Result := Self.ContentFetched;
 end;
 
+procedure TNBoxBooruItemBase.MergeFull(const APost: IBooruPost);
+begin
+  if APost.Thumbnail.IsEmpty then
+    APost.Thumbnail := Full.Thumbnail;
+
+  if (APost.Id = BOORU_NOTSET) then
+    APost.Id := Full.Id;
+
+  Full := APost;
+end;
+
 procedure TNBoxBooruItemBase.SetFull(const value: IBooruPost);
 begin
   Self.FFull.Assign(value);
 end;
 
-procedure TNBoxBooruItemBase.SetThumbItem(const value: IBooruThumb);
-begin
-  Self.FThumbItem.Assign(value);
-end;
 
 { TNBoxBooruItem }
 

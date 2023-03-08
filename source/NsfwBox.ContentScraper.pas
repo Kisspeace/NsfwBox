@@ -229,8 +229,8 @@ begin
     begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.Origin);
       var
-      LFull := LClient.GetPost(LItem.ThumbItem);
-      LItem.Full := LFull;
+      LFull := LClient.GetPost(LItem.Full);
+      LItem.MergeFull(LFull);
     end;
   end;
 end;
@@ -563,7 +563,7 @@ begin
   begin
     var
     LItem := TNBoxBooruItemBase.Create(AProviderId);
-    LItem.ThumbItem := LContent[i];
+    LItem.Full.Assign(LContent[I]);
     AList.Add(LItem);
   end;
 end;
