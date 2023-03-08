@@ -134,9 +134,9 @@ function TNBoxBooruItemBase.GetContentUrls: TArray<string>;
 begin
   if Self.ContentFetched then begin
     Result := [Self.FFull.ContentUrl];
-    if (Result[0] <> Self.Full.Thumbnail)
-    and not (Self.Full.Thumbnail.IsEmpty) then
-      Result := Result + [Self.Full.Thumbnail]; { Sample image }
+    if (Result[0] <> Self.Full.SampleUrl)
+    and not (Self.Full.SampleUrl.IsEmpty) then
+      Result := Result + [Self.Full.SampleUrl]; { Sample image }
   end else
     Result := [];
 end;

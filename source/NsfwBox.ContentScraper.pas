@@ -26,6 +26,7 @@ uses
   BooruScraper.Client.rule34us,
   BooruScraper.Client.rule34PahealNet,
   BooruScraper.Parser.rule34PahealNet,
+  BooruScraper.Urls,
   BooruScraper.ClientBase, BooruScraper, NsfwBox.Provider.BooruScraper;
 
 const
