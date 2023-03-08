@@ -2965,11 +2965,15 @@ end;
 procedure TForm1.SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer); //AOrigin: integer = 0
 begin
   with AClient do begin
-    Useragent := Settings.DefaultUseragent;
+
+    if not (AOrigin = PVR_DANBOORU) then begin
+      Useragent := Settings.DefaultUseragent;
+      Customheaders['Accept'] := '*/*';
+      CustomHeaders['Accept-Language'] := 'en-US,en;q=0.5';
+      CustomHeaders['Accept-Encoding'] := 'gzip, deflate'; { br not support }
+    end;
+
     AutomaticDecompression := [THttpCompressionMethod.Any];
-    Customheaders['Accept'] := '*/*';
-    CustomHeaders['Accept-Language'] := 'en-US,en;q=0.5';
-    CustomHeaders['Accept-Encoding'] := 'gzip, deflate'; { br not support }
     AllowCookies := Settings.AllowCookies;
     SendTimeout := 6000;
     ConnectionTimeout := 6000;

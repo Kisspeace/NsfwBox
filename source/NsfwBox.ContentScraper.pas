@@ -220,6 +220,7 @@ begin
       PVR_XBOORU: LClient := BooruScraper.NewClientXbooru;
       PVR_HYPNOHUBNET: LClient := BooruScraper.NewClientHypnohubnet;
       PVR_TBIB: LClient := BooruScraper.NewClientTbib;
+      PVR_DANBOORU: LClient := BooruScraper.NewClientDonmaiUs(True);
     end;
 
     if Assigned(LClient) then
@@ -375,6 +376,12 @@ begin
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientTbib,
         ARequest.Origin, TBIBORG_URL, AList, ARequest.Request, ARequest.PageId);
+    end;
+
+    PVR_DANBOORU:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientDonmaiUs(True),
+        ARequest.Origin, DANBOORUDONMAIUS_URL, AList, ARequest.Request, ARequest.PageId);
     end;
   end;
 end;
