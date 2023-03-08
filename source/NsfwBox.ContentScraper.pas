@@ -222,6 +222,7 @@ begin
       PVR_TBIB: LClient := BooruScraper.NewClientTbib;
       PVR_DANBOORU: LClient := BooruScraper.NewClientDonmaiUs(True);
       PVR_ALLTHEFALLEN: LClient := BooruScraper.NewClientAllTheFallen(True);
+      PVR_BLEACHBOORU: LClient := BooruScraper.NewClientBleachbooru(True);
     end;
 
     if Assigned(LClient) then
@@ -389,6 +390,12 @@ begin
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientAllTheFallen(True),
         ARequest.Origin, BOORUALLTHEFALLENMOE_URL, AList, ARequest.Request, ARequest.PageId);
+    end;
+
+    PVR_BLEACHBOORU:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientBleachbooru(True),
+        ARequest.Origin, BLEACHBOORUORG_URL, AList, ARequest.Request, ARequest.PageId);
     end;
 
   end;

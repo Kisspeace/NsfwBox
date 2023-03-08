@@ -29,6 +29,7 @@ const
   PVR_TBIB              = 15;
   PVR_DANBOORU          = 16;
   PVR_ALLTHEFALLEN      = 17;
+  PVR_BLEACHBOORU       = 18;
 
 type
 
@@ -79,6 +80,7 @@ type
       FTbib: TNBoxProviderInfo;
       FDanbooru: TNBoxProviderInfo;
       FAllTheFallen: TNBoxProviderInfo;
+      FBleachbooru: TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
@@ -105,6 +107,7 @@ type
       property TBib: TNBoxProviderInfo read FTbib;
       property Danbooru: TNBoxProviderInfo read FDanbooru;
       property AllTheFallen: TNBoxProviderInfo read FAllTheFallen;
+      property Bleachbooru: TNBoxProviderInfo read FBleachbooru;
       { ------------------------- }
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
@@ -178,6 +181,7 @@ begin
   FHypnohub    := Add(PVR_HYPNOHUBNET, 'Hypnohub.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FDanbooru    := Add(PVR_DANBOORU, 'Danbooru.donmai.us', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FAllTheFallen := Add(PVR_ALLTHEFALLEN, 'booru.allthefallen.moe', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FBleachbooru := Add(PVR_BLEACHBOORU, 'bleachbooru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
 
   FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
   FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);

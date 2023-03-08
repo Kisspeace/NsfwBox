@@ -7,7 +7,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
   System.Variants, FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics,
   XSuperObject, Alcinoe.FMX.Objects, NsfwBox.Graphics.Rectangle, NsfwBox.Graphics,
-  System.IOUtils, NsfwBox.FileSystem;
+  System.IOUtils, NsfwBox.FileSystem, NsfwBox.Consts;
 
 const
   ICON_NSFWBOX     = 'app-icon.png';
@@ -238,7 +238,10 @@ end;
 
 function TNBoxGUIStyle.GetImagePath(AOrigin: integer): string;
 begin
-   Result := GetImagePath(ICON_ORIGIN_PREFIX + AOrigin.ToString + '.png');
+  if (AOrigin = PVR_BLEACHBOORU) then
+    AOrigin := PVR_DANBOORU;
+
+  Result := GetImagePath(ICON_ORIGIN_PREFIX + AOrigin.ToString + '.png');
 end;
 
 
