@@ -9,7 +9,7 @@ uses
   NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi, NsfwBox.Consts,
   NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging,
   NsfwBox.Provider.BooruScraper, BooruScraper.Interfaces, BooruScraper.BaseTypes,
-  BooruScraper.Serialize.XSuperObject;
+  BooruScraper.Serialize.XSuperObject, ZExceptions, ZPlainSqLiteDriver;
 
 type
 
@@ -74,7 +74,6 @@ type
   TBookmarkGroupRecAr = TArray<TBookmarkGroupRec>;
 
   TNBoxBookmarksDb = class(TDbHelper)
-  private
     protected
       FPageSize: integer;
       procedure CreateBase; override;
@@ -82,6 +81,7 @@ type
       function NewBookmark(AValue: IHasOrigin): TNBoxBookmark;
     public
       property PageSize: integer read FPageSize write FPageSize;
+      { -------------------- }
       function GetBookmarksGroups: TBookmarkGroupRecAr;
       function GetGroupById(AGroupId: int64): TBookmarkGroupRec;
       function GetGroupsByName(AGroupName: string): TBookmarkGroupRecAr;
@@ -324,13 +324,10 @@ const
 var
   I, Stop, Pos, ArPos, Iter: integer;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  With Query do begin
+  try
     ArPos := 0;
     while True do begin
-      SQL.AddStrings([
+      Query.SQL.AddStrings([
         'INSERT INTO `items` (`group_id`, `origin`, `type`, `about`, `object`)',
         'VALUES'
       ]);
@@ -341,28 +338,31 @@ begin
 
       Iter := 0;
       for I := ArPos to Stop do begin
-        SQL.Add(format(VALUES_TEMPLATE, [I, I, I, I, I]));
+        Query.SQL.Add(format(VALUES_TEMPLATE, [I, I, I, I, I]));
 
         if (I < Stop) then
-          SQL.Add(',');
+          Query.SQL.Add(',');
 
         Pos := Iter * 5;
-        Params.Items[Pos + 0].AsInt64 := AGroupId; // group_id
-        params.Items[Pos + 1].AsInteger := AValues[I].Origin; // origin
-        params.Items[Pos + 2].AsInteger := ord(AValues[I].FBookmarkType); // type
-        params.Items[Pos + 3].AsString := AValues[I].About; // about
-        Params.Items[Pos + 4].AsString := ToJsonStr(AValues[I].Obj); // object
+        with Query.Params do begin
+          Items[Pos + 0].AsInt64 := AGroupId; // group_id
+          Items[Pos + 1].AsInteger := AValues[I].Origin; // origin
+          Items[Pos + 2].AsInteger := ord(AValues[I].FBookmarkType); // type
+          Items[Pos + 3].AsString := AValues[I].About; // about
+          Items[Pos + 4].AsString := ToJsonStr(AValues[I].Obj); // object
+        end;
         inc(Iter);
       end;
 
-      ExecSQL;
-      SQL.Clear;
+      ForceExecSQL;
+      Query.SQL.Clear;
 
       ArPos := I;
       if ArPos > High(AValues) then
         break;
     end;
-
+  finally
+    Query.SQL.Clear;
   end;
 end;
 
@@ -394,43 +394,40 @@ begin
 end;
 
 function TNBoxBookmarksDb.AddGroup(AName, AAbout: string): TBookmarkGroupRec;
-var
-  NewId: int64;
-  TableName: string;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
+  try
+    Result.FDb := self;
+    Result.Name := AName;
+    Result.About := AAbout;
+    Result.Timestamp := now;
+    Result.Id := 0;
 
-  Result.FDb := self;
-  Result.Name := AName;
-  Result.About := AAbout;
-  Result.Timestamp := now;
-  Result.Id := 0;
+    with Query do begin
+      SQL.AddStrings([
+        'INSERT INTO groups (name, about)',
+        'VALUES (:name, :about);'
+      ]);
+      Params.ParamByName('name').AsString  := AName;
+      Params.ParamByName('about').AsString := AAbout;
+      ForceExecSql;
+    end;
 
-  with Query do begin
-    SQL.AddStrings([
-      'INSERT INTO `groups` (`name`, `about`)',
-      'VALUES (:name, :about);'
-    ]);
-    Params.ParamByName('name').AsString  := AName;
-    Params.ParamByName('about').AsString := AAbout;
-    ExecSQL;
-    SQL.Clear;
+    Query.SQL.Clear;
+    Result := Self.GetLastGroup;
+
+  finally
+    Query.SQL.Clear;
   end;
-
-  Result := Self.GetLastGroup;
 end;
 
 procedure TNBoxBookmarksDb.ClearGroup(AGroupId: int64);
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  with Query do begin
-    SQL.Text := 'DELETE FROM `items` WHERE (`group_id` = :id);';
-    Params.ParamByName('id').AsLargeInt := AGroupId;
-    ExecSQL;
-    SQL.Clear;
+  try
+    Query.SQL.Text := 'DELETE FROM items WHERE (group_id = :id);';
+    Query.Params.ParamByName('id').AsLargeInt := AGroupId;
+    ForceExecSql
+  finally
+    Query.SQL.Clear;
   end;
 end;
 
@@ -442,203 +439,204 @@ end;
 
 procedure TNBoxBookmarksDb.CreateBase;
 begin
-  Query.SQL.AddStrings([
-    'CREATE TABLE `groups` (',
-    '  `id`        INTEGER PRIMARY KEY AUTOINCREMENT,',
-    '  `name`      VARCHAR(255),',
-    '  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,',
-    '  `about`     TEXT',
-    ');'
-  ]);
-  Query.ExecSQL;
-  Query.SQL.Clear;
+  try
+    SqlProc.Script.AddStrings([
+      'CREATE TABLE `groups` (',
+      '  `id`        INTEGER PRIMARY KEY AUTOINCREMENT,',
+      '  `name`      VARCHAR(255),',
+      '  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,',
+      '  `about`     TEXT',
+      ');',
 
-  Query.SQL.AddStrings([
-    'CREATE TABLE `items` (',
-    '  `origin`    INTEGER,',
-    '  `type`      INTEGER,',
-    '  `about`     TEXT,',
-    '  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,',
-    '  `object`    JSON,',
-    '  `group_id`  INTEGER DEFAULT 1,',
-    '  FOREIGN KEY(group_id) REFERENCES `groups` (id)',
-    ');'
-  ]);
-  Query.ExecSQL;
-  Query.SQL.Clear;
+      'CREATE TABLE `items` (',
+      '  `origin`    INTEGER,',
+      '  `type`      INTEGER,',
+      '  `about`     TEXT,',
+      '  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,',
+      '  `object`    JSON,',
+      '  `group_id`  INTEGER DEFAULT 1,',
+      '  FOREIGN KEY(group_id) REFERENCES `groups` (id)',
+      ');',
 
-  Query.SQL.AddStrings([
-    'CREATE VIEW `only_content` AS',
-    '  SELECT * FROM `items` WHERE (`type` = 0);'
-  ]);
-  Query.ExecSQL;
-  Query.SQL.Clear;
+      'CREATE VIEW `only_content` AS',
+      '  SELECT * FROM `items` WHERE (`type` = 0);',
 
-  Query.SQL.AddStrings([
-    'CREATE VIEW `only_requests` AS',
-    '  SELECT * FROM `items` WHERE (`type` = 1);'
-  ]);
-  Query.ExecSQL;
-  Query.SQL.Clear;
+      'CREATE VIEW `only_requests` AS',
+      '  SELECT * FROM `items` WHERE (`type` = 1);'
+    ]);
+    SqlProc.Execute;
+  finally
+    SqlProc.Script.Clear;
+  end;
 end;
 
 procedure TNBoxBookmarksDb.Delete(ABookmarkId: int64);
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  Query.SQL.Text := 'DELETE FROM `items` WHERE ( `rowid` = :id);';
-  Query.Params.ParamByName('id').AsInt64 := ABookmarkId;
-  Query.ExecSQL;
-  Query.SQL.Clear;
+  try
+    Query.SQL.Text := 'DELETE FROM items WHERE (rowid = :id);';
+    Query.Params.ParamByName('id').AsInt64 := ABookmarkId;
+    ForceExecSql;
+  finally
+    Query.SQL.Clear;
+  end;
 end;
 
 procedure TNBoxBookmarksDb.DeleteAllGroups;
-var
-  I: integer;
-  Tables: TBookmarkGroupRecAr;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  Tables := Self.GetBookmarksGroups;
-  for I := low(Tables) to high(Tables) do
-    Tables[I].DeleteGroup;
+  try
+    SqlProc.Script.AddStrings([
+      'BEGIN TRANSACTION;',
+	      'DELETE FROM items;',
+	      'DELETE FROM groups;',
+      'COMMIT;'
+    ]);
+    ForceExecScript;
+  finally
+    SqlProc.Script.Clear;
+  end;
 end;                            
 
 procedure TNBoxBookmarksDb.DeleteGroup(AGroupId: Int64);
 begin
-  if not Connection.Connected then
-    Connection.Connect;
+  try
+    SqlProc.Script.AddStrings([
+      'BEGIN TRANSACTION;',
+	      'DELETE FROM items WHERE (group_id = :id);',
+	      'DELETE FROM groups WHERE (id = :id);',
+      'COMMIT;'
+    ]);
 
-  with Query do begin
-    SQL.Text := 'DELETE FROM `items` WHERE ( `group_id` = :id );';
-    Params.ParamByName('id').AsInt64 := AGroupId;
-    ExecSql;
-
-    SQL.Text := 'DELETE FROM `groups` WHERE ( `id` = :id );';
-    Params.ParamByName('id').AsInt64 := AGroupId;
-    ExecSql;
-
-    SQL.Clear;
+    SqlProc.Params.ParamByName('id').AsInt64 := AGroupId;
+    ForceExecScript;
+  finally
+    SqlProc.Script.Clear;
   end;
 end;
 
 function TNBoxBookmarksDb.Get(AGroupId: int64; AStart, AEnd: integer): TBookmarkAr;
 var
   I, Pos: integer;
-  Bookmark: TNBoxBookmark;
-  Json: string;
-  tmp: TObject;
+  LBookmark: TNBoxBookmark;
+  LJson: string;
+  Tmp: TObject;
 begin
-  Result := [];
-  Pos := 1;
+  try
+    Result := [];
+    Pos := 1;
+    Query.SQL.Text := 'SELECT rowid AS id, * FROM items WHERE (group_id = :id) LIMIT :start, :count;';
 
-  if not Connection.Connected then
-    Connection.Connect;
+    with Query.Params do begin
+      ParamByName('id').AsLargeInt := AGroupId;
+      ParamByName('start').AsInteger := AStart;
+      ParamByName('count').AsInteger := (AEnd - AStart);
+    end;
+    ForceOpen;
 
-  Query.SQL.Text := 'SELECT `rowid` AS id, * FROM `items` WHERE ( `group_id` = ' + AGroupId.ToString + ' ) LIMIT ' + AStart.ToString + ', ' + (AEnd - AStart).ToString + ';';
-  Query.Open;
+    Query.First;
+    while ( not Query.Eof ) do begin
+      LBookmark := TNBoxBookmark.Create;
 
-  Query.First;
-  while ( not Query.Eof ) do begin
-    Bookmark := TNBoxBookmark.Create;
+      with LBookmark do begin
 
-    with Bookmark do begin
+        Id := Query.FieldByName('id').AsLargeInt;
+        Origin := Query.FieldByName('origin').AsInteger;
+        BookmarkType := TNBoxBookmarkType(Query.FieldByName('type').AsInteger);
+        LJson := Query.FieldByName('object').AsString;
 
-      Id := Query.FieldByName('id').AsLargeInt;
-      Origin := Query.FieldByName('origin').AsInteger;
-      BookmarkType := TNBoxBookmarkType(Query.FieldByName('type').AsInteger);
-      Json := Query.FieldByName('object').AsString;
+        case BookmarkType of
 
-      case bookmarktype of
+          Content: begin
+            var Post: INBoxItem;
+            Post := CreateItemByOrigin(Origin);
+            tmp := (Post as TObject);
+            SafeAssignFromJSON(Tmp, LJson);
+            LBookmark.Obj := tmp;
+          end;
 
-        Content: begin
-          var Post: INBoxItem;
-          Post := CreateItemByOrigin(Origin);
-          tmp := (Post as TObject);
-          SafeAssignFromJSON(tmp, Json);
-          Bookmark.Obj := tmp;
-        end;
+          SearchRequest: begin
+            var Req: INBoxSearchRequest;
+            Req := CreateReqByOrigin(Origin);
+            tmp := (Req as TObject);
+            SafeAssignFromJSON(Tmp, LJson);
+            LBookmark.Obj := tmp;
+          end;
 
-        SearchRequest: begin
-          var Req: INBoxSearchRequest;
-          Req := CreateReqByOrigin(Origin);
-          tmp := (Req as TObject);
-          SafeAssignFromJSON(tmp, Json);
-          Bookmark.Obj := tmp;
         end;
 
       end;
 
+      Result := Result + [LBookmark];
+      Query.Next;
+      inc(Pos);
     end;
 
-    Result := Result + [ Bookmark ];
-    Query.Next;
-    inc(Pos);
-
+    Query.Close;
+  finally
+    Query.SQL.Clear;
   end;
-
-  Query.Close;
-  Query.SQL.Clear;
 end;
 
 function TNBoxBookmarksDb.GetBookmarksGroups: TBookmarkGroupRecAr;
 var
   Rec: TBookmarkGroupRec;
 begin
-  Result := [];
+  try
+    Result := [];
 
-  if not Connection.Connected then
-    Connection.Connect;
+    Query.SQL.AddStrings([
+      'SELECT g.*, IFNULL(r.cnt, 0) items_count',
+      'FROM groups g',
+      'LEFT JOIN ( SELECT r.group_id, COUNT(*) cnt',
+      '	  FROM items r',
+      '	  GROUP BY r.group_id) AS r',
+      'ON r.group_id = g.id',
+      'GROUP BY g.id'
+    ]);
 
-  Query.SQL.AddStrings([
-    'SELECT g.*, IFNULL(r.cnt, 0) items_count',
-    'FROM groups g',
-    'LEFT JOIN ( SELECT r.group_id, COUNT(*) cnt',
-    '	  FROM items r',
-    '	  GROUP BY r.group_id) AS r',
-    'ON r.group_id = g.id',
-    'GROUP BY g.id'
-  ]);
-  Query.Open;
-  Query.First;
+    ForceOpen;
+    try
+      Query.First;
+      while ( not Query.Eof ) do begin
+        Rec := Self.ReadGroup;
+        Result := Result + [Rec];
+        Query.Next;
+      end;
+    finally
+      Query.Close;
+    end;
 
-  while ( not Query.Eof ) do begin
-    Rec := Self.ReadGroup;
-    Result := Result + [Rec];
-    Query.Next;
+  finally
+    Query.SQL.Clear;
   end;
-
-  Query.Close;
-  Query.SQL.Clear;
 end;
 
 function TNBoxBookmarksDb.GetMaxId(AGroupId: Int64): int64;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  Result := -1;
-  Query.SQL.Text := 'SELECT `rowid` FROM `items` WHERE ( `group_id` = ' + AGroupId.ToString + ' ) ORDER BY `rowid` DESC LIMIT 1;';
-  Query.Open;
   try
-    Query.First;
-    Result := Query.FieldByName('rowid').AsLargeInt;
-  except
     Result := -1;
+    Query.SQL.Text := 'SELECT rowid FROM items WHERE (group_id = ' + AGroupId.ToString + ') ORDER BY rowid DESC LIMIT 1;';
+    ForceOpen;
+
+    try
+      Query.First;
+      Result := Query.FieldByName('rowid').AsLargeInt;
+    except
+      Result := -1;
+    end;
+
+    Query.Close;
+  finally
+    Query.SQL.Clear;
   end;
-  Query.Close;
-  Query.SQL.Clear;
 end;
 
 function TNBoxBookmarksDb.GetMaxPage(AGroupId: int64): int64;
 var
   count: int64;
 begin
-  count := self.GetItemsCount(AGroupId);
+  count := GetItemsCount(AGroupId);
   if count > 0 then
-    Result := Ceil(count / self.FPageSize)
+    Result := Ceil(count / FPageSize)
   else
     Result := 0
 end;
@@ -683,11 +681,8 @@ end;
 
 function TNBoxBookmarksDb.GetGroupById(AGroupId: int64): TBookmarkGroupRec;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  with Query do begin
-    SQL.AddStrings([
+  try
+    Query.SQL.AddStrings([
       'SELECT * FROM (',
       '   SELECT g.*, IFNULL(r.cnt, 0) items_count',
       ' 	FROM groups g',
@@ -698,15 +693,19 @@ begin
       '	 GROUP BY g.id ) as g',
       'WHERE g.id = :id'
     ]);
-    Params.ParamByName('id').AsInt64 := AGroupId;
-    Open;
+
+    Query.Params.ParamByName('id').AsInt64 := AGroupId;
+    ForceOpen;
+
     try
-      First;
+      Query.First;
       Result := Self.ReadGroup;
     finally
-      Close;
-      SQL.Clear;
+      Query.Close;
     end;
+
+  finally
+    Query.SQL.Clear;
   end;
 end;
 
@@ -715,13 +714,8 @@ function TNBoxBookmarksDb.GetGroupsByName(
 var
   Rec: TBookmarkGroupRec;
 begin
-  Result := [];
-
-  if not Connection.Connected then
-    Connection.Connect;
-
-  with Query do begin
-    SQL.AddStrings([
+  try
+    Query.SQL.AddStrings([
       'SELECT * FROM (',
       '   SELECT g.*, IFNULL(r.cnt, 0) items_count',
       ' 	FROM groups g',
@@ -732,50 +726,48 @@ begin
       '	 GROUP BY g.id ) as g',
       'WHERE g.name = :name'
     ]);
-    Params[0].AsString := AGroupName;
-    Open;
+
+    Query.Params[0].AsString := AGroupName;
+    ForceOpen;
 
     try
-      First;
-
+      Query.First;
       while ( not Query.Eof ) do begin
         Rec := Self.ReadGroup;
         Result := Result + [Rec];
-        Next;
+        Query.Next;
       end;
-
     finally
-      Close;
-      SQL.Clear;
+      Query.Close;
     end;
+
+  finally
+    Query.SQL.Clear;
   end;
 end;
 
 function TNBoxBookmarksDb.GetItemsCount(AGroupId: int64): int64;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
+  try
+    Query.SQL.Text := 'SELECT COUNT(*) FROM items WHERE (group_id = :id);';
+    Query.Params.ParamByName('id').AsInt64 := AGroupId;
+    ForceOpen;
 
-  with Query do begin
-    SQL.Text := 'SELECT COUNT(*) FROM `items` WHERE (`group_id` = :id);';
-    Params.ParamByName('id').AsInt64 := AGroupId;
-    Open;
     try
       Result := Query.FieldList[0].AsLargeInt;
     finally
-      Close;
-      SQL.Clear;
+      Query.Close;
     end;
+
+  finally
+    Query.SQL.Clear;
   end;
 end;
 
 function TNBoxBookmarksDb.GetLastGroup: TBookmarkGroupRec;
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  With Query do begin
-    SQL.AddStrings([
+  try
+    Query.SQL.AddStrings([
       'SELECT * FROM (',
       '   SELECT g.*, IFNULL(r.cnt, 0) items_count',
       ' 	FROM groups g',
@@ -786,36 +778,42 @@ begin
       '	 GROUP BY g.id ) as g',
       'ORDER BY g.id DESC LIMIT 1'
     ]);
-    Open;
+
+    ForceOpen;
     try
-      First;
+      Query.First;
       Result := Self.ReadGroup;
     finally
-      Close;
-      SQL.Clear;
+      Query.Close;
     end;
+
+  finally
+    Query.SQL.Clear;
   end;
 end;
 
 procedure TNBoxBookmarksDb.UpdateGroup(AGroupId: int64; ANew: TBookmarkGroupRec);
 begin
-  if not Connection.Connected then
-    Connection.Connect;
-
-  with Query do begin
-    SQL.AddStrings([
+  try
+    Query.SQL.AddStrings([
       'UPDATE `groups`',
       'SET `name` = :name,',
       '    `about` = :about,',
       '    `timestamp` = :timestamp',
       'WHERE ( `id` = :id );'
     ]);
-    Params.ParamByName('name').AsString := ANew.Name;
-    Params.ParamByName('about').AsString := ANew.About;
-    Params.ParamByName('timestamp').AsDateTime := ANew.Timestamp;
-    Params.ParamByName('id').AsInt64 := AGroupId;
-    ExecSql;
-    SQL.Clear;
+
+    with Query.Params do begin
+      ParamByName('name').AsString := ANew.Name;
+      ParamByName('about').AsString := ANew.About;
+      ParamByName('timestamp').AsDateTime := ANew.Timestamp;
+      ParamByName('id').AsInt64 := AGroupId;
+    end;
+
+    ForceExecSql;
+
+  finally
+    Query.SQL.Clear;
   end;
 end;
 

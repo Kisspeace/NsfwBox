@@ -4,20 +4,29 @@ unit DbHelper;
 
 interface
 uses
-  ZConnection, classes, system.sysutils,
+  ZConnection, ZSQLUpdate, ZSQLProcessor, ZClasses, ZExceptions, ZPlainSqLiteDriver, classes, system.sysutils,
   ZDataset, System.IOUtils, NsfwBox.Filesystem;
 
 type
 
   TDbHelper = class(TObject)
+    private const
+      TRY_TIMEOUT = 10;
     protected
       Query: TZQuery;
+      SqlProc: TZSQLProcessor;
+//      Update: TZUpdateSQL;
       procedure SetFilename(const value: string);
       function GetFilename: string;
       function BaseExists: boolean;
       procedure CreateBase; virtual; abstract;
+      function TryExecSql: boolean;
+      procedure ForceExecScript;
+      procedure ForceExecSql;
+      procedure ForceOpen;
     public
       Connection: TZConnection;
+      procedure ForceConnect;
       property Filename: string read GetFilename write SetFilename;
       constructor Create(ADbFilename: string); virtual;
       destructor Destroy; virtual;
@@ -37,6 +46,12 @@ begin
   Connection := TZConnection.Create(nil);
   Query := TZQuery.Create(nil);
   Query.Connection := Connection;
+  SqlProc := TZSQLProcessor.Create(nil);
+  SqlProc.Connection := Connection;
+
+//  Update := TZUpdateSql.Create(nil);
+//  Update.MultiStatements := True;
+//  Query.UpdateObject := Update;
 
   with Connection do begin
     {$IFDEF ANDROID}
@@ -59,8 +74,60 @@ destructor TDbHelper.Destroy;
 begin
   if connection.Connected then
     Connection.Disconnect;
+
   Connection.Free;
+//  Update.Free;
   Query.Free;
+end;
+
+procedure TDbHelper.ForceConnect;
+begin
+  while True do begin
+    try
+      Self.Connection.Connect;
+      break;
+    except
+      On E: EZSQLException do begin
+        if not (E.ErrorCode = SQLITE_BUSY) then
+          Raise
+      end;
+    end;
+  end;
+end;
+
+procedure TDbHelper.ForceExecScript;
+begin
+  while True do begin
+    try
+      SqlProc.Execute;
+      break;
+    except
+      On E: EZSQLException do begin
+        if not (E.ErrorCode = SQLITE_BUSY) then
+          Raise
+      end;
+    end;
+  end;
+end;
+
+procedure TDbHelper.ForceExecSql;
+begin
+  while not Self.TryExecSql do sleep(TRY_TIMEOUT);
+end;
+
+procedure TDbHelper.ForceOpen;
+begin
+  while True do begin
+    try
+      Self.Query.Open;
+      break;
+    except
+      On E: EZSQLException do begin
+        if not (E.ErrorCode = SQLITE_BUSY) then
+          Raise
+      end;
+    end;
+  end;
 end;
 
 function TDbHelper.GetFilename: string;
@@ -71,6 +138,19 @@ end;
 procedure TDbHelper.SetFilename(const value: string);
 begin
   Connection.Database := Value;
+end;
+
+function TDbHelper.TryExecSql: boolean;
+begin
+  try
+    Self.Query.ExecSQL;
+    Result := True;
+  except
+    On E: EZSQLException do begin
+      if not (E.ErrorCode = SQLITE_BUSY) then
+        Raise
+    end;
+  end;
 end;
 
 end.
