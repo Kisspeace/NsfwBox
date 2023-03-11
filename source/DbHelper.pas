@@ -4,8 +4,10 @@ unit DbHelper;
 
 interface
 uses
-  ZConnection, ZSQLUpdate, ZSQLProcessor, ZClasses, ZExceptions, ZPlainSqLiteDriver, classes, system.sysutils,
-  ZDataset, System.IOUtils, NsfwBox.Filesystem;
+  classes, system.sysutils, System.IOUtils,
+  ZConnection, ZSQLUpdate, ZSQLProcessor, ZClasses,
+  ZExceptions, ZPlainSqLiteDriver, ZDataset,
+  NsfwBox.Filesystem, NsfwBox.Logging;
 
 type
 
@@ -15,7 +17,6 @@ type
     protected
       Query: TZQuery;
       SqlProc: TZSQLProcessor;
-//      Update: TZUpdateSQL;
       procedure SetFilename(const value: string);
       function GetFilename: string;
       function BaseExists: boolean;
@@ -49,10 +50,6 @@ begin
   SqlProc := TZSQLProcessor.Create(nil);
   SqlProc.Connection := Connection;
 
-//  Update := TZUpdateSql.Create(nil);
-//  Update.MultiStatements := True;
-//  Query.UpdateObject := Update;
-
   with Connection do begin
     {$IFDEF ANDROID}
       Connection.LibraryLocation := TNBoxPath.GetLibPath('libsqliteX.so');
@@ -76,7 +73,7 @@ begin
     Connection.Disconnect;
 
   Connection.Free;
-//  Update.Free;
+  SqlProc.Free;
   Query.Free;
 end;
 
@@ -117,6 +114,7 @@ end;
 
 procedure TDbHelper.ForceOpen;
 begin
+  try
   while True do begin
     try
       Self.Query.Open;
@@ -126,6 +124,12 @@ begin
         if not (E.ErrorCode = SQLITE_BUSY) then
           Raise
       end;
+    end;
+  end;
+  except
+    On E: Exception do begin
+      Log('TDbHelper.ForceOpen', E);
+      raise;
     end;
   end;
 end;

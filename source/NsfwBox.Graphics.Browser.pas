@@ -207,11 +207,6 @@ var
   LRequest: INBoxSearchRequest;
   LBookmark: TNBoxBookmark;
 
-  function IsNeedToBeSync: boolean;
-  begin
-    Result := ( AItem.Origin = ORIGIN_BOOKMARKS );
-  end;
-
 begin
   try
     Fetched := false;
@@ -227,20 +222,8 @@ begin
     if TThread.Current.CheckTerminated then exit;
 
     try
-
-      if IsNeedToBeSync then begin
-
-        TThread.Synchronize(nil, procedure
-        begin
-          Fetched := Scraper.GetContent(AItem, Content);
-        end);
-
-      end else begin
-        Fetched := Scraper.GetContent(AItem, Content);
-      end;
-
+      Fetched := Scraper.GetContent(AItem, Content);
       if not Fetched then exit;
-
     except
       on E: Exception do begin
         Log('Provider: ' + AItem.Origin.ToString + ' Browser -> Scraper.GetContent', E);
@@ -259,11 +242,11 @@ begin
 
       Supports(LContentItem, INBoxItem, LPost);
 
-      if ( LContentItem is TNBoxBookmark ) then begin
+      if (LContentItem is TNBoxBookmark) then begin
         LBookmark := TNBoxBookmark(LContentItem);
-        if ( LBookmark.BookmarkType = TNBoxBookmarkType.Content ) then
+        if (LBookmark.BookmarkType = TNBoxBookmarkType.Content) then
           LPost := LBookmark.AsItem
-        else if ( LBookmark.BookmarkType = SearchRequest ) then
+        else if (LBookmark.BookmarkType = SearchRequest) then
           LRequest := LBookmark.AsRequest;
       end;
 

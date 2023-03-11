@@ -849,18 +849,16 @@ begin
     procedure
     var
       I: integer;
-      Groups: TBookmarkGroupRecAr;
     begin
       if UserSayYes then begin
-        Groups := CurrentBookmarksDb.GetBookmarksGroups;
-        for I := 0 to Length(Groups) - 1 do begin
-          Groups[I].DeleteGroup;
-        end;
 
-        if CurrentBookmarksDb = BookmarksDb then
+        if CurrentBookmarksDb = BookmarksDb then begin
+          CurrentBookmarksDb.DeleteAllGroups;
           BookmarksControls.Clear
-        else if CurrentBookmarksDb = HistoryDb then
+        end else if CurrentBookmarksDb = HistoryDb then begin
+          CurrentBookmarksDb.DeleteAllItems;
           HistoryDbControls.Clear;
+        end;
 
       end;
       GotoBookmarksMenu(CurrentBookmarksDb);
@@ -921,8 +919,7 @@ begin
       else if (CurrentBookmarksDb = BookmarksDb) then
         Req.Path := REGULAR_BMRKDB;
 
-      AddBrowser(Req);
-      Browsers.Last.GoBrowse;
+      AddBrowser(Req, True);
     end;
 
   end else begin
@@ -940,7 +937,7 @@ begin
       Req.Path := REGULAR_BMRKDB;
 
     Req.Request := CurrentBookmarkControl.Tag.ToString;
-    AddBrowser(Req, true);
+    AddBrowser(Req, True);
 
   end;
 
@@ -2995,8 +2992,8 @@ end;
 procedure TForm1.OnBrowserScraperCreate(Sender: TObject;
   var AScraper: TNBoxScraper);
 begin
-  AScraper.BookmarksDb := BookmarksDb;
-  AScraper.HistoryDb := HistoryDb;
+  AScraper.BookmarksDb := BookmarksDb.Clone;
+  AScraper.HistoryDb := HistoryDb.Clone;
 end;
 
 procedure TForm1.OnBrowserSetWebClient(Sender: TObject;
@@ -3100,7 +3097,7 @@ begin
     AAllow := True
   else begin
     AAllow := False;
-    Log('Disallow MimeType: "' + AResponse.MimeType + '" from: ' + AUrl);
+//    Log('Disallow MimeType: "' + AResponse.MimeType + '" from: ' + AUrl);
   end;
 end;
 

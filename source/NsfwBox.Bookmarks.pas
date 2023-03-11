@@ -4,14 +4,17 @@ unit NsfwBox.Bookmarks;
 
 interface
 uses
-  SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper,
+  SysUtils, Classes, XSuperObject, XSuperJSON, DbHelper, System.JSON,
   NsfwBox.Interfaces, NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx,
   NsfwBox.Provider.R34App, NsfwBox.Provider.R34JsonApi, NsfwBox.Consts,
   NsfwBox.Helper, Math, system.Generics.Collections, NsfwBox.Logging,
   NsfwBox.Provider.BooruScraper, BooruScraper.Interfaces, BooruScraper.BaseTypes,
-  BooruScraper.Serialize.XSuperObject, ZExceptions, ZPlainSqLiteDriver;
+  BooruScraper.Serialize.Json, BooruScraper.Serialize.XSuperObject,
+  ZExceptions, ZPlainSqLiteDriver;
 
 type
+
+  TSJsonMom = BooruScraper.Serialize.Json.TJsonMom;
 
   TNBoxBookmarkType = ( Content, SearchRequest );
   TNBoxBookmarksDb = class;
@@ -25,7 +28,6 @@ type
       FBookmarkType: TNBoxBookmarkType;
       FAbout: string;
       FTime: TDateTime;
-      function GetBookmarkType: TNBoxBookmarkType;
       function GetOrigin: integer;
       function GetTime: TDateTime;
       procedure SetObj(const value: TObject);
@@ -36,7 +38,7 @@ type
       property Time: TDateTime read GetTime write FTime;
       property About: string read FAbout write FAbout;
       property Origin: integer read GetOrigin write FOrigin;
-      property BookmarkType: TNBoxBookmarkType read GetBookmarkType write FBookmarkType;
+      property BookmarkType: TNBoxBookmarkType read FBookmarkType;
       function IsRequest: boolean;
       function AsItem: INBoxItem;
       function AsRequest: INBoxSearchRequest;
@@ -91,6 +93,7 @@ type
       procedure ClearGroup(AGroupId: int64);
       procedure DeleteGroup(AGroupId: Int64);
       procedure DeleteAllGroups;
+      procedure DeleteAllItems;
       procedure Delete(ABookmarkId: int64);
       procedure AddB(AGroupId: int64; A: TNBoxBookmark);           overload;
       procedure AddB(AGroupId: int64; AValues: TBookmarkAr);       overload;
@@ -101,6 +104,7 @@ type
       function GetItemsCount(AGroupId: int64): int64;
       function GetPage(AGroupId: int64; APageNum: integer = 1): TBookmarkAr;
       function Get(AGroupId: int64; AStart, AEnd: integer): TBookmarkAr;
+      function Clone: TNBoxBookmarksDb;
       constructor Create(ADbFilename: string); override;
   end;
 
@@ -127,48 +131,58 @@ type
   end;
 
   Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject); overload;
-  Procedure SafeAssignFromJSON(AObject: TObject; AJsonString: string); overload;
+  Procedure SafeAssignFromJSON(AObject: TObject; const AJsonString: string); overload;
 
   function ToJson(AObject: TObject): ISuperObject;
+  function ToJsonObj(AObject: TObject): TJsonObject;
   function ToJsonStr(AObject: TObject): String;
 
 implementation
-uses unit1;
+
 
 function ToJson(AObject: TObject): ISuperObject;
 begin
   if (AObject is TNBoxBooruItemBase) then begin
-
-    var LObj := (AObject as TNBoxBooruItemBase);
     Result := SO;
+    var LObj := (AObject as TNBoxBooruItemBase);
 
     with Result do begin
       I['Origin'] := LObj.Origin;
-//      O['ThumbItem'] := TJsonMom.ToJson(LObj.ThumbItem);
       O['Full'] := TJsonMom.ToJson(LObj.Full);
     end;
-
   end else
     Result := AObject.AsJSONObject;
 end;
 
+function ToJsonObj(AObject: TObject): TJsonObject;
+begin
+  if (AObject is TNBoxBooruItemBase) then begin
+    Result := TJsonObject.Create;
+    var LObj := (AObject as TNBoxBooruItemBase);
+
+    with Result do begin
+      AddPair('Origin', LObj.Origin);
+      AddPair('Full', TSJsonMom.ToJson(LObj.Full));
+    end;
+  end else
+    Result := TJsonObject.ParseJSONValue(AObject.AsJSON) as TJsonObject; { slow }
+end;
+
 function ToJsonStr(AObject: TObject): String;
 begin
-  Result := ToJson(AObject).AsJSON(false);
+  if (AObject is TNBoxBooruItemBase) then
+  begin
+    var LJson := ToJsonObj(AObject);
+    try
+      Result := LJson.ToJSON;
+    finally
+      LJson.Free;
+    end;
+  end else
+    Result := ToJson(AObject).AsJSON(false);
 end;
 
 Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject);
-
-  function _AsStrings(const Lx: ISuperArray): TArray<String>;
-  var
-    I: integer;
-  begin
-    Result := [];
-    for I := 0 to Lx.Length - 1 do begin
-      Result := Result + [Lx.S[I]];
-    end;
-  end;
-
 begin
   if ( AObject is TNBoxR34AppItem ) then begin
 
@@ -184,6 +198,7 @@ begin
     except
       On E: Exception do begin
         Log('SafeAssignFromJSON(TNBoxR34AppItem)', E);
+        raise;
       end;
     end;
 
@@ -191,17 +206,30 @@ begin
 
     try
       with (AObject as TNBoxBooruItemBase) do begin
+        var LJsonTmp: TJsonObject;
 
-        var LThumb: IBooruThumb;
+        var LThumb: IBooruThumb := Nil;
         if JSON.Null['ThumbItem'] = TMemberStatus.jAssigned then
         begin
-          LThumb := TjsonMom.FromJsonIBooruThumb(JSON.O['ThumbItem']);
+          LJsonTmp := TJsonObject.ParseJSONValue(JSON.O['ThumbItem'].AsJSON) as TJsonObject;
+          try
+            LThumb := TSJsonMom.FromJsonIBooruThumb(LJsonTmp);
+          finally
+            LJsonTmp.Free;
+          end;
           Full.Assign(LThumb);
         end;
 
         if JSON.Null['Full'] = TMemberStatus.jAssigned then
         begin
-          var LFull: IBooruPost := TjsonMom.FromJsonIBooruPost(JSON.O['Full']);
+          var LFull: IBooruPost := Nil;
+
+          LJsonTmp := TJsonObject.ParseJSONValue(JSON.O['Full'].AsJSON) as TJsonObject;
+          try
+            LFull := TSJsonMom.FromJsonIBooruPost(LJsonTmp);
+          finally
+            LJsonTmp.Free;
+          end;
 
           { v2.3.0 }
           if Assigned(LThumb) then begin
@@ -216,19 +244,44 @@ begin
 
       Exit; { !! }
     except
-       On E: Exception do begin
-        Log('SafeAssignFromJSON(TNBoxBooruItemBase)', E);
+      On E: Exception do begin
+        Log('SafeAssignFromJSON(TNBoxBooruItemBase) ' + SLineBreak + JSON.AsJSON(True), E);
+        raise;
       end;
     end;
 
   end;
 
-  AObject.AssignFromJSON(JSON);
+  try
+    AObject.AssignFromJSON(JSON);
+  except
+    On E: exception do begin
+      Log('AObject.AssignFromJSON(JSON): ' + AObject.ClassName + SLineBreak + JSON.AsJSON(True), E);
+      raise;
+    end;
+  end;
 end;
 
-Procedure SafeAssignFromJSON(AObject: TObject; AJsonString: string);
+Procedure SafeAssignFromJSON(AObject: TObject; const AJsonString: string);
+var
+  LJson: ISuperObject;
 begin
-  SafeAssignFromJSON(AObject, SO(AJSONString));
+  try
+    try
+      LJson := SO(AJsonString);
+    except
+      On E: exception do begin
+        Log('LJson := SO(AJsonString) ' + BoolToStr(Assigned(LJson), True) + ' ' + AJsonString, E);
+        raise;
+      end;
+    end;
+    SafeAssignFromJSON(AObject, LJson);
+  except
+    On E: exception do begin
+      Log('SafeAssignFromJSON(string) ' + BoolToStr(Assigned(LJson), True) + ' ' + AJsonString, E);
+      raise
+    end;
+  end;
 end;
 
 { TNBoxBookmark }
@@ -268,12 +321,6 @@ begin
   inherited;
 end;
 
-function TNBoxBookmark.GetBookmarkType: TNBoxBookmarkType;
-begin
-  Result := FBookmarkType;
-end;
-
-
 function TNBoxBookmark.GetOrigin: integer;
 begin
   Result := FOrigin;
@@ -303,9 +350,9 @@ begin
     Origin := LHasOrigin.Origin;
 
     if Supports(Obj, INboxItem) then
-      BookmarkType := Content
+      FBookmarkType := Content
     else
-      BookmarkType := SearchRequest;
+      FBookmarkType := SearchRequest;
 
   end;
 end;
@@ -431,6 +478,12 @@ begin
   end;
 end;
 
+function TNBoxBookmarksDb.Clone: TNBoxBookmarksDb;
+begin
+  Result := TNBoxBookmarksDb.Create(Connection.Database);
+  Result.ForceConnect;
+end;
+
 constructor TNBoxBookmarksDb.Create(ADbFilename: string);
 begin
   inherited;
@@ -441,28 +494,28 @@ procedure TNBoxBookmarksDb.CreateBase;
 begin
   try
     SqlProc.Script.AddStrings([
-      'CREATE TABLE `groups` (',
-      '  `id`        INTEGER PRIMARY KEY AUTOINCREMENT,',
-      '  `name`      VARCHAR(255),',
-      '  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,',
-      '  `about`     TEXT',
+      'CREATE TABLE groups (',
+      '  id        INTEGER PRIMARY KEY AUTOINCREMENT,',
+      '  name      VARCHAR(255),',
+      '  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,',
+      '  about     TEXT',
       ');',
 
-      'CREATE TABLE `items` (',
-      '  `origin`    INTEGER,',
-      '  `type`      INTEGER,',
-      '  `about`     TEXT,',
-      '  `timestamp` DATETIME DEFAULT CURRENT_TIMESTAMP,',
-      '  `object`    JSON,',
-      '  `group_id`  INTEGER DEFAULT 1,',
-      '  FOREIGN KEY(group_id) REFERENCES `groups` (id)',
+      'CREATE TABLE items (',
+      '  origin    INTEGER,',
+      '  type      INTEGER,',
+      '  about     TEXT,',
+      '  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,',
+      '  object    JSON,',
+      '  group_id  INTEGER DEFAULT 1,',
+      '  FOREIGN KEY(group_id) REFERENCES groups (id)',
       ');',
 
-      'CREATE VIEW `only_content` AS',
-      '  SELECT * FROM `items` WHERE (`type` = 0);',
+      'CREATE VIEW only_content AS',
+      '  SELECT * FROM items WHERE (type = 0);',
 
-      'CREATE VIEW `only_requests` AS',
-      '  SELECT * FROM `items` WHERE (`type` = 1);'
+      'CREATE VIEW only_requests AS',
+      '  SELECT * FROM items WHERE (type = 1);'
     ]);
     SqlProc.Execute;
   finally
@@ -488,13 +541,27 @@ begin
       'BEGIN TRANSACTION;',
 	      'DELETE FROM items;',
 	      'DELETE FROM groups;',
-      'COMMIT;'
+      'COMMIT;',
+      'VACUUM;'
     ]);
     ForceExecScript;
   finally
     SqlProc.Script.Clear;
   end;
 end;                            
+
+procedure TNBoxBookmarksDb.DeleteAllItems;
+begin
+  try
+    SqlProc.Script.AddStrings([
+      'DELETE FROM items;',
+      'VACUUM;'
+    ]);
+    ForceExecScript;
+  finally
+    SqlProc.Script.Clear;
+  end;
+end;
 
 procedure TNBoxBookmarksDb.DeleteGroup(AGroupId: Int64);
 begin
@@ -503,7 +570,8 @@ begin
       'BEGIN TRANSACTION;',
 	      'DELETE FROM items WHERE (group_id = :id);',
 	      'DELETE FROM groups WHERE (id = :id);',
-      'COMMIT;'
+      'COMMIT;',
+      'VACUUM;'
     ]);
 
     SqlProc.Params.ParamByName('id').AsInt64 := AGroupId;
@@ -517,62 +585,77 @@ function TNBoxBookmarksDb.Get(AGroupId: int64; AStart, AEnd: integer): TBookmark
 var
   I, Pos: integer;
   LBookmark: TNBoxBookmark;
+  LBookmarkType: TNBoxBookmarkType;
   LJson: string;
   Tmp: TObject;
 begin
   try
-    Result := [];
-    Pos := 1;
-    Query.SQL.Text := 'SELECT rowid AS id, * FROM items WHERE (group_id = :id) LIMIT :start, :count;';
+    try
+      Result := [];
+      Pos := 1;
+      Query.SQL.Text := 'SELECT rowid AS id, * FROM items WHERE (group_id = :id) LIMIT :start, :count;';
 
-    with Query.Params do begin
-      ParamByName('id').AsLargeInt := AGroupId;
-      ParamByName('start').AsInteger := AStart;
-      ParamByName('count').AsInteger := (AEnd - AStart);
-    end;
-    ForceOpen;
+      with Query.Params do begin
+        ParamByName('id').AsLargeInt := AGroupId;
+        ParamByName('start').AsInteger := AStart;
+        ParamByName('count').AsInteger := (AEnd - AStart);
+      end;
 
-    Query.First;
-    while ( not Query.Eof ) do begin
-      LBookmark := TNBoxBookmark.Create;
+      ForceOpen;
+      Query.First;
+      while ( not Query.Eof ) do begin
+        LBookmark := TNBoxBookmark.Create;
 
-      with LBookmark do begin
+        with LBookmark do begin
 
-        Id := Query.FieldByName('id').AsLargeInt;
-        Origin := Query.FieldByName('origin').AsInteger;
-        BookmarkType := TNBoxBookmarkType(Query.FieldByName('type').AsInteger);
-        LJson := Query.FieldByName('object').AsString;
+          Id := Query.FieldByName('id').AsLargeInt;
+          Origin := Query.FieldByName('origin').AsInteger;
+          LBookmarkType := TNBoxBookmarkType(Query.FieldByName('type').AsInteger);
+          LJson := Query.FieldByName('object').AsString;
 
-        case BookmarkType of
+          case LBookmarkType of
 
-          Content: begin
-            var Post: INBoxItem;
-            Post := CreateItemByOrigin(Origin);
-            tmp := (Post as TObject);
-            SafeAssignFromJSON(Tmp, LJson);
-            LBookmark.Obj := tmp;
-          end;
+            Content: begin
+              try
+                var Post: INBoxItem;
+                Post := CreateItemByOrigin(Origin);
+                tmp := (Post as TObject);
+                SafeAssignFromJSON(Tmp, LJson);
+                LBookmark.Obj := tmp;
+              except
+                On E: exception do begin
+                  Log('BookmarkType of Content', E);
+                  raise;
+                end;
+              end;
+            end;
 
-          SearchRequest: begin
-            var Req: INBoxSearchRequest;
-            Req := CreateReqByOrigin(Origin);
-            tmp := (Req as TObject);
-            SafeAssignFromJSON(Tmp, LJson);
-            LBookmark.Obj := tmp;
+            SearchRequest: begin
+              var Req: INBoxSearchRequest;
+              Req := CreateReqByOrigin(Origin);
+              tmp := (Req as TObject);
+              SafeAssignFromJSON(Tmp, LJson);
+              LBookmark.Obj := tmp;
+            end;
+
           end;
 
         end;
 
+        Result := Result + [LBookmark];
+        Query.Next;
+        inc(Pos);
       end;
 
-      Result := Result + [LBookmark];
-      Query.Next;
-      inc(Pos);
+      Query.Close;
+    finally
+      Query.SQL.Clear;
     end;
-
-    Query.Close;
-  finally
-    Query.SQL.Clear;
+  except
+    On E: exception do begin
+      Log('TNBoxBookmarksDb.Get', E);
+      raise;
+    end;
   end;
 end;
 
@@ -614,7 +697,8 @@ function TNBoxBookmarksDb.GetMaxId(AGroupId: Int64): int64;
 begin
   try
     Result := -1;
-    Query.SQL.Text := 'SELECT rowid FROM items WHERE (group_id = ' + AGroupId.ToString + ') ORDER BY rowid DESC LIMIT 1;';
+    Query.SQL.Text := 'SELECT rowid FROM items WHERE (group_id = :id) ORDER BY rowid DESC LIMIT 1;';
+    Query.Params.ParamByName('id').AsInt64 := AGroupId;
     ForceOpen;
 
     try
@@ -660,14 +744,7 @@ begin
 end;
 
 function TNBoxBookmarksDb.ReadGroup: TBookmarkGroupRec;
-//var
-//  I: integer;
 begin
-//  for I := 0 to Query.Fields.Count - 1 do begin
-//    var LField := Query.Fields.Fields[I];
-//    log('Field "' + LField.FieldName + '" : "' + LField.AsString + '"')
-//  end;
-
   With Result do begin
     ItemsCount := Query.FieldByName('items_count').AsLargeInt;
     Id := Query.FieldByName('id').AsLargeInt;
@@ -796,11 +873,11 @@ procedure TNBoxBookmarksDb.UpdateGroup(AGroupId: int64; ANew: TBookmarkGroupRec)
 begin
   try
     Query.SQL.AddStrings([
-      'UPDATE `groups`',
-      'SET `name` = :name,',
-      '    `about` = :about,',
-      '    `timestamp` = :timestamp',
-      'WHERE ( `id` = :id );'
+      'UPDATE groups',
+      'SET name = :name,',
+      '    about = :about,',
+      '    timestamp = :timestamp',
+      'WHERE (id = :id);'
     ]);
 
     with Query.Params do begin

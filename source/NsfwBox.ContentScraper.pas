@@ -85,6 +85,7 @@ type
     property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet
       write FOnWebClientSet;
     constructor Create;
+    destructor Destroy; virtual;
   end;
 
   TNBoxFetchManager = Class(TGenericYDWQueuedThreadInterface<INBoxItem>)
@@ -110,8 +111,15 @@ uses unit1;
 { TNBoxScraper }
 constructor TNBoxScraper.Create;
 begin
-  Self.FOnWebClientSet := nil;
-  Self.BookmarksDb := nil;
+  FOnWebClientSet := Nil;
+  BookmarksDb := Nil;
+  HistoryDb := Nil;
+end;
+
+destructor TNBoxScraper.Destroy;
+begin
+  if Assigned(BookmarksDb) then BookmarksDb.Free;
+  if Assigned(HistoryDb) then HistoryDb.Free;
 end;
 
 procedure TNBoxScraper.FetchAuthors(var APost: INBoxItem);
@@ -506,38 +514,31 @@ end;
 function TNBoxScraper.GetContentBookmarks(AList: INBoxHasOriginList;
   ADbPath: string; ABookmarksListId: int64; APageId: integer): boolean;
 var
-  i, C: integer;
-  Groups: TBookmarkGroupRecAr;
-  Group: TBookmarkGroupRec;
+  I, C: integer;
   Bookmarks: TBookmarkAr;
   TargetDb: TNBoxBookmarksDb;
 begin
-  Result := false;
-  if (ADbPath = REGULAR_BMRKDB) or ADbPath.IsEmpty then
-    TargetDb := Self.BookmarksDb
-  else if (ADbPath = HISTORY_BMRKDB) then
-    TargetDb := Self.HistoryDb;
-  if not Assigned(TargetDb) then
-    Exit;
-  C := AList.Count;
-  Groups := TargetDb.GetBookmarksGroups;
-  for i := low(Groups) to high(Groups) do
-  begin
-    if Groups[i].Id = ABookmarksListId then
-    begin
-      Group := Groups[i];
-      break;
-    end;
+  try
+    Result := false;
+
+    if (ADbPath = REGULAR_BMRKDB) or ADbPath.IsEmpty then
+      TargetDb := BookmarksDb
+    else if (ADbPath = HISTORY_BMRKDB) then
+      TargetDb := HistoryDb;
+
+    if not Assigned(TargetDb) then Exit;
+    C := AList.Count;
+
+    Bookmarks := TargetDb.GetPage(ABookmarksListId, APageId);
+    for I := low(Bookmarks) to high(Bookmarks) do
+      AList.Add(Bookmarks[I]);
+
+    Bookmarks := nil;
+    Result := (AList.Count > C);
+  except
+    On E: exception do
+      Log('TNBoxScraper.GetContentBookmarks', E);
   end;
-  Bookmarks := Group.GetPage(APageId);
-  for i := low(Bookmarks) to high(Bookmarks) do
-  begin
-    // if Bookmarks[I].BookmarkType = Content then
-    AList.Add(Bookmarks[i]);
-    // Bookmarks[I].Free;
-  end;
-  Bookmarks := nil;
-  Result := (AList.Count > C);
 end;
 
 function TNBoxScraper.GetContentBooruScraper(ABooruClient: IBooruClient;
