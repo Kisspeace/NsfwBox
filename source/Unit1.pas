@@ -593,10 +593,8 @@ begin
     OnClick          := ClickTapRef;
   end;
 
-  if Assigned(ARequest) then
-    B.Request := ARequest;
-
-  form1.OnBrowserLayout.BringToFront;
+  B.Request := ARequest;
+  Form1.OnBrowserLayout.BringToFront;
   Result := T;
 
   if AAutoStartBrowse then
@@ -800,9 +798,17 @@ begin
 end;
 
 procedure TForm1.BrowserBeforeBrowse(Sender: TObject);
+var
+  LReq: INBoxSearchRequest;
 begin
-  if Settings.SaveSearchHistory then
-    HistoryDb.SearchGroup.Add(( Sender as TNBoxBrowser ).Request);
+  if not Settings.SaveSearchHistory then exit;
+  try
+    LReq := (Sender as TNBoxBrowser).Request;
+    HistoryDb.SearchGroup.Add(LReq);
+  finally
+    FreeAndNil(LReq as TObject);
+    LReq := Nil;
+  end;
 end;
 
 procedure TForm1.BtnBMarkChangeOnTap(Sender: TObject; const Point: TPointF);
@@ -901,6 +907,7 @@ var
   I: integer;
   Groups: TBookmarkGroupRecAr;
 begin
+  Req := Nil;
   if DoWithAllItems then begin
 
     Groups := CurrentBookmarksDb.GetBookmarksGroups;
@@ -943,6 +950,11 @@ begin
 
   CurrentBrowser := browsers.Last;
   ChangeInterface(Self.BrowserLayout);
+
+  if Assigned(Req) then begin
+    FreeAndNil(Req as TObject);
+    Req := nil;
+  end;
 end;
 
 procedure TForm1.BtnBMarkOpenLastPageOnTap(Sender: TObject;
@@ -1150,11 +1162,20 @@ procedure TForm1.BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
 var
   LBrowser: TNBoxBrowser;
   NewCount: integer;
+  LReq: INBoxSearchRequest;
 begin
   LBrowser := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
 
-  if Settings.SaveClosedTabHistory then // Maybe move this to DeleteBrowser()
-    HistoryDb.TabGroup.Add(LBrowser.Request);  // Save this tab on history
+  if Settings.SaveClosedTabHistory then
+  begin
+    LReq := LBrowser.Request;
+    try
+      HistoryDb.TabGroup.Add(LReq);
+    finally
+      FreeAndNil(LReq as TObject);
+      LReq := nil;
+    end;
+  end;
 
   NewCount := Browsers.Count - 1;
 
@@ -1326,12 +1347,6 @@ begin
   end;
 end;
 
-function RandReq: INBoxSearchRequest;
-begin
-  Result := nil;
-  Result := TNBoxSearchReqNsfwxxx.Create;
-end;
-
 function TForm1.CreateDefBrowser(AOwner: TComponent): TNBoxBrowser;
 begin
   Result := TNBoxBrowser.Create(AOwner);
@@ -1339,7 +1354,7 @@ begin
     Align                    := TAlignlayout.Contents;
     ColumnsCount   := Settings.ContentLayoutsCount;
     ItemsIndent    := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
-    Request                  := RandReq;
+    Request                  := nil;
     Result.OnWebClientCreate := OnBrowserSetWebClient;
     Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
     visible                  := false;
@@ -1585,24 +1600,29 @@ var
   Req: INBoxSearchRequest;
 begin
   Req := ABrowser.Request;
-  Result := Req.Request;
+  try
+    Result := Req.Request;
 
-  if ( Result.IsEmpty ) then begin
+    if ( Result.IsEmpty ) then begin
 
-    if ( Req is TNBoxSearchReqCoomerParty ) then begin
-      var LReq: TNBoxSearchReqCoomerParty;
-      LReq := (Req as TNBoxSearchReqCoomerParty);
-      if ( not LReq.UserId.IsEmpty ) then
-        Result := LReq.UserId;
+      if ( Req is TNBoxSearchReqCoomerParty ) then begin
+        var LReq := (Req as TNBoxSearchReqCoomerParty);
+        if (not LReq.UserId.IsEmpty) then
+          Result := LReq.UserId;
+        LReq := Nil;
+      end;
+
+      if ( Result.IsEmpty ) then
+        Result := 'empty';
+
     end;
 
-    if ( Result.IsEmpty ) then
-      Result := 'empty';
-
+    Result := Result + ': ' + Req.PageId.ToString + ' | '
+      + ABrowser.Items.Count.ToString;
+  finally
+    FreeAndNil(Req as TObject);
+    Req := Nil;
   end;
-
-  Result := Result + ': ' + ABrowser.Request.PageId.ToString + ' | '
-    + ABrowser.Items.Count.ToString;
 end;
 
 procedure TForm1.DeleteAllBrowsers(ADeleteFromSession: boolean = True);
@@ -1905,6 +1925,13 @@ begin
       
     end;
 
+  end;
+
+  LRequest := nil;
+  LPost := nil;
+  if Assigned(LTmpReq) then begin
+    FreeAndNil(LTmpReq as TObject);
+    LTmpReq := Nil;
   end;
 end;
 
@@ -2899,10 +2926,18 @@ begin
 end;
 
 procedure TForm1.GotoSearchSettings(ABrowser: TNBoxBrowser);
+var
+  LReq: INBoxSearchRequest;
 begin
   ChangeInterface(MenuSearchSettings);
   if Assigned(ABrowser) then begin
-    SearchMenu.Request := ABrowser.Request;
+    LReq := ABrowser.Request;
+    try
+      SearchMenu.Request := LReq;
+    finally
+      FreeAndNil(LReq as TObject);
+      LReq := nil;
+    end;
   end;
 end;
 
@@ -2934,28 +2969,33 @@ var
   LBrowser: TNBoxBrowser;
   Groups: TBookmarkGroupRecAr;
   Group: TBookmarkGroupRec;
+  LReq: INBoxSearchRequest;
 begin
   LBrowser := TNBoxBrowser(Sender);
   LTab := GetTab(Sender as TNBoxBrowser);
+  LReq := LBrowser.Request;
+  try
+    if not Assigned(LTab) then Exit;
 
-  if not Assigned(LTab) then
-    Exit;
+    LTab.Text.Text := CreateTabText(LBrowser);
+    LNewTabImageName := AppStyle.GetImagePath(LReq.Origin);
+    if LNewTabImageName <> LTab.Image.ImageURL then
+      LTab.Image.ImageURL := LNewTabImageName;
 
-  LTab.Text.Text := CreateTabText(LBrowser);
-  LNewTabImageName := AppStyle.GetImagePath(LBrowser.Request.Origin);
-  if LNewTabImageName <> LTab.Image.ImageURL then
-    LTab.Image.ImageURL := LNewTabImageName;
+    if ( not NowLoadingSession ) And Settings.AutoSaveSession then begin
+      Groups := Session.GetBookmarksGroups;
+      if Length(Groups) > 0 then begin
+        Group := Groups[0];
+        if ( LBrowser.Tag <> -1 ) then
+          Group.Delete(LBrowser.Tag);
 
-  if ( not NowLoadingSession ) And Settings.AutoSaveSession then begin
-    Groups := Session.GetBookmarksGroups;
-    if Length(Groups) > 0 then begin
-      Group := Groups[0];
-      if ( LBrowser.Tag <> -1 ) then
-        Group.Delete(LBrowser.Tag);
-
-      Group.Add(LBrowser.Request);
-      LBrowser.Tag := Group.GetMaxId;
+        Group.Add(LReq);
+        LBrowser.Tag := Group.GetMaxId;
+      end;
     end;
+  finally
+    FreeAndNil(LReq as TObject);
+    LReq := nil;
   end;
 end;
 
@@ -2999,11 +3039,10 @@ end;
 procedure TForm1.OnBrowserSetWebClient(Sender: TObject;
   AWebClient: TNetHttpClient; AOrigin: integer);
 begin
-  tthread.Synchronize(Tthread.Current,
+  TThread.Synchronize(Tthread.Current,
   procedure
   begin
     SetDefToWebClient(AWebClient, AOrigin);
-
   end);
 end;
 
@@ -3194,8 +3233,7 @@ begin
   TThread.Synchronize(TThread.Current,
   procedure begin
     try
-      if not AppDestroying then
-        AddDownload(LItem.Clone);
+      if not AppDestroying then AddDownload(LItem);
     except
       On E: Exception do Log('DownloadFetcherOnFetched', E);
     end;
@@ -3458,11 +3496,16 @@ end;
 procedure TForm1.MenuItemTagsOnSelected(Sender: TObject);
 var
   LBtnTag: TRectButtonWithTag;
+  LReq: INBoxSearchRequest;
 begin
   LBtnTag := MenuItemTags.SelectedBtn as TRectButtonWithTag;
-  self.AddBrowser(CreateTagReq(MenuItemTagsOrigin,
-                  LBtnTag.ContainedData),
-                  Settings.AutoStartBrowse);
+  LReq := CreateTagReq(MenuItemTagsOrigin, LBtnTag.ContainedData);
+  try
+    self.AddBrowser(LReq, Settings.AutoStartBrowse);
+  finally
+    FreeAndNil(LReq as TObject);
+    LReq := nil;
+  end;
 end;
 
 procedure TForm1.NetHttpOnValidateCertAutoAccept(const Sender: TObject;
@@ -3927,6 +3970,7 @@ end;
 procedure TForm1.SetCurrentBrowser(const Value: TNBoxBrowser);
 var
   Tab: TNBoxTab;
+  LReq: INBoxSearchRequest;
 begin
   if Assigned(FCurrentBrowser) then begin
     Tab := self.GetTab(FCurrentBrowser);
@@ -3938,8 +3982,14 @@ begin
   FCurrentBrowser := Value;
   Tab := self.GetTab(FCurrentBrowser);
   Tab.ImageControl.Visible := true;
-  Tab.Image.ImageURL := AppStyle.GetImagePath(FCurrentBrowser.Request.Origin);
-  FCurrentBrowser.Visible := true;
+  LReq := FCurrentBrowser.Request;
+  try
+    Tab.Image.ImageURL := AppStyle.GetImagePath(LReq.Origin);
+    FCurrentBrowser.Visible := true;
+  finally
+    FreeAndNil(LReq as TObject);
+    LReq := nil;
+  end;
 end;
 
 procedure TForm1.SetCurrentItem(const value: TNBoxCardBase);
@@ -4050,6 +4100,10 @@ end;
 
 procedure TForm1.TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
 begin
+  Form1.TopBottomText.Text := 'BaseItem: ' + BaseItemCounter.Count.ToString
+  + ' BookmarkItem: ' + BookmarkItemCounter.Count.ToString
+  + ' ReqItem: ' + ReqItemCounter.Count.ToString
+  + ' YDWReusableThreads: ' + ReusableThreadCounter.Count.ToString;
   ChangeInterface(BrowserLayout);
 end;
 
@@ -4069,16 +4123,22 @@ end;
 
 procedure TForm1.TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
 var
-  Req: INBoxSearchRequest;
+  LReq: INBoxSearchRequest;
 begin
   if MenuSearchSettings.Visible then begin
     if not Assigned(CurrentBrowser) then
       CurrentBrowser := self.AddBrowser(nil, false).Owner as TNBoxBrowser;
 
-    Req := SearchMenu.Request;
-    CurrentBrowser.Request := Req;
-    ChangeInterface(form1.BrowserLayout);
-    CurrentBrowser.GoBrowse;
+    LReq := SearchMenu.Request;
+    try
+      CurrentBrowser.Request := LReq;
+      ChangeInterface(form1.BrowserLayout);
+      CurrentBrowser.GoBrowse;
+    finally
+      FreeAndNil(LReq as TObject);
+      LReq := nil;
+    end;
+
   end else begin
 
     if not Assigned(CurrentBrowser) then begin

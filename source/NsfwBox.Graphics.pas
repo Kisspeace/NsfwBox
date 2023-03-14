@@ -15,7 +15,9 @@ uses
   NsfwBox.Bookmarks, NsfwBox.Helper, NsfwBox.Provider.Bookmarks, NsfwBox.Logging,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle;
+
 type
+
   TNBoxCardBase = class(TAlRectangleImageWithURL)
     protected
       FItem: IHasOrigin;
@@ -36,7 +38,9 @@ type
       Constructor Create(Aowner: TComponent); override;
       Destructor Destroy; override;
   end;
+
   TNBoxCardObjList = TObjectlist<TNBoxCardBase>;
+
   TNBoxCardSimple = class(TNBoxCardBase)
     protected
       procedure AutoLook; override;
@@ -52,25 +56,30 @@ type
       Constructor Create(Aowner: TComponent); override;
       Destructor Destroy; override;
   end;
+
   TTagButton = class(Tlayout)
     public
       Text: TAlText;
       Constructor Create(Aowner: Tcomponent); override;
       Destructor Destroy; override;
   end;
+
   TNBoxTab = class(TRectButton)
     public
       CloseBtn: TRectButton;
       constructor Create(Aowner: Tcomponent); override;
       destructor Destroy; override;
   end;
+
   TNBoxTabList = Tlist<TNBoxTab>;
+
   TNBoxEdit = class(TAlRectangle)
     public
       Edit: TEdit;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
   end;
+
   TNBoxCheckButton = class(TRectButton, IIsChecked)
     protected
       {$IFDEF ANDROID}
@@ -88,7 +97,9 @@ type
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
   end;
+
   TNBoxRadioButtonMode = (ByOwnerControls);
+
   TNBoxRadioButton = class(TNBoxCheckButton)
     private
       FWorkMode: TNBoxRadioButtonMode;
@@ -99,36 +110,46 @@ type
 
 implementation
 uses unit1;
+
 { TNsfwBoxItem }
+
 procedure TNBoxCardSimple.AutoLook;
 begin
   if not Assigned(FItem) then exit;
   if HasPost then begin
+
     if Supports(Post, IHasCaption) then begin
       Text.Text := (Post as IHasCaption).Caption;
       Rect.Visible := true;
     end else
       Rect.Visible := false;
+
   end else if ( HasBookmark and Bookmark.IsRequest ) then begin
+
     var str: string;
     with Bookmark.AsRequest do begin
       str := '[' + OriginToStr(Origin) + ']: ' + SLineBreak
       + 'Req: "' + Request + '"' + SLineBreak;
+
       if PageId > 1 then
         str := str + 'Page: ' + PageId.ToString + SLineBreak;
       if (Bookmark.AsRequest is TNBoxSearchReqBookmarks) then
         str := str + 'Path: ' + (Bookmark.AsRequest as TNBoxSearchReqBookmarks).Path;
+
       str := trim(str);
     end;
+
     Text.Text := str;
     Text.Font.Size := 11;
     Text.AutoSize := true;
     Rect.Visible := true;
     Rect.Fill.Kind := TBrushKind.None;
     Rect.Align := TAlignlayout.Client;
+
   end;
   Inherited;
 end;
+
 Constructor TNBoxCardSimple.Create(Aowner: Tcomponent);
 const
   m: single = 4;
@@ -137,6 +158,7 @@ begin
   Fill.Kind := tbrushkind.Bitmap;
   Fill.Bitmap.WrapMode := twrapmode.TileStretch;
   Stroke.Kind := tbrushkind.None;
+
   Rect := TAlRectangle.Create(self);
   with Rect do begin
     //Fill.Color := getcolor(0, 0, 0, 180);
@@ -146,6 +168,7 @@ begin
     Padding.Create(trectf.Create(m, m, m, m));
     HitTest := false;
   end;
+
   Text := TAlText.Create(self);
   with Text do begin
     HitTest := false;
@@ -158,33 +181,39 @@ begin
     TextSettings.HorzAlign := TtextAlign.Center;
   end;
 end;
+
 procedure TNBoxCardSimple.SetItem(Value: IHasOrigin);
 begin
   inherited;
   AutoLook;
 end;
+
 procedure TNBoxCardSimple.SetThumbnail(AFilename: string);
 begin
   Fill.Kind := TBrushKind.Bitmap;
   Fill.Bitmap.Bitmap.LoadFromFile(AFilename);
 end;
+
 procedure TNBoxCardSimple.SetThumbnail(AStream: TStream);
 begin
   Fill.Kind := TBrushKind.Bitmap;
   Fill.Bitmap.Bitmap.LoadFromStream(AStream);
 end;
+
 Destructor TNBoxCardSimple.Destroy;
 begin
   inherited;
 end;
 
 { TTagButton }
+
 Constructor TTagButton.Create(Aowner: Tcomponent);
 begin
   inherited create(Aowner);
   HitTest := true;
   margins.Rect := trectf.Create(5, 5, 5, 5);
   Text := tAltext.Create(self);
+
   with text do begin
     Parent := self;
     HitTest := false;
@@ -194,21 +223,26 @@ begin
     textsettings.VertAlign := ttextalign.Center;
   end;
 end;
+
 Destructor TTagButton.Destroy;
 begin
   Text.Free;
   inherited Destroy;
 end;
+
 { TNBoxTab }
+
 constructor TNBoxTab.Create(Aowner: tcomponent);
 begin
   inherited create(Aowner);
   Closebtn := TRectButton.Create(self);
+
   with closebtn do begin
     Parent := self;
     Align := talignlayout.MostRight;
     Cursor := CrHandPoint;
   end;
+
   with text do begin
     Align := talignlayout.Client;
     Font.Size := 10;
@@ -222,6 +256,7 @@ begin
     Color := talphacolorrec.White;
   end;
 end;
+
 destructor TNBoxTab.Destroy;
 begin
   Closebtn.Free;
@@ -240,6 +275,7 @@ begin
     StyledSettings := [];
   end;
 end;
+
 destructor TNBoxEdit.Destroy;
 begin
   inherited;
@@ -259,6 +295,7 @@ constructor TNBoxCheckButton.Create(AOwner: TComponent);
 begin
   inherited;
   Check := TRectTextCheck.Create(Self);
+
   with Check do begin
     Parent := self;
     Align := TAlignLayout.Right;
@@ -266,19 +303,23 @@ begin
     hitTest := false;
   end;
 end;
+
 destructor TNBoxCheckButton.Destroy;
 begin
   Check.Free;
   inherited;
 end;
+
 function TNBoxCheckButton.GetIsChecked: Boolean;
 begin
   Result := Check.IsChecked;
 end;
+
 function TNBoxCheckButton.IsCheckedStored: Boolean;
 begin
   Result := true;
 end;
+
 procedure TNBoxCheckButton.SetIsChecked(const Value: Boolean);
 begin
   Check.IsChecked := Value;
@@ -288,7 +329,6 @@ end;
 procedure TNBoxCheckButton.Tap(const APoint: TPointF);
 begin
   IsChecked := (not IsChecked);
-//    Log('TNBoxCheckButton.Tap');
   inherited;
 end;
 {$ENDIF}
@@ -302,6 +342,7 @@ begin
   inherited;
   if ( not IsChecked ) then
     exit;
+
   if WorkMode = ByOwnerControls then begin
     List := TControl(Owner).Controls;
     for I := 0 to List.Count - 1 do begin
@@ -310,43 +351,52 @@ begin
     end;
   end;
 end;
+
 { TNBoxCard }
+
 procedure TNBoxCardBase.AutoLook;
 begin
   if Assigned(OnAutoLook) then
     OnAutoLook(Self);
 end;
+
 constructor TNBoxCardBase.Create(Aowner: TComponent);
 begin
   inherited;
   FItem := nil;
 end;
+
 destructor TNBoxCardBase.Destroy;
 begin
   try
-    try
-      inherited;
-    except
-      On E: Exception do
-        Log('TNBoxCardBase.Destroy inherited', E);
-    end;
     if Assigned(FItem) then begin
+
       if Self.HasBookmark then begin
-//        FreeAndNil(TNBoxBookmark(FItem).Obj);
         var LBobj := TNBoxBookmark(FItem);
         if Assigned(LBobj.Obj) then begin
           LBobj.Obj.Free;
           LBobj.Obj := nil;
         end;
       end;
-      FreeAndNil( ( FItem as TObject ));
-//     .Free;
+
+      FreeAndNil(FItem as TObject);
+      FItem := Nil;
+
     end;
+
+    try
+      inherited;
+    except
+      On E: Exception do
+        Log('TNBoxCardBase.Destroy inherited', E);
+    end;
+
   except
     On E: Exception do
       Log('TNBoxCardBase.Destroy', E);
   end;
 end;
+
 function TNBoxCardBase.GetBookmark: TNBoxBookmark;
 begin
   if HasBookmark then
@@ -354,39 +404,41 @@ begin
   else
     Result := nil;
 end;
+
 function TNBoxCardBase.GetPost: INBoxItem;
 begin
-  if not Assigned(FItem) then begin
+  if not Assigned(FItem) then
+  begin
     Result := nil;
     exit;
   end;
-  if ( FItem is TNBoxBookmark ) then begin
+
+  if (FItem is TNBoxBookmark) then
+  begin
     if TNBoxBookmark(FItem).BookmarkType = Content then
       Result := TNBoxBookmark(FItem).AsItem
     else
       Result := nil;
   end else begin
-    Result := ( FItem as INBoxItem );
+    Result := (FItem as INBoxItem);
   end;
 end;
+
 function TNBoxCardBase.HasBookmark: boolean;
 begin
-  Result := ( FItem is TNBoxBookmark);
+  Result := (FItem is TNBoxBookmark);
 end;
+
 function TNBoxCardBase.HasPost: boolean;
 begin
   Result := Assigned(Post);
 end;
+
 procedure TNBoxCardBase.SetItem(Value: IHasOrigin);
 begin
-  if not Assigned(Value) then
-    exit;
-  if Assigned(FItem) then                    // !!!!
-    (FItem as TObject).Free;
-//  if Supports(Value, INBoxItem) then
-//    FItem := ( Value as INBoxItem ).Clone   // !!!!
-//  else
-//    FItem := Value;
+  if not Assigned(Value) then exit;
+  if Assigned(FItem) then (FItem as TObject).Free;
   FItem := Value;
 end;
+
 end.

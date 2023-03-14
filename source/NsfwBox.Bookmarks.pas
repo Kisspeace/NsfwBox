@@ -311,6 +311,8 @@ end;
 
 constructor TNBoxBookmark.Create;
 begin
+  Inherited;
+  BookmarkItemCounter.Inc;
   FObj := nil;
 end;
 
@@ -318,6 +320,7 @@ destructor TNBoxBookmark.destroy;
 begin
 //  if Assigned(Self.Obj) then
 //    Obj.Free;
+  BookmarkItemCounter.Dec;
   inherited;
 end;
 

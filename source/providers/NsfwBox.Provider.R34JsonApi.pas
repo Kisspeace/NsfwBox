@@ -65,6 +65,7 @@ end;
 
 constructor TNBoxR34JsonApiItem.Create;
 begin
+  Inherited;
   FOrigin := PROVIDERS.R34JsonApi.Id;
 end;
 

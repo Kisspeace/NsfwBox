@@ -100,6 +100,7 @@ end;
 
 constructor TNBox9HentaitoItem.Create;
 begin
+  Inherited;
   Create(True);
 end;
 
@@ -164,6 +165,7 @@ end;
 
 constructor TNBoxSearchReq9Hentaito.Create;
 begin
+  Inherited;
   FSearchRec := T9HentaiBookSearchRec.New;
 end;
 

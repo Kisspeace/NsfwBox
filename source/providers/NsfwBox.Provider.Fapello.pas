@@ -95,6 +95,7 @@ end;
 
 constructor TNBoxFapelloItem.Create;
 begin
+  Inherited;
   FOrigin := PROVIDERS.Fapello.Id;
   Kind := FlFeed;
   FeedItem := TFapelloFeedItem.New;

@@ -85,23 +85,19 @@ type
     property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet
       write FOnWebClientSet;
     constructor Create;
-    destructor Destroy; virtual;
+    destructor Destroy; override;
   end;
 
   TNBoxFetchManager = Class(TGenericYDWQueuedThreadInterface<INBoxItem>)
   private
-    FQueue: TList<INBoxItem>;
     FOnWebClientSet: TWebClientSetEvent;
     FOnFetched: TINBoxItemEvent;
   protected
     procedure SubThreadExecute(AItem: INBoxItem); override;
   public
     property OnFetched: TINBoxItemEvent read FOnFetched write FOnFetched;
-    property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet
-      write FOnWebClientSet;
+    property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
     procedure Add(AItem: INBoxItem);
-    constructor Create; override;
-    destructor Destroy; override;
   End;
 
 implementation
@@ -120,6 +116,7 @@ destructor TNBoxScraper.Destroy;
 begin
   if Assigned(BookmarksDb) then BookmarksDb.Free;
   if Assigned(HistoryDb) then HistoryDb.Free;
+  Inherited;
 end;
 
 procedure TNBoxScraper.FetchAuthors(var APost: INBoxItem);
@@ -514,7 +511,7 @@ end;
 function TNBoxScraper.GetContentBookmarks(AList: INBoxHasOriginList;
   ADbPath: string; ABookmarksListId: int64; APageId: integer): boolean;
 var
-  I, C: integer;
+  I: integer;
   Bookmarks: TBookmarkAr;
   TargetDb: TNBoxBookmarksDb;
 begin
@@ -527,14 +524,13 @@ begin
       TargetDb := HistoryDb;
 
     if not Assigned(TargetDb) then Exit;
-    C := AList.Count;
 
     Bookmarks := TargetDb.GetPage(ABookmarksListId, APageId);
     for I := low(Bookmarks) to high(Bookmarks) do
       AList.Add(Bookmarks[I]);
 
+    Result := (Length(Bookmarks) > 0);
     Bookmarks := nil;
-    Result := (AList.Count > C);
   except
     On E: exception do
       Log('TNBoxScraper.GetContentBookmarks', E);
@@ -754,20 +750,20 @@ begin
   try
     Result := Self.GetContent(LRequest, AList);
   finally
-    (LRequest as TObject).Free;
+    FreeAndNil(LRequest as TObject);
+    LRequest := Nil;
   end;
 end;
 
 procedure TNBoxScraper.SyncWebClientSet(AClient: TNetHttpClient;
   AOrigin: integer);
 begin
-  if Not Assigned(Self.OnWebClientSet) then
-    Exit;
-  TThread.Synchronize(Nil,
-    procedure
-    begin
-      OnWebClientSet(Self, AClient, AOrigin);
-    end);
+  if Not Assigned(Self.OnWebClientSet) then Exit;
+  TThread.Synchronize(TThread.Current,
+  procedure
+  begin
+    OnWebClientSet(Self, AClient, AOrigin);
+  end);
 end;
 
 function TNBoxScraper.TryFetchAuthors(var APost: INBoxItem): boolean;
@@ -796,9 +792,9 @@ begin
 end;
 
 function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
-AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer;
-Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
-ASite: TNsfwXxxSite): boolean;
+  AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer;
+  Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
+  ASite: TNsfwXxxSite): boolean;
 var
   Client: TNsfwXxxScraper;
   i: integer;
@@ -836,19 +832,7 @@ end;
 { TNBoxFetchManager }
 procedure TNBoxFetchManager.Add(AItem: INBoxItem);
 begin
-  Self.QueueAdd(AItem);
-end;
-
-constructor TNBoxFetchManager.Create;
-begin
-  Inherited;
-  FQueue := TList<INBoxItem>.Create;
-end;
-
-destructor TNBoxFetchManager.Destroy;
-begin
-  inherited;
-  FQueue.Free;
+  QueueAdd(AItem);
 end;
 
 procedure TNBoxFetchManager.SubThreadExecute(AItem: INBoxItem);
@@ -861,14 +845,15 @@ begin
       LScraper.OnWebClientSet := Self.OnWebClientSet;
       while not LScraper.TryFetchContentUrls(AItem) do
       begin
-        TThread.Current.CheckTerminated;
+        if TThread.Current.CheckTerminated then exit;
       end;
       // Fetched
-      TThread.Current.CheckTerminated;
+      if TThread.Current.CheckTerminated then exit;
       if (Assigned(Self.OnFetched)) then
         Self.OnFetched(Self, AItem);
     finally
-      // TObject(AItem).Free;
+//      FreeAndNil(AItem as TObject);
+//      AItem := nil;
       LScraper.Free;
     end;
   Except

@@ -109,6 +109,7 @@ end;
 
 constructor TNBoxCoomerPartyItem.Create;
 begin
+  Inherited;
   FOrigin := ORIGIN_COOMERPARTY;
   //FSite := TCoomerPartySite.CoomerParty;
   FSite := URL_COOMER_PARTY;

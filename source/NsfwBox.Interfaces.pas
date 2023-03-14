@@ -7,7 +7,7 @@ interface
 uses
   System.SysUtils, Classes, System.Generics.Collections, XSuperObject,
   BooruScraper.Interfaces, Ninehentaito.APITypes, CoomerParty.Types,
-  Fapello.Types;
+  Fapello.Types, System.SyncObjs;
 
 type
 {*
@@ -165,6 +165,18 @@ type
   INBoxItemList = TList<INBoxItem>;
   INBoxHasOriginList = TList<IHasOrigin>;
 
+  { DELETE THES }
+  TRefCounter = Class(TObject)
+    private
+      FCount: integer;
+      function GetCount: integer;
+    public
+      procedure Inc;
+      Procedure Dec;
+      property Count: integer read GetCount;
+      constructor Create;
+  End;
+
   TNBoxItemBase = class(TNoRefCountObject, INBoxItem, IHasOrigin)
     protected
       FOrigin: Integer;
@@ -183,6 +195,7 @@ type
       [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
       [DISABLE] property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
       constructor Create; virtual;
+      destructor Destroy; override;
   end;
 
   TNBoxItemBaseClass = Class of TNBoxItemBase;
@@ -218,6 +231,7 @@ type
       [DISABLE] property Request: string read GetRequest write SetRequest;
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
       constructor Create; virtual;
+      Destructor Destroy; override;
   end;
 
   TNBoxSearchRequestBaseClass = Class of TNBoxSearchRequestBase;
@@ -247,14 +261,28 @@ type
       constructor Create(ADisplayName: string; AAvatarUrl: string; AContentCount: integer = -1);
   End;
 
+  var
+    BaseItemCounter: TRefCounter;
+    BookmarkItemCounter: TRefCounter;
+    ReqItemCounter: TRefCounter;
+    ReusableThreadCounter: TRefCounter;
+
+
 implementation
 
 { TNBoxSearchRequestBase }
 
 constructor TNBoxSearchRequestBase.Create;
 begin
+  ReqItemCounter.Inc;
   PageId := 1;
   Request := '';
+end;
+
+destructor TNBoxSearchRequestBase.Destroy;
+begin
+  ReqItemCounter.Dec;
+//  inherited;
 end;
 
 function TNBoxSearchRequestBase.GetPageId: integer;
@@ -300,7 +328,12 @@ end;
 constructor TNBoxItemBase.Create;
 begin
   inherited;
+  BaseItemCounter.Inc;
+end;
 
+destructor TNBoxItemBase.Destroy;
+begin
+  BaseItemCounter.Dec;
 end;
 
 function TNBoxItemBase.GetOrigin: integer;
@@ -358,6 +391,51 @@ end;
 function TNBoxItemArtistBase.GetDisplayName: string;
 begin
   Result := FDisplayName;
+end;
+
+{ TRefCounter }
+
+constructor TRefCounter.Create;
+begin
+  FCount := 0;
+end;
+
+procedure TRefCounter.Dec;
+begin
+  TMonitor.Enter(Self);
+  try
+    FCount := FCount - 1;
+  finally
+    TMonitor.Exit(Self);
+  end;
+end;
+
+function TRefCounter.GetCount: integer;
+begin
+  TMonitor.Enter(Self);
+  try
+    Result := FCount;
+  finally
+    TMonitor.Exit(Self);
+  end;
+end;
+
+procedure TRefCounter.Inc;
+begin
+  TMonitor.Enter(Self);
+  try
+    FCount := FCount + 1;
+  finally
+    TMonitor.Exit(Self);
+  end;
+end;
+
+initialization
+begin
+  BaseItemCounter := TRefCounter.Create;
+  BookmarkItemCounter := TRefCounter.Create;
+  ReqItemCounter := TRefCounter.Create;
+  ReusableThreadCounter := TRefCounter.Create;
 end;
 
 end.

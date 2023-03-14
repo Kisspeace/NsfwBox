@@ -121,6 +121,7 @@ end;
 
 constructor TNBoxMotherlessItem.Create;
 begin
+  Inherited;
   FPage := TMotherlessPostPage.Create('');
   FOrigin := PROVIDERS.Motherless.Id;
 end;

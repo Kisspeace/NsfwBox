@@ -73,6 +73,7 @@ end;
 
 constructor TNBoxPseudoItem.Create;
 begin
+  Inherited;
   FOrigin := ORIGIN_PSEUDO;
 end;
 

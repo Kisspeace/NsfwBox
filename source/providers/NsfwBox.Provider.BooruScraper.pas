@@ -96,6 +96,7 @@ end;
 
 constructor TNBoxBooruItemBase.Create(AOrigin: integer);
 begin
+  Inherited Create;
   Self.FOrigin := AOrigin;
   Self.FFull := TBooruPostBase.Create;
 end;
@@ -201,6 +202,7 @@ end;
 
 constructor TNBoxSearchReqBooru.Create(AOrigin: integer);
 begin
+  Inherited Create;
   Self.FOrigin := AOrigin;
   Self.FPageId := PROVIDERS.ById(AOrigin).FisrtPageId;
 end;

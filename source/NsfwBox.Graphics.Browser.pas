@@ -32,6 +32,7 @@ type
             procedure SubThreadExecute(AItem: TNBoxSearchRequestBase); override;
         End;
     private
+      FSync: TMREWSync;
       FWorker: TBrowserWorker;
       FRequest: INBoxSearchRequest;
       FOnItemCreate: TBrowserItemCreateEvent;
@@ -40,6 +41,7 @@ type
       FOnRequestChanged: TNotifyEvent;
       FBeforeBrowse: TNotifyEvent;
       FImageManager: IImageWithUrlManager;
+      function GetRequest: INBoxSearchRequest;
       procedure SetRequest(const value: INBoxSearchRequest);
       procedure OnItemImageLoadFinished(Sender: TObject; ASuccess: boolean);
     public
@@ -51,7 +53,7 @@ type
       procedure GoPrevPage;
       procedure Clear;
       function IsBrowsingNow: boolean;
-      property Request: INBoxSearchRequest read FRequest write SetRequest;
+      property Request: INBoxSearchRequest read GetRequest write SetRequest;
       property ImageManager: IImageWithUrlManager read FImageManager write FImageManager; //FIXME
       property BeforeBrowse: TNotifyEvent read FBeforeBrowse write FBeforeBrowse;
       property OnItemCreate: TBrowserItemCreateEvent read FOnItemCreate write FOnItemCreate;
@@ -72,6 +74,7 @@ implementation
 constructor TNBoxBrowser.Create(Aowner:Tcomponent);
 begin
   Inherited create(Aowner);
+  FSync := TMREWSync.Create;
   FWorker := TBrowserWorker.Create;
   FWorker.Browser := Self;
   FOnScraperCreate      := nil;
@@ -88,16 +91,20 @@ procedure TNBoxBrowser.SetRequest(const value: INBoxSearchRequest);
 var
   New: INBoxSearchRequest;
 begin
+  FSync.BeginWrite;
+  try
+    if Assigned(value) then
+      New := value.Clone
+    else
+      New := TNBoxSearchReqNsfwXxx.Create;
 
-  if Assigned(value) then
-    New := value
-  else
-    New := TNBoxSearchReqNsfwXxx.Create;
+    if Assigned(FRequest) then
+      (FRequest as TObject).Free;
 
-  if Assigned(FRequest) then
-    TObject(FRequest).Free;
-
-  FRequest := new;
+    FRequest := new;
+  finally
+    FSync.EndWrite;
+  end;
 
   if Assigned(OnRequestChanged) then
     OnRequestChanged(Self);
@@ -108,29 +115,56 @@ begin
   self.Clear;
   FWorker.Free;
   items.Free;
-  inherited Destroy;
+  FSync.Free;
+  if Assigned(FRequest) then
+    (FRequest as TObject).Free;
+  FRequest := nil;
+  inherited;
+end;
+
+function TNBoxBrowser.GetRequest: INBoxSearchRequest;
+begin
+  FSync.BeginRead;
+  try
+    if Assigned(FRequest) then
+      Result := FRequest.Clone;
+  finally
+    FSync.EndRead;
+  end;
 end;
 
 procedure TNBoxBrowser.GoBrowse;
 begin
-  if Assigned(BeforeBrowse) then
-    BeforeBrowse(Self);
-
-  FWorker.QueueAdd(Self.Request.Clone as TNBoxSearchRequestBase);
+  if Assigned(BeforeBrowse) then BeforeBrowse(Self);
+  FWorker.QueueAdd(Self.Request as TNBoxSearchRequestBase);
 end;
 
 procedure TNBoxBrowser.GoNextPage;
 begin
-  Request.PageId := Request.PageId + 1;
+  FSync.BeginWrite;
+  try
+    FRequest.PageId := FRequest.PageId + 1;
+  finally
+    FSync.EndWrite;
+  end;
+
   if Assigned(OnRequestChanged) then
     OnRequestChanged(Self);
-  self.GoBrowse;
+  GoBrowse;
 end;
 
 procedure TNBoxBrowser.GoPrevPage;
 begin
-  Request.PageId := Request.PageId - 2;
-  self.GoNextPage;
+  FSync.BeginWrite;
+  try
+    FRequest.PageId := FRequest.PageId - 1;
+  finally
+    FSync.EndWrite;
+  end;
+
+  if Assigned(OnRequestChanged) then
+    OnRequestChanged(Self);
+  GoBrowse;
 end;
 
 function TNBoxBrowser.IsBrowsingNow: boolean;
@@ -140,19 +174,31 @@ end;
 
 function TNBoxBrowser.NewItem: TNBoxCardBase;
 begin
-  Result := TNBoxCardSimple.Create(self);
-  Result.ImageManager := Self.ImageManager;
-  Result.OnLoadingFinished := OnItemImageLoadFinished;
-  Result.Fill.Kind := TBrushKind.Bitmap;
-  Items.Add(Result);
+  try
+    Result := TNBoxCardSimple.Create(self);
+    Result.ImageManager := Self.ImageManager;
+    Result.OnLoadingFinished := OnItemImageLoadFinished;
+    Result.Fill.Kind := TBrushKind.Bitmap;
 
-  if Assigned(Self.DummyImage) then
-    Result.BitmapIWU.Assign(Self.DummyImage);
+    FSync.BeginWrite;
+    try
+      Items.Add(Result);
+      if Assigned(Self.DummyImage) then
+        Result.BitmapIWU.Assign(Self.DummyImage);
 
-  Result.Parent := Self;
+      Result.Parent := Self;
+    finally
+      FSync.EndWrite;
+    end;
 
-  if Assigned(OnItemCreate) then
-    OnItemCreate(Self, Result);
+    if Assigned(OnItemCreate) then
+      OnItemCreate(Self, Result);
+  except
+    On E: Exception do begin
+      Log('TNBoxBrowser.NewItem', E);
+      raise;
+    end;
+  end;
 end;
 
 
@@ -177,14 +223,20 @@ begin
     FWorker.Terminate;
     FWorker.WaitFor;
 
-    if items.Count > 0 then begin
-      for I := 0 to Items.Count - 1 do begin
-        Items[I].AbortLoading;
-      end;
+    FSync.BeginWrite;
+    try
+      if (Items.Count > 0) then begin
+        for I := 0 to Items.Count - 1 do begin
+          Items[I].AbortLoading;
+        end;
 
-      items.Clear;
-      RecalcColumns;
+        Items.Clear;
+        RecalcColumns;
+      end;
+    finally
+      FSync.EndWrite;
     end;
+
   except
     On E:Exception do
       Log('TNBoxBrowser.clear', E);
@@ -250,7 +302,7 @@ begin
           LRequest := LBookmark.AsRequest;
       end;
 
-      TThread.Synchronize(nil,
+      TThread.Synchronize(TThread.Current,
       procedure
       begin
         LNewItem := Self.Browser.NewItem;
@@ -261,7 +313,7 @@ begin
           if Assigned(LBookmark) then
             LNewItem.Item := LBookmark
           else
-            LNewItem.Item := LPost; // LPost.Clone;
+            LNewItem.Item := LPost;
 
           if (Assigned(LPost) and (not LPost.ThumbnailUrl.IsEmpty)) then
             ImageURL := LPost.ThumbnailUrl;
@@ -274,7 +326,11 @@ begin
 
   finally
 
-    (AItem as TObject).Free;
+    FreeAndNil(AItem as TObject);
+    AItem := Nil;
+    LBookmark := nil;
+    LPost     := nil;
+    LRequest  := nil;
     Scraper.Free;
     Content.Free;
 

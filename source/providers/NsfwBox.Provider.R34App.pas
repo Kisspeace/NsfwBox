@@ -74,6 +74,7 @@ end;
 
 constructor TNBoxR34AppItem.Create;
 begin
+  inherited;
   FOrigin := PROVIDERS.R34App.Id;
 end;
 
