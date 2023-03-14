@@ -3039,11 +3039,15 @@ end;
 procedure TForm1.OnBrowserSetWebClient(Sender: TObject;
   AWebClient: TNetHttpClient; AOrigin: integer);
 begin
-  TThread.Synchronize(Tthread.Current,
-  procedure
-  begin
-    SetDefToWebClient(AWebClient, AOrigin);
-  end);
+  if (MainThreadId = TThread.Current.ThreadID) then
+    SetDefToWebClient(AWebClient, AOrigin)
+  else begin
+    TThread.Synchronize(Tthread.Current,
+    procedure
+    begin
+      SetDefToWebClient(AWebClient, AOrigin);
+    end);
+  end;
 end;
 
 procedure TForm1.OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser;
