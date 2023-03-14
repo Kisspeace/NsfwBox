@@ -10,7 +10,7 @@ uses
   NsfwBox.Provider.Bookmarks, NsfwBox.Interfaces, NsfwBox.Graphics,
   NsfwBox.Graphics.Browser, NsfwBox.ContentScraper,
   NsfwBox.Graphics.Rectangle, NsfwBox.Styling, NsfwBox.Logging,
-  NsfwBox.Consts;
+  NsfwBox.Consts, NsfwBox.Bookmarks;
 
 type
 
@@ -18,6 +18,7 @@ type
     public
       class procedure TestBrowserOnTap(Sender: TObject; const Point: TPointF);
       class procedure TestDownloadsOnTap(Sender: TObject; const Point: TPointF);
+      class procedure TestBookmarksRead(Sender: TObject; const Point: TPointF);
   End;
 
   procedure Init(); { Call on form create }
@@ -46,9 +47,41 @@ procedure Init();
 begin
   NewTestBtn('Stress test downloads', TNBoxTests.TestDownloadsOnTap);
   NewTestBtn('Stress test browser', TNBoxTests.TestBrowserOnTap);
+  NewTestBtn('Test bookmarks read', TNBoxTests.TestBookmarksRead);
 end;
 
 { TNBoxTests }
+
+class procedure TNBoxTests.TestBookmarksRead(Sender: TObject;
+  const Point: TPointF);
+var
+  LGroups: TBookmarkGroupRecAr;
+  LAr: TBookmarkAr;
+  I, N: integer;
+begin
+  LGroups := BookmarksDb.GetBookmarksGroups;
+  if Length(LGroups) < 1 then exit;
+
+  for N := 0 to High(LGroups) do
+  begin
+    for I := 1 to LGroups[N].GetMaxPage do
+    begin
+      LAr := LAr + LGroups[N].GetPage(I);
+    end;
+  end;
+
+  With (Sender as TRectButton) do
+    Text.Text := '(' + Length(LAr).ToString + ')' + 'Test bookmarks read';
+
+  for I := Low(LAr) to High(LAr) do
+  begin
+    LAr[I].Obj.Free;
+    LAr[I].Obj := Nil;
+    LAr[I].Free;
+  end;
+
+  LAr := Nil;
+end;
 
 class procedure TNBoxTests.TestBrowserOnTap(Sender: TObject; const Point: TPointF);
 var
