@@ -37,7 +37,6 @@ type
       property OnCreateDownloader: TOnCreateDownloader read FOnCreateDownloader write FOnCreateDownloader;
       property OnStartDownloader: TOnStartDownloader read FOnStartDownloader write FOnStartDownloader;
       constructor Create; override;
-      destructor Destroy; override;
   end;
 
 implementation
@@ -69,12 +68,7 @@ end;
 constructor TNBoxDownloadManager.Create;
 begin
   inherited;
-  FSynchronizeEvents := true;
-end;
-
-destructor TNBoxDownloadManager.Destroy;
-begin
-  inherited;
+  FSynchronizeEvents := True;
 end;
 
 function TNBoxDownloadManager.GetSynchronizeEvents: boolean;
@@ -102,16 +96,43 @@ const
   WAIT_TIMEOUT = 10;
 begin
   try
+    {$IFDEF DEBUG}
+    TThread.Current.NameThreadForDebugging('TNBoxDownloadManager.SubThread: ' + AItem.Filename);
+    {$ENDIF}
     try
-       AItem.Start;
-
-       while AItem.IsRunning do begin
-         Sleep(WAIT_TIMEOUT);
-         if TThread.Current.CheckTerminated then exit;
+       while not TThread.Current.CheckTerminated do begin
+         try
+           AItem.Start;
+           Break;
+         except
+           On E: Exception do begin
+             Log('TNBoxDownloadManager.SubThreadExecute - AItem.Start.', E);
+             Sleep(1000);
+           end;
+         end;
        end;
 
+       try
+         while AItem.IsRunning do begin
+           Sleep(WAIT_TIMEOUT);
+           if TThread.Current.CheckTerminated then
+           begin
+             AItem.AbortRequest;
+             Break;
+           end;
+         end;
+       except
+          On E: Exception do Log('TNBoxDownloadManager.SubThreadExecute - waiting for finish.', E);
+       end;
     finally
-      FreeAndNil(AItem);
+      try
+        while AItem.IsRunning do
+          Sleep(WAIT_TIMEOUT);
+      except
+        On E: Exception do Log('TNBoxDownloadManager.SubThreadExecute - finally waiting for finish.', E);
+
+      end;
+      FreeAndNil(AItem);  { FIXME }
     end;
   Except
     On E: Exception do

@@ -165,7 +165,6 @@ type
   INBoxItemList = TList<INBoxItem>;
   INBoxHasOriginList = TList<IHasOrigin>;
 
-  { DELETE THES }
   TRefCounter = Class(TObject)
     private
       FCount: integer;
@@ -265,7 +264,6 @@ type
     BaseItemCounter: TRefCounter;
     BookmarkItemCounter: TRefCounter;
     ReqItemCounter: TRefCounter;
-    ReusableThreadCounter: TRefCounter;
 
 
 implementation
@@ -435,7 +433,6 @@ begin
   BaseItemCounter := TRefCounter.Create;
   BookmarkItemCounter := TRefCounter.Create;
   ReqItemCounter := TRefCounter.Create;
-  ReusableThreadCounter := TRefCounter.Create;
 end;
 
 end.

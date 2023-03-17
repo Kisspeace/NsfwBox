@@ -328,10 +328,23 @@ begin
 
     FreeAndNil(AItem as TObject);
     AItem := Nil;
-    LBookmark := nil;
-    LPost     := nil;
-    LRequest  := nil;
     Scraper.Free;
+
+    { freeing not used items. }
+    for I := I to Content.Count - 1 do
+    begin
+
+      var LContentItem := Content[I];
+      Content[I] := Nil;
+
+      if (LContentItem is TNBoxBookmark) then
+        (LContentItem as TNBoxBookmark).Free
+      else
+        FreeAndNil(LContentItem as TObject);
+
+      LContentItem := Nil;
+    end;
+
     Content.Free;
 
   end;

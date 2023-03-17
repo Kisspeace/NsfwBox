@@ -75,12 +75,12 @@ type
   public
     BookmarksDb: TNBoxBookmarksDb;
     HistoryDb: TNBoxBookmarksDb;
-    procedure FetchContentUrls(var APost: INBoxItem);
-    procedure FetchTags(var APost: INBoxItem);
-    procedure FetchAuthors(var APost: INBoxItem);
-    function TryFetchContentUrls(var APost: INBoxItem): boolean;
-    function TryFetchTags(var APost: INBoxItem): boolean;
-    function TryFetchAuthors(var APost: INBoxItem): boolean;
+    procedure FetchContentUrls(APost: INBoxItem);
+    procedure FetchTags(APost: INBoxItem);
+    procedure FetchAuthors(APost: INBoxItem);
+    function TryFetchContentUrls(APost: INBoxItem): boolean;
+    function TryFetchTags(APost: INBoxItem): boolean;
+    function TryFetchAuthors(APost: INBoxItem): boolean;
     function GetContent(ARequest: INBoxSearchRequest; AList: INBoxHasOriginList): boolean;
     property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet
       write FOnWebClientSet;
@@ -119,12 +119,12 @@ begin
   Inherited;
 end;
 
-procedure TNBoxScraper.FetchAuthors(var APost: INBoxItem);
+procedure TNBoxScraper.FetchAuthors(APost: INBoxItem);
 begin
   Self.FetchTags(APost);
 end;
 
-procedure TNBoxScraper.FetchContentUrls(var APost: INBoxItem);
+procedure TNBoxScraper.FetchContentUrls(APost: INBoxItem);
 begin
   if (APost is TNBoxNsfwXxxItem) then
   begin
@@ -240,7 +240,7 @@ begin
   end;
 end;
 
-procedure TNBoxScraper.FetchTags(var APost: INBoxItem);
+procedure TNBoxScraper.FetchTags(APost: INBoxItem);
 begin
   Self.FetchContentUrls(APost);
 end;
@@ -766,7 +766,7 @@ begin
   end);
 end;
 
-function TNBoxScraper.TryFetchAuthors(var APost: INBoxItem): boolean;
+function TNBoxScraper.TryFetchAuthors(APost: INBoxItem): boolean;
 begin
   try
     FetchAuthors(APost);
@@ -776,7 +776,7 @@ begin
   end;
 end;
 
-function TNBoxScraper.TryFetchContentUrls(var APost: INBoxItem): boolean;
+function TNBoxScraper.TryFetchContentUrls(APost: INBoxItem): boolean;
 begin
   try
     FetchContentUrls(APost);
@@ -786,7 +786,7 @@ begin
   end;
 end;
 
-function TNBoxScraper.TryFetchTags(var APost: INBoxItem): boolean;
+function TNBoxScraper.TryFetchTags(APost: INBoxItem): boolean;
 begin
   Self.TryFetchContentUrls(APost);
 end;

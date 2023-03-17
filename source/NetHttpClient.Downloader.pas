@@ -90,7 +90,7 @@ type
   TNetHttpDownloader = TFileDownloader;
 
 implementation
-uses Unit1;
+
 { TDownloader }
 
 procedure TDownloader.AbortRequest;
@@ -115,16 +115,8 @@ destructor TDownloader.Destroy;
 begin
   if IsRunning then
     Self.AbortRequest;
-
-  while IsRunning do begin
-    if System.MainThreadID = TThread.Current.ThreadID then
-      CheckSynchronize(0);
-    Sleep(10);
-  end;
-
   inherited;
 end;
-
 
 function TDownloader.GetAutoRetry: boolean;
 begin
@@ -175,7 +167,11 @@ procedure TDownloader.DoOnCreateWebClient(AWebClient: TNetHttpClient);
 begin
   if not Assigned(OnCreateWebClient) then exit;
   if SynchronizeEvents then
-    TThread.Synchronize(nil, procedure begin OnCreateWebClient(Self, AWebClient); end)
+    TThread.Synchronize(TThread.Current,
+    procedure
+    begin
+      OnCreateWebClient(Self, AWebClient);
+    end)
   else
     OnCreateWebClient(Self, AWebClient);
 end;
@@ -184,7 +180,11 @@ procedure TDownloader.DoOnFinish;
 begin
   if not Assigned(OnFinish) then exit;
   if SynchronizeEvents then
-    Tthread.Synchronize(nil, procedure begin OnFinish(Self); end)
+    Tthread.Synchronize(TThread.Current,
+    procedure
+    begin
+      OnFinish(Self);
+    end)
   else
     OnFinish(Self);
 end;
@@ -204,7 +204,11 @@ begin
   if not Assigned(OnReceiveData) then exit;
   if SynchronizeEvents then begin
     var PseudoAbort := AAbort;
-    TThread.Synchronize(nil, procedure begin OnReceiveData(Self, AContentLength, AReadCount, PseudoAbort); end);
+    TThread.Synchronize(TThread.Current,
+    procedure
+    begin
+      OnReceiveData(Self, AContentLength, AReadCount, PseudoAbort);
+    end);
   end else
     OnReceiveData(Self, AContentLength, AReadCount, AAbort);
 end;
@@ -216,7 +220,11 @@ begin
   if not Assigned(OnSendData) then exit;
   if SynchronizeEvents then begin
     var PseudoAbort := AAbort;
-    TThread.Synchronize(Tthread.Current, procedure begin OnSendData(Self, AContentLength, AWriteCount, PseudoAbort); end);
+    TThread.Synchronize(Tthread.Current,
+    procedure
+    begin
+      OnSendData(Self, AContentLength, AWriteCount, PseudoAbort);
+    end);
   end else
     OnSendData(Self, AContentLength, AWriteCount, AAbort);
 end;
@@ -226,6 +234,13 @@ var
   LWebClient: TNetHttpClient;
 begin
   try
+    {$IFDEF DEBUG}
+    if Self is TFileDownloader then
+      TThread.Current.NameThreadForDebugging('TDownloader: ' + TFileDownloader(Self).Filename)
+    else
+      TThread.Current.NameThreadForDebugging('TDownloader.');
+    {$ENDIF}
+
     LWebClient := TNetHttpClient.Create(Nil);
     try
       DoOnCreateWebClient(LWebClient);

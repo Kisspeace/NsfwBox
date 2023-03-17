@@ -19,6 +19,7 @@ type
       class procedure TestBrowserOnTap(Sender: TObject; const Point: TPointF);
       class procedure TestDownloadsOnTap(Sender: TObject; const Point: TPointF);
       class procedure TestBookmarksRead(Sender: TObject; const Point: TPointF);
+      class procedure TryDeadlock(Sender: TObject; const Point: TPointF);
   End;
 
   procedure Init(); { Call on form create }
@@ -48,6 +49,7 @@ begin
   NewTestBtn('Stress test downloads', TNBoxTests.TestDownloadsOnTap);
   NewTestBtn('Stress test browser', TNBoxTests.TestBrowserOnTap);
   NewTestBtn('Test bookmarks read', TNBoxTests.TestBookmarksRead);
+  NewTestBtn('Try Deadlock', TNBoxTests.TryDeadlock);
 end;
 
 { TNBoxTests }
@@ -217,6 +219,54 @@ begin
       Log('Test in anonymous thread finished!');
     end;
   end).Start;
+end;
+
+class procedure TNBoxTests.TryDeadlock(Sender: TObject; const Point: TPointF);
+var
+  LGroups: TBookmarkGroupRecAr;
+  LAr: TBookmarkAr;
+  I, N: integer;
+  LFin: Boolean;
+const
+  MAX_ITEMS_COUNT = 320;
+begin
+  LGroups := BookmarksDb.GetBookmarksGroups;
+  if Length(LGroups) < 1 then exit;
+
+  LFin := False;
+  for N := 0 to High(LGroups) do
+  begin
+    for I := 1 to LGroups[N].GetMaxPage do
+    begin
+      LAr := LAr + LGroups[N].GetPage(I);
+      if Length(LAr) >= MAX_ITEMS_COUNT then
+      begin
+        LFin := True;
+        break;
+      end;
+    end;
+    if LFin then break;
+  end;
+
+  With (Sender as TRectButton) do
+    Text.Text := '(' + Length(LAr).ToString + ')' + 'Try Deadlock';
+
+  Application.ProcessMessages;
+
+  for I := Low(LAr) to High(LAr) do
+  begin
+    if not LAr[I].IsRequest then
+      Unit1.Form1.AddDownload(LAr[I].AsItem);
+  end;
+
+  for I := Low(LAr) to High(LAr) do
+  begin
+    LAr[I].Obj.Free;
+    LAr[I].Obj := Nil;
+    LAr[I].Free;
+  end;
+
+  LAr := Nil;
 end;
 
 end.

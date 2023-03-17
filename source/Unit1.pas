@@ -38,7 +38,7 @@ uses
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
   NsfwBox.Tests, NsfwBox.Logging, NsfwBox.Graphics.ImageViewer,
-  NsfwBox.Utils,
+  NsfwBox.Utils, NsfwBox.GarbageCollector,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces,
@@ -384,7 +384,7 @@ type
     function CreateDefSettingsEdit(AOwner: TComponent; AStyle: integer = 0): TNBoxSettingsEdit;
     function CreateDefScraper: TNBoxScraper;
     { -> Download ----------------- }
-    function AddDownload(AItem: INBoxItem): TNBoxTab; overload;
+    function AddDownload(AItem: INBoxItem; ADontFetch: boolean = False): TNBoxTab; overload;
     function AddDownload(AUrl, AFullFilename: string): TNBoxTab; overload;
     { ----------------------------- }
     function AddSettingsCheck(ACaption: string; AText: string = ''): TNBoxSettingsCheck;
@@ -601,32 +601,37 @@ begin
     B.GoBrowse;
 end;
 
-function TForm1.AddDownload(AItem: INBoxItem): TNBoxTab;
+function TForm1.AddDownload(AItem: INBoxItem; ADontFetch: boolean): TNBoxTab;
 var
   LFull, LFilename, LUrl: string;
   I: integer;
+  LFetchable: IFetchableContent;
+  LUrlsAr: TArray<String>;
 begin
-  if Supports(AItem, IFetchableContent)
-  And not (AItem as IFetchableContent).ContentFetched
+  if (Not ADontFetch)
+  And Supports(AItem, IFetchableContent, LFetchable)
+  And (Not LFetchable.ContentFetched)
   then begin
     DownloadFetcher.Add(AItem.Clone);
     exit;
   end;
 
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   if Settings.SaveDownloadHistory then
     HistoryDb.DownloadGroup.Add(AItem);
 
-  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  for I := 0 to high(AItem.ContentUrls) do begin
-    LUrl := AItem.ContentUrls[I];
+  LUrlsAr := AItem.ContentUrls;
+  for I := 0 to High(LUrlsAr) do begin
+    LUrl := LUrlsAr[I];
     LFull := Settings.DefDownloadPath;
 
     if not DirectoryExists(LFull) then
       CreateDir(LFull);
 
     var LPreviewed: string;
-    with MenuImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
+    with MenuImageViewer.ImageManager.CacheManager
+      as TImageWithURLCahceManager do
     begin
       LPreviewed := FindCachedFilename(LUrl);
     end;
@@ -1326,11 +1331,12 @@ var
   Loader: TNBoxDownloader;
 begin
   try
-    LTab := ( TControl(Sender).Parent as TNBoxTab );
+    LTab := (TControl(Sender).Parent as TNBoxTab);
     if Assigned(LTab.TagObject) then begin
-      Loader := ( LTab.TagObject as TNBoxDownloader );
+      Loader := (LTab.TagObject as TNBoxDownloader);
       if Loader.IsRunning And (not Loader.IsAborted) then begin
         DownloadManager.AbortDownload(Loader);
+        LTab.Visible := False;
       end;
     end;
   except
@@ -1679,9 +1685,10 @@ var
   procedure LTryFetchIfEmpty;
   var
     LScraper: TNBoxScraper;
+    LFetchable: IFetchableContent;
   begin
-    if Supports(LPost, IFetchableContent)
-    And ( not (LPost as IFetchableContent).ContentFetched ) then begin
+    if Supports(LPost, IFetchableContent, LFetchable)
+    And ( not LFetchable.ContentFetched ) then begin
       LScraper := Form1.CreateDefScraper;
       try
         try
@@ -1723,7 +1730,7 @@ begin
     ACTION_BROWSE:
     begin
       if not Assigned(Lrequest) then exit;
-      AddBrowser(Lrequest.Clone, Settings.AutoStartBrowse);
+      AddBrowser(Lrequest, Settings.AutoStartBrowse);
     end;
 
     ACTION_DOWNLOAD_ALL:
@@ -1927,8 +1934,9 @@ begin
 
   end;
 
-  LRequest := nil;
-  LPost := nil;
+  LRequest := Nil;
+  LPost := Nil;
+  LBookmark := Nil;
   if Assigned(LTmpReq) then begin
     FreeAndNil(LTmpReq as TObject);
     LTmpReq := Nil;
@@ -3108,9 +3116,9 @@ procedure TForm1.OnCreateDownloader(Sender: Tobject;
   const ADownloader: TNBoxDownloader);
 begin
   with ADownloader do begin
-    SynchronizeEvents := true;
+    SynchronizeEvents := True;
     RetryTimeout := 1500;
-    OnCreateWebClient := self.DownloaderOnCreateWebClient;
+    OnCreateWebClient := DownloaderOnCreateWebClient;
     OnReceiveData := DownloaderOnReceiveData;
     OnRequestException := DownloaderOnException;
     OnFinish := Self.DownloaderOnFinish;
@@ -3189,11 +3197,14 @@ var
   LNewText: string;
 begin
   try
-    Loader := ( Sender as TNBoxDownloader );
+    Loader := (Sender as TNBoxDownloader);
 
-    TThread.Synchronize(nil, procedure begin
+    TThread.Synchronize(TThread.Current,
+    procedure
+    begin
       if Assigned(Loader.Tab) then begin
-        LNewText := DownloadItemText(Loader) + ' ' + AError.Message + ' try: ' + Loader.RetriedCount.ToString;
+        LNewText := DownloadItemText(Loader) + ' '
+          + AError.Message + ' try: ' + Loader.RetriedCount.ToString;
         Loader.Tab.Text.Text := LNewText;
       end;
     end);
@@ -3205,14 +3216,26 @@ end;
 procedure TForm1.DownloaderOnFinish(Sender: TObject);
 var
   Loader: TNBoxDownloader;
-  LTab: TNBoxTab;
 begin
-  Loader := ( Sender as TNBoxDownloader );
-  LTab := Loader.Tab;
-  var LIndex: integer := DownloadItems.IndexOf(LTab);
-  if Assigned(Loader.Tab) then begin
-    DownloadItems.Delete(LIndex);
-    LTab.Free;
+  try
+    Loader := (Sender as TNBoxDownloader);
+
+    var LIndex: integer := DownloadItems.IndexOf(Loader.Tab);
+    if Assigned(Loader.Tab) then begin
+      DownloadItems.Delete(LIndex);
+      try
+       { potential deadlock - Tab.CloseBtn have ImageWithUrl }
+       { that need to be waited before destroy.              }
+        BlackHole.Throw(Loader.Tab);
+        Loader.Tab := Nil;
+      except
+        On E: Exception do Log('LTab.Free; with index of ' + LIndex.ToString, E);
+      end;
+
+    end else
+      Log('DownloaderOnFinish: Loader.Tab not Assigned.');
+  except
+    On E: Exception do Log('DownloaderOnFinish', E);
   end;
 end;
 
@@ -3221,10 +3244,14 @@ procedure TForm1.DownloaderOnReceiveData(const Sender: TObject; AContentLength,
 var
   Loader: TNBoxDownloader;
 begin
-  Loader := ( Sender as TNBoxDownloader );
-  if Loader.IsRunning then begin
-    if not Assigned(Loader.Tab) then exit;
-    Loader.Tab.Text.Text := DownloadItemText(Loader);
+  try
+    Loader := (Sender as TNBoxDownloader);
+    if Loader.IsRunning then begin
+      if not Assigned(Loader.Tab) then exit;
+      Loader.Tab.Text.Text := DownloadItemText(Loader);
+    end;
+  except
+    On E: Exception do Log('DownloaderOnReceiveData', E);
   end;
 end;
 
@@ -3237,7 +3264,9 @@ begin
   TThread.Synchronize(TThread.Current,
   procedure begin
     try
-      if not AppDestroying then AddDownload(LItem);
+      if not AppDestroying then AddDownload(LItem, True);
+      FreeAndNil(LItem as TObject);
+      LItem := nil;
     except
       On E: Exception do Log('DownloadFetcherOnFetched', E);
     end;
@@ -4106,8 +4135,7 @@ procedure TForm1.TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
 begin
   Form1.TopBottomText.Text := 'BaseItem: ' + BaseItemCounter.Count.ToString
   + ' BookmarkItem: ' + BookmarkItemCounter.Count.ToString
-  + ' ReqItem: ' + ReqItemCounter.Count.ToString
-  + ' YDWReusableThreads: ' + ReusableThreadCounter.Count.ToString;
+  + ' ReqItem: ' + ReqItemCounter.Count.ToString;
   ChangeInterface(BrowserLayout);
 end;
 
