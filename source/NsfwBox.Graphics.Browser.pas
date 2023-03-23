@@ -196,7 +196,6 @@ begin
   except
     On E: Exception do begin
       Log('TNBoxBrowser.NewItem', E);
-      raise;
     end;
   end;
 end;
@@ -261,92 +260,98 @@ var
 
 begin
   try
-    Fetched := false;
-    Scraper := TNBoxScraper.Create;
-    Content := INBoxHasOriginList.Create;
-
-    if Assigned(Browser.OnWebClientCreate) then
-      Scraper.OnWebClientSet := Browser.OnWebClientCreate;
-
-    if Assigned(Browser.OnScraperCreate) then
-      Browser.OnScraperCreate(Self.Browser, Scraper);
-
-    if TThread.Current.CheckTerminated then exit;
-
     try
-      Fetched := Scraper.GetContent(AItem, Content);
-      if not Fetched then exit;
-    except
-      on E: Exception do begin
-        Log('Provider: ' + AItem.Origin.ToString + ' Browser -> Scraper.GetContent', E);
-        exit;
-      end;
-    end;
+      Fetched := false;
+      Scraper := TNBoxScraper.Create;
+      Content := INBoxHasOriginList.Create;
 
-    for I := 0 to Content.Count - 1 do begin
-      var LContentItem := Content[I];
+      if Assigned(Browser.OnWebClientCreate) then
+        Scraper.OnWebClientSet := Browser.OnWebClientCreate;
+
+      if Assigned(Browser.OnScraperCreate) then
+        Browser.OnScraperCreate(Self.Browser, Scraper);
 
       if TThread.Current.CheckTerminated then exit;
 
-      LBookmark := nil;
-      LPost     := nil;
-      LRequest  := nil;
-
-      Supports(LContentItem, INBoxItem, LPost);
-
-      if (LContentItem is TNBoxBookmark) then begin
-        LBookmark := TNBoxBookmark(LContentItem);
-        if (LBookmark.BookmarkType = TNBoxBookmarkType.Content) then
-          LPost := LBookmark.AsItem
-        else if (LBookmark.BookmarkType = SearchRequest) then
-          LRequest := LBookmark.AsRequest;
+      try
+        Fetched := Scraper.GetContent(AItem, Content);
+        if not Fetched then exit;
+      except
+        on E: Exception do begin
+          Log('Provider: ' + AItem.Origin.ToString + ' Browser -> Scraper.GetContent', E);
+          exit;
+        end;
       end;
 
-      TThread.Synchronize(TThread.Current,
-      procedure
-      begin
-        LNewItem := Self.Browser.NewItem;
+      for I := 0 to Content.Count - 1 do begin
+        var LContentItem := Content[I];
 
-        With LNewItem do begin
-          Height := START_ITEM_HEIGHT;
+        if TThread.Current.CheckTerminated then exit;
 
-          if Assigned(LBookmark) then
-            LNewItem.Item := LBookmark
-          else
-            LNewItem.Item := LPost;
+        LBookmark := nil;
+        LPost     := nil;
+        LRequest  := nil;
 
-          if (Assigned(LPost) and (not LPost.ThumbnailUrl.IsEmpty)) then
-            ImageURL := LPost.ThumbnailUrl;
+        Supports(LContentItem, INBoxItem, LPost);
+
+        if (LContentItem is TNBoxBookmark) then begin
+          LBookmark := (LContentItem as TNBoxBookmark);
+          if (LBookmark.BookmarkType = TNBoxBookmarkType.Content) then
+            LPost := LBookmark.AsItem
+          else if (LBookmark.BookmarkType = SearchRequest) then
+            LRequest := LBookmark.AsRequest;
         end;
 
-        Self.Browser.RecalcColumns;
-      end);
+        TThread.Synchronize(TThread.Current,
+        procedure
+        begin
+          LNewItem := Self.Browser.NewItem;
+
+          With LNewItem do begin
+            Height := START_ITEM_HEIGHT;
+
+            if Assigned(LBookmark) then
+              LNewItem.Item := LBookmark
+            else
+              LNewItem.Item := LPost;
+
+            if (Assigned(LPost) and (not LPost.ThumbnailUrl.IsEmpty)) then
+              ImageURL := LPost.ThumbnailUrl;
+          end;
+
+          Self.Browser.RecalcColumns;
+        end);
+
+      end;
+
+    finally
+
+      FreeAndNil(AItem);
+      Scraper.Free;
+
+      { freeing not used items. }
+      for I := I to Content.Count - 1 do
+      begin
+
+        var LContentItem := Content[I];
+        Content[I] := Nil;
+
+        if (LContentItem is TNBoxBookmark) then
+        begin
+          LBookmark := (LContentItem as TNBoxBookmark);
+          LBookmark.FreeObj;
+        end;
+
+        (LContentItem as TObject).Free;
+        LContentItem := Nil;
+      end;
+
+      Content.Free;
 
     end;
-
-  finally
-
-    FreeAndNil(AItem as TObject);
-    AItem := Nil;
-    Scraper.Free;
-
-    { freeing not used items. }
-    for I := I to Content.Count - 1 do
-    begin
-
-      var LContentItem := Content[I];
-      Content[I] := Nil;
-
-      if (LContentItem is TNBoxBookmark) then
-        (LContentItem as TNBoxBookmark).Free
-      else
-        FreeAndNil(LContentItem as TObject);
-
-      LContentItem := Nil;
-    end;
-
-    Content.Free;
-
+  except
+    On E: Exception do
+      Log('TNBoxBrowser.TBrowserWorker.SubThreadExecute', E);
   end;
 end;
 

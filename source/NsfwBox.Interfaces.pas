@@ -165,6 +165,7 @@ type
   INBoxItemList = TList<INBoxItem>;
   INBoxHasOriginList = TList<IHasOrigin>;
 
+  {$IFDEF COUNT_APP_OBJECTS}
   TRefCounter = Class(TObject)
     private
       FCount: integer;
@@ -175,6 +176,7 @@ type
       property Count: integer read GetCount;
       constructor Create;
   End;
+  {$ENDIF}
 
   TNBoxItemBase = class(TNoRefCountObject, INBoxItem, IHasOrigin)
     protected
@@ -260,11 +262,12 @@ type
       constructor Create(ADisplayName: string; AAvatarUrl: string; AContentCount: integer = -1);
   End;
 
-  var
-    BaseItemCounter: TRefCounter;
-    BookmarkItemCounter: TRefCounter;
-    ReqItemCounter: TRefCounter;
-
+{$IFDEF COUNT_APP_OBJECTS}
+var
+  BaseItemCounter: TRefCounter;
+  BookmarkItemCounter: TRefCounter;
+  ReqItemCounter: TRefCounter;
+{$ENDIF}
 
 implementation
 
@@ -272,15 +275,15 @@ implementation
 
 constructor TNBoxSearchRequestBase.Create;
 begin
-  ReqItemCounter.Inc;
+  {$IFDEF COUNT_APP_OBJECTS} ReqItemCounter.Inc; {$ENDIF}
   PageId := 1;
   Request := '';
 end;
 
 destructor TNBoxSearchRequestBase.Destroy;
 begin
-  ReqItemCounter.Dec;
-//  inherited;
+  {$IFDEF COUNT_APP_OBJECTS} ReqItemCounter.Dec; {$ENDIF}
+  inherited;
 end;
 
 function TNBoxSearchRequestBase.GetPageId: integer;
@@ -326,12 +329,13 @@ end;
 constructor TNBoxItemBase.Create;
 begin
   inherited;
-  BaseItemCounter.Inc;
+  {$IFDEF COUNT_APP_OBJECTS} BaseItemCounter.Inc; {$ENDIF}
 end;
 
 destructor TNBoxItemBase.Destroy;
 begin
-  BaseItemCounter.Dec;
+  {$IFDEF COUNT_APP_OBJECTS} BaseItemCounter.Dec; {$ENDIF}
+  inherited;
 end;
 
 function TNBoxItemBase.GetOrigin: integer;
@@ -391,6 +395,7 @@ begin
   Result := FDisplayName;
 end;
 
+{$IFDEF COUNT_APP_OBJECTS}
 { TRefCounter }
 
 constructor TRefCounter.Create;
@@ -434,5 +439,6 @@ begin
   BookmarkItemCounter := TRefCounter.Create;
   ReqItemCounter := TRefCounter.Create;
 end;
+{$ENDIF}
 
 end.

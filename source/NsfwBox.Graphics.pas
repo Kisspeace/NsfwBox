@@ -372,11 +372,8 @@ begin
     if Assigned(FItem) then begin
 
       if Self.HasBookmark then begin
-        var LBobj := TNBoxBookmark(FItem);
-        if Assigned(LBobj.Obj) then begin
-          LBobj.Obj.Free;
-          LBobj.Obj := nil;
-        end;
+        var LBobj := (FItem as TNBoxBookmark);
+        LBobj.FreeObj;
       end;
 
       FreeAndNil(FItem as TObject);

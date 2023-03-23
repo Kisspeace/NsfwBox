@@ -42,6 +42,7 @@ type
       function IsRequest: boolean;
       function AsItem: INBoxItem;
       function AsRequest: INBoxSearchRequest;
+      procedure FreeObj;
       constructor Create(AItem: INBoxItem); overload;
       constructor Create(AItem: INBoxSearchRequest); overload;
       constructor Create; overload;
@@ -150,8 +151,9 @@ begin
       I['Origin'] := LObj.Origin;
       O['Full'] := TJsonMom.ToJson(LObj.Full);
     end;
-  end else
+  end else begin
     Result := AObject.AsJSONObject;
+  end;
 end;
 
 function ToJsonObj(AObject: TObject): TJsonObject;
@@ -170,16 +172,22 @@ end;
 
 function ToJsonStr(AObject: TObject): String;
 begin
-  if (AObject is TNBoxBooruItemBase) then
-  begin
-    var LJson := ToJsonObj(AObject);
-    try
-      Result := LJson.ToJSON;
-    finally
-      LJson.Free;
+  try
+    if (AObject is TNBoxBooruItemBase) then
+    begin
+      var LJson := ToJsonObj(AObject);
+      try
+        Result := LJson.ToJSON;
+      finally
+        LJson.Free;
+      end;
+    end else
+      Result := ToJson(AObject).AsJSON(false);
+  except
+    On E: Exception do begin
+      Log('ToJsonStr', E);
     end;
-  end else
-    Result := ToJson(AObject).AsJSON(false);
+  end;
 end;
 
 Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject);
@@ -312,16 +320,20 @@ end;
 constructor TNBoxBookmark.Create;
 begin
   Inherited;
-  BookmarkItemCounter.Inc;
+  {$IFDEF COUNT_APP_OBJECTS} BookmarkItemCounter.Inc; {$ENDIF}
   FObj := nil;
 end;
 
 destructor TNBoxBookmark.destroy;
 begin
-//  if Assigned(Self.Obj) then
-//    Obj.Free;
-  BookmarkItemCounter.Dec;
+  {$IFDEF COUNT_APP_OBJECTS} BookmarkItemCounter.Dec; {$ENDIF}
   inherited;
+end;
+
+procedure TNBoxBookmark.FreeObj;
+begin
+  if Assigned(FObj) then
+    FreeAndNil(FObj);
 end;
 
 function TNBoxBookmark.GetOrigin: integer;

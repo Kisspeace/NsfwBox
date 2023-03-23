@@ -811,7 +811,7 @@ begin
     LReq := (Sender as TNBoxBrowser).Request;
     HistoryDb.SearchGroup.Add(LReq);
   finally
-    FreeAndNil(LReq as TObject);
+    (LReq as TObject).Free;
     LReq := Nil;
   end;
 end;
@@ -957,7 +957,7 @@ begin
   ChangeInterface(Self.BrowserLayout);
 
   if Assigned(Req) then begin
-    FreeAndNil(Req as TObject);
+    (Req as TObject).Free;
     Req := nil;
   end;
 end;
@@ -1097,7 +1097,16 @@ begin
   begin
     if Assigned(CurrentBookmarkControl) then begin
       if ( CurrentBookmarkGroup.Id <> -1 ) then
-      CurrentBookmarkGroup.Add(SearchMenu.Request);
+      begin
+        var LReq := SearchMenu.Request;
+        try
+          CurrentBookmarkGroup.Add(LReq)
+        finally
+          (LReq as TObject).Free;
+          LReq := Nil;
+        end;
+      end;
+
       CurrentBookmarkControl := nil;
       ChangeInterface(MenuSearchSettings);
     end;
@@ -1177,7 +1186,7 @@ begin
     try
       HistoryDb.TabGroup.Add(LReq);
     finally
-      FreeAndNil(LReq as TObject);
+      (LReq as TObject).Free;
       LReq := nil;
     end;
   end;
@@ -1626,8 +1635,15 @@ begin
     Result := Result + ': ' + Req.PageId.ToString + ' | '
       + ABrowser.Items.Count.ToString;
   finally
-    FreeAndNil(Req as TObject);
-    Req := Nil;
+    try
+      (Req as TObject).Free;
+      Req := Nil;
+    except
+      On E: Exception do begin
+        Log('TForm1.CreateTabText finally', E);
+        raise;
+      end;
+    end;
   end;
 end;
 
@@ -1817,19 +1833,19 @@ begin
       if Settings.FetchAllBeforeAddBookmark then
         LTryFetchIfEmpty;
 
-      UserSelectBookmarkList(
+      UserSelectBookmarkList( { Need redisign }
       procedure
       var
-        Table: TBookmarkGroupRec;
+        LTable: TBookmarkGroupRec;
       begin
         if Assigned(CurrentBookmarkControl) then begin
-          Table := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
-          ToastMessage(Table.Name + ' choosed.', True);
-          if ( Table.Id <> -1 ) then begin
+          LTable := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
+          ToastMessage(LTable.Name + ' choosed.', True);
+          if ( LTable.Id <> -1 ) then begin
             if Assigned(LRequest) then
-              Table.Add(LRequest)
+              LTable.Add(LRequest) { LRequest can be Nil at this time. }
             else
-              Table.Add(LPost);
+              LTable.Add(LPost); { LPost can be Nil at this time. }
           end;
 
           CurrentBookmarkControl := nil;
@@ -1934,11 +1950,8 @@ begin
 
   end;
 
-  LRequest := Nil;
-  LPost := Nil;
-  LBookmark := Nil;
   if Assigned(LTmpReq) then begin
-    FreeAndNil(LTmpReq as TObject);
+    (LTmpReq as TObject).Free;
     LTmpReq := Nil;
   end;
 end;
@@ -2943,7 +2956,7 @@ begin
     try
       SearchMenu.Request := LReq;
     finally
-      FreeAndNil(LReq as TObject);
+      (LReq as TObject).Free;
       LReq := nil;
     end;
   end;
@@ -3002,7 +3015,7 @@ begin
       end;
     end;
   finally
-    FreeAndNil(LReq as TObject);
+    (LReq as TObject).Free;
     LReq := nil;
   end;
 end;
@@ -3265,7 +3278,7 @@ begin
   procedure begin
     try
       if not AppDestroying then AddDownload(LItem, True);
-      FreeAndNil(LItem as TObject);
+      (LItem as TObject).Free;
       LItem := nil;
     except
       On E: Exception do Log('DownloadFetcherOnFetched', E);
@@ -3388,7 +3401,8 @@ function TForm1.LoadSession: boolean;
 var
   Group: TBookmarkGroupRec;
   Groups: TBookmarkGroupRecAr;
-  LBmrks: TBookmarkAr;
+  LBookmarks: TBookmarkAr;
+  LBookmark: TNBoxBookmark;
   I: integer;
 begin
   Result := false;
@@ -3400,19 +3414,22 @@ begin
         exit;
 
       Group := Groups[0];
-      LBmrks := Group.GetPage;
-      for I := High(LBmrks) Downto Low(LBmrks) do begin
+      LBookmarks := Group.GetPage;
+      for I := High(LBookmarks) Downto Low(LBookmarks) do begin
+        LBookmark := LBookmarks[I];
 
-        if not ( LBmrks[I].BookmarkType = SearchRequest ) then
+        if not ( LBookmark.BookmarkType = SearchRequest ) then
           continue;
 
-        AddBrowser(LBmrks[I].AsRequest);
-        Browsers.Last.Tag := LBmrks[I].Id;
-        LBmrks[I].Free;
+        AddBrowser(LBookmark.AsRequest);
+        Browsers.Last.Tag := LBookmark.Id;
+
+        LBookmark.FreeObj;
+        LBookmark.Free;
 
       end;
 
-      if Length(LBmrks) > 0 then
+      if Length(LBookmarks) > 0 then
         Result := true;
     except
       On E: Exception do begin
@@ -3536,7 +3553,7 @@ begin
   try
     self.AddBrowser(LReq, Settings.AutoStartBrowse);
   finally
-    FreeAndNil(LReq as TObject);
+    (LReq as TObject).Free;
     LReq := nil;
   end;
 end;
@@ -4015,12 +4032,13 @@ begin
   FCurrentBrowser := Value;
   Tab := self.GetTab(FCurrentBrowser);
   Tab.ImageControl.Visible := true;
+
   LReq := FCurrentBrowser.Request;
   try
     Tab.Image.ImageURL := AppStyle.GetImagePath(LReq.Origin);
     FCurrentBrowser.Visible := true;
   finally
-    FreeAndNil(LReq as TObject);
+    (LReq as TObject).Free;
     LReq := nil;
   end;
 end;
@@ -4133,9 +4151,11 @@ end;
 
 procedure TForm1.TopBtnAppOnTap(Sender: TObject; const Point: TPointF);
 begin
-  Form1.TopBottomText.Text := 'BaseItem: ' + BaseItemCounter.Count.ToString
-  + ' BookmarkItem: ' + BookmarkItemCounter.Count.ToString
-  + ' ReqItem: ' + ReqItemCounter.Count.ToString;
+  {$IFDEF COUNT_APP_OBJECTS}
+  Form1.TopBottomText.Text := 'I: ' + BaseItemCounter.Count.ToString
+  + ' B: ' + BookmarkItemCounter.Count.ToString
+  + ' R: ' + ReqItemCounter.Count.ToString;
+  {$ENDIF}
   ChangeInterface(BrowserLayout);
 end;
 
@@ -4159,7 +4179,7 @@ var
 begin
   if MenuSearchSettings.Visible then begin
     if not Assigned(CurrentBrowser) then
-      CurrentBrowser := self.AddBrowser(nil, false).Owner as TNBoxBrowser;
+      CurrentBrowser := AddBrowser(nil, false).Owner as TNBoxBrowser;
 
     LReq := SearchMenu.Request;
     try
@@ -4167,7 +4187,7 @@ begin
       ChangeInterface(form1.BrowserLayout);
       CurrentBrowser.GoBrowse;
     finally
-      FreeAndNil(LReq as TObject);
+      (LReq as TObject).Free;
       LReq := nil;
     end;
 
