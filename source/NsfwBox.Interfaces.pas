@@ -262,6 +262,14 @@ type
       constructor Create(ADisplayName: string; AAvatarUrl: string; AContentCount: integer = -1);
   End;
 
+  IAbortableAndWaitable = Interface
+    ['{40FFEE8F-AEA6-4D35-BCEA-552315054444}']
+    { public }
+    function IsExecuting: boolean; { must be thread safe }
+    procedure AbortExecution; { must be thread safe }
+    procedure WaitFor; { must be thread safe }
+  End;
+
 {$IFDEF COUNT_APP_OBJECTS}
 var
   BaseItemCounter: TRefCounter;

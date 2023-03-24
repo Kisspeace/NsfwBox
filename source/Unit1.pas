@@ -1661,6 +1661,7 @@ var
   LBrowserIndex, LTabIndex: integer;
   Groups: TBookmarkGroupRecAr;
   Group: TBookmarkGroupRec;
+  LTab: TNBoxTab;
 begin
   if ABrowser = FCurrentBrowser then
     FCurrentBrowser := nil;
@@ -1672,9 +1673,7 @@ begin
   LTabIndex := IndexTabByBrowser(ABrowser);
   if ( LTabIndex = -1 ) then
     exit;
-
-  ABrowser.Visible := false;
-  Tabs.Items[LTabIndex].Visible := false;
+  LTab := Tabs.Items[LTabIndex];
 
   if (ABrowser.Tag <> -1) and ADeleteFromSession then begin
     Groups := Session.GetBookmarksGroups;
@@ -1684,9 +1683,10 @@ begin
     end;
   end;
 
-  ABrowser.Free;
+  LTab.Visible := False;
   Browsers.Delete(LBrowserIndex);
   Tabs.Delete(LTabIndex);
+  BlackHole.Throw(ABrowser);
 end;
 
 procedure TForm1.ExecItemInteraction(AItem: TNBoxCardBase;

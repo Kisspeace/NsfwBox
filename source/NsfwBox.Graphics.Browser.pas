@@ -23,7 +23,7 @@ type
   TBrowserItemCreateEvent = procedure (Sender: TObject; var AItem: TNBoxCardBase) of object;
   TScraperCreateEvent = procedure (Sender: TObject; var AScraper: TNBoxScraper) of object;
 
-  TNBoxBrowser = class(TColumnsView)
+  TNBoxBrowser = class(TColumnsView, IAbortableAndWaitable)
     protected
       type
         TBrowserWorker = Class(TGenericYDWQueuedThreadObject<TNBoxSearchRequestBase>)
@@ -47,10 +47,17 @@ type
     public
       Items: TNBoxCardObjList;
       DummyImage: TBitmap;
+      { IAbortableAndWaitable }
+      function IAbortableAndWaitable.IsExecuting = IsBrowsingNow;
+      procedure IAbortableAndWaitable.AbortExecution = AbortBrowsing;
+      procedure IAbortableAndWaitable.WaitFor = WaitFor;
+      { --------------------- }
       function NewItem: TNBoxCardBase;
       procedure GoBrowse;
       procedure GoNextPage;
       procedure GoPrevPage;
+      procedure AbortBrowsing;
+      procedure WaitFor;
       procedure Clear;
       function IsBrowsingNow: boolean;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
@@ -67,7 +74,7 @@ type
   TNBoxBrowserList = TList<TNBoxBrowser>;
 
 implementation
-  uses unit1;
+  uses unit1, NsfwBox.GarbageCollector;
 
 { TNsfwBoxBrowser }
 
@@ -82,7 +89,7 @@ begin
   FOnWebClientCreate    := nil;
   FOnRequestChanged     := nil;
   DummyImage            := nil;
-  items := TNBoxCardObjList.Create;
+  items := TNBoxCardObjList.Create(False);
   ColumnsCount := 2;
   FRequest := TNBoxSearchReqNsfwXxx.create;
 end;
@@ -110,11 +117,18 @@ begin
     OnRequestChanged(Self);
 end;
 
+procedure TNBoxBrowser.WaitFor;
+begin
+  FWorker.WaitFor;
+end;
+
 Destructor TNBoxBrowser.Destroy;
 begin
-  self.Clear;
+  FWorker.Terminate;
+  FWorker.WaitFor;
+  Self.Clear;
   FWorker.Free;
-  items.Free;
+  Items.Free;
   FSync.Free;
   if Assigned(FRequest) then
     (FRequest as TObject).Free;
@@ -175,7 +189,7 @@ end;
 function TNBoxBrowser.NewItem: TNBoxCardBase;
 begin
   try
-    Result := TNBoxCardSimple.Create(self);
+    Result := TNBoxCardSimple.Create(Nil);
     Result.ImageManager := Self.ImageManager;
     Result.OnLoadingFinished := OnItemImageLoadFinished;
     Result.Fill.Kind := TBrushKind.Bitmap;
@@ -214,22 +228,23 @@ begin
   Self.RecalcColumns;
 end;
 
+procedure TNBoxBrowser.AbortBrowsing;
+begin
+  FWorker.Terminate;
+end;
+
 procedure TNBoxBrowser.Clear;
 var
   I: integer;
 begin
   try
-    FWorker.Terminate;
-    FWorker.WaitFor;
-
     FSync.BeginWrite;
     try
       if (Items.Count > 0) then begin
-        for I := 0 to Items.Count - 1 do begin
-          Items[I].AbortLoading;
-        end;
-
+        for I := 0 to Items.Count - 1 do
+          BlackHole.Throw(Items[I]);
         Items.Clear;
+
         RecalcColumns;
       end;
     finally
@@ -238,7 +253,7 @@ begin
 
   except
     On E:Exception do
-      Log('TNBoxBrowser.clear', E);
+      Log('TNBoxBrowser.Clear', E);
   end;
 end;
 

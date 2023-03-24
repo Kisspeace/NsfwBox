@@ -68,7 +68,6 @@ type
     public
       CloseBtn: TRectButton;
       constructor Create(Aowner: Tcomponent); override;
-      destructor Destroy; override;
   end;
 
   TNBoxTabList = Tlist<TNBoxTab>;
@@ -255,12 +254,6 @@ begin
     VertTextAlign := ttextalign.Center;
     Color := talphacolorrec.White;
   end;
-end;
-
-destructor TNBoxTab.Destroy;
-begin
-  Closebtn.Free;
-  inherited Destroy;
 end;
 
 { TNBoxEdit }

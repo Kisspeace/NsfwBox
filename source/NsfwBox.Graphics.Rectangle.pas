@@ -19,7 +19,6 @@ type
     public
       Text: TAlText;
       constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
   end;
   
   TNBoxImageTypes = Class
@@ -221,12 +220,6 @@ begin
   Text.hittest := false;
 end;
 
-destructor TRectText.Destroy;
-begin
-  Text.free;
-  inherited;
-end;
-
 { TRectButton }
 
 constructor TRectButton.Create(AOwner: TComponent);
@@ -254,12 +247,17 @@ end;
 
 destructor TRectButton.Destroy;
 begin
+try
+  Image := Nil;
+  inherited;
   FFillMove.Free;
   FFillDef.Free;
   FStrokeMove.Free;
   FStrokedef.Free;
-  ImageControl.Free;
-  inherited;
+except
+  On E: Exception do
+    Log('TRectButton.Destroy', E);
+end;
 end;
 
 procedure TRectButton.DoMouseEnter;
