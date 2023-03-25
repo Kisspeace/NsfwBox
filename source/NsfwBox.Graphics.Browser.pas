@@ -14,6 +14,7 @@ uses
   NsfwBox.Interfaces, NsfwBox.ContentScraper, NsfwBox.Provider.Pseudo,
   NsfwBox.Provider.NsfwXxx, NsfwBox.Graphics, NsfwBox.Consts,
   NsfwBox.Bookmarks, NsfwBox.Provider.R34App, NsfwBox.Logging,
+  NsfwBox.Utils,
   { you-did-well! }
   YDW.FMX.ImageWithURL.Interfaces, YDW.FMX.ImageWithURL.AlRectangle,
   YDW.FMX.ImageWithURLManager, YDW.Threading;
@@ -100,21 +101,29 @@ var
 begin
   FSync.BeginWrite;
   try
-    if Assigned(value) then
-      New := value.Clone
-    else
-      New := TNBoxSearchReqNsfwXxx.Create;
+    try
+      if Assigned(value) then
+        New := value.Clone
+      else
+        New := TNBoxSearchReqNsfwXxx.Create;
+    except
+      On E: Exception do Log('TNBoxBrowser.SetRequest 110', E);
+    end;
 
     if Assigned(FRequest) then
-      (FRequest as TObject).Free;
+      FreeInterfaced(FRequest);
 
     FRequest := new;
   finally
     FSync.EndWrite;
   end;
 
+  try
   if Assigned(OnRequestChanged) then
     OnRequestChanged(Self);
+  except
+      On E: Exception do Log('TNBoxBrowser.SetRequest 124', E);
+    end;
 end;
 
 procedure TNBoxBrowser.WaitFor;
@@ -357,8 +366,7 @@ begin
           LBookmark.FreeObj;
         end;
 
-        (LContentItem as TObject).Free;
-        LContentItem := Nil;
+        FreeInterfaced(LContentItem);
       end;
 
       Content.Free;

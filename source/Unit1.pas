@@ -566,39 +566,47 @@ var
   B: TNBoxBrowser;
   T: TNBoxTab;
 begin
-  B := Form1.CreateDefBrowser(BrowserLayout);
-  Browsers.Add(B);
-  with B do begin
-    Tag              := -1;
-    Parent           := BrowserLayout;
-    OnRequestChanged := OnBrowserReqChanged;
-    OnItemCreate     := OnNewItem;
-    BeforeBrowse     := BrowserBeforeBrowse;
-    DummyImage       := DummyLoadingImage;
+  try
+    B := Form1.CreateDefBrowser(BrowserLayout);
+    Browsers.Add(B);
+    with B do begin
+      Tag              := -1;
+      Parent           := BrowserLayout;
+      OnRequestChanged := OnBrowserReqChanged;
+      OnItemCreate     := OnNewItem;
+      BeforeBrowse     := BrowserBeforeBrowse;
+      DummyImage       := DummyLoadingImage;
+    end;
+
+    T := Form1.CreateDefTab(B);
+    Tabs.Add(T);
+    with T do begin
+      ImageControl.Visible := false;
+      Align         := TAlignlayout.Top;
+      Text.Text     := 'Empty tab';
+      Position.Y    := Single.MaxValue; // to the bottom
+      parent        := TabsScroll;
+      Margins.Rect  := TRectF.Create(4, 4, 4, 0);
+      Position.Y    := 0;
+      Closebtn.OnTap   := BtnTabCloseOnTap;
+      Closebtn.OnClick := form1.ClickTapRef;
+      OnTap            := form1.TabOnTap;
+      OnClick          := ClickTapRef;
+    end;
+
+    try
+      B.Request := ARequest;
+    except
+      On E: Exception do Log('AddBrowser B.Request := ARequest;', E);
+    end;
+    Form1.OnBrowserLayout.BringToFront;
+    Result := T;
+
+    if AAutoStartBrowse then
+      B.GoBrowse;
+  except
+    On E: Exception do Log('AddBrowser', E);
   end;
-
-  T := Form1.CreateDefTab(B);
-  Tabs.Add(T);
-  with T do begin
-    ImageControl.Visible := false;
-    Align         := TAlignlayout.Top;
-    Text.Text     := 'Empty tab';
-    Position.Y    := Single.MaxValue; // to the bottom
-    parent        := TabsScroll;
-    Margins.Rect  := TRectF.Create(4, 4, 4, 0);
-    Position.Y    := 0;
-    Closebtn.OnTap   := BtnTabCloseOnTap;
-    Closebtn.OnClick := form1.ClickTapRef;
-    OnTap            := form1.TabOnTap;
-    OnClick          := ClickTapRef;
-  end;
-
-  B.Request := ARequest;
-  Form1.OnBrowserLayout.BringToFront;
-  Result := T;
-
-  if AAutoStartBrowse then
-    B.GoBrowse;
 end;
 
 function TForm1.AddDownload(AItem: INBoxItem; ADontFetch: boolean): TNBoxTab;
@@ -811,8 +819,7 @@ begin
     LReq := (Sender as TNBoxBrowser).Request;
     HistoryDb.SearchGroup.Add(LReq);
   finally
-    (LReq as TObject).Free;
-    LReq := Nil;
+    FreeInterfaced(LReq);
   end;
 end;
 
@@ -956,10 +963,8 @@ begin
   CurrentBrowser := browsers.Last;
   ChangeInterface(Self.BrowserLayout);
 
-  if Assigned(Req) then begin
-    (Req as TObject).Free;
-    Req := nil;
-  end;
+  if Assigned(Req) then
+    FreeInterfaced(Req);
 end;
 
 procedure TForm1.BtnBMarkOpenLastPageOnTap(Sender: TObject;
@@ -1102,8 +1107,7 @@ begin
         try
           CurrentBookmarkGroup.Add(LReq)
         finally
-          (LReq as TObject).Free;
-          LReq := Nil;
+          FreeInterfaced(LReq);
         end;
       end;
 
@@ -1186,8 +1190,7 @@ begin
     try
       HistoryDb.TabGroup.Add(LReq);
     finally
-      (LReq as TObject).Free;
-      LReq := nil;
+      FreeInterfaced(LReq);
     end;
   end;
 
@@ -1636,8 +1639,7 @@ begin
       + ABrowser.Items.Count.ToString;
   finally
     try
-      (Req as TObject).Free;
-      Req := Nil;
+      FreeInterfaced(Req);
     except
       On E: Exception do begin
         Log('TForm1.CreateTabText finally', E);
@@ -1951,8 +1953,7 @@ begin
   end;
 
   if Assigned(LTmpReq) then begin
-    (LTmpReq as TObject).Free;
-    LTmpReq := Nil;
+    FreeInterfaced(LTmpReq);
   end;
 end;
 
@@ -2685,6 +2686,8 @@ begin
     FreeAndNil(DownloadFetcher);
     FreeAndNil(DownloadManager);
     DeleteAllBrowsers(False);
+    BlackHole.Terminate;
+    BlackHole.WaitFor;
   except
     On E: Exception do
       Log('On Destroy', E);
@@ -2956,8 +2959,7 @@ begin
     try
       SearchMenu.Request := LReq;
     finally
-      (LReq as TObject).Free;
-      LReq := nil;
+      FreeInterfaced(LReq);
     end;
   end;
 end;
@@ -3015,8 +3017,11 @@ begin
       end;
     end;
   finally
-    (LReq as TObject).Free;
-    LReq := nil;
+    try
+      FreeInterfaced(LReq);
+    except
+      On E: Exception do Log('OnBrowserReqChanged finally', E);
+    end
   end;
 end;
 
@@ -3278,8 +3283,7 @@ begin
   procedure begin
     try
       if not AppDestroying then AddDownload(LItem, True);
-      (LItem as TObject).Free;
-      LItem := nil;
+      FreeInterfaced(LItem);
     except
       On E: Exception do Log('DownloadFetcherOnFetched', E);
     end;
@@ -3421,11 +3425,22 @@ begin
         if not ( LBookmark.BookmarkType = SearchRequest ) then
           continue;
 
-        AddBrowser(LBookmark.AsRequest);
-        Browsers.Last.Tag := LBookmark.Id;
+        try
+          var LReq := LBookmark.AsRequest;
+          AddBrowser(LReq);
+          Browsers.Last.Tag := LBookmark.Id;
+          LReq := Nil;
+        except
+          On E: Exception do Log('LoadSession addBrowser', E);
+        end;
 
-        LBookmark.FreeObj;
-        LBookmark.Free;
+        try
+          LBookmarks[I] := Nil;
+          LBookmark.FreeObj;
+          FreeAndNil(LBookmark);
+        except
+          On E: Exception do Log('LoadSession free item', E);
+        end;
 
       end;
 
@@ -3553,8 +3568,7 @@ begin
   try
     self.AddBrowser(LReq, Settings.AutoStartBrowse);
   finally
-    (LReq as TObject).Free;
-    LReq := nil;
+    FreeInterfaced(LReq);
   end;
 end;
 
@@ -4038,8 +4052,7 @@ begin
     Tab.Image.ImageURL := AppStyle.GetImagePath(LReq.Origin);
     FCurrentBrowser.Visible := true;
   finally
-    (LReq as TObject).Free;
-    LReq := nil;
+    FreeInterfaced(LReq);
   end;
 end;
 
@@ -4187,8 +4200,7 @@ begin
       ChangeInterface(form1.BrowserLayout);
       CurrentBrowser.GoBrowse;
     finally
-      (LReq as TObject).Free;
-      LReq := nil;
+      FreeInterfaced(LReq);
     end;
 
   end else begin

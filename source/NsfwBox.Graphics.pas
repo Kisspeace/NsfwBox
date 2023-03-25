@@ -13,6 +13,7 @@ uses
   NsfwBox.Interfaces, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34JsonApi,
   NsfwBox.ContentScraper, NsfwBox.Graphics.Rectangle, Fmx.ActnList,
   NsfwBox.Bookmarks, NsfwBox.Helper, NsfwBox.Provider.Bookmarks, NsfwBox.Logging,
+  NsfwBox.Utils,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle;
 
@@ -369,8 +370,7 @@ begin
         LBobj.FreeObj;
       end;
 
-      FreeAndNil(FItem as TObject);
-      FItem := Nil;
+      FreeInterfaced(FItem);
 
     end;
 
@@ -427,7 +427,8 @@ end;
 procedure TNBoxCardBase.SetItem(Value: IHasOrigin);
 begin
   if not Assigned(Value) then exit;
-  if Assigned(FItem) then (FItem as TObject).Free;
+  if Assigned(FItem) then
+    FreeInterfaced(FItem);
   FItem := Value;
 end;
 

@@ -20,6 +20,7 @@ type
       class procedure TestDownloadsOnTap(Sender: TObject; const Point: TPointF);
       class procedure TestBookmarksRead(Sender: TObject; const Point: TPointF);
       class procedure TryDeadlock(Sender: TObject; const Point: TPointF);
+      class procedure TestLoadSession(Sender: TObject; const Point: TPointF);
   End;
 
   procedure Init(); { Call on form create }
@@ -50,6 +51,7 @@ begin
   NewTestBtn('Stress test browser', TNBoxTests.TestBrowserOnTap);
   NewTestBtn('Test bookmarks read', TNBoxTests.TestBookmarksRead);
   NewTestBtn('Try Deadlock', TNBoxTests.TryDeadlock);
+  NewTestBtn('Test load session', TNBoxTests.TestLoadSession)
 end;
 
 { TNBoxTests }
@@ -219,6 +221,17 @@ begin
       Log('Test in anonymous thread finished!');
     end;
   end).Start;
+end;
+
+class procedure TNBoxTests.TestLoadSession(Sender: TObject;
+  const Point: TPointF);
+var
+  I: integer;
+begin
+  for I := 1 to 2 do begin
+    Unit1.Form1.LoadSession;
+    Application.ProcessMessages;
+  end;
 end;
 
 class procedure TNBoxTests.TryDeadlock(Sender: TObject; const Point: TPointF);
