@@ -4167,7 +4167,8 @@ begin
   {$IFDEF COUNT_APP_OBJECTS}
   Form1.TopBottomText.Text := 'I: ' + BaseItemCounter.Count.ToString
   + ' B: ' + BookmarkItemCounter.Count.ToString
-  + ' R: ' + ReqItemCounter.Count.ToString;
+  + ' R: ' + ReqItemCounter.Count.ToString
+  + ' C: ' + CardCounter.Count.ToString;
   {$ENDIF}
   ChangeInterface(BrowserLayout);
 end;

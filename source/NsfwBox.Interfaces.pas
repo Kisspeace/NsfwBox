@@ -275,6 +275,7 @@ var
   BaseItemCounter: TRefCounter;
   BookmarkItemCounter: TRefCounter;
   ReqItemCounter: TRefCounter;
+  CardCounter: TRefCounter;
 {$ENDIF}
 
 implementation
@@ -446,6 +447,7 @@ begin
   BaseItemCounter := TRefCounter.Create;
   BookmarkItemCounter := TRefCounter.Create;
   ReqItemCounter := TRefCounter.Create;
+  CardCounter := TRefCounter.Create;
 end;
 {$ENDIF}
 

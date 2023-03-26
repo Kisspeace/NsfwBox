@@ -356,22 +356,20 @@ end;
 
 constructor TNBoxCardBase.Create(Aowner: TComponent);
 begin
+  {$IFDEF COUNT_APP_OBJECTS} CardCounter.Inc; {$ENDIF}
   inherited;
   FItem := nil;
 end;
 
 destructor TNBoxCardBase.Destroy;
 begin
+  {$IFDEF COUNT_APP_OBJECTS} CardCounter.Dec; {$ENDIF}
   try
     if Assigned(FItem) then begin
-
-      if Self.HasBookmark then begin
-        var LBobj := (FItem as TNBoxBookmark);
-        LBobj.FreeObj;
-      end;
+      if HasBookmark then
+        (FItem as TNBoxBookmark).FreeObj;
 
       FreeInterfaced(FItem);
-
     end;
 
     try
