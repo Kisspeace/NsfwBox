@@ -3589,13 +3589,8 @@ var
 
   function _getName(AGroup: TBookmarkGroupRec): string;
   begin
-    Result := AGroup.Name;
-    if Settings.DevMode then begin
-      Result := '[ id: ' + AGroup.Id.ToString + ' ] ' + Result;
-      Result := '[ LastPage: ' + AGroup.GetMaxPage.ToString + ' ] ' + Result;
-    end;
-
-    Result := '(' + AGroup.ItemsCount.ToString + ') ' + Result;
+    Result := ' ' + AGroup.Name + ' <font color="' + COLOR_TAG_TOTAL_COUNT + '">'
+      + AGroup.ItemsCount.ToString + ' </font>';
   end;
 
   function BookmarkControlById(AId: nativeint): TNBoxSettingsCheck;
@@ -3627,6 +3622,7 @@ begin
       if assigned(LControl) then begin
       { Changing already exists control }
         with LControl do begin
+          Check.Text.TextIsHtml := True;
           Check.Text.Text := _getName(LGroup);
           Text.Text := LGroup.About;
         end;
@@ -3646,6 +3642,7 @@ begin
 
           Align := TAlignLayout.Top;
           Position.Y := Single.MaxValue;
+          Check.Text.TextIsHtml := True;
           Check.Text.Text := _getName(LGroup);
           Text.Text := LGroup.About;
           Tag := LGroup.Id;
