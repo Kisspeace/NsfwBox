@@ -166,7 +166,9 @@ type
     BtnBMarkOpen,
     BtnBMarkOpenLastPage,
     BtnBMarkChange,
-    BtnBMarkDelete
+    BtnBMarkDelete,
+    BtnBMarkPushUp,
+    BtnBMarkPushDown
     : TRectButton;
     ButtonsBMark: TControlList;
 
@@ -303,6 +305,8 @@ type
     procedure BtnSearchAddBookmarkOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSearchSetDefaultOnTap(Sender: TObject; const Point: TPointF);
     { -> Bookmark menu buttons ---- }
+    procedure MoveBookmarkGroupOrderIndex(AGroupId: UInt64; AMoveValue: integer);
+    procedure DeleteFromBookmarkGroupOrder(AGroupId: UInt64);
     procedure BtnBMarkSaveChangesOnTap(Sender: TObject; const Point: TPointF);
     procedure BMarkOpen(AOpenLastPage: boolean);
     procedure BtnBMarkOpenOnTap(Sender: TObject; const Point: TPointF);
@@ -310,6 +314,8 @@ type
     procedure BtnBMarkChangeOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnBMarkCreateOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnBMarkDeleteOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnBMarkPushUpOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnBMarkPushDownOnTap(Sender: TObject; const Point: TPointF);
     { -> Dialog Yes or No --------- }
     procedure BtnDialogYesOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnDialogNoOnTap(Sender: TObject; const Point: TPointF);
@@ -845,6 +851,7 @@ var
   Group: TBookmarkGroupRec;
 begin
   Group := BookmarksDb.AddGroup('New ' + DateTimeToStr(now), 'New bookmarks group.');
+  MoveBookmarkGroupOrderIndex(Group.Id, 1);
   FCurrentBookmarkGroup := Group;
   ChangeInterface(MenuBookmarksChange);
 
@@ -872,7 +879,9 @@ begin
 
         if CurrentBookmarksDb = BookmarksDb then begin
           CurrentBookmarksDb.DeleteAllGroups;
-          BookmarksControls.Clear
+          BookmarksControls.Clear;
+          Settings.BookmarksOrder.Clear;
+          SaveSettings;
         end else if CurrentBookmarksDb = HistoryDb then begin
           CurrentBookmarksDb.DeleteAllItems;
           HistoryDbControls.Clear;
@@ -902,6 +911,7 @@ begin
         end else if (CurrentBookmarksDb = BookmarksDb) then begin
           CurrentBookmarkGroup.DeleteGroup;
           BookmarksControls.Clear;
+          DeleteFromBookmarkGroupOrder(CurrentBookmarkGroup.Id);
         end;
 
         CurrentBookmarkControl := nil;
@@ -976,6 +986,47 @@ end;
 procedure TForm1.BtnBMarkOpenOnTap(Sender: TObject; const Point: TPointF);
 begin
   BMarkOpen(False);
+end;
+
+procedure TForm1.MoveBookmarkGroupOrderIndex(AGroupId: UInt64; AMoveValue: integer);
+var
+  LIndex, LSwapWithIndex: integer;
+  LOrder: TList<Int64>;
+begin
+  if AMoveValue = 0 then exit;
+  LOrder := Settings.BookmarksOrder;
+  LIndex := LOrder.IndexOf(AGroupId);
+
+  if (LIndex <> -1) then
+  begin
+    if AMoveValue < 0 then
+      LSwapWithIndex := LIndex - AMoveValue
+    else
+      LSwapWithIndex := LIndex - AMoveValue;
+
+    if LSwapWithIndex < 0 then
+      LSwapWithIndex := 0
+    else if LSwapWithIndex > (LOrder.Count - 1) then
+      LSwapWithIndex := LOrder.Count - 1;
+
+    if LIndex = LSwapWithIndex then exit;
+    LOrder.Exchange(LIndex, LSwapWithIndex)
+  end else if (AMoveValue > 0) then
+    LOrder.Add(AGroupId);
+
+  SaveSettings;
+end;
+
+procedure TForm1.BtnBMarkPushDownOnTap(Sender: TObject; const Point: TPointF);
+begin
+  if Assigned(CurrentBookmarkControl) then
+    MoveBookmarkGroupOrderIndex(CurrentBookmarkGroup.Id, -1);
+end;
+
+procedure TForm1.BtnBMarkPushUpOnTap(Sender: TObject; const Point: TPointF);
+begin
+  if Assigned(CurrentBookmarkControl) then
+    MoveBookmarkGroupOrderIndex(CurrentBookmarkGroup.Id, 1);
 end;
 
 procedure TForm1.BtnBMarkSaveChangesOnTap(Sender: TObject; const Point: TPointF);
@@ -1298,7 +1349,9 @@ begin
   end else if ( ALayout = MenuBookmarksDoList ) then begin
   { Menu with list of actions for selected bookmark list }
     _ChangeMenuMode(ButtonsBMark, DoWithAllItems);
-    BtnBmarkCreate.Visible := DoWithAllItems;
+    BtnBMarkCreate.Visible := DoWithAllItems;
+    BtnBMarkPushUp.Visible := not (CurrentBookmarksDb = HistoryDb);
+    BtnBMarkPushDown.Visible := BtnBMarkPushUp.Visible;
 
   end else if ( ALayout = MenuItem ) then begin
   { Menu with CurrentItem (card) actions }
@@ -1689,6 +1742,18 @@ begin
   Browsers.Delete(LBrowserIndex);
   Tabs.Delete(LTabIndex);
   BlackHole.Throw(ABrowser);
+end;
+
+procedure TForm1.DeleteFromBookmarkGroupOrder(AGroupId: UInt64);
+var
+  LIndex: integer;
+begin
+  LIndex := Settings.BookmarksOrder.IndexOf(AGroupId);
+  if (LIndex <> -1) then
+  begin
+    Settings.BookmarksOrder.Delete(LIndex);
+    SaveSettings;
+  end;
 end;
 
 procedure TForm1.ExecItemInteraction(AItem: TNBoxCardBase;
@@ -2462,6 +2527,8 @@ begin
   BtnBMarkOpenLastPage := AddBMarksDoListButton('Open and show (last page)', ICON_NEWTAB, BtnBMarkOpenLastPageOnTap, TAG_CAN_USE_MORE_THAN_ONE);
   BtnBMarkChange := AddBMarksDoListButton('Change bookmark list', ICON_EDIT, BtnBMarkChangeOnTap);
   BtnBMarkDelete := AddBMarksDoListButton('Delete', ICON_DELETE, BtnBMarkDeleteOnTap, TAG_CAN_USE_MORE_THAN_ONE);
+  BtnBMarkPushUp := AddBMarksDoListButton('Push up in the list', ICON_CURRENT_TAB, BtnBMarkPushUpOnTap);
+  BtnBMarkPushDown := AddBMarksDoListButton('Push down in the list', ICON_CURRENT_TAB, BtnBMarkPushDownOnTap);
 
   DialogYesOrNo.Padding.Rect := TRectF.Create(10, 10, 10, 10);
 
@@ -3461,6 +3528,7 @@ function TForm1.LoadSettings: boolean;
 var
   NewSettings: TNsfwBoxSettings;
   X: ISuperObject;
+  JsonStr: String;
 begin
   try
     try
@@ -3469,7 +3537,9 @@ begin
 
       if Result then begin
         X := TSuperObject.ParseFile(SETTINGS_FILENAME);
-        NewSettings := TNsfwBoxSettings.FromJSON(X);
+        JsonStr := X.AsJSON;
+        NewSettings := TNSfwBoxSettings.Create;
+        NewSettings.AssignFromJSONStr(JsonStr);
         Settings := NewSettings;
       end;
     except
@@ -3586,6 +3656,7 @@ var
   LGroup: TBookmarkGroupRec;
   LControl: TNBoxSettingsCheck;
   LControls: TControlObjList;
+  LOrder: TList<Int64>;
 
   function _getName(AGroup: TBookmarkGroupRec): string;
   begin
@@ -3664,6 +3735,19 @@ begin
       end;
 
     end;
+
+    { applying order of groups }
+    if ADataBase = BookmarksDb then
+    begin
+      LOrder := Settings.BookmarksOrder;
+      for I := LOrder.Count - 1 downto 0 do
+      begin
+        LControl := BookmarkControlById(LOrder[I]);
+        if not Assigned(LControl) then Continue;
+        LControl.Position.Y := 0 + I; { push up }
+      end;
+    end;
+
   except
     On E: Exception do
       Log('ReloadBookmarks', E);
@@ -3905,9 +3989,13 @@ end;
 {$ENDIF}
 
 procedure TForm1.SaveSettings;
+var
+  LFile: TFileStream;
 begin
   Settings.SemVer := APP_VERSION;
-  Settings.AsJSONObject.SaveTo(SETTINGS_FILENAME, true);
+  if FileExists(SETTINGS_FILENAME) then
+    TFile.Delete(SETTINGS_FILENAME);
+  WriteToFile(SETTINGS_FILENAME, Settings.ToJsonStr);
 end;
 
 procedure TForm1.SaveSettingsChanges;
@@ -3982,6 +4070,11 @@ begin
 
     if AutoSaveSession then
       ConnectSession;
+
+    if Assigned(Settings) then begin
+      BookmarksOrder.Clear;
+      BookmarksOrder.AddRange(Settings.BookmarksOrder.ToArray);
+    end;
   end;
 
   Settings := NewSet;

@@ -4,7 +4,9 @@ unit NsfwBox.Settings;
 
 interface
 uses
-  Classes, XSuperObject, system.Generics.Collections, NsfwBox.UpdateChecker;
+  Classes, System.SysUtils, XSuperObject, system.Generics.Collections,
+  NsfwBox.UpdateChecker,
+  NsfwBox.Logging;
 
 Const
 
@@ -33,46 +35,53 @@ type
 
   TNBoxItemInteractions = TArray<TNBoxItemInteraction>;
 
+  TInt64Ar = TArray<Int64>;
+
   TNsfwBoxSettings = class
-    SemVer: TSemVer;
-    DefaultUseragent: string;
-    AllowCookies: boolean;
-    DefDownloadPath: string;
-    StyleName: string;
-    ThreadsCount: integer;
-    ContentLayoutsCount: integer;
-    ItemIndent: single;
-    Fullscreen: boolean;
-    AutoSaveSession: boolean;
-    SaveSearchHistory: boolean;
-    SaveDownloadHistory: boolean;
-    SaveTapHistory: boolean;
-    SaveClosedTabHistory: boolean;
-    BrowseNextPageByScrollDown: boolean;
-    ImageCacheSave: boolean;
-    ImageCacheLoad: boolean;
-    AutoAcceptAllCertificates: boolean;
-    YDWSyncLoadFromFile: boolean;
-    ShowCaptions: boolean;
-    MaxDownloadThreads: integer;
-    AutoStartBrowse: boolean;
-    AllowDuplicateTabs: boolean;
-    AutoCloseItemMenu: boolean;
-    ItemInteractions: TNBoxItemInteractions;
-    FilenameLogUrls: string;
-    DevMode: boolean;
-    AutoCheckUpdates: boolean;
-    ShowScrollBars: boolean;
-    ShowNavigateBackButton: boolean;
-    EnableAllContent: boolean;
-    FetchAllBeforeAddBookmark: boolean;
-    {$IFDEF MSWINDOWS}
-      UseNewAppTitlebar: boolean;
-      ContentPlayApp: string;
-      ContentPlayParams: string;
-    {$ENDIF}
-    procedure Assign(ASource: TNsfwBoxSettings);
-    constructor Create;
+    public
+      SemVer: TSemVer;
+      DefaultUseragent: string;
+      AllowCookies: boolean;
+      DefDownloadPath: string;
+      StyleName: string;
+      ThreadsCount: integer;
+      ContentLayoutsCount: integer;
+      ItemIndent: single;
+      Fullscreen: boolean;
+      AutoSaveSession: boolean;
+      SaveSearchHistory: boolean;
+      SaveDownloadHistory: boolean;
+      SaveTapHistory: boolean;
+      SaveClosedTabHistory: boolean;
+      BrowseNextPageByScrollDown: boolean;
+      ImageCacheSave: boolean;
+      ImageCacheLoad: boolean;
+      AutoAcceptAllCertificates: boolean;
+      YDWSyncLoadFromFile: boolean;
+      ShowCaptions: boolean;
+      MaxDownloadThreads: integer;
+      AutoStartBrowse: boolean;
+      AllowDuplicateTabs: boolean;
+      AutoCloseItemMenu: boolean;
+      ItemInteractions: TNBoxItemInteractions;
+      FilenameLogUrls: string;
+      DevMode: boolean;
+      AutoCheckUpdates: boolean;
+      ShowScrollBars: boolean;
+      ShowNavigateBackButton: boolean;
+      EnableAllContent: boolean;
+      FetchAllBeforeAddBookmark: boolean;
+      {$IFDEF MSWINDOWS}
+        UseNewAppTitlebar: boolean;
+        ContentPlayApp: string;
+        ContentPlayParams: string;
+      {$ENDIF}
+      [DISABLE] BookmarksOrder: TList<Int64>; { order of items (ids) in bookmarks menu  }
+      function ToJsonStr: String;
+      procedure AssignFromJsonStr(const AJson: String);
+      procedure Assign(ASource: TNsfwBoxSettings);
+      constructor Create;
+      destructor Destroy; override;
   end;
 
 
@@ -83,7 +92,29 @@ implementation
 
 procedure TNsfwBoxSettings.Assign(ASource: TNsfwBoxSettings);
 begin
-  Self.AssignFromJSON(ASource.AsJSONObject);
+  Self.AssignFromJsonStr(ASource.ToJsonStr);
+end;
+
+procedure TNsfwBoxSettings.AssignFromJsonStr(const AJson: String);
+var
+  X: ISuperObject;
+  Ar: TInt64Ar;
+  I: integer;
+begin
+  X := SO(AJson);
+  Self.AssignFromJson(X);
+
+  if X.Null['BookmarksOrder'] = jAssigned then
+  begin
+    var A: ISuperArray := X.A['BookmarksOrder'];
+    SetLength(Ar, A.Length);
+    for I := 0 to A.Length - 1 do
+      Ar[I] := A.I[I];
+  end;
+//  Ar := TJson.Parse<TInt64Ar>(X.A['BookmarksOrder']); { <- dont work }
+
+  BookmarksOrder.Clear;
+  BookmarksOrder.AddRange(Ar);
 end;
 
 constructor TNsfwBoxSettings.Create;
@@ -128,6 +159,25 @@ begin
   ImageCacheLoad := True;
   AutoAcceptAllCertificates := False;
   YDWSyncLoadFromFile := False;
+  BookmarksOrder := TList<Int64>.Create;
+end;
+
+destructor TNsfwBoxSettings.Destroy;
+begin
+  BookmarksOrder.Free;
+  inherited;
+end;
+
+function TNsfwBoxSettings.ToJsonStr: String;
+var
+  X: ISuperObject;
+  A: ISuperArray;
+  I: integer;
+begin
+  X := Self.AsJSONObject;
+  A :=  TJson.SuperObject<TInt64Ar>(BookmarksOrder.ToArray).AsArray;
+  X.A['BookmarksOrder'] := A;
+  Result := X.AsJSON(True);
 end;
 
 end.
