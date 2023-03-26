@@ -23,7 +23,7 @@ Developed on RAD Studio 11 Alexandria.
   <img src="./assets/github/screenshot_win_1.jpg" width="97%"/> 
 </div>
 
-[✨ About design ✨](./assets/themes#readme)
+[✨ About user interface design ✨](./assets/themes#readme)
 
 #### Supported sites / APIs:
 * <img src="https://nsfw.xxx/favicon.ico" width="24" align="left">[nsfw.xxx](https://nsfw.xxx), [pornpic.xxx](https://pornpic.xxx/), [hdporn.pics](https://hdporn.pics/)
@@ -39,26 +39,38 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="assets/themes/default/content-origin-11.png" width="24" align="left">[rule34.us](https://rule34.us)
 * <img src="assets/themes/default/content-origin-12.png" width="24" align="left">[rule34.paheal.net](https://rule34.paheal.net)
 * <img src="assets/themes/default/content-origin-13.png" width="24" align="left">[xbooru.com](https://xbooru.com)
+* <img src="assets/themes/default/content-origin-15.png" width="24" align="left">[tbib.org](https://tbib.org)
+* <img src="assets/themes/default/content-origin-16.png" width="24" align="left">[danbooru.donmai.us](https://Danbooru.donmai.us)
+* <img src="assets/themes/default/content-origin-14.png" width="24" align="left">[hypnohub.net](https://hypnohub.net)
+* <img src="assets/themes/default/content-origin-17.png" width="24" align="left">[booru.allthefallen.moe](https://Booru.allthefallen.moe)
+* <img src="assets/themes/default/content-origin-16.png" width="24" align="left">[bleachbooru.org](https://bleachbooru.org)
 <!-- * <img src="assets/themes/default/" width="24" align="left">[]() -->
 
-#### Dependencies:
-* [Alcinoe](https://github.com/Zeus64/alcinoe)
-* [ZeosLib 8.0](https://sourceforge.net/p/zeoslib/code-0/HEAD/tree/branches/8.0-patches/)
-* [x-superobject](https://github.com/onryldz/x-superobject)
-* [you-did-well](https://github.com/Kisspeace/you-did-well)
-* [HTMLp](https://github.com/RomanYankovsky/HTMLp)
-* [delphi-r34.app-api-wrapper](https://github.com/Kisspeace/delphi-r34.app-api-wrapper)
-* [delphi-r34-json-api-wrapper](https://github.com/Kisspeace/delphi-r34-json-api-wrapper)
-* [delphi-nsfw.xxx-scraper](https://github.com/Kisspeace/delphi-nsfw.xxx-scraper)
-* [delphi-givemeporn.club-scraper](https://github.com/Kisspeace/delphi-givemeporn.club-scraper)
-* [delphi-9hentai.to-api-wrapper](https://github.com/Kisspeace/delphi-9hentai.to-api-wrapper)
-* [coomer.party-scraper](https://github.com/Kisspeace/coomer.party-scraper)
-* [motherless.com-scraper](https://github.com/Kisspeace/motherless.com-scraper)
-* [fapello.com-scraper](https://github.com/Kisspeace/fapello.com-scraper)
-* [BooruScraper](https://github.com/Kisspeace/BooruScraper)
-* [Kastri](https://github.com/DelphiWorlds/Kastri)
+<details>
+    <summary>Dependencies list.</summary>
+    <pre>
+    <a href="https://github.com/Zeus64/Alcinoe">Alcinoe</a>
+    <a href="https://sourceforge.net/p/zeoslib/code-0/HEAD/tree/branches/8.0-patches/">ZeosLib 8.0</a>
+    <a href="https://github.com/csm101/x-superobject">x-superobject</a>
+    <a href="https://github.com/Kisspeace/you-did-well">you-did-well</a>
+    <a href="https://github.com/RomanYankovsky/HTMLp">HTMLp</a>
+    <a href="https://github.com/ying32/htmlparser">htmlparser</a>
+    <a href="https://github.com/Kisspeace/delphi-r34.app-api-wrapper">delphi-r34.app-api-wrapper</a>
+    <a href="https://github.com/Kisspeace/delphi-r34-json-api-wrapper">delphi-r34-json-api-wrapper</a>
+    <a href="https://github.com/Kisspeace/delphi-nsfw.xxx-scraper">delphi-nsfw.xxx-scraper</a>
+    <a href="https://github.com/Kisspeace/delphi-givemeporn.club-scraper">delphi-givemeporn.club-scraper</a>
+    <a href="https://github.com/Kisspeace/delphi-9hentai.to-api-wrapper">delphi-9hentai.to-api-wrapper</a>
+    <a href="https://github.com/Kisspeace/coomer.party-scraper">coomer.party-scraper</a>
+    <a href="https://github.com/Kisspeace/motherless.com-scraper">motherless.com-scraper</a>
+    <a href="https://github.com/Kisspeace/fapello.com-scraper">fapello.com-scraper</a>
+    <a href="https://github.com/Kisspeace/BooruScraper">BooruScraper</a>
+    <a href="https://github.com/DelphiWorlds/Kastri">Kastri</a>
+    <!-- <a href=""></a> -->
+    </pre>
+</details>  
+   
 
-#### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.3.0/Kisspeace.NsfwBox.v2.3.0.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.3.0/Kisspeace.NsfwBox-ins32.v2.3.0.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.3.0/Kisspeace.NsfwBox-ins64.v2.3.0.exe)  
+### Download last release:
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.4.0/Kisspeace.NsfwBox.v2.4.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.4.0/Kisspeace.NsfwBox-ins32.v2.4.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.4.0/Kisspeace.NsfwBox-ins64.v2.4.0.exe)  

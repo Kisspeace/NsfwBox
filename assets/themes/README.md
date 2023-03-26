@@ -45,6 +45,12 @@
 * <img src="default/content-origin-9.png" width="24" align="left"> [gelbooru.com](https://gelbooru.com) -> [Item page](https://gelbooru.com/layout/gelbooru-logo.svg)
 * <img src="default/content-origin-10.png" width="24" align="left"> [realbooru.com](https://realbooru.com) favicon (upscaled) -> [Item page](https://realbooru.com/favicon.ico)
 * <img src="default/content-origin-11.png" width="24" align="left"> [rule34.us](https://rule34.us) favicon (upscaled) -> [Item page](https://rule34.us/favicon.png)
+* <img src="default/content-origin-12.png" width="24" align="left"> [rule34.paheal.net](https://rule34.paheal.net) apple-touch-icon -> [Item page](https://rule34.paheal.net/apple-touch-icon.png)
+* <img src="default/content-origin-13.png" width="24" align="left"> [xbooru.com](https://xbooru.com) favicon (upscaled) -> [Item page](https://xbooru.com/favicon.ico)
+* <img src="default/content-origin-14.png" width="24" align="left"> [hypnohub.net](https://hypnohub.net) favicon -> [Item page](https://hypnohub.net/favicon.ico?v=2)
+* <img src="default/content-origin-15.png" width="24" align="left"> [tbib.org](https://tbib.org) favicon (upscaled) -> [Item page](https://tbib.org/favicon.ico)
+* <img src="default/content-origin-16.png" width="24" align="left"> [danbooru.donmai.us](https://danbooru.donmai.us) favicon (upscaled) -> [Item page](https://danbooru.donmai.us/favicon.svg)
+* <img src="default/content-origin-17.png" width="24" align="left"> [allthefallen.moe](https://allthefallen.moe) favicon (upscaled) -> [Item page](https://allthefallen.moe/catchpage/favicon.ico)
 <!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON_URL) -->
 
 
