@@ -26,8 +26,8 @@ uses
   BooruScraper.Client.rule34us,
   BooruScraper.Client.rule34PahealNet,
   BooruScraper.Parser.rule34PahealNet,
-  BooruScraper.Urls,
-  BooruScraper.ClientBase, BooruScraper, NsfwBox.Provider.BooruScraper;
+  BooruScraper.Urls, BooruScraper.ClientBase, BooruScraper,
+  NsfwBox.Provider.BooruScraper, NsfwBox.Utils;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -711,10 +711,12 @@ var
 begin
   Result := false;
   Randomize;
-  if (length(AProviders) < 1) then
-    Exit;
+
+  if (length(AProviders) < 1) then Exit;
+
   LProvider := System.Math.RandomFrom(AProviders);
   LRequest := CreateReqByOrigin(LProvider);
+
   if (LRequest is TNBoxSearchReqNsfwXxx) then
   begin
     LRequest.Pageid := RandomRange(1, 50);
@@ -747,11 +749,11 @@ begin
   begin
     LRequest.Pageid := RandomRange(0, 5119);
   end;
+
   try
     Result := Self.GetContent(LRequest, AList);
   finally
-    FreeAndNil(LRequest as TObject);
-    LRequest := Nil;
+    FreeInterfaced(LRequest);
   end;
 end;
 
