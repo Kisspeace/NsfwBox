@@ -1684,12 +1684,15 @@ begin
       end;
 
       if ( Result.IsEmpty ) then
-        Result := 'empty';
+        Result := 'Empty';
 
     end;
 
-    Result := Result + ': ' + Req.PageId.ToString + ' | '
-      + ABrowser.Items.Count.ToString;
+    Result := Result + ' '
+      + '<font color="' + COLOR_TAG_CHARACTER+ '">'
+      + Req.PageId.ToString + '</font> : '
+      + '<font color="' + COLOR_TAG_TOTAL_COUNT + '">'
+      + ABrowser.Items.Count.ToString + '</font>';
   finally
     try
       FreeInterfaced(Req);
@@ -3067,6 +3070,7 @@ begin
   try
     if not Assigned(LTab) then Exit;
 
+    LTab.Text.TextIsHtml := True;
     LTab.Text.Text := CreateTabText(LBrowser);
     LNewTabImageName := AppStyle.GetImagePath(LReq.Origin);
     if LNewTabImageName <> LTab.Image.ImageURL then
