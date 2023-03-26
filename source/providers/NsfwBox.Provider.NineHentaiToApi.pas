@@ -106,9 +106,12 @@ end;
 
 constructor TNBox9HentaitoItem.Create(AWithItem: boolean);
 begin
+  Inherited Create;
   FOrigin := PROVIDERS.NineHentaiTo.Id;
   if AWithItem then
-    FItem := T9HentaiBook.Create;
+    FItem := T9HentaiBook.Create
+  else
+    FItem := Nil;
 end;
 
 destructor TNBox9HentaitoItem.Destroy;
