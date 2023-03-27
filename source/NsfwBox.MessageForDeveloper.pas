@@ -5,10 +5,13 @@ unit NsfwBox.MessageForDeveloper;
 interface
 uses
   Classes, SysUtils, Net.HttpClient, Net.HttpClientComponent,
-  XSuperObject, System.NetEncoding;
+  XSuperObject, System.NetEncoding, NsfwBox.Logging, NsfwBox.Utils;
 
 
   function SendMessage(ANickname, AMessage: string): boolean;
+
+const
+  MAX_MSG_LENGTH = 2000;
 
 implementation
 uses unit1;
@@ -28,6 +31,9 @@ begin
   Result := false;
   Json := SO();
   ANickname := trim(ANickName);
+
+  if (AMessage.Length > MAX_MSG_LENGTH) then
+    AMessage := AMessage.Substring(MAX_MSG_LENGTH - AMessage.Length, MAX_MSG_LENGTH);
 
   if ( not ANickname.IsEmpty ) then
     Json.S['username'] := ANickname;

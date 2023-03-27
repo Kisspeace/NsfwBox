@@ -255,6 +255,7 @@ type
     EditNickMsgForDev: TNBoxEdit;
     MemoMsgForDev: TNBoxMemo;
     BtnSendMsgForDev: TRectButton;
+    BtnSendLogs: TRectButton;
 
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
@@ -286,10 +287,12 @@ type
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
+    { -> Send message for dev ----- }
+    procedure BtnSetAnonMsgOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnSendLogsOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnSendMsgForDevOnTap(Sender: TObject; const Point: TPointF);
     { ----------------------------- }
     procedure BtnOpenAppRepOnTap(Sender: TObject; const Point: TPointF);
-    procedure BtnSetAnonMsgOnTap(Sender: TObject; const Point: TPointF);
-    procedure BtnSendMsgForDevOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetChangeThemeOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnItemMenuOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetViewLogOnTap(Sender: TObject; const Point: TPointF);
@@ -422,6 +425,7 @@ var
   APP_VERSION: TSemVer; // Current application version
 
   LOG_FILENAME         : string = 'log.txt';
+  YDW_LOG_FILENAME     : string = 'you-did-well-debug-log.txt';
   SETTINGS_FILENAME    : string = 'settings.json';
   BOOKMARKSDB_FILENAME : string = 'bookmarks.sqlite';
   SESSION_FILENAME     : string = 'session.sqlite';
@@ -1172,6 +1176,31 @@ procedure TForm1.BtnSearchSetDefaultOnTap(Sender: TObject;
   const Point: TPointF);
 begin
 
+end;
+
+procedure TForm1.BtnSendLogsOnTap(Sender: TObject; const Point: TPointF);
+var
+  LFinalMsg: String;
+  LSuccess: boolean;
+begin
+  try
+    if FileExists(YDW_LOG_FILENAME) then begin
+      LFinalMsg := TFile.ReadAllText(YDW_LOG_FILENAME);
+      LFinalMsg := LFinalMsg + SLineBreak;
+    end;
+
+    if FileExists(LOG_FILENAME) then
+      LFinalMsg := LoadCompressedLog(MAX_MSG_LENGTH - LFinalMsg.Length);
+
+    LSuccess := SendMessage(EditNickMsgForDev.Edit.Text, LFinalMsg);
+  except
+    LSuccess := False;
+  end;
+
+  if LSuccess then begin
+    Showmessage('Logs sended successfully!');
+  end else
+    ShowMessage('Error.');
 end;
 
 procedure TForm1.BtnSendMsgForDevOnTap(Sender: TObject; const Point: TPointF);
@@ -2077,6 +2106,8 @@ begin
   SESSION_FILENAME := TPath.Combine(TNBoxPath.GetAppMainPath, SESSION_FILENAME);
   HISTORY_FILENAME := TPath.Combine(TNBoxPath.GetAppMainPath, HISTORY_FILENAME);
   LOG_FILENAME := TPath.Combine(TNBoxPath.GetAppMainPath, LOG_FILENAME);
+  YDW_LOG_FILENAME := TPath.Combine(TNBoxPath.GetAppMainPath, YDW_LOG_FILENAME);
+
   TNBoxPath.CreateThumbnailsDir;
   FSettings := nil;
   FAppStyle := TNBoxGuiStyle.Create;
@@ -2350,18 +2381,22 @@ begin
   BtnDeleteBookmark := AddItemMenuBtn('Delete from bookmarks', ACTION_DELETE_BOOKMARK, ICON_DELETE, TAG_CAN_USE_MORE_THAN_ONE);
   BtnDeleteCard     := AdditemMenuBtn('Delete (free object)', ACTION_DELETE_CARD, ICON_DELETE, TAG_CAN_USE_MORE_THAN_ONE);
 
-  BtnOpenAppRep := AddSettingsButton('Author: Kisspeace ' + SLineBreak + 'Click to open GitHub repository', ICON_NSFWBOX);
+  BtnOpenAppRep := AddSettingsButton('Author: <font color="'
+    + COLOR_TAG_CHARACTER + '">Kisspeace</font> ' + SLineBreak
+    + 'Click to open GitHub repository', ICON_NSFWBOX);
   with BtnOpenAppRep do begin
     OnTap := BtnOpenAppRepOnTap;
     Height := Height * 1.5;
     Text.WordWrap := true;
+    Text.TextIsHtml := True;
   end;
 
-  BtnSetAnonMsg := AddSettingsButtonC('Anonymous message for developer', '', TNBoxImageTypes.AlRect);
+  BtnSetAnonMsg := AddSettingsButtonC('Anonymous message for <font color="' + COLOR_TAG_CHARACTER + '">developer</font>', '', TNBoxImageTypes.AlRect);
   with BtnSetAnonMsg do begin
     OnTap := BtnSetAnonMsgOnTap;
     Height := Height * 1.25;
     Text.WordWrap := true;
+    Text.TextIsHtml := True;
     with ImageControl as TNBoxImageTypes.AlRect do begin
       XRadius := 10;
       YRadius := XRadius;
@@ -2594,7 +2629,17 @@ begin
     Align := TAlignLayout.Client;
   end;
 
-  BtnSendMsgForDev := Self.CreateDefButton(MenuAnonMessage, BTN_STYLE_DEF2);
+  BtnSendLogs := CreateDefButton(MenuAnonMessage, BTN_STYLE_DEF2);
+  with BtnSendLogs do begin
+    Margins := EditNickMsgForDev.Margins;
+    Parent := MenuAnonMessage;
+    Align := TAlignlayout.Bottom;
+    Text.Text := 'Send logs';
+    Image.ImageURL := AppStyle.GetImagePath(ICON_NSFWBOX);
+    OnTap := BtnSendLogsOnTap;
+  end;
+
+  BtnSendMsgForDev := CreateDefButton(MenuAnonMessage, BTN_STYLE_DEF2);
   with BtnSendMsgForDev do begin
     Margins := EditNickMsgForDev.Margins;
     Margins.Bottom := Margins.Top;
@@ -2604,6 +2649,8 @@ begin
     Image.ImageURL := AppStyle.GetImagePath(ICON_TRANS);
     OnTap := BtnSendMsgForDevOnTap;
   end;
+
+
 
   { MenuSearchDoList }
   BtnSearchAddBookmark := AddMenuSearchBtn('Add current request to bookmarks', ICON_BOOKMARKS, BtnSearchAddBookmarkOnTap);
