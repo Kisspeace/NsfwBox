@@ -21,6 +21,7 @@ type
       class procedure TestBookmarksRead(Sender: TObject; const Point: TPointF);
       class procedure TryDeadlock(Sender: TObject; const Point: TPointF);
       class procedure TestLoadSession(Sender: TObject; const Point: TPointF);
+      class procedure TestCompressLog(Sender: TObject; const Point: TPointF);
   End;
 
   procedure Init(); { Call on form create }
@@ -51,7 +52,8 @@ begin
   NewTestBtn('Stress test browser', TNBoxTests.TestBrowserOnTap);
   NewTestBtn('Test bookmarks read', TNBoxTests.TestBookmarksRead);
   NewTestBtn('Try Deadlock', TNBoxTests.TryDeadlock);
-  NewTestBtn('Test load session', TNBoxTests.TestLoadSession)
+  NewTestBtn('Test load session', TNBoxTests.TestLoadSession);
+  NewTestBtn('Show compressed log', TNBoxTests.TestCompressLog);
 end;
 
 { TNBoxTests }
@@ -158,6 +160,16 @@ begin
         Log('TestButton', E);
     end;
   end).Start;
+end;
+
+class procedure TNBoxTests.TestCompressLog(Sender: TObject;
+  const Point: TPointF);
+var
+  LLog: string;
+begin
+  LLog := LoadCompressedLog(2000);
+  Unit1.Form1.ChangeInterface(Form1.MenuLog);
+  Unit1.Form1.MemoLog.Memo.Text := LLog;
 end;
 
 class procedure TNBoxTests.TestDownloadsOnTap(Sender: TObject; const Point: TPointF);

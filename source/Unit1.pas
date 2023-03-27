@@ -1190,15 +1190,16 @@ begin
     end;
 
     if FileExists(LOG_FILENAME) then
-      LFinalMsg := LoadCompressedLog(MAX_MSG_LENGTH - LFinalMsg.Length);
+      LFinalMsg := LFinalMsg + LoadCompressedLog(MAX_MSG_LENGTH - LFinalMsg.Length);
 
-    LSuccess := SendMessage(EditNickMsgForDev.Edit.Text, LFinalMsg);
+    LSuccess := SendMessage(EditNickMsgForDev.Edit.Text, LFinalMsg, True);
   except
     LSuccess := False;
   end;
 
   if LSuccess then begin
     Showmessage('Logs sended successfully!');
+    BtnSendLogs.Visible := False;
   end else
     ShowMessage('Error.');
 end;
@@ -1325,6 +1326,10 @@ begin
   { Need to free bitmap on image viewer }
   if MenuImageViewer.Visible then
     Form1.ClearControlBitmap(MenuImageViewer);
+
+  { Clear lines from log memo when user go away }
+  if MenuLog.Visible then
+    MemoLog.Memo.Lines.Clear;
 
   Form1.MVMenu.HideMaster;
   for I := 0 to MainLayout.Controls.Count - 1 do begin

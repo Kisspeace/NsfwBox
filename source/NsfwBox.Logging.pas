@@ -17,7 +17,6 @@ type
   procedure Log(AText: string); overload;
 
   function LoadCompressedLog(AUpToCharsCount: integer): string;
-
 var
   LogFile: TLogFile;
 
@@ -32,6 +31,48 @@ end;
 procedure Log(AText: string);
 begin
   LogFile.Log(AText);
+end;
+
+procedure CompressDuplicates(var Source: TStrings);
+var
+  I, N: integer;
+  LPos: integer;
+  LStr: string;
+  LCount: integer;
+
+  function CountStr(const AStr: string; Start: integer; out LastIndex: integer): integer;
+  var
+    I: integer;
+  begin
+    LastIndex := Start;
+    Result := 0;
+    for I := Start to Source.Count - 1 do
+    begin
+      if not (AStr = Source[I]) then break
+      else begin
+        LastIndex := I;
+        Inc(Result);
+      end;
+    end;
+  end;
+
+begin
+  I := 0; { first string }
+  while True do begin
+    if (Source.Count <= I) then break;
+    LStr := Source[I]; { Current string }
+    LPos := I;
+
+    LCount := CountStr(LStr, I + 1, I);
+    if (LCount > 0) then
+    begin
+      { Save message about dup count }
+      Source[LPos + 1] := '^+' + LCount.ToString;
+      for N := LPos + 2 to I do
+        Source[N] := ''; { Clear duplicate }
+    end;
+
+  end;
 end;
 
 function LoadCompressedLog(AUpToCharsCount: integer): string;
@@ -104,28 +145,7 @@ begin
         LStrings[I] := LStr;
       end;
 
-      { Compress same lines }
-      I := 0;
-      LDupCount := 0;
-      LStr:= '';
-      while True do begin
-        if (I >= LStrings.Count) then break;
-        if (LStr = LStrings[I]) then
-        begin
-          if not LStr.IsEmpty then
-            Inc(LDupCount);
-        end else begin
-          if (LDupCount > 0) then begin
-            LStrings.Insert(I + 1, '^+' + LDupCount.ToString);
-            for N := I downto (I - LDupCount) do
-              LStrings[N] := '';
-            Inc(I);
-          end;
-          LStr := LStrings[I];
-          LDupCount := 0;
-        end;
-        Inc(I);
-      end;
+      CompressDuplicates(LStrings);
 
       { Delete empty lines }
       I := 0;
