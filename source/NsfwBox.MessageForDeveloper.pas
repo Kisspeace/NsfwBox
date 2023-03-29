@@ -46,8 +46,6 @@ begin
     Json.S['username'] := ANickname;
   Json.S['content'] := AMessage;
 
-  Log(AMessage);
-
   Client := TNetHttpClient.Create(nil);
   Client.UserAgent := 'Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0';
   Client.ContentType := 'application/json';
