@@ -18,10 +18,12 @@ Developed on RAD Studio 11 Alexandria.
   <img src="./assets/github/screenshot_3.jpg" width="32%"/>
 </div>
 
-#### Windows:
-<div>
-  <img src="./assets/github/screenshot_win_1.jpg" width="97%"/> 
-</div>
+<details>
+    <summary>Windows:</summary>
+    <pre>
+     <img src="./assets/github/screenshot_win_1.jpg" width="97%"/> 
+    </pre>
+</details> 
 
 [✨ About user interface design ✨](./assets/themes#readme)
 
