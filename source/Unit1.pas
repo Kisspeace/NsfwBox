@@ -3789,12 +3789,20 @@ begin
 
         LControls.Add(LControl);
       end;
-
     end;
 
-    { applying order of groups }
     if ADataBase = BookmarksDb then
     begin
+      { Saving order of groups (v?.?.? -> >=v2.4.0) }
+      if (Settings.BookmarksOrder.Count = 0)
+      and (Length(LGroups) > 0) then
+      begin
+        for I := Low(LGroups) to High(LGroups) do
+          Settings.BookmarksOrder.Add(LGroups[I].Id);
+        SaveSettings;
+      end;
+
+      { applying order of groups }
       LOrder := Settings.BookmarksOrder;
       for I := LOrder.Count - 1 downto 0 do
       begin
