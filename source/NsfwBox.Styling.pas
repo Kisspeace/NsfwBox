@@ -167,7 +167,7 @@ type
       function GetImagePath(AImageName: string): string; overload;
       procedure Assign(AValue: TNBoxGUIStyle);
       constructor Create; virtual;
-      destructor Destroy; virtual;
+      destructor Destroy; override;
   end;
 
 

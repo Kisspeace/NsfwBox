@@ -79,8 +79,7 @@ function LoadCompressedLog(AUpToCharsCount: integer): string;
 var
   LStrings: TStrings;
   LStr: string;
-  I, N: integer;
-  LDupCount: integer;
+  I: integer;
 begin
   try
     LStrings := TStringList.Create;

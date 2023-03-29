@@ -64,7 +64,7 @@ type
 
   TNBoxOriginSetMenu = class(TNBoxSelectMenu)
     public
-      constructor Create(AOwner: TComponent);
+      constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
   end;
 
@@ -253,8 +253,8 @@ begin
     end;
   end;
 
-  Size.Height := MaxY + Control.Height;
-//  Size.Height := Self.ChildrenRect.height;
+  if Assigned(Control) then
+    Size.Height := MaxY + Control.Height;
 end;
 
 procedure TNBoxSearchSubMenuBase.OnResizeEvent(Sender: TObject);
@@ -1166,7 +1166,6 @@ var
   I: integer;
   C: TControl;
 begin
-  I := 0;
   for I := 0 to Self.Content.Controls.Count - 1 do begin
     C := Self.Content.Controls[0];
     if (C is TRectButton) then begin
@@ -1201,7 +1200,9 @@ var
 begin
   LIndex := BtnIndexByIntTag(AId);
   if LIndex <> -1 then
-    Result := Content.Controls[LIndex] as TRectButton;
+    Result := Content.Controls[LIndex] as TRectButton
+  else
+    Result := Nil;
 end;
 
 procedure TNBoxSelectMenu.SetSelected(const value: NativeInt);

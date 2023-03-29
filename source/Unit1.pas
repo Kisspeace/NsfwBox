@@ -621,11 +621,12 @@ end;
 
 function TForm1.AddDownload(AItem: INBoxItem; ADontFetch: boolean): TNBoxTab;
 var
-  LFull, LFilename, LUrl: string;
+  LFull, LUrl: string;
   I: integer;
   LFetchable: IFetchableContent;
   LUrlsAr: TArray<String>;
 begin
+  Result := Nil;
   if (Not ADontFetch)
   And Supports(AItem, IFetchableContent, LFetchable)
   And (Not LFetchable.ContentFetched)
@@ -876,8 +877,6 @@ begin
 
     UserBooleanDialog('Are you sure ?' + SLineBreak + 'Delete ALL YOUR BOOKMARKS !',
     procedure
-    var
-      I: integer;
     begin
       if UserSayYes then begin
 
@@ -2951,7 +2950,6 @@ var
   LDownloadedFilename: string;
   LUri: TURI;
   LExt: string;
-  I: integer;
 begin
   Self.ClearControlBitmap(MenuImageViewer);
   ChangeInterface(MenuImageViewer);
@@ -3048,9 +3046,8 @@ var
 begin
   MenuItemTagsOrigin := AOrigin;
   MenuItemTags.ClearButtons;
-
+  LIconBmp := TBitmap.Create;
   try
-    LIconBmp := TBitmap.Create;
     var LImagePath: string := Form1.AppStyle.GetImagePath(ICON_TAG);
     if FileExists(LImagePath) then
       LIconBmp.LoadFromFile(Form1.AppStyle.GetImagePath(ICON_TAG));
@@ -3587,10 +3584,9 @@ var
   JsonStr: String;
 begin
   try
+    NewSettings := nil;
+    Result := fileexists(SETTINGS_FILENAME);
     try
-      NewSettings := nil;
-      Result := fileexists(SETTINGS_FILENAME);
-
       if Result then begin
         X := TSuperObject.ParseFile(SETTINGS_FILENAME);
         JsonStr := X.AsJSON;
@@ -4053,8 +4049,6 @@ end;
 {$ENDIF}
 
 procedure TForm1.SaveSettings;
-var
-  LFile: TFileStream;
 begin
   Settings.SemVer := APP_VERSION;
   if FileExists(SETTINGS_FILENAME) then

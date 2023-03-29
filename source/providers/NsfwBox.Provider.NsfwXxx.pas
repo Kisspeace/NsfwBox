@@ -17,7 +17,6 @@ type
       FPage: TNsfwXxxPostPage;
       FItem: TNsfwXxxItem;
       function GetTags: TNBoxItemTagAr;
-      function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
       function GetArtists: TNBoxItemArtisAr;
@@ -25,7 +24,6 @@ type
       function GetCaption: string;
       function GetContentUrls: TArray<string>; override;
       function GetThumbnailUrl: string; override;
-      function GetHasAuthorName: boolean;
     public
       procedure Assign(ASource: INBoxItem); override;
       function Clone: INBoxItem; override;
@@ -134,22 +132,12 @@ begin
     Result := Page.Items[0].Thumbnails;
 end;
 
-function TNBoxNsfwXxxItem.GetHasAuthorName: boolean;
-begin
-  Result := true;
-end;
-
 function TNBoxNsfwXxxItem.GetTags: TNBoxItemTagAr;
 begin
   if ContentFetched then
     Result := TNBoxItemTagBase.Convert(FPage.Items[0].Categories)
   else
     Result := TNBoxItemTagBase.Convert(FItem.Categories);
-end;
-
-function TNBoxNsfwXxxItem.GetTagsCount: integer;
-begin
-  Result := Length(FItem.Categories);
 end;
 
 function TNBoxNsfwXxxItem.GetTagsFetched: boolean;

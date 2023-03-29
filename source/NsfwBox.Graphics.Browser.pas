@@ -284,10 +284,10 @@ var
 
 begin
   try
+    Fetched := false;
+    Scraper := TNBoxScraper.Create;
+    Content := INBoxHasOriginList.Create;
     try
-      Fetched := false;
-      Scraper := TNBoxScraper.Create;
-      Content := INBoxHasOriginList.Create;
 
       if Assigned(Browser.OnWebClientCreate) then
         Scraper.OnWebClientSet := Browser.OnWebClientCreate;

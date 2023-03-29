@@ -102,7 +102,6 @@ end;
 
 procedure TGarbageCollector.Throw(AValue: TObject);
 var
-  I, N: integer;
   LToWaitList: boolean;
   LAnW: IAbortableAndWaitable;
   LControl: TControl;
@@ -213,11 +212,9 @@ function TGarbageCollector.TryAddIWU(AValue: TObject): boolean;
 var
   LIWU: IImageWithUrl;
 begin
-  if Supports(AValue, IImageWithUrl, LIWU) then
-  begin
+  Result := Supports(AValue, IImageWithUrl, LIWU);
+  if Result then
     FWaitListIWU.Add(LIWU);
-    Result := True;
-  end;
 end;
 
 function TGarbageCollector.TryAddIWUDeep(AValue: TControlList): boolean;

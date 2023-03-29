@@ -103,7 +103,6 @@ begin
 
   end else if ( APost is TNBoxFapelloItem ) then begin
 
-    var LPost := ( Apost As TNBoxFapelloItem);
     var LReq := TNBoxSearchReqFapello.Create;
     var LArtist: INBoxItemArtistFapello;
     Supports(AArtist, INBoxItemArtistFapello, LArtist);

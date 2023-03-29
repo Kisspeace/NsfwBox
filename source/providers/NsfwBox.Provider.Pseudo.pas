@@ -52,8 +52,6 @@ implementation
 { TNBoxPseudoItem }
 
 procedure TNBoxPseudoItem.Assign(ASource: INBoxItem);
-var
-  I: TNBoxPseudoItem;
 begin
   if not ( ASource is TNBoxPseudoItem ) then
     Exit;

@@ -180,7 +180,7 @@ begin
   Form1 := Unit1.Form1;
   Form1.AddBrowser();
   var LReq := TNBoxSearchReqBookmarks.Create;
-  LReq.Request := '1';
+  LReq.Request := BookmarksDb.GetLastGroup.Id.ToString;
   LReq.Path := NsfwBox.ContentScraper.REGULAR_BMRKDB;
   LReq.PageId := 1;
   Form1.CurrentBrowser := Form1.Browsers.Last;
@@ -205,27 +205,25 @@ begin
       try
         I := 0;
         var LNeedWork: boolean := TRUE;
-//        while LNeedWork do begin
-//          TThread.Synchronize(Nil, procedure begin
-//            LNeedWork := (Form1.DownloadItems.Count > 0);
-//            if LNeedWork then begin
-//              var LIndex: integer := Random(Form1.DownloadItems.Count);
-//              var LTab := Form1.DownloadItems[LIndex];
-//              var hash: string := LTab.GetHashCode.ToString;
-////              Unit1.Log('Test before tap: ' + Hash);
-//              try
-//                LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
-//              except On E: exception do Log('Test Downloaders', E); end;
-//              Inc(I);
-////              Unit1.Log('Test after tap: ' + Hash);
-//            end;
-//            LNeedWork := TRUE;
-//
-//          end);
-//
-//          if TThread.Current.CheckTerminated then exit;
-//            Sleep(Random(25));
-//        end;
+        while LNeedWork do begin
+          TThread.Synchronize(Nil, procedure begin
+            LNeedWork := (Form1.DownloadItems.Count > 0);
+            if LNeedWork then begin
+              var LIndex: integer := Random(Form1.DownloadItems.Count);
+              var LTab := Form1.DownloadItems[LIndex];
+
+              try
+                LTab.CloseBtn.OnTap(LTab.CloseBtn, TPointF.Create(0, 0));
+              except On E: exception do Log('Test Downloaders', E); end;
+              Inc(I);
+            end;
+            LNeedWork := TRUE;
+
+          end);
+
+          if TThread.Current.CheckTerminated then exit;
+            Sleep(Random(25));
+        end;
       except
         On E: exception do Log('Test', E);
       end;

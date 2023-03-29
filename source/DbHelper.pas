@@ -30,7 +30,7 @@ type
       procedure ForceConnect;
       property Filename: string read GetFilename write SetFilename;
       constructor Create(ADbFilename: string); virtual;
-      destructor Destroy; virtual;
+      destructor Destroy; override;
   end;
 
 implementation
@@ -146,6 +146,7 @@ end;
 
 function TDbHelper.TryExecSql: boolean;
 begin
+  Result := False;
   try
     Self.Query.ExecSQL;
     Result := True;

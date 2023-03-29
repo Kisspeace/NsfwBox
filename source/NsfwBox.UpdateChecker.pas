@@ -54,7 +54,7 @@ type
       WebClient: TNetHttpClient;
       function GetReleases(AAuthor: string; ARepo: string): TGithubReleaseAr;
       constructor Create;
-      destructor Destroy;
+      destructor Destroy; override;
   End;
 
   TSemVer = record

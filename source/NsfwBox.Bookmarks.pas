@@ -46,7 +46,7 @@ type
       constructor Create(AItem: INBoxItem); overload;
       constructor Create(AItem: INBoxSearchRequest); overload;
       constructor Create; overload;
-      destructor destroy; override;
+      destructor Destroy; override;
   end;
 
   TBookmarkAr = TArray<TNBoxBookmark>;
@@ -598,7 +598,6 @@ end;
 
 function TNBoxBookmarksDb.Get(AGroupId: int64; AStart, AEnd: integer): TBookmarkAr;
 var
-  I, Pos: integer;
   LBookmark: TNBoxBookmark;
   LBookmarkType: TNBoxBookmarkType;
   LJson: string;
@@ -607,7 +606,6 @@ begin
   try
     try
       Result := [];
-      Pos := 1;
       Query.SQL.Text := 'SELECT rowid AS id, * FROM items WHERE (group_id = :id) LIMIT :start, :count;';
 
       with Query.Params do begin
@@ -659,7 +657,6 @@ begin
 
         Result := Result + [LBookmark];
         Query.Next;
-        inc(Pos);
       end;
 
       Query.Close;
@@ -710,8 +707,8 @@ end;
 
 function TNBoxBookmarksDb.GetMaxId(AGroupId: Int64): int64;
 begin
+  Result := -1;
   try
-    Result := -1;
     Query.SQL.Text := 'SELECT rowid FROM items WHERE (group_id = :id) ORDER BY rowid DESC LIMIT 1;';
     Query.Params.ParamByName('id').AsInt64 := AGroupId;
     ForceOpen;

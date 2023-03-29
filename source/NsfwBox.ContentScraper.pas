@@ -515,9 +515,8 @@ var
   Bookmarks: TBookmarkAr;
   TargetDb: TNBoxBookmarksDb;
 begin
+  Result := false;
   try
-    Result := false;
-
     if (ADbPath = REGULAR_BMRKDB) or ADbPath.IsEmpty then
       TargetDb := BookmarksDb
     else if (ADbPath = HISTORY_BMRKDB) then
@@ -790,7 +789,7 @@ end;
 
 function TNBoxScraper.TryFetchTags(APost: INBoxItem): boolean;
 begin
-  Self.TryFetchContentUrls(APost);
+  Result := Self.TryFetchContentUrls(APost);
 end;
 
 function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
@@ -799,14 +798,13 @@ function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
   ASite: TNsfwXxxSite): boolean;
 var
   Client: TNsfwXxxScraper;
-  i: integer;
   Content: TNsfwXXXItemList;
 begin
   Result := false;
+  Client := TNsfwXxxScraper.Create;
+  Client.Host := TNsfwXxxSiteToUrl(ASite);
+  Content := TNsfwXXXItemList.Create;
   try
-    Client := TNsfwXxxScraper.Create;
-    Client.Host := TNsfwXxxSiteToUrl(ASite);
-    Content := TNsfwXXXItemList.Create;
     SyncWebClientSet(Client.WebClient, ORIGIN_NSFWXXX);
     Result := Client.GetItems(Content, AReqParam, ASearchType, APageNum, Asort,
       ATypes, AOrientations);
@@ -842,8 +840,8 @@ var
   LScraper: TNBoxScraper;
 begin
   try
+    LScraper := TNBoxScraper.Create;
     try
-      LScraper := TNBoxScraper.Create;
       LScraper.OnWebClientSet := Self.OnWebClientSet;
       while not LScraper.TryFetchContentUrls(AItem) do
       begin
