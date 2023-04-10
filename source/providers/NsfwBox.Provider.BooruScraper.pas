@@ -123,16 +123,18 @@ end;
 
 function TNBoxBooruItemBase.GetContentFetched: boolean;
 begin
-  Result := (not Self.Full.ContentUrl.IsEmpty);
+  Result := (not ((Full.ContentUrl.IsEmpty) and (Full.SampleUrl.IsEmpty)));
 end;
 
 function TNBoxBooruItemBase.GetContentUrls: TArray<string>;
 begin
-  if Self.ContentFetched then begin
-    Result := [Self.FFull.ContentUrl];
-    if (Result[0] <> Self.Full.SampleUrl)
-    and not (Self.Full.SampleUrl.IsEmpty) then
-      Result := Result + [Self.Full.SampleUrl]; { Sample image }
+  if ContentFetched then begin
+    if not Full.ContentUrl.IsEmpty then
+      Result := [FFull.ContentUrl];
+
+    if (FFull.ContentUrl <> Full.SampleUrl)
+    and not (Full.SampleUrl.IsEmpty) then
+      Result := Result + [Full.SampleUrl]; { Sample image }
   end else
     Result := [];
 end;

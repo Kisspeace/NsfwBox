@@ -65,7 +65,7 @@ type
       APageNum: integer; ASearchType: TFapelloItemKind): boolean;
     function GetContentBooruScraper(ABooruClient: IBooruClient;
       AProviderId: integer;
-      AHost: string; AList: INBoxHasOriginList; ARequest: string;
+      AList: INBoxHasOriginList; ARequest: string;
       APageNum: integer): boolean;
     function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string;
       ABookmarksListId: int64; APageId: integer = 1): boolean;
@@ -228,6 +228,7 @@ begin
       PVR_DANBOORU: LClient := BooruScraper.NewClientDonmaiUs(True);
       PVR_ALLTHEFALLEN: LClient := BooruScraper.NewClientAllTheFallen(True);
       PVR_BLEACHBOORU: LClient := BooruScraper.NewClientBleachbooru(True);
+      PVR_ILLUSIONCARDS: LClient := BooruScraper.NewClientIllusioncards;
     end;
 
     if Assigned(LClient) then
@@ -339,68 +340,73 @@ begin
     PVR_GELBOORU:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientGelbooru,
-        ARequest.Origin, GELBOORU_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_RULE34XXX:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientRule34xxx,
-        ARequest.Origin, RULE34XXX_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_REALBOORU:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientRealbooru,
-        ARequest.Origin, REALBOORU_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_RULE34US:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientRule34us,
-        ARequest.Origin, RULE34US_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_RULE34PAHEALNET:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientRule34PahealNet,
-        ARequest.Origin, RULE34PAHEALNET_URL,
-        AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_XBOORU:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientXbooru,
-        ARequest.Origin, XBOORU_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_HYPNOHUBNET:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientHypnohubnet,
-        ARequest.Origin, HYPNOHUBNET_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_TBIB:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientTbib,
-        ARequest.Origin, TBIBORG_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_DANBOORU:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientDonmaiUs(True),
-        ARequest.Origin, DANBOORUDONMAIUS_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_ALLTHEFALLEN:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientAllTheFallen(True),
-        ARequest.Origin, BOORUALLTHEFALLENMOE_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
     PVR_BLEACHBOORU:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientBleachbooru(True),
-        ARequest.Origin, BLEACHBOORUORG_URL, AList, ARequest.Request, ARequest.PageId);
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
+    end;
+
+    PVR_ILLUSIONCARDS:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientIllusioncards,
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
   end;
@@ -537,7 +543,7 @@ begin
 end;
 
 function TNBoxScraper.GetContentBooruScraper(ABooruClient: IBooruClient;
-  AProviderId: integer; AHost: string; AList: INBoxHasOriginList;
+  AProviderId: integer; AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
 var
   i: integer;

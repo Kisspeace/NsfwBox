@@ -30,6 +30,7 @@ const
   PVR_DANBOORU          = 16;
   PVR_ALLTHEFALLEN      = 17;
   PVR_BLEACHBOORU       = 18;
+  PVR_ILLUSIONCARDS     = 19;
 
 type
 
@@ -58,29 +59,31 @@ type
     strict private
       FItems: TObjectList<TNBoxProviderInfo>;
       { ------------------------- }
-      FRandomizer: TNBoxProviderInfo;
-      FPseudo: TNBoxProviderInfo;
-      FBookmarks: TNBoxProviderInfo;
+      FRandomizer,
+      FPseudo,
+      FBookmarks,
       { ------------------------- }
-      FNsfwXxx: TNBoxProviderInfo;
-      FR34App: TNBoxProviderInfo;
-      FR34JsonApi: TNBoxProviderInfo;
-      FCoomerParty: TNBoxProviderInfo;
-      FGMPClub: TNBoxProviderInfo;
-      FMotherless: TNBoxProviderInfo;
-      F9HentaiTo: TNBoxProviderInfo;
-      FFapello: TNBoxProviderInfo;
-      FRule34xxx: TNBoxProviderInfo;
-      FGelbooru: TNBoxProviderInfo;
-      FRealbooru: TNBoxProviderInfo;
-      FRule34us: TNBoxProviderInfo;
-      FRule34PahealNet: TNBoxProviderInfo;
-      FXBooru: TNBoxProviderInfo;
-      FHypnohub: TNBoxProviderInfo;
-      FTbib: TNBoxProviderInfo;
-      FDanbooru: TNBoxProviderInfo;
-      FAllTheFallen: TNBoxProviderInfo;
-      FBleachbooru: TNBoxProviderInfo;
+      FNsfwXxx,
+      FR34App,
+      FR34JsonApi,
+      FCoomerParty,
+      FGMPClub,
+      FMotherless,
+      F9HentaiTo,
+      FFapello,
+      FRule34xxx,
+      FGelbooru,
+      FRealbooru,
+      FRule34us,
+      FRule34PahealNet,
+      FXBooru,
+      FHypnohub,
+      FTbib,
+      FDanbooru,
+      FAllTheFallen,
+      FBleachbooru,
+      FIllusioncards
+      : TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
       function GetCount: integer;
@@ -108,6 +111,7 @@ type
       property Danbooru: TNBoxProviderInfo read FDanbooru;
       property AllTheFallen: TNBoxProviderInfo read FAllTheFallen;
       property Bleachbooru: TNBoxProviderInfo read FBleachbooru;
+      property IllusionCards: TNBoxProviderInfo read FIllusioncards;
       { ------------------------- }
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
@@ -182,6 +186,7 @@ begin
   FDanbooru    := Add(PVR_DANBOORU, 'Danbooru.donmai.us', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FAllTheFallen := Add(PVR_ALLTHEFALLEN, 'booru.allthefallen.moe', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FBleachbooru := Add(PVR_BLEACHBOORU, 'bleachbooru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FIllusioncards := Add(PVR_ILLUSIONCARDS, 'illusioncards.booru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
 
   FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
   FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);
