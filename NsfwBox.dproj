@@ -5,7 +5,7 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Android64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>32787</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>NsfwBox.dpr</MainSource>
@@ -198,14 +198,14 @@
         <DCC_RangeChecking>true</DCC_RangeChecking>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
-        <VerInfo_Build>10</VerInfo_Build>
+        <VerInfo_Build>11</VerInfo_Build>
         <Android_LauncherIcon36>assets\android-icons\nsfwbox36.png</Android_LauncherIcon36>
         <Android_LauncherIcon48>assets\android-icons\nsfwbox48.png</Android_LauncherIcon48>
         <Android_LauncherIcon72>assets\android-icons\nsfwbox72.png</Android_LauncherIcon72>
         <Android_LauncherIcon96>assets\android-icons\nsfwbox96.png</Android_LauncherIcon96>
         <Android_LauncherIcon144>assets\android-icons\nsfwbox144.png</Android_LauncherIcon144>
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
-        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=10;versionName=2.4.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=11;versionName=2.5.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <Android_SplashTileMode>disabled</Android_SplashTileMode>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     </PropertyGroup>
@@ -216,9 +216,10 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.0.1.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.0.1.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.5.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.5.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
+        <VerInfo_MinorVer>5</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -226,9 +227,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=2.4.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.4.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=2.5.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.5.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
-        <VerInfo_MinorVer>4</VerInfo_MinorVer>
+        <VerInfo_MinorVer>5</VerInfo_MinorVer>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -254,7 +255,7 @@
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
-        <VerInfo_Build>10</VerInfo_Build>
+        <VerInfo_Build>11</VerInfo_Build>
         <AUP_READ_PHONE_STATE>false</AUP_READ_PHONE_STATE>
         <AUP_CALL_PHONE>false</AUP_CALL_PHONE>
         <AUP_CAMERA>false</AUP_CAMERA>
@@ -267,7 +268,7 @@
         <Android_LauncherIcon144>assets\android-icons\nsfwbox144.png</Android_LauncherIcon144>
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
-        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=10;versionName=2.4.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=11;versionName=2.5.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <Android_SplashTileMode>disabled</Android_SplashTileMode>
     </PropertyGroup>
@@ -276,12 +277,12 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=Kisspeace.$(MSBuildProjectName);FileVersion=2.4.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.4.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=Kisspeace.$(MSBuildProjectName);FileVersion=2.5.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.5.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-        <VerInfo_MinorVer>4</VerInfo_MinorVer>
+        <VerInfo_MinorVer>5</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -291,8 +292,8 @@
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
-        <VerInfo_MinorVer>4</VerInfo_MinorVer>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=2.4.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.4.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_MinorVer>5</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=2.5.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.5.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
