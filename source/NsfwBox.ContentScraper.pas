@@ -27,7 +27,9 @@ uses
   BooruScraper.Client.rule34PahealNet,
   BooruScraper.Parser.rule34PahealNet,
   BooruScraper.Urls, BooruScraper.ClientBase, BooruScraper,
-  NsfwBox.Provider.BooruScraper, NsfwBox.Utils;
+  NsfwBox.Provider.BooruScraper, NsfwBox.Utils,
+  BooruScraper.Client.BepisDb,
+  NsfwBox.Provider.BepisDb;
 
 const
   REGULAR_BMRKDB: string = '<BOOKMARKS>';
@@ -406,6 +408,15 @@ begin
     PVR_ILLUSIONCARDS:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientIllusioncards,
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
+    end;
+
+    PVR_BEPISDB:
+    begin
+      var LClient := BooruScraper.NewClientBepisDb As IBepisDbClient;
+      var LReq := (ARequest as TNBoxSearchReqBepisDb);
+      LClient.SearchOptions := LReq.SearchOpt;
+      Result := GetContentBooruScraper(LClient,
         ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 

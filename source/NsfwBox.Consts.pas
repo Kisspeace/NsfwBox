@@ -31,6 +31,7 @@ const
   PVR_ALLTHEFALLEN      = 17;
   PVR_BLEACHBOORU       = 18;
   PVR_ILLUSIONCARDS     = 19;
+  PVR_BEPISDB           = 20;
 
 type
 
@@ -82,7 +83,8 @@ type
       FDanbooru,
       FAllTheFallen,
       FBleachbooru,
-      FIllusioncards
+      FIllusioncards,
+      FBepisDb
       : TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
@@ -112,6 +114,7 @@ type
       property AllTheFallen: TNBoxProviderInfo read FAllTheFallen;
       property Bleachbooru: TNBoxProviderInfo read FBleachbooru;
       property IllusionCards: TNBoxProviderInfo read FIllusioncards;
+      property BepisDb: TNBoxProviderInfo read FBepisDb;
       { ------------------------- }
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
@@ -131,7 +134,8 @@ uses
   NsfwBox.Provider.Bookmarks, NsfwBox.Provider.GivemepornClub,
   NsfwBox.Provider.NineHentaiToApi, NsfwBox.Provider.CoomerParty,
   NsfwBox.Provider.motherless, NsfwBox.Provider.Randomizer,
-  NsfwBox.Provider.Fapello, NsfwBox.Provider.BooruScraper;
+  NsfwBox.Provider.Fapello, NsfwBox.Provider.BooruScraper,
+  NsfwBox.Provider.BepisDb;
 
 { TNBoxProviders }
 
@@ -187,6 +191,7 @@ begin
   FAllTheFallen := Add(PVR_ALLTHEFALLEN, 'booru.allthefallen.moe', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FBleachbooru := Add(PVR_BLEACHBOORU, 'bleachbooru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FIllusioncards := Add(PVR_ILLUSIONCARDS, 'illusioncards.booru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FBepisDb     := Add(PVR_BEPISDB, 'db.bepis.moe', 0, TNBoxSearchReqBepisDb, TNBoxBooruItemBase);
 
   FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
   FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);

@@ -46,7 +46,8 @@ uses
   NsfwBox.Provider.R34App in 'source\providers\NsfwBox.Provider.R34App.pas',
   NsfwBox.Provider.R34JsonApi in 'source\providers\NsfwBox.Provider.R34JsonApi.pas',
   NsfwBox.Provider.Randomizer in 'source\providers\NsfwBox.Provider.Randomizer.pas',
-  NsfwBox.GarbageCollector in 'source\NsfwBox.GarbageCollector.pas';
+  NsfwBox.GarbageCollector in 'source\NsfwBox.GarbageCollector.pas',
+  NsfwBox.Provider.BepisDb in 'source\providers\NsfwBox.Provider.BepisDb.pas';
 
 {$R *.res}
 

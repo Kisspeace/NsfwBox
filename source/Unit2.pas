@@ -18,7 +18,8 @@ uses
   NsfwBox.Provider.GivemepornClub, NsfwBox.Styling, NsfwBox.Provider.Bookmarks,
   NsfwBox.Helper, CoomerParty.Scraper, NsfwBox.Provider.CoomerParty,
   NsfwBox.Provider.Randomizer, NsfwBox.Provider.motherless, Motherless.types,
-  Fapello.Types, NsfwBox.Provider.Fapello;
+  Fapello.Types, NsfwBox.Provider.Fapello,
+  NsfwBox.Provider.BepisDb, BooruScraper.Client.BepisDb;
 
 type
 
@@ -28,6 +29,7 @@ type
       FSelectedStr: string;
       FSelectedBtn: TRectButton;
       FOnSelect: TNotifyEvent;
+      FDontChangeCurrentBtn: boolean;
       procedure SetSelected(const value: NativeInt); virtual;
       {$IFDEF MSWINDOWS}
       procedure ClickTapRef(Sender: TObject);
@@ -105,6 +107,7 @@ type
       procedure OnMotherlessUploadDateChanged(Sender: TObject);
       procedure OnMotherlessMediaSizeChanged(Sender: TObject);
       procedure OnFapelloSearchTypeChanged(Sender: TObject);
+      procedure DefaultSelectMenuOnChanged(Sender: TObject);
       procedure BtnSelectMenuOnTap(Sender: TObject; const Point: TPointF);
       procedure SetRequest(const value: INBoxSearchRequest);
       function GetRequest: INBoxSearchRequest;
@@ -113,17 +116,23 @@ type
       procedure ShowMainMenu;
     public
       OriginSetMenu: TNBoxOriginSetMenu;
-      NsfwXxxSortMenu: TNBoxSelectMenu;
-      NsfwXxxSearchTypeMenu: TNBoxSelectMenu;
-      NsfwXxxHostChangeMenu: TNBoxSelectMenu;
-      R34AppBooruChangeMenu: TNBoxSelectMenu;
-      GmpClubSearchTypeMenu: TNBoxSelectMenu;
-      CoomerPartyHostChangeMenu: TNBoxSelectMenu;
-      MotherlessSortChangeMenu: TNBoxSelectMenu;
-      MotherlessMediaChangeMenu: TNBoxSelectMenu;
-      MotherlessUploadDateChangeMenu: TNBoxSelectMenu;
-      MotherlessMediaSizeChangeMenu: TNBoxSelectMenu;
-      FapelloSearchTypeMenu: TNBoxSelectMenu;
+      NsfwXxxSortMenu,
+      NsfwXxxSearchTypeMenu,
+      NsfwXxxHostChangeMenu,
+      R34AppBooruChangeMenu,
+      GmpClubSearchTypeMenu,
+      CoomerPartyHostChangeMenu,
+      MotherlessSortChangeMenu,
+      MotherlessMediaChangeMenu,
+      MotherlessUploadDateChangeMenu,
+      MotherlessMediaSizeChangeMenu,
+      FapelloSearchTypeMenu,
+      BepisDbSubjectMenu,
+      BepisDbOrderByMenu,
+      BepisDbKKGenderMenu,
+      BepisDbKKPersonalityMenu,
+      BepisDbKKGameTypeMenu
+      : TNBoxSelectMenu;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -174,6 +183,12 @@ type
           BtnRandGelbooru: TNBoxCheckButton;
           BtnRandXBooru: TNBoxCheckButton;
           BtnRandRule34PahealNet: TNBoxCheckButton;
+        BepisDbMenu: TNBoxSearchSubMenuBase;
+          BtnBepisDbChangeSubject: TRectButton;
+          BtnBepisDbChangeOrderBy: TRectButton;
+          BtnBepisDbChangeGender: TRectButton;
+          BtnBepisDbChangePersonality: TRectButton;
+          BtnBepisDbChangeGameType: TRectButton;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       constructor Create(AOwner: TComponent); override;
       destructor Destroy; override;
@@ -314,7 +329,7 @@ var
     end;
   end;
 
-  function NewSelectMenu: TNBoxSelectMenu;
+  function NewSelectMenu: TNBoxSelectMenu; overload;
   begin
     Result := TNBoxSelectMenu.Create(Self);
     with Result do begin
@@ -340,6 +355,7 @@ var
   procedure SetBtnTriggerSelectMenu(ABtn: TRectbutton; AMenu: TNBoxSelectMenu);
   begin
     ABtn.OnTap := Self.BtnSelectMenuOnTap;
+    AMenu.TagObject := ABtn;
     ABtn.TagObject := AMenu;
   end;
 
@@ -361,6 +377,15 @@ var
   begin
     Result := NewBtn(AParent, AText, ABeBottomControl);
     SetBtnTriggerSelectMenu(Result, ASelectMenu);
+  end;
+
+  function NewSelectMenu(out AMenu: TNBoxSelectMenu; AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenu; overload;
+  begin
+    Result := NewSelectMenu;
+    AMenu := Result;
+    Result.OnSelected := DefaultSelectMenuOnChanged;
+    ARepresentButton := NewSelectBtn(AParent, '', Result);
+    ARepresentButton.Position.Y := Single.MaxValue;
   end;
 
 begin
@@ -424,53 +449,11 @@ begin
 
     IconPath :=  Form1.AppStyle.GetImagePath(ICON_TAG);
 
-    NsfwXxxSortMenu := NewSelectMenu;
-    with NsfwXxxSortMenu do begin
-      Addbtn('Newest', Ord(Newest), Form1.AppStyle.GetImagePath(ICON_HISTORY));
-      Addbtn('Popular', Ord(Popular), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
-      Addbtn('Recommended', Ord(Recommended), IconPath);
-      OnSelected := OnNsfwXxxSortChanged;
-    end;
-
-    NsfwXxxSearchTypeMenu := NewSelectMenu;
-    with NsfwXxxSearchTypeMenu do begin
-      Addbtn('Text request', Ord(TNsfwUrlType.Default), IconPath);
-      Addbtn('User name', Ord(TNsfwUrlType.User), Form1.AppStyle.GetImagePath(ICON_AVATAR));
-      Addbtn('Category', Ord(TNsfwUrlType.Category), IconPath);
-      Addbtn('Related posts', Ord(TNsfwUrlType.Related), Form1.AppStyle.GetImagePath(ICON_COPY));
-      OnSelected := OnNsfwXxxSearchTypeChanged;
-    end;
-
-    GmpClubSearchTypeMenu := NewSelectMenu;
-    with GmpClubSearchTypeMenu do begin
-      Addbtn('Default navigate', Ord(TGmpclubSearchType.Empty), IconPath);
-      Addbtn('Search by tag', Ord(TGmpclubSearchType.Tag), IconPath);
-      Addbtn('Search by category', Ord(TGmpclubSearchType.Category), IconPath);
-      Addbtn('Random content', Ord(TGmpclubSearchType.Random), Form1.AppStyle.GetImagePath(ORIGIN_RANDOMIZER));
-      OnSelected := OnGmpClubSearchTypeChanged;
-    end;
-
-    NsfwXxxHostChangeMenu := NewSelectMenu;
-    with NsfwXxxHostChangeMenu do begin
-      Addbtn('nsfw.xxx', Ord(TNsfwXxxSite.NsfwXxx), IconPath);
-      Addbtn('pornpic.xxx', Ord(TNsfwXxxSite.PornpicXxx), IconPath);
-      Addbtn('hdporn.pics', Ord(TNsfwXxxSite.HdpornPics), IconPath);
-      OnSelected := OnNsfwXxxHostChanged;
-      //Addbtn('', Ord(), IconPath);
-    end;
-
     R34AppBooruChangeMenu := NewSelectMenu;
     with R34AppBooruChangeMenu do begin
       for I := 0 to Ord(TR34AppFreeBooru.e926net) do
         Addbtn(BooruToLink(TR34AppFreeBooru(I)), I, IconPath);
       OnSelected := Self.OnR34AppBooruChanged;
-    end;
-
-    CoomerPartyHostChangeMenu := NewSelectMenu;
-    with CoomerPartyHostChangeMenu do begin
-      AddBtnStr('coomer.party', URL_COOMER_PARTY, IconPath);
-      AddBtnStr('kemono.party', URL_KEMONO_PARTY, IconPath);
-      OnSelected := OnCoomerPartyHostChanged;
     end;
 
     R34AppMenu := NewProviderMenu(PROVIDERS.R34App.Id);
@@ -501,6 +484,29 @@ begin
     end;
 
     NsfwXxxMenu := NewProviderMenu(PROVIDERS.NsfwXxx.Id);
+
+    with NewSelectMenu(NsfwXxxSortMenu, NsfwXxxMenu, BtnChangeSort) do
+    begin
+      Addbtn('Newest', Ord(Newest), Form1.AppStyle.GetImagePath(ICON_HISTORY));
+      Addbtn('Popular', Ord(Popular), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
+      Addbtn('Recommended', Ord(Recommended), IconPath);
+    end;
+
+    with NewSelectMenu(NsfwXxxSearchTypeMenu, NsfwXxxMenu, BtnChangeUrlType) do
+    begin
+      Addbtn('Text request', Ord(TNsfwUrlType.Default), IconPath);
+      Addbtn('User name', Ord(TNsfwUrlType.User), Form1.AppStyle.GetImagePath(ICON_AVATAR));
+      Addbtn('Category', Ord(TNsfwUrlType.Category), IconPath);
+      Addbtn('Related posts', Ord(TNsfwUrlType.Related), Form1.AppStyle.GetImagePath(ICON_COPY));
+    end;
+
+    with NewSelectMenu(NsfwXxxHostChangeMenu, NsfwXxxMenu, BtnChangeSite) do
+    begin
+      Addbtn('nsfw.xxx', Ord(TNsfwXxxSite.NsfwXxx), IconPath);
+      Addbtn('pornpic.xxx', Ord(TNsfwXxxSite.PornpicXxx), IconPath);
+      Addbtn('hdporn.pics', Ord(TNsfwXxxSite.HdpornPics), IconPath);
+    end;
+
     with NsfwXxxMenu do begin
 
       CheckGrid := TColumnsLayout.Create(NsfwXxxMenu);
@@ -527,59 +533,18 @@ begin
         AutoSize := TRUE;
       end;
 
-      BtnChangeSort := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
-      With BtnChangeSort do begin
-        Parent := NsfwXxxMenu;
-        Align := TAlignlayout.top;
-        BeBottom(BtnChangeSort, CheckGrid);
-        Margins.Rect := M;
-        Text.Text := 'Change sort';
-        TagObject := NsfwXxxSortMenu; // linking button with menu
-        OnTap := BtnSelectMenuOnTap;
-        Image.ImageURL := IconPath;
-      end;
-
-      BtnChangeUrlType := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
-      With BtnChangeUrlType do begin
-        Parent := NsfwXxxMenu;
-        Align := TAlignlayout.top;
-        BeBottom(BtnChangeUrlType, BtnChangeSort);
-        Margins.Rect := M;
-        Text.Text := 'Change search type';
-        TagObject := NsfwXxxSearchTypeMenu; // linking button with menu
-        OnTap := BtnSelectMenuOnTap;
-        Image.ImageURL := IconPath;
-      end;
-
-      BtnChangeSite := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
-      with BtnChangeSite do begin
-        Parent := NsfwXxxMenu;
-        Align := TAlignlayout.top;
-        BeBottom(BtnChangeSite, BtnChangeUrlType);
-        Margins.Rect := M;
-        Text.Text := 'Change site';
-        TagObject := Self.NsfwXxxHostChangeMenu; // linking button with menu
-        OnTap := BtnSelectMenuOnTap;
-        Image.ImageURL := IconPath;
-      end;
-
       OnResize := OnResizeEvent;
     end;
 
     GmpClubMenu := NewProviderMenu(PROVIDERS.GMPClub.Id);
-    with GmpClubMenu do begin
 
-      BtnGmpChangeSearchType := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
-      With BtnGmpChangeSearchType do begin
-        Parent := GmpClubMenu;
-        Align := TAlignlayout.top;
-        Margins.Rect := M;
-        Text.Text := 'Change search type';
-        TagObject := GmpClubSearchTypeMenu; // linking button with menu
-        OnTap := BtnSelectMenuOnTap;
-        Image.ImageURL := IconPath;
-      end;
-
+    with NewSelectMenu(GmpClubSearchTypeMenu, GmpClubMenu, BtnGmpChangeSearchType) do
+    begin
+      Addbtn('Default navigate', Ord(TGmpclubSearchType.Empty), IconPath);
+      Addbtn('Search by tag', Ord(TGmpclubSearchType.Tag), IconPath);
+      Addbtn('Search by category', Ord(TGmpclubSearchType.Category), IconPath);
+      Addbtn('Random content', Ord(TGmpclubSearchType.Random), Form1.AppStyle.GetImagePath(ORIGIN_RANDOMIZER));
+      Selected := Ord(TGmpclubSearchType.Empty);
     end;
 
     CoomerPartyMenu := NewProviderMenu(PROVIDERS.CoomerParty.Id);
@@ -594,16 +559,13 @@ begin
         Edit.TextPrompt := 'Host URL';
       end;
 
-      BtnCoomerPartyChangeSite := form1.CreateDefButton(Self, BTN_STYLE_DEF2);
-      With BtnCoomerPartyChangeSite do begin
-        Parent := CoomerPartyMenu;
-        Align := TAlignlayout.top;
-        Margins.Rect := M;
-        Text.Text := 'Change host URL';
-        TagObject := CoomerPartyHostChangeMenu; // linking button with menu
-        OnTap := BtnSelectMenuOnTap;
-        Image.ImageURL := IconPath;
+      with NewSelectMenu(CoomerPartyHostChangeMenu, CoomerPartyMenu, BtnCoomerPartyChangeSite) do
+      begin
+        AddBtnStr('coomer.party', URL_COOMER_PARTY, IconPath);
+        AddBtnStr('kemono.party', URL_KEMONO_PARTY, IconPath);
+        OnSelected := OnCoomerPartyHostChanged;
       end;
+      BtnCoomerPartyChangeSite.Text.Text := 'Change host URL';
       BeBottom(BtnCoomerPartyChangeSite, EditCoomerPartyHost);
 
       EditCoomerPartyUserId := Form1.CreateDefEdit(Self);
@@ -673,14 +635,96 @@ begin
   { Fapello menu ---------------- }
 
   FapelloMenu := NewProviderMenu(PROVIDERS.Fapello.Id);
-  FapelloSearchTypeMenu := NewSelectMenu;
-  with FapelloSearchTypeMenu do begin
-    OnSelected := OnFapelloSearchTypeChanged;
+  with NewSelectMenu(FapelloSearchTypeMenu, FapelloMenu, BtnFapelloChangeSearchType) do
+  begin
     AddBtn('Feed', Ord(TFapelloItemKind.FlFeed), Form1.AppStyle.GetImagePath(ICON_HISTORY));
     AddBtn('Author', Ord(TFapelloItemKind.FlThumb), Form1.AppStyle.GetImagePath(ICON_AVATAR));
+    Selected := Ord(TFapelloItemKind.FlFeed);
   end;
-  BtnFapelloChangeSearchType := NewSelectBtn(FapelloMenu, '', FapelloSearchTypeMenu);
-  FapelloSearchTypeMenu.Selected := Ord(TFapelloItemKind.FlFeed);
+
+  { BepisDb menu ---------------- }
+
+  BepisDbMenu := NewProviderMenu(PROVIDERS.BepisDb.Id);
+
+  with NewSelectMenu(BepisDbSubjectMenu, BepisDbMenu, BtnBepisDbChangeSubject) do
+  begin
+    AddBtn('Koikatsu cards', Ord(TBepisDbSearchOpt.TSubject.KoikatsuCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Koikatsu scenes', Ord(TBepisDbSearchOpt.TSubject.KoikatsuScenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Koikatsu clothing', Ord(TBepisDbSearchOpt.TSubject.KoikatsuClothing), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Artificial Academy 2 cards', Ord(TBepisDbSearchOpt.TSubject.AA2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Artificial Academy 2 scenes', Ord(TBepisDbSearchOpt.TSubject.AA2Scenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Honey Select', Ord(TBepisDbSearchOpt.TSubject.HoneySelectCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Play Home', Ord(TBepisDbSearchOpt.TSubject.PlayHomeCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('AI Shoujo / HS2 cards', Ord(TBepisDbSearchOpt.TSubject.AIHS2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('AI Shoujo / HS2 scenes', Ord(TBepisDbSearchOpt.TSubject.AIHS2Scenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Custom Order Maid 3D 2', Ord(TBepisDbSearchOpt.TSubject.COM3D2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Summer Heat', Ord(TBepisDbSearchOpt.TSubject.SummerHeatCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    Selected := Ord(TBepisDbSearchOpt.TSubject.KoikatsuCards);
+  end;
+
+  with NewSelectMenu(BepisDbOrderByMenu, BepisDbMenu, BtnBepisDbChangeOrderBy) do
+  begin
+    AddBtn('By date (descending)', Ord(TBepisDbSearchOpt.TOrderBy.OrderDateDescending), Form1.AppStyle.GetImagePath(ICON_HISTORY));
+    AddBtn('By date (ascending)', Ord(TBepisDbSearchOpt.TOrderBy.OrderDateAscending), Form1.AppStyle.GetImagePath(ICON_HISTORY));
+    AddBtn('By popularity', Ord(TBepisDbSearchOpt.TOrderBy.OrderPopularity), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
+    Selected := Ord(TBepisDbSearchOpt.TOrderBy.OrderDateDescending);
+  end;
+
+  with NewSelectMenu(BepisDbKKGenderMenu, BepisDbMenu, BtnBepisDbChangeGender) do
+  begin
+    AddBtn('Gender unspecified', Ord(TBepisDbSearchOpt.TGender.GendUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Gender female', Ord(TBepisDbSearchOpt.TGender.GendFemale), Form1.AppStyle.GetImagePath(ICON_STRAIGHT));
+    AddBtn('Gender male', Ord(TBepisDbSearchOpt.TGender.GendMale), Form1.AppStyle.GetImagePath(ICON_GAY));
+    Selected := Ord(TBepisDbSearchOpt.TGender.GendUnspecified);
+  end;
+
+  with NewSelectMenu(BepisDbKKPersonalityMenu, BepisDbMenu, BtnBepisDbChangePersonality) do
+  begin
+    AddBtn('Personality unspecified', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Sexy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSexy), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Ojousama', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOjousama), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Snobby', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSnobby), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Kouhai', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersKouhai), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Mysterious', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersMysterious), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Weirdo', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWeirdo), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Yamato Nadeshiko', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersYamatoNadeshiko), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Tomboy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTomboy), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Pure', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersPure), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Simple', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSimple), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Delusional', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersDelusional), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Motherly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersMotherly), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('BigSisterly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersBigSisterly), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Gyaru', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersGyaru), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Delinquent', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersDelinquent), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Wild', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWild), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Wannable', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWannabe), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Reluctant', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersReluctant), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Jinxed', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersJinxed), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Bookish', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersBookish), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Timid', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTimid), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Typical Schoolgirl', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTypicalSchoolgirl), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Trendy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTrendy), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Otaku', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOtaku), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Yandere', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersYandere), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Lazy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersLazy), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Quiet', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersQuiet), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Stubborn', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersStubborn), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Oldfashioned', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOldFashioned), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Humble', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersHumble), Form1.AppStyle.GetImagePath(ICON_EDIT));
+//    AddBtn('', Ord(TBepisDbSearchOpt.TKoikatsuPersonality), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    Selected := Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersUnspecified);
+  end;
+
+  with NewSelectMenu(BepisDbKKGameTypeMenu, BepisDbMenu, BtnBepisDbChangeGameType) do
+  begin
+    AddBtn('Game type unspecified', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Game type: Base', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameBase), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Game type: Steam', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Game type: Steam 18+', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam18), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Game type: Emotion Creators', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameEmotionCreators), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Game type: Sunshine', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSunshine), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    Selected := Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameUnspecified);
+  end;
 
   { Randomizer menu ------------- }
 
@@ -814,6 +858,17 @@ begin
       end;
     end;
 
+    PVR_BEPISDB: begin
+      var LReq := ( Result as TNBoxSearchReqBepisDb );
+      var LOpt := LReq.SearchOpt;
+      LOpt.Subject := TBepisDbSearchOpt.TSubject(BepisDbSubjectMenu.Selected);
+      LOpt.OrderBy := TBepisDbSearchOpt.TOrderBy(BepisDbOrderByMenu.Selected);
+      LOpt.Gender := TBepisDbSearchOpt.TGender(BepisDbKKGenderMenu.Selected);
+      LOpt.KoikatsuPersonality := TBepisDbSearchOpt.TKoikatsuPersonality(BepisDbKKPersonalityMenu.Selected);
+      LOpt.KoikatsuGameType := TBepisDbSearchOpt.TKoikatsuGameType(BepisDbKKGameTypeMenu.Selected);
+      LReq.SearchOpt := LOpt;
+    end;
+
   end;
 
   with Result do begin
@@ -841,6 +896,24 @@ var
 begin
   for I := 0 to FProviderMenus.Count - 1 do
     FProviderMenus[I].Visible := False;
+end;
+
+procedure TNBoxSearchMenu.DefaultSelectMenuOnChanged(Sender: TObject);
+var
+  LMenu: TNBoxSelectMenu;
+  LRepresentBtn: TRectButton;
+begin
+  ShowMainMenu;
+  LMenu := Sender as TNBoxSelectMenu;
+  if Assigned(LMenu.TagObject) then
+  begin
+    LRepresentBtn := LMenu.TagObject as TRectButton;
+    if Assigned(LMenu.SelectedBtn) then
+    begin
+      LRepresentBtn.Text.Text := LMenu.SelectedBtn.Text.Text;
+      LRepresentBtn.Image.ImageURL := LMenu.SelectedBtn.Image.ImageURL;
+    end;
+  end;
 end;
 
 procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
@@ -1085,6 +1158,13 @@ begin
     with ( Value as TNBoxSearchReqFapello ) do
       FapelloSearchTypeMenu.Selected := Ord(RequestKind);
 
+  end else if (Value is TNBoxSearchReqBepisDb) then begin
+    var LReq := Value as TNBoxSearchReqBepisDb;
+    BepisDbSubjectMenu.Selected := Ord(LReq.SearchOpt.Subject);
+    BepisDbOrderByMenu.Selected := Ord(LReq.SearchOpt.OrderBy);
+    BepisDbKKGenderMenu.Selected := Ord(LReq.SearchOpt.Gender);
+    BepisDbKKPersonalityMenu.Selected := Ord(LReq.SearchOpt.KoikatsuPersonality);
+    BepisDbKKGameTypeMenu.Selected := Ord(LReq.SearchOpt.KoikatsuGameType);
   end;
 end;
 
@@ -1157,8 +1237,12 @@ procedure TNBoxSelectMenu.BtnOnTap(Sender: TObject; const Point: TPointF);
 begin
   FSelectedBtn := (Sender As TRectButton);
   FSelectedStr := TFmxObject(Sender).TagString;
-
-  Selected := TFmxObject(Sender).Tag;
+  FDontChangeCurrentBtn := True;
+  try
+    Selected := TFmxObject(Sender).Tag;
+  finally
+    FDontChangeCurrentBtn := False;
+  end;
 end;
 
 procedure TNBoxSelectMenu.ClearButtons;
@@ -1186,6 +1270,7 @@ end;
 constructor TNBoxSelectMenu.Create(AOwner: TComponent);
 begin
   inherited;
+  FDontChangeCurrentBtn := False;
   FSelectedBtn := nil;
 end;
 
@@ -1210,15 +1295,8 @@ var
   I: integer;
 begin
   FSelected := value;
-
-  if not Assigned(Self.FSelectedBtn) then begin
-    I := BtnIndexByIntTag(value);
-    if ( I <> -1 ) then
-      Self.FSelectedBtn := (Content.Controls[I] as TRectButton);
-  end;
-
-  if Assigned(OnSelected) then
-    OnSelected(self);
+  if not FDontChangeCurrentBtn then FSelectedBtn := GetBtnByTag(Value);
+  if Assigned(OnSelected) then OnSelected(self);
 end;
 
 { TNBoxSettingsCheck }
