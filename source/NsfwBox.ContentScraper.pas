@@ -231,6 +231,7 @@ begin
       PVR_ALLTHEFALLEN: LClient := BooruScraper.NewClientAllTheFallen(True);
       PVR_BLEACHBOORU: LClient := BooruScraper.NewClientBleachbooru(True);
       PVR_ILLUSIONCARDS: LClient := BooruScraper.NewClientIllusioncards;
+      PVR_HGOONBOORU: LClient := BooruScraper.NewClientHgoon;
     end;
 
     if Assigned(LClient) then
@@ -408,6 +409,12 @@ begin
     PVR_ILLUSIONCARDS:
     begin
       Result := GetContentBooruScraper(BooruScraper.NewClientIllusioncards,
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
+    end;
+
+    PVR_HGOONBOORU:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientHgoon,
         ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
