@@ -261,6 +261,7 @@ type
     function CreateTabText(ABrowser: TNBoxBrowser): string;
     procedure AppOnException(Sender: TObject; E: Exception);
     procedure ClickTapRef(Sender: TObject);
+    procedure SetClick(A: TControl);
     { -> Menu buttons ------------- }
     procedure MenuBtnDownloadsOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuBtnDownloadsOnDblClick(Sender: TObject);
@@ -1522,6 +1523,7 @@ begin
     Image.ImageManager := IWUContentManager;
     Height := BUTTON_HEIGHT;
     ImageControl.OnResize(ImageControl);
+    {$IFDEF MSWINDOWS} OnClick := Form1.ClickTapRef; {$ENDIF}
   end;
 end;
 
@@ -2071,21 +2073,21 @@ begin
     Result := '';
 end;
 
+procedure TForm1.SetClick(A: TControl);
+var
+  I: integer;
+begin
+  if Assigned(A.OnTap) then
+    A.OnClick := ClickTapRef;
+  for I := 0 to A.Controls.Count - 1 do begin
+    SetClick(A.Controls.Items[I]);
+  end;
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 var
   I: integer;
   Control: TControl;
-
-  procedure SetClick(A: TControl);
-  var
-    I: integer;
-  begin
-    if Assigned(A.OnTap) then
-      A.OnClick := ClickTapRef;
-    for I := 0 to A.Controls.Count - 1 do begin
-      SetClick(A.Controls.Items[I]);
-    end;
-  end;
 
   function AddBottomLayout(AOwner: TFmxObject; AHeight: single): TLayout;
   begin
