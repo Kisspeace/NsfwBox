@@ -62,16 +62,14 @@ type
 
   TRectButtonClass = Class of TRectButton;
 
-  TRectButtonContainer<T> = Class(TRectButton)
-    protected
-      FContainedData: T;
-      procedure SetContainedData(value: T);
-      function GetContainedData: T;
-    public
-      property ContainedData: T read GetContainedData write SetContainedData;
-  End;
-
-  TRectButtonWithTag = TRectButtonContainer<INBoxItemTag>;
+//  TRectButtonContainer<T> = Class(TRectButton)
+//    protected
+//      FContainedData: T;
+//      procedure SetContainedData(value: T);
+//      function GetContainedData: T;
+//    public
+//      property ContainedData: T read GetContainedData write SetContainedData;
+//  End;
 
   TRectTextCheck = class(TRectText, IIsChecked)
     protected
@@ -325,15 +323,15 @@ end;
 
 { TRectButtonContainer<T> }
 
-function TRectButtonContainer<T>.GetContainedData: T;
-begin
-  Result := FContainedData;
-end;
-
-procedure TRectButtonContainer<T>.SetContainedData(value: T);
-begin
-  FContainedData := value;
-end;
+//function TRectButtonContainer<T>.GetContainedData: T;
+//begin
+//  Result := FContainedData;
+//end;
+//
+//procedure TRectButtonContainer<T>.SetContainedData(value: T);
+//begin
+//  FContainedData := value;
+//end;
 
 end.
 

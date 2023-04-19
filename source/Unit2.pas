@@ -23,52 +23,112 @@ uses
 
 type
 
-  TNBoxSelectMenu = class(TVertScrollBox)
-    private
-      FSelected: NativeInt;
-      FSelectedStr: string;
-      FSelectedBtn: TRectButton;
-      FOnSelect: TNotifyEvent;
-      FDontChangeCurrentBtn: boolean;
-      procedure SetSelected(const value: NativeInt); virtual;
-      {$IFDEF MSWINDOWS}
-      procedure ClickTapRef(Sender: TObject);
-      {$ENDIF}
-      procedure BtnOnTap(Sender: TObject; const Point: TPointF); virtual;
-      function BtnIndexByIntTag(AId: NativeInt): integer;
+  INBoxSelectControls = Interface
+    ['{3D11AE0C-F101-48DF-974A-92E832906EC5}']
+    { Protected / private }
+    procedure SetSelectedControl(const value: TControl);
+    function GetSelectedControl: TControl;
+    procedure SetOnSelected(const value: TNotifyEvent);
+    function GetOnSelected: TNotifyEvent;
+    { Public }
+    property SelectedControl: TControl read GetSelectedControl write SetSelectedControl;
+    property OnSelected: TNotifyEvent read GetOnSelected write SetOnSelected;
+    procedure SelectFirst;
+    procedure FreeControls;
+  End;
+
+  INBoxSelectMenu = Interface(IControl)
+    ['{218067DC-26F7-41C3-8E74-9533F2333C95}']
+    { Protected / private }
+    function GetMenu: INBoxSelectControls;
+    { Public }
+    property Menu: INBoxSelectControls read GetMenu;
+  End;
+
+  TNBoxSelectControlsAbs<T> = Class;
+
+  TNBoxSelectControlsAbs<T> = Class(TComponent, INBoxSelectControls)
+    public type
+      TControlContainer = Record
+        Control: TControl;
+        Value: T;
+        constructor Create(AControl: TControl; AValue: T); overload;
+        constructor Create(AControl: TControl); overload;
+      End;
+    protected
+      FSelectedContainer: TControlContainer;
+      FOnSelected: TNotifyEvent;
+      procedure SetOnSelected(const value: TNotifyEvent);
+      function GetOnSelected: TNotifyEvent;
+      function IsEqual(const AValue, AValue2: T): boolean; virtual; abstract;
+      procedure DoOnSelected; virtual;
+      function IndexOfValue(const AValue: T): integer;
+      function IndexOfControl(const AControl: TControl): integer;
+      procedure SetSelected(const value: T);
+      function GetSelected: T;
+      procedure SetSelectedControl(const value: TControl);
+      function GetSelectedControl: TControl;
+      procedure OnControlTap(Sender: TObject; const Point: TPointF);
     public
-      function GetBtnByTag(AId: NativeInt): TRectButton;
-      property SelectedBtn: TRectButton read FSelectedBtn;
-      property Selected: NativeInt read FSelected write SetSelected;
-      property SelectedStr: string read FSelectedStr;
-      property OnSelected: TNotifyEvent read FOnSelect write FOnSelect;
-      {}
-      function AddBtn(ABtnClass: TRectButtonClass; AText: string): TRectButton; overload;
-      {}
+      Items: TList<TControlContainer>;
+      function GetControlByValue(const AValue: T): TControl;
+      procedure AddControl(AControl: TControl; const AValue: T);
+      procedure SelectFirst;
+      procedure FreeControls;
+      property Selected: T read GetSelected write SetSelected;
+      property SelectedControl: TControl read GetSelectedControl write SetSelectedControl;
+      property OnSelected: TNotifyEvent read GetOnSelected write SetOnSelected;
+      constructor Create(AOwner: TComponent); override;
+  End;
+
+  TNBoxSelectControlsObj<T: class> = Class(TNBoxSelectControlsAbs<T>)
+    protected
+      function IsEqual(const AValue, AValue2: T): boolean; override;
+  End;
+
+  TNBoxSelectControlsIObj<T: IInterface> = Class(TNBoxSelectControlsAbs<T>)
+    protected
+      function IsEqual(const AValue, AValue2: T): boolean; override;
+  End;
+
+  TNBoxSelectControlsInt = Class(TNBoxSelectControlsAbs<Int64>)
+    protected
+      function IsEqual(const AValue, AValue2: Int64): boolean; override;
+  End;
+
+  TNBoxSelectControlsStr = Class(TNBoxSelectControlsAbs<String>)
+    protected
+      function IsEqual(const AValue, AValue2: String): boolean; override;
+  End;
+
+  TNBoxSelectMenuAbs<ValueType; MenuType: TNBoxSelectControlsAbs<ValueType>> = Class(TVertScrollBox, INBoxSelectMenu)
+    protected
+      FMenu: MenuType;
+      function GetMenu: INBoxSelectControls;
+    public
+      property Menu: MenuType read FMenu;
+      constructor Create(AOwner: TComponent); override;
+  End;
+
+  TNBoxSelectMenu<ValueType; MenuType: TNBoxSelectControlsAbs<ValueType>> = Class(TNBoxSelectMenuAbs<ValueType, MenuType>)
+    protected
+      procedure SetSelected(const value: ValueType);
+      function GetSelected: ValueType;
+    public
+      function AddBtn(ABtnClass: TRectButtonClass;
+        AText: string; AValue: ValueType): TRectButton; overload; virtual;
       function AddBtn(AText: string;
-       AId: NativeInt = 0;
-       AImageFilename: string = '';
-       AShortImageName: boolean = false
+       AValue: ValueType;
+       AImageFilename: string = ''
       ): TRectButton; overload; virtual;
-      {}
-      function AddBtnStr(AText: string;
-       ATagStr: string = '';
-       AImageFilename: string = '';
-       AShortImageName: boolean = false
-      ): TRectButton; overload; virtual;
-      {}
-      procedure ClearButtons;
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
-  end;
+      property Selected: ValueType read GetSelected write SetSelected;
+  End;
 
-  TTNBoxSelectMenuList = TList<TNBoxSelectMenu>;
+  TNBoxSelectMenuInt = Class(TNBoxSelectMenu<Int64, TNBoxSelectControlsInt>);
+  TNBoxSelectMenuStr = Class(TNBoxSelectMenu<String, TNBoxSelectControlsStr>);
+  TNBoxSelectMenuTag = Class(TNBoxSelectMenu<INBoxItemTag, TNBoxSelectControlsIObj<INBoxItemTag>>);
 
-  TNBoxOriginSetMenu = class(TNBoxSelectMenu)
-    public
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
-  end;
+  TTNBoxSelectMenuList = TList<INBoxSelectMenu>;
 
   TNBoxCheckMenu = class(TVertScrollBox)
     private
@@ -107,9 +167,11 @@ type
       procedure HideOriginMenus;
       procedure ShowMainMenu;
       { GUI Contructors ------- }
+      procedure FinishNewSelectMenu(AMenu: TControl; AParent: TControl; out AButton: TRectButton);
       function NewBtn(AParent: TControl; AText: string; ABeBottomControl: TControl = nil): TRectButton;
-      function NewSelectBtn(AParent: TControl; AText: string; ASelectMenu: TNBoxSelectMenu; ABeBottomControl: TControl = nil): TRectButton;
-      function NewSelectMenu(out AMenu: TNBoxSelectMenu; AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenu; overload;
+      function NewSelectBtn(AParent: TControl; AText: string; ASelectMenu: TControl; ABeBottomControl: TControl = nil): TRectButton;
+      function NewSelectMenu(out AMenu: TNBoxSelectMenuInt; AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenuInt; overload;
+      function NewSelectMenu(out AMenu: TNBoxSelectMenuStr; AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenuStr; overload;
       procedure NewEdit(out AEdit: TNBoxEdit; AParent: TControl; APrompt: string = ''; ABeBottom: TControl = Nil; AText: string = '');
       function NewBtnCheck(AText: string; AParent: TControl; AImageName: string; AIsChecked: boolean = True): TNBoxCheckButton;
       { Init sub menus -------- }
@@ -122,13 +184,12 @@ type
       procedure InitGmpClubMenu;
       procedure InitR34AppMenu;
     public
-      OriginSetMenu: TNBoxOriginSetMenu;
+      OriginSetMenu,
       NsfwXxxSortMenu,
       NsfwXxxSearchTypeMenu,
       NsfwXxxHostChangeMenu,
       R34AppBooruChangeMenu,
       GmpClubSearchTypeMenu,
-      CoomerPartyHostChangeMenu,
       MotherlessSortChangeMenu,
       MotherlessMediaChangeMenu,
       MotherlessUploadDateChangeMenu,
@@ -139,7 +200,8 @@ type
       BepisDbKKGenderMenu,
       BepisDbKKPersonalityMenu,
       BepisDbKKGameTypeMenu
-      : TNBoxSelectMenu;
+      : TNBoxSelectMenuInt;
+      CoomerPartyHostChangeMenu: TNBoxSelectMenuStr;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -235,33 +297,6 @@ begin
   AControl.Position.Y := AControlOnTop.Position.Y + 1 + AControlOnTop.Height;
 end;
 
-{ TNBoxOriginSetMenu }
-
-constructor TNBoxOriginSetMenu.Create(AOwner: TComponent);
-var
-  I: integer;
-
-  function NewBtn(AOrigin: integer): TRectButton;
-  begin
-    Result := AddBtn(OriginToStr(AOrigin), AOrigin, Form1.AppStyle.GetImagePath(AOrigin));
-  end;
-
-begin
-  inherited;
-  FSelected := ORIGIN_NSFWXXX;
-
-  for I := 0 to PROVIDERS.Count - 1 do begin
-    var LProvider := PROVIDERS[I];
-    if (LProvider <> PROVIDERS.R34App) then
-      NewBtn(LProvider.Id);
-  end;
-end;
-
-destructor TNBoxOriginSetMenu.Destroy;
-begin
-  inherited;
-end;
-
 { TNBoxSearchSubMenuBase }
 
 procedure TNBoxSearchSubMenuBase.DoAutoSize;
@@ -315,7 +350,7 @@ begin
   end;
 end;
 
-function TNBoxSearchMenu.NewSelectBtn(AParent: TControl; AText: string; ASelectMenu: TNBoxSelectMenu; ABeBottomControl: TControl = nil): TRectButton;
+function TNBoxSearchMenu.NewSelectBtn(AParent: TControl; AText: string; ASelectMenu: TControl; ABeBottomControl: TControl = nil): TRectButton;
 begin
   Result := NewBtn(AParent, AText, ABeBottomControl);
   ASelectMenu.TagObject := Result;
@@ -325,19 +360,20 @@ begin
   end;
 end;
 
-function TNBoxSearchMenu.NewSelectMenu(out AMenu: TNBoxSelectMenu; AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenu;
+function TNBoxSearchMenu.NewSelectMenu(out AMenu: TNBoxSelectMenuStr;
+  AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenuStr;
 begin
-  Result := TNBoxSelectMenu.Create(Self);
-  AMenu := Result;
-  with Result do begin
-    Parent := Self;
-    Visible := false;
-    Align := TAlignlayout.Client;
-  end;
-  Result.OnSelected := DefaultSelectMenuOnChanged;
-  ARepresentButton := NewSelectBtn(AParent, '', Result);
-  ARepresentButton.Position.Y := Single.MaxValue; { Most bottom }
-  FSelectMenus.Add(Result);
+  AMenu := TNBoxSelectMenuStr.Create(Self);
+  Result := AMenu;
+  FinishNewSelectMenu(AMenu, AParent, ARepresentButton);
+end;
+
+function TNBoxSearchMenu.NewSelectMenu(out AMenu: TNBoxSelectMenuInt;
+  AParent: TControl; out ARepresentButton: TRectButton): TNBoxSelectMenuInt;
+begin
+  AMenu := TNBoxSelectMenuInt.Create(Self);
+  Result := AMenu;
+  FinishNewSelectMenu(AMenu, AParent, ARepresentButton);
 end;
 
 procedure TNBoxSearchMenu.NewEdit(out AEdit: TNBoxEdit; AParent: TControl;
@@ -390,12 +426,19 @@ begin
   M := TRectF.Create(10, 10, 10, 0);
   FDefIconPath :=  Form1.AppStyle.GetImagePath(ICON_TAG);
 
-  OriginSetMenu := TNBoxOriginSetMenu.Create(Self);
+  OriginSetMenu := TNBoxSelectMenuInt.Create(Self);
   with OriginSetMenu do begin
     Parent := Self;
     Visible := false;
     Align := TAlignlayout.Client;
-    OnSelected := Self.OnOriginChanged;
+    for I := 0 to PROVIDERS.Count - 1 do
+    begin
+      var LProvider := PROVIDERS[I];
+      if (LProvider <> PROVIDERS.R34App) then
+        AddBtn(LProvider.TitleName, LProvider.Id, Form1.AppStyle.GetImagePath(LProvider.Id));
+    end;
+    Menu.SelectFirst;
+    Menu.OnSelected := OnOriginChanged;
   end;
   FSelectMenus.Add(OriginSetMenu);
 
@@ -620,7 +663,7 @@ begin
     AddBtn('AI Shoujo / HS2 scenes', Ord(TBepisDbSearchOpt.TSubject.AIHS2Scenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
     AddBtn('Custom Order Maid 3D 2', Ord(TBepisDbSearchOpt.TSubject.COM3D2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
     AddBtn('Summer Heat', Ord(TBepisDbSearchOpt.TSubject.SummerHeatCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    Selected := Ord(TBepisDbSearchOpt.TSubject.KoikatsuCards);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(BepisDbOrderByMenu, BepisDbMenu, BtnBepisDbChangeOrderBy) do
@@ -628,7 +671,7 @@ begin
     AddBtn('By date (descending)', Ord(TBepisDbSearchOpt.TOrderBy.OrderDateDescending), Form1.AppStyle.GetImagePath(ICON_HISTORY));
     AddBtn('By date (ascending)', Ord(TBepisDbSearchOpt.TOrderBy.OrderDateAscending), Form1.AppStyle.GetImagePath(ICON_HISTORY));
     AddBtn('By popularity', Ord(TBepisDbSearchOpt.TOrderBy.OrderPopularity), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
-    Selected := Ord(TBepisDbSearchOpt.TOrderBy.OrderDateDescending);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(BepisDbKKGenderMenu, BepisDbMenu, BtnBepisDbChangeGender) do
@@ -636,7 +679,7 @@ begin
     AddBtn('Gender unspecified', Ord(TBepisDbSearchOpt.TGender.GendUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
     AddBtn('Gender female', Ord(TBepisDbSearchOpt.TGender.GendFemale), Form1.AppStyle.GetImagePath(ICON_STRAIGHT));
     AddBtn('Gender male', Ord(TBepisDbSearchOpt.TGender.GendMale), Form1.AppStyle.GetImagePath(ICON_GAY));
-    Selected := Ord(TBepisDbSearchOpt.TGender.GendUnspecified);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(BepisDbKKPersonalityMenu, BepisDbMenu, BtnBepisDbChangePersonality) do
@@ -673,7 +716,7 @@ begin
     AddBtn('Oldfashioned', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOldFashioned), Form1.AppStyle.GetImagePath(ICON_EDIT));
     AddBtn('Humble', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersHumble), Form1.AppStyle.GetImagePath(ICON_EDIT));
 //    AddBtn('', Ord(TBepisDbSearchOpt.TKoikatsuPersonality), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    Selected := Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersUnspecified);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(BepisDbKKGameTypeMenu, BepisDbMenu, BtnBepisDbChangeGameType) do
@@ -684,7 +727,7 @@ begin
     AddBtn('Game type: Steam 18+', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam18), Form1.AppStyle.GetImagePath(ICON_EDIT));
     AddBtn('Game type: Emotion Creators', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameEmotionCreators), Form1.AppStyle.GetImagePath(ICON_EDIT));
     AddBtn('Game type: Sunshine', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSunshine), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    Selected := Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameUnspecified);
+    Menu.SelectFirst;
   end;
 end;
 
@@ -695,10 +738,10 @@ begin
 
   with NewSelectMenu(CoomerPartyHostChangeMenu, CoomerPartyMenu, BtnCoomerPartyChangeSite) do
   begin
-    var LDefBtn := AddBtnStr('coomer.party', URL_COOMER_PARTY, FDefIconPath);
-    AddBtnStr('kemono.party', URL_KEMONO_PARTY, FDefIconPath);
-    OnSelected := OnCoomerPartyHostChanged;
-    LDefBtn.OnTap(LDefBtn, TPointF.Zero);
+    AddBtn('coomer.party', URL_COOMER_PARTY, FDefIconPath);
+    AddBtn('kemono.party', URL_KEMONO_PARTY, FDefIconPath);
+    Menu.OnSelected := OnCoomerPartyHostChanged;
+    Menu.SelectFirst;
   end;
   BtnCoomerPartyChangeSite.Text.Text := 'Change host URL';
   BeBottom(BtnCoomerPartyChangeSite, EditCoomerPartyHost);
@@ -714,7 +757,7 @@ begin
   begin
     AddBtn('Feed', Ord(TFapelloItemKind.FlFeed), Form1.AppStyle.GetImagePath(ICON_HISTORY));
     AddBtn('Author', Ord(TFapelloItemKind.FlThumb), Form1.AppStyle.GetImagePath(ICON_AVATAR));
-    Selected := Ord(TFapelloItemKind.FlFeed);
+    Menu.SelectFirst;
   end;
 end;
 
@@ -727,7 +770,7 @@ begin
     Addbtn('Search by tag', Ord(TGmpclubSearchType.Tag), FDefIconPath);
     Addbtn('Search by category', Ord(TGmpclubSearchType.Category), FDefIconPath);
     Addbtn('Random content', Ord(TGmpclubSearchType.Random), Form1.AppStyle.GetImagePath(ORIGIN_RANDOMIZER));
-    Selected := Ord(TGmpclubSearchType.Empty);
+    Menu.SelectFirst;
   end;
 end;
 
@@ -738,9 +781,9 @@ begin
   if Assigned(BtnMotherlessChangeSort) then Exit;
   with NewSelectMenu(MotherlessMediaChangeMenu, MotherlessMenu, BtnMotherlessChangeMedia) do
   begin
-    AddBtn(MediaTypeToStr(MediaImage), Ord(MediaImage), ICON_IMAGE, True);
-    AddBtn(MediaTypeToStr(MediaVideo), Ord(MediaVideo), ICON_VIDEO, True);
-    Selected := ord(TMotherlessMediaType.MediaImage);
+    AddBtn(MediaTypeToStr(MediaImage), Ord(MediaImage), Form1.AppStyle.GetImagePath(ICON_IMAGE));
+    AddBtn(MediaTypeToStr(MediaVideo), Ord(MediaVideo), Form1.AppStyle.GetImagePath(ICON_VIDEO));
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(MotherlessSortChangeMenu, MotherlessMenu, BtnMotherlessChangeSort) do
@@ -748,22 +791,22 @@ begin
     for I := Ord(TMotherlessSort.SortRecent)
     to Ord(TMotherlessSort.SortDate) do
       Addbtn(SortTypeToStr(TMotherlessSort(I)), I, FDefIconPath);
-    Selected := Ord(TMotherlessSort.SortRecent);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(MotherlessUploadDateChangeMenu, MotherlessMenu, BtnMotherlessChangeUploadDate) do
   begin
     for I := Ord(TMotherLessUploadDate.DateAll)
     to Ord(TMotherLessUploadDate.DateThisYear) do
-      Addbtn(UploadDateToStr(TMotherLessUploadDate(I)), I, ICON_HISTORY, True);
-    Selected := Ord(TMotherLessUploadDate.DateAll);
+      Addbtn(UploadDateToStr(TMotherLessUploadDate(I)), I, Form1.AppStyle.GetImagePath(ICON_HISTORY));
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(MotherlessMediaSizeChangeMenu, MotherlessMenu, BtnMotherlessChangeMediaSize) do
   begin
     for I := Ord(TMotherLessMediaSize.SizeAll) to Ord(TMotherLessMediaSize.SizeBig) do
       Addbtn(MediaSizeToStr(TMotherLessMediaSize(I)), I, FDefIconPath);
-    Selected := Ord(TMotherLessMediaSize.SizeAll);
+    Menu.SelectFirst;
   end;
 end;
 
@@ -791,7 +834,7 @@ begin
     Addbtn('Newest', Ord(Newest), Form1.AppStyle.GetImagePath(ICON_HISTORY));
     Addbtn('Popular', Ord(Popular), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
     Addbtn('Recommended', Ord(Recommended), FDefIconPath);
-    Selected := Ord(Newest);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(NsfwXxxSearchTypeMenu, NsfwXxxMenu, BtnChangeUrlType) do
@@ -800,7 +843,7 @@ begin
     Addbtn('User name', Ord(TNsfwUrlType.User), Form1.AppStyle.GetImagePath(ICON_AVATAR));
     Addbtn('Category', Ord(TNsfwUrlType.Category), FDefIconPath);
     Addbtn('Related posts', Ord(TNsfwUrlType.Related), Form1.AppStyle.GetImagePath(ICON_COPY));
-    Selected := Ord(TNsfwUrlType.Default);
+    Menu.SelectFirst;
   end;
 
   with NewSelectMenu(NsfwXxxHostChangeMenu, NsfwXxxMenu, BtnChangeSite) do
@@ -808,7 +851,7 @@ begin
     Addbtn('nsfw.xxx', Ord(TNsfwXxxSite.NsfwXxx), FDefIconPath);
     Addbtn('pornpic.xxx', Ord(TNsfwXxxSite.PornpicXxx), FDefIconPath);
     Addbtn('hdporn.pics', Ord(TNsfwXxxSite.HdpornPics), FDefIconPath);
-    Selected := Ord(TNsfwXxxSite.NsfwXxx);
+    Menu.SelectFirst;
   end;
 
   CheckGrid := TColumnsLayout.Create(NsfwXxxMenu);
@@ -867,18 +910,23 @@ end;
 
 procedure TNBoxSearchMenu.DefaultSelectMenuOnChanged(Sender: TObject);
 var
-  LMenu: TNBoxSelectMenu;
+  LMenu: INBoxSelectControls;
+  LMenuControl: TControl;
+  LSelectedControl: TControl;
   LRepresentBtn: TRectButton;
 begin
   ShowMainMenu;
-  LMenu := Sender as TNBoxSelectMenu;
-  if Assigned(LMenu.TagObject) then
+  Supports(Sender, INBoxSelectControls, LMenu);
+  LMenuControl := (Sender as TComponent).Owner as TControl;
+  if Assigned(LMenuControl.TagObject) then
   begin
-    LRepresentBtn := LMenu.TagObject as TRectButton;
-    if Assigned(LMenu.SelectedBtn) then
+    LSelectedControl := LMenu.SelectedControl;
+    if LSelectedControl is TRectButton then
     begin
-      LRepresentBtn.Text.Text := LMenu.SelectedBtn.Text.Text;
-      LRepresentBtn.Image.ImageURL := LMenu.SelectedBtn.Image.ImageURL;
+      var LBtn := LSelectedControl as TRectButton;
+      LRepresentBtn := LMenuControl.TagObject as TRectButton;
+      LRepresentBtn.Text.Text := LBtn.Text.Text;
+      LRepresentBtn.Image.ImageURL := LBtn.Image.ImageURL;
     end;
   end;
 end;
@@ -886,7 +934,7 @@ end;
 procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
 begin
   ShowMainMenu;
-  Self.EditCoomerPartyHost.Edit.Text := CoomerPartyHostChangeMenu.SelectedStr;
+  Self.EditCoomerPartyHost.Edit.Text := CoomerPartyHostChangeMenu.Selected;
 end;
 
 procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
@@ -896,8 +944,8 @@ var
 begin
   LProvider := PROVIDERS.ById(OriginSetMenu.Selected);
   BtnChangeOrigin.Image.ImageURL := form1.AppStyle.GetImagePath(LProvider.Id);
-  BtnChangeOrigin.Text.Text := '( ' + LProvider.TitleName + ' ) Change content provider';
-  Self.EditPageId.Edit.Text := LProvider.FisrtPageId.ToString;
+  BtnChangeOrigin.Text.Text := '( ' + LProvider.TitleName + ' ) Change provider';
+  EditPageId.Edit.Text := LProvider.FisrtPageId.ToString;
 
   case LProvider.Id of
     ORIGIN_NSFWXXX: InitNsfwXxxMenu;
@@ -919,6 +967,22 @@ begin
     FProviderMenus[I].Visible := True;
     Break;
   end;
+end;
+
+procedure TNBoxSearchMenu.FinishNewSelectMenu(AMenu: TControl; AParent: TControl; out AButton: TRectButton);
+var
+  LMenu: INBoxSelectMenu;
+begin
+  with AMenu do begin
+    Parent := Self;
+    Visible := false;
+    Align := TAlignlayout.Client;
+  end;
+  LMenu := AMenu as INBoxSelectMenu;
+  LMenu.Menu.OnSelected := DefaultSelectMenuOnChanged;
+  AButton := NewSelectBtn(AParent, '', AMenu);
+  AButton.Position.Y := Single.MaxValue; { Most bottom }
+  FSelectMenus.Add(LMenu);
 end;
 
 procedure TNBoxSearchMenu.SetRequest(const value: INBoxSearchRequest);
@@ -1027,131 +1091,6 @@ procedure TNBoxSearchMenu.ShowMainMenu;
 begin
   HideMenus;
   MainMenu.Visible := true;
-end;
-
-{ TNBoxSelectMenu }
-
-function TNBoxSelectMenu.AddBtn(AText: string; AId: NativeInt = 0;
-  AImageFilename: string = ''; AShortImageName: boolean = false): TRectButton;
-begin
-  Result := Self.AddBtn(TRectButton, AText);
-  with Result do begin
-    Tag := AId;
-
-    if not AImageFilename.IsEmpty then begin
-
-      if AShortImageName then
-        Image.ImageURL := Form1.AppStyle.GetImagePath(AImageFilename)
-      else
-        Image.ImageURL := AImageFilename;
-
-    end;
-  end;
-end;
-
-function TNBoxSelectMenu.AddBtn(ABtnClass: TRectButtonClass;
-  AText: string): TRectButton;
-begin
-  Result := Form1.CreateDefButtonC(Self, ABtnClass, DEFAULT_IMAGE_CLASS);
-  with Result do begin
-
-    Parent := Self;
-    Align := TAlignLayout.Top;
-    Position.Y := 0;
-    Text.Text := AText;
-
-    OnTap := self.BtnOnTap;
-    {$IFDEF MSWINDOWS}
-    OnClick := Self.ClickTapRef;
-    {$ENDIF}
-
-  end;
-end;
-
-function TNBoxSelectMenu.AddBtnStr(AText: string; ATagStr,
-  AImageFilename: string; AShortImageName: boolean): TRectButton;
-begin
-  Result := Self.AddBtn(AText, 0, AImageFilename, AShortImageName);
-  Result.TagString := ATagStr;
-end;
-
-function TNBoxSelectMenu.BtnIndexByIntTag(AId: NativeInt): integer;
-var
-  I: integer;
-begin
-  for I := 0 to Content.Controls.Count - 1 do begin
-    if (Content.Controls[I].Tag = AId) then begin
-      Result := I;
-      Exit;
-    end;
-  end;
-  Result := -1;
-end;
-
-procedure TNBoxSelectMenu.BtnOnTap(Sender: TObject; const Point: TPointF);
-begin
-  FSelectedBtn := (Sender As TRectButton);
-  FSelectedStr := TFmxObject(Sender).TagString;
-  FDontChangeCurrentBtn := True;
-  try
-    Selected := TFmxObject(Sender).Tag;
-  finally
-    FDontChangeCurrentBtn := False;
-  end;
-end;
-
-procedure TNBoxSelectMenu.ClearButtons;
-var
-  I: integer;
-  C: TControl;
-begin
-  for I := 0 to Self.Content.Controls.Count - 1 do begin
-    C := Self.Content.Controls[0];
-    if (C is TRectButton) then begin
-      C.Free;
-    end;
-  end;
-end;
-
-{$IFDEF MSWINDOWS}
-procedure TNBoxSelectMenu.ClickTapRef(Sender: TObject);
-begin
-  with Sender as TControl do begin
-    Ontap(Sender, TPointF.Create(0, 0));
-  end;
-end;
-{$ENDIF}
-
-constructor TNBoxSelectMenu.Create(AOwner: TComponent);
-begin
-  inherited;
-  FDontChangeCurrentBtn := False;
-  FSelectedBtn := nil;
-end;
-
-destructor TNBoxSelectMenu.Destroy;
-begin
-  inherited;
-end;
-
-function TNBoxSelectMenu.GetBtnByTag(AId: NativeInt): TRectButton;
-var
-  LIndex: integer;
-begin
-  LIndex := BtnIndexByIntTag(AId);
-  if LIndex <> -1 then
-    Result := Content.Controls[LIndex] as TRectButton
-  else
-    Result := Nil;
-end;
-
-procedure TNBoxSelectMenu.SetSelected(const value: NativeInt);
-var
-  I: integer;
-begin
-  FSelected := value;
-  if not FDontChangeCurrentBtn then FSelectedBtn := GetBtnByTag(Value);
-  if Assigned(OnSelected) then OnSelected(self);
 end;
 
 { TNBoxSettingsCheck }
@@ -1292,6 +1231,225 @@ destructor TNBoxMemo.Destroy;
 begin
   Memo.Free;
   inherited;
+end;
+
+{ TNBoxSelectControls<T> }
+
+procedure TNBoxSelectControlsAbs<T>.AddControl(AControl: TControl; const AValue: T);
+begin
+  with (AControl as TControl) do
+  begin
+    OnTap := Self.OnControlTap;
+    {$IFDEF MSWINDOWS} OnClick := Form1.ClickTapRef; {$ENDIF}
+  end;
+  Items.Add(TControlContainer.Create(AControl, AValue));
+end;
+
+constructor TNBoxSelectControlsAbs<T>.Create(AOwner: TComponent);
+begin
+  Inherited;
+  FSelectedContainer.Control := Nil;
+  Items := TList<TControlContainer>.Create;
+end;
+
+procedure TNBoxSelectControlsAbs<T>.DoOnSelected;
+begin
+  if Assigned(FOnSelected) then
+    FOnSelected(Self);
+end;
+
+function TNBoxSelectControlsAbs<T>.GetControlByValue(const AValue: T): TControl;
+var
+  LIndex: integer;
+begin
+  LIndex := IndexOfValue(AValue);
+  if not LIndex < 0 then
+    Result := Items[LIndex].Control
+  else
+    Result := Nil;
+end;
+
+function TNBoxSelectControlsAbs<T>.GetOnSelected: TNotifyEvent;
+begin
+  Result := FOnSelected;
+end;
+
+function TNBoxSelectControlsAbs<T>.GetSelected: T;
+begin
+  if Assigned(FSelectedContainer.Control) then
+    Result := FSelectedContainer.Value;
+end;
+
+function TNBoxSelectControlsAbs<T>.GetSelectedControl: TControl;
+begin
+  Result := FSelectedContainer.Control;
+end;
+
+function TNBoxSelectControlsAbs<T>.IndexOfControl(
+  const AControl: TControl): integer;
+var
+  I: integer;
+begin
+  if Assigned(AControl) then
+  begin
+    For I := 0 to Items.Count - 1 do
+      if (AControl = Items[I].Control) then Exit(I);
+  end;
+  Result := -1; { Not found. }
+end;
+
+function TNBoxSelectControlsAbs<T>.IndexOfValue(const AValue: T): integer;
+var
+  I: integer;
+begin
+  For I := 0 to Items.Count - 1 do
+    if IsEqual(AValue, Items[I].Value) then Exit(I);
+  Result := -1; { Not found. }
+end;
+
+procedure TNBoxSelectControlsAbs<T>.OnControlTap(Sender: TObject;
+  const Point: TPointF);
+begin
+  SelectedControl := Sender as TControl;
+end;
+
+procedure TNBoxSelectControlsAbs<T>.SelectFirst;
+begin
+  if Items.Count > 0 then begin
+    FSelectedContainer := Items.First;
+    DoOnSelected;
+  end;
+end;
+
+procedure TNBoxSelectControlsAbs<T>.FreeControls;
+var
+  I: integer;
+begin
+  FSelectedContainer := TControlContainer.Create(Nil);
+  For I := 1 to Items.Count do
+  begin
+    Items[0].Control.Free;
+    Items.Delete(0);
+  end;
+end;
+
+procedure TNBoxSelectControlsAbs<T>.SetOnSelected(const value: TNotifyEvent);
+begin
+  FOnSelected := Value;
+end;
+
+procedure TNBoxSelectControlsAbs<T>.SetSelected(const value: T);
+var
+  LIndex: integer;
+begin
+  LIndex := Self.IndexOfValue(value);
+  if not LIndex < 0 then
+    SelectedControl := Items[LIndex].Control;
+end;
+
+procedure TNBoxSelectControlsAbs<T>.SetSelectedControl(const value: TControl);
+var
+  LIndex: Integer;
+begin
+  LIndex := IndexOfControl(value);
+  if not LIndex < 0 then
+    FSelectedContainer := Items[LIndex];
+  DoOnSelected;
+end;
+
+{ TNBoxSelectControlsObj<T> }
+
+function TNBoxSelectControlsObj<T>.IsEqual(const AValue, AValue2: T): boolean;
+begin
+  Result := AValue = AValue2;
+end;
+
+{ TNBoxSelectControlsIObj<T> }
+
+function TNBoxSelectControlsIObj<T>.IsEqual(const AValue, AValue2: T): boolean;
+begin
+  Result := (AValue as TObject) = (AValue2 as TObject);
+end;
+
+{ TNBoxSelectControlsInt }
+
+function TNBoxSelectControlsInt.IsEqual(const AValue, AValue2: Int64): boolean;
+begin
+  Result := AValue = AValue2;
+end;
+
+{ TNBoxSelectControlsAbs<T>.TControlContainer }
+
+constructor TNBoxSelectControlsAbs<T>.TControlContainer.Create(
+  AControl: TControl; AValue: T);
+begin
+  Control := AControl;
+  Value := AValue;
+end;
+
+constructor TNBoxSelectControlsAbs<T>.TControlContainer.Create(
+  AControl: TControl);
+begin
+  Control := AControl;
+end;
+
+
+{ TNBoxSelectMenuAbs<ValueType, MenuType> }
+
+constructor TNBoxSelectMenuAbs<ValueType, MenuType>.Create(AOwner: TComponent);
+begin
+  inherited;
+  FMenu := MenuType.Create(Self);
+end;
+
+function TNBoxSelectMenuAbs<ValueType, MenuType>.GetMenu: INBoxSelectControls;
+begin
+  Result := FMenu;
+end;
+
+{ TNBoxSelectMenu<ValueType, MenuType> }
+
+function TNBoxSelectMenu<ValueType, MenuType>.AddBtn(AText: string;
+  AValue: ValueType; AImageFilename: string): TRectButton;
+begin
+  Result := AddBtn(TRectButton, AText, AValue);
+  with Result do
+  begin
+    if not AImageFilename.IsEmpty then
+      Image.ImageURL := AImageFilename;
+  end;
+end;
+
+function TNBoxSelectMenu<ValueType, MenuType>.GetSelected: ValueType;
+begin
+  Result := Menu.Selected;
+end;
+
+procedure TNBoxSelectMenu<ValueType, MenuType>.SetSelected(
+  const value: ValueType);
+begin
+  Menu.Selected := value;
+end;
+
+function TNBoxSelectMenu<ValueType, MenuType>.AddBtn(
+  ABtnClass: TRectButtonClass; AText: string; AValue: ValueType): TRectButton;
+begin
+  Result := Form1.CreateDefButtonC(Self, ABtnClass, DEFAULT_IMAGE_CLASS);
+  with Result do
+  begin
+    Parent := Self;
+    Align := TAlignLayout.Top;
+    Position.Y := 0;
+    Text.Text := AText;
+  end;
+  Menu.AddControl(Result, AValue);
+end;
+
+{ TNBoxSelectControlsStr }
+
+function TNBoxSelectControlsStr.IsEqual(const AValue, AValue2: String): boolean;
+begin
+  Result := (AValue = AValue2);
 end;
 
 end.

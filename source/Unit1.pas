@@ -239,13 +239,13 @@ type
     BtnSetSave
     : TRectButton;
 
-    MenuChangeTheme: TNBoxSelectMenu;
+    MenuChangeTheme: TNBoxSelectMenuStr;
 
     { Settings }
     CheckMenuSetOnItemTap: TNBoxCheckMenu;
     BtnSetSaveOnItemTap: TRectButton;
 
-    MenuItemTags: TNBoxSelectMenu;
+    MenuItemTags: TNBoxSelectMenuTag;
     MenuItemTagsOrigin: integer;
 
     { Image viewer menu }
@@ -1352,10 +1352,14 @@ begin
   { Menu for change app theme\style }
     var ThemeFiles: TSearchRecAr;
     ThemeFiles := GetFiles(TPath.Combine(TNBoxPath.GetThemesPath, '*'));
-    MenuChangeTheme.ClearButtons;
+    MenuChangeTheme.Menu.FreeControls;
     for I := 0 to High(ThemeFiles) do begin
       if (pos('.json', ThemeFiles[I].Name) > 0) then
-        MenuChangeTheme.AddBtn(ThemeFiles[I].Name, 0, ICON_NSFWBOX, true);
+        MenuChangeTheme.AddBtn(
+          TPath.GetFileNameWithoutExtension(ThemeFiles[I].Name),
+          ThemeFiles[I].Name,
+          AppStyle.GetImagePath(ICON_NSFWBOX)
+        );
     end;
 
   end else if ( ALayout = MenuLog ) then begin
@@ -2494,11 +2498,11 @@ begin
 
   end;
 
-  MenuChangeTheme := TNBoxSelectMenu.Create(MainLayout);
+  MenuChangeTheme := TNBoxSelectMenuStr.Create(MainLayout);
   with MenuChangeTheme do begin
     Parent := MainLayout;
     Align  := TAlignlayout.Client;
-    OnSelected := MenuChangeThemeOnSelected;
+    Menu.OnSelected := MenuChangeThemeOnSelected;
   end;
 
   BtnSetViewLog := AddSettingsButton('View log', ICON_NSFWBOX);
@@ -2661,10 +2665,10 @@ begin
   { MenuSearchDoList }
   BtnSearchAddBookmark := AddMenuSearchBtn('Add current request to bookmarks', ICON_BOOKMARKS, BtnSearchAddBookmarkOnTap);
 
-  MenuItemTags := TNBoxSelectMenu.Create(Form1.MainLayout);
+  MenuItemTags := TNBoxSelectMenuTag.Create(Form1.MainLayout);
   MenuItemTags.Parent := Form1.MainLayout;
   MenuItemTags.Align := TAlignLayout.Client;
-  MenuItemTags.OnSelected := MenuItemTagsOnSelected;
+  MenuItemTags.Menu.OnSelected := MenuItemTagsOnSelected;
 
   BookmarksControls := TControlObjList.Create;
   HistoryDbControls := TControlObjList.Create;
@@ -3047,7 +3051,7 @@ var
   LIconBmp: TBitmap;
 begin
   MenuItemTagsOrigin := AOrigin;
-  MenuItemTags.ClearButtons;
+  MenuItemTags.Menu.FreeControls;
   LIconBmp := TBitmap.Create;
   try
     var LImagePath: string := Form1.AppStyle.GetImagePath(ICON_TAG);
@@ -3055,12 +3059,11 @@ begin
       LIconBmp.LoadFromFile(Form1.AppStyle.GetImagePath(ICON_TAG));
 
     for I := low(ATags) to high(ATags) do begin
-      LNewBtn := MenuItemTags.AddBtn(TRectButtonWithTag, ItemTagToCaption(ATags[I]));
+      LNewBtn := MenuItemTags.AddBtn(
+        ItemTagToCaption(ATags[I]),
+        ATags[I]);
       LNewBtn.Text.TextIsHtml := True;
       LNewBtn.Image.BitmapIWU.Assign(LIconBmp);
-
-      with LNewBtn as TRectButtonWithTag do
-        ContainedData := ATags[I];
     end;
 
   finally
@@ -3677,20 +3680,18 @@ end;
 
 procedure TForm1.MenuChangeThemeOnSelected(Sender: TObject);
 begin
-  FSettings.StyleName := (Sender as TNBoxSelectMenu).SelectedBtn.Text.Text;
+  FSettings.StyleName := MenuChangeTheme.Selected;
   SaveSettings;
   ChangeInterface(MenuSettings);
 end;
 
 procedure TForm1.MenuItemTagsOnSelected(Sender: TObject);
 var
-  LBtnTag: TRectButtonWithTag;
   LReq: INBoxSearchRequest;
 begin
-  LBtnTag := MenuItemTags.SelectedBtn as TRectButtonWithTag;
-  LReq := CreateTagReq(MenuItemTagsOrigin, LBtnTag.ContainedData);
+  LReq := CreateTagReq(MenuItemTagsOrigin, MenuItemTags.Selected);
   try
-    self.AddBrowser(LReq, Settings.AutoStartBrowse);
+    AddBrowser(LReq, Settings.AutoStartBrowse);
   finally
     FreeInterfaced(LReq);
   end;
@@ -4262,9 +4263,9 @@ begin
   {$ENDIF}
 
   With SearchMenu.OriginSetMenu do begin
-    var LBtn: TRectButton := GetBtnByTag(PROVIDERS.Pseudo.id);
+    var LBtn: TControl := Menu.GetControlByValue(PROVIDERS.Pseudo.id);
     if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
-    LBtn := GetBtnByTag(PROVIDERS.Bookmarks.id);
+    LBtn := Menu.GetControlByValue(PROVIDERS.Bookmarks.id);
     if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
   end;
 
