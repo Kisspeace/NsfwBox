@@ -243,7 +243,6 @@ type
           BtnFapelloChangeSearchType: TRectButton;
         RandomizerMenu: TNBoxSearchSubMenuBase;
           BtnRandNsfwXxx: TNBoxCheckButton;
-//          BtnRandR34App: TNBoxCheckButton;
           BtnRandGmpClub: TNBoxCheckButton;
           BtnRandCoomerParty: TNBoxCheckButton;
           BtnRandMotherless: TNBoxCheckButton;
@@ -272,21 +271,18 @@ type
       Text: TAlText;
       property IsChecked: Boolean read GetIsChecked write SetIsChecked;
       constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
   end;
 
   TNBoxSettingsEdit = class(TNBoxSettingsCheck)
     public
       Edit: TNBoxEdit;
       constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
   end;
 
   TNBoxMemo = class(TAlRectangle)
     public
       Memo: TMemo;
       constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
   end;
 
 implementation
@@ -479,34 +475,19 @@ begin
     end;
   end;
   MainMenu.Height := BtnChangeOrigin.Height;
-
-  { R34.app menu ----------- } { Full in - InitR34appMenu }
   R34AppMenu := NewProviderMenu(PROVIDERS.R34App.Id);
 
-  { bookmarks menu --------- }
   BookmarksMenu := NewProviderMenu(PROVIDERS.Bookmarks.id);
   NewEdit(EditBookmarksPath, BookmarksMenu, 'Bookmarks data base path', Nil, '<BOOKMARKS>');
 
-  { nsfw.xxx menu ---------- } { Full in - InitNsfwXxxMenu }
   NsfwXxxMenu := NewProviderMenu(PROVIDERS.NsfwXxx.Id);
   NsfwXxxMenu.OnResize := NsfwXxxMenu.OnResizeEvent;
 
-  { gmpclub club menu ------ } { Full in - InitGmpClubMenu }
   GmpClubMenu := NewProviderMenu(PROVIDERS.GMPClub.Id);
-
-  { Coomer.party menu ------ } { Full in - InitCoomerPartyMenu }
   CoomerPartyMenu := NewProviderMenu(PROVIDERS.CoomerParty.Id);
-
-  { Motherless menu -------- } { Full in - InitMotherlessMenu }
   MotherlessMenu := NewProviderMenu(PROVIDERS.Motherless.Id);
-
-  { Fapello menu ----------- } { Full in - InitFapelloMenu }
   FapelloMenu := NewProviderMenu(PROVIDERS.Fapello.Id);
-
-  { BepisDb menu ---------------- } { Full in - InitBepisDbMenu }
   BepisDbMenu := NewProviderMenu(PROVIDERS.BepisDb.Id);
-
-  { Randomizer menu ------------- } { Full in - InitRandomizerDbMenu }
   RandomizerMenu := NewProviderMenu(PROVIDERS.Randomizer.id);
 end;
 
@@ -589,7 +570,6 @@ begin
       with ( Result as TNBoxSearchReqRandomizer ) do begin
         Providers := [];
         if BtnRandNsfwXxx.IsChecked then Providers := Providers + [ORIGIN_NSFWXXX];
-//        if BtnRandR34App.IsChecked then Providers := Providers + [ORIGIN_R34APP];
         if BtnRandGmpClub.IsChecked then Providers := Providers + [ORIGIN_GIVEMEPORNCLUB];
         if BtnRandCoomerParty.IsChecked then Providers := Providers + [ORIGIN_COOMERPARTY];
         if BtnRand9Hentaito.IsChecked then Providers := Providers + [ORIGIN_9HENTAITO];
@@ -621,12 +601,9 @@ begin
   end;
 
   with Result do begin
-
     Request := EditRequest.Edit.Text;
-
     if TryStrToInt(EditPageId.Edit.Text, tmp) then
       PageId := tmp;
-
   end;
 end;
 
@@ -652,17 +629,17 @@ begin
   if Assigned(BepisDbSubjectMenu) then exit;
   with NewSelectMenu(BepisDbSubjectMenu, BepisDbMenu, BtnBepisDbChangeSubject) do
   begin
-    AddBtn('Koikatsu cards', Ord(TBepisDbSearchOpt.TSubject.KoikatsuCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Koikatsu scenes', Ord(TBepisDbSearchOpt.TSubject.KoikatsuScenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Koikatsu clothing', Ord(TBepisDbSearchOpt.TSubject.KoikatsuClothing), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Artificial Academy 2 cards', Ord(TBepisDbSearchOpt.TSubject.AA2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Artificial Academy 2 scenes', Ord(TBepisDbSearchOpt.TSubject.AA2Scenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Honey Select', Ord(TBepisDbSearchOpt.TSubject.HoneySelectCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Play Home', Ord(TBepisDbSearchOpt.TSubject.PlayHomeCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('AI Shoujo / HS2 cards', Ord(TBepisDbSearchOpt.TSubject.AIHS2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('AI Shoujo / HS2 scenes', Ord(TBepisDbSearchOpt.TSubject.AIHS2Scenes), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Custom Order Maid 3D 2', Ord(TBepisDbSearchOpt.TSubject.COM3D2Cards), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Summer Heat', Ord(TBepisDbSearchOpt.TSubject.SummerHeatCards), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Koikatsu cards', Ord(TBepisDbSearchOpt.TSubject.KoikatsuCards), FDefIconPath);
+    AddBtn('Koikatsu scenes', Ord(TBepisDbSearchOpt.TSubject.KoikatsuScenes), FDefIconPath);
+    AddBtn('Koikatsu clothing', Ord(TBepisDbSearchOpt.TSubject.KoikatsuClothing), FDefIconPath);
+    AddBtn('Artificial Academy 2 cards', Ord(TBepisDbSearchOpt.TSubject.AA2Cards), FDefIconPath);
+    AddBtn('Artificial Academy 2 scenes', Ord(TBepisDbSearchOpt.TSubject.AA2Scenes), FDefIconPath);
+    AddBtn('Honey Select', Ord(TBepisDbSearchOpt.TSubject.HoneySelectCards), FDefIconPath);
+    AddBtn('Play Home', Ord(TBepisDbSearchOpt.TSubject.PlayHomeCards), FDefIconPath);
+    AddBtn('AI Shoujo / HS2 cards', Ord(TBepisDbSearchOpt.TSubject.AIHS2Cards), FDefIconPath);
+    AddBtn('AI Shoujo / HS2 scenes', Ord(TBepisDbSearchOpt.TSubject.AIHS2Scenes), FDefIconPath);
+    AddBtn('Custom Order Maid 3D 2', Ord(TBepisDbSearchOpt.TSubject.COM3D2Cards), FDefIconPath);
+    AddBtn('Summer Heat', Ord(TBepisDbSearchOpt.TSubject.SummerHeatCards), FDefIconPath);
     Menu.SelectFirst;
   end;
 
@@ -676,7 +653,7 @@ begin
 
   with NewSelectMenu(BepisDbKKGenderMenu, BepisDbMenu, BtnBepisDbChangeGender) do
   begin
-    AddBtn('Gender unspecified', Ord(TBepisDbSearchOpt.TGender.GendUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Gender unspecified', Ord(TBepisDbSearchOpt.TGender.GendUnspecified), FDefIconPath);
     AddBtn('Gender female', Ord(TBepisDbSearchOpt.TGender.GendFemale), Form1.AppStyle.GetImagePath(ICON_STRAIGHT));
     AddBtn('Gender male', Ord(TBepisDbSearchOpt.TGender.GendMale), Form1.AppStyle.GetImagePath(ICON_GAY));
     Menu.SelectFirst;
@@ -684,49 +661,57 @@ begin
 
   with NewSelectMenu(BepisDbKKPersonalityMenu, BepisDbMenu, BtnBepisDbChangePersonality) do
   begin
-    AddBtn('Personality unspecified', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Sexy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSexy), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Ojousama', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOjousama), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Snobby', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSnobby), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Kouhai', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersKouhai), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Mysterious', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersMysterious), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Weirdo', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWeirdo), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Yamato Nadeshiko', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersYamatoNadeshiko), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Tomboy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTomboy), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Pure', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersPure), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Simple', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSimple), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Delusional', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersDelusional), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Motherly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersMotherly), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('BigSisterly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersBigSisterly), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Gyaru', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersGyaru), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Delinquent', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersDelinquent), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Wild', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWild), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Wannable', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWannabe), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Reluctant', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersReluctant), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Jinxed', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersJinxed), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Bookish', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersBookish), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Timid', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTimid), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Typical Schoolgirl', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTypicalSchoolgirl), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Trendy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTrendy), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Otaku', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOtaku), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Yandere', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersYandere), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Lazy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersLazy), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Quiet', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersQuiet), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Stubborn', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersStubborn), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Oldfashioned', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOldFashioned), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Humble', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersHumble), Form1.AppStyle.GetImagePath(ICON_EDIT));
-//    AddBtn('', Ord(TBepisDbSearchOpt.TKoikatsuPersonality), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Personality unspecified', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersUnspecified), FDefIconPath);
+    AddBtn('Sexy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSexy), FDefIconPath);
+    AddBtn('Ojousama', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOjousama), FDefIconPath);
+    AddBtn('Snobby', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSnobby), FDefIconPath);
+    AddBtn('Kouhai', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersKouhai), FDefIconPath);
+    AddBtn('Mysterious', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersMysterious), FDefIconPath);
+    AddBtn('Weirdo', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWeirdo), FDefIconPath);
+    AddBtn('Yamato Nadeshiko', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersYamatoNadeshiko), FDefIconPath);
+    AddBtn('Tomboy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTomboy), FDefIconPath);
+    AddBtn('Pure', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersPure), FDefIconPath);
+    AddBtn('Simple', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSimple), FDefIconPath);
+    AddBtn('Delusional', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersDelusional), FDefIconPath);
+    AddBtn('Motherly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersMotherly), FDefIconPath);
+    AddBtn('BigSisterly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersBigSisterly), FDefIconPath);
+    AddBtn('Gyaru', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersGyaru), FDefIconPath);
+    AddBtn('Delinquent', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersDelinquent), FDefIconPath);
+    AddBtn('Wild', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWild), FDefIconPath);
+    AddBtn('Wannable', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWannabe), FDefIconPath);
+    AddBtn('Reluctant', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersReluctant), FDefIconPath);
+    AddBtn('Jinxed', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersJinxed), FDefIconPath);
+    AddBtn('Bookish', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersBookish), FDefIconPath);
+    AddBtn('Timid', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTimid), FDefIconPath);
+    AddBtn('Typical Schoolgirl', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTypicalSchoolgirl), FDefIconPath);
+    AddBtn('Trendy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersTrendy), FDefIconPath);
+    AddBtn('Otaku', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOtaku), FDefIconPath);
+    AddBtn('Yandere', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersYandere), FDefIconPath);
+    AddBtn('Lazy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersLazy), FDefIconPath);
+    AddBtn('Quiet', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersQuiet), FDefIconPath);
+    AddBtn('Stubborn', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersStubborn), FDefIconPath);
+    AddBtn('Oldfashioned', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersOldFashioned), FDefIconPath);
+    AddBtn('Humble', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersHumble), FDefIconPath);
+    AddBtn('Friendly', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersFriendly), FDefIconPath);
+    AddBtn('Willful', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersWillful), FDefIconPath);
+    AddBtn('Honest', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersHonest), FDefIconPath);
+    AddBtn('Glamorous', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersGlamorous), FDefIconPath);
+    AddBtn('Returnee', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersReturnee), FDefIconPath);
+    AddBtn('Slangy', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSlangy), FDefIconPath);
+    AddBtn('Sadistic', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersSadistic), FDefIconPath);
+    AddBtn('Emotionless', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersEmotionless), FDefIconPath);
+    AddBtn('Perfectionist', Ord(TBepisDbSearchOpt.TKoikatsuPersonality.PersPerfectionist), FDefIconPath);
     Menu.SelectFirst;
   end;
 
   with NewSelectMenu(BepisDbKKGameTypeMenu, BepisDbMenu, BtnBepisDbChangeGameType) do
   begin
-    AddBtn('Game type unspecified', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameUnspecified), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Game type: Base', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameBase), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Game type: Steam', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Game type: Steam 18+', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam18), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Game type: Emotion Creators', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameEmotionCreators), Form1.AppStyle.GetImagePath(ICON_EDIT));
-    AddBtn('Game type: Sunshine', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSunshine), Form1.AppStyle.GetImagePath(ICON_EDIT));
+    AddBtn('Game type unspecified', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameUnspecified), FDefIconPath);
+    AddBtn('Game type: Base', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameBase), FDefIconPath);
+    AddBtn('Game type: Steam', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam), FDefIconPath);
+    AddBtn('Game type: Steam 18+', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSteam18), FDefIconPath);
+    AddBtn('Game type: Emotion Creators', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameEmotionCreators), FDefIconPath);
+    AddBtn('Game type: Sunshine', Ord(TBepisDbSearchOpt.TKoikatsuGameType.GameSunshine), FDefIconPath);
     Menu.SelectFirst;
   end;
 end;
@@ -804,7 +789,8 @@ begin
 
   with NewSelectMenu(MotherlessMediaSizeChangeMenu, MotherlessMenu, BtnMotherlessChangeMediaSize) do
   begin
-    for I := Ord(TMotherLessMediaSize.SizeAll) to Ord(TMotherLessMediaSize.SizeBig) do
+    for I := Ord(TMotherLessMediaSize.SizeAll)
+    to Ord(TMotherLessMediaSize.SizeBig) do
       Addbtn(MediaSizeToStr(TMotherLessMediaSize(I)), I, FDefIconPath);
     Menu.SelectFirst;
   end;
@@ -1115,13 +1101,6 @@ begin
 
 end;
 
-destructor TNBoxSettingsCheck.Destroy;
-begin
-  Check.Free;
-  Text.Free;
-  inherited;
-end;
-
 function TNBoxSettingsCheck.GetIsChecked: Boolean;
 begin
   Result := Check.IsChecked;
@@ -1148,12 +1127,6 @@ begin
     Parent := self;
     Align := TAlignLayout.Top;
   end;
-end;
-
-destructor TNBoxSettingsEdit.Destroy;
-begin
-  Edit.Free;
-  inherited;
 end;
 
 { TNBoxCheckMenu }
@@ -1225,12 +1198,6 @@ begin
     Align := TAlignLayout.Client;
     Margins.Rect := TRectF.Create(6, 6, 6, 6);
   end;
-end;
-
-destructor TNBoxMemo.Destroy;
-begin
-  Memo.Free;
-  inherited;
 end;
 
 { TNBoxSelectControls<T> }
