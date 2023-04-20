@@ -26,6 +26,9 @@ type
 
   procedure Init(); { Call on form create }
 
+var
+  Initialized: Boolean = FALSE;
+
 implementation
 uses Unit1;
 
@@ -48,6 +51,8 @@ procedure Init();
   end;
 
 begin
+  if Initialized then Exit;
+  Initialized := TRUE;
   NewTestBtn('Stress test downloads', TNBoxTests.TestDownloadsOnTap);
   NewTestBtn('Stress test browser', TNBoxTests.TestBrowserOnTap);
   NewTestBtn('Test bookmarks read', TNBoxTests.TestBookmarksRead);

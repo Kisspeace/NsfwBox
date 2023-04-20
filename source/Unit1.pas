@@ -2379,7 +2379,6 @@ begin
   end;
 
   MenuTestButtons := TList<TRectButton>.Create;
-  NsfwBox.Tests.Init();
 
   SearchMenu := TNBoxSearchMenu.Create(self);
   with Searchmenu do begin
@@ -4317,6 +4316,8 @@ begin
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
   CheckSetUseNewAppTitlebar.IsChecked   := Settings.UseNewAppTitlebar;
   {$ENDIF}
+
+  if Settings.DevMode then NsfwBox.Tests.Init;
 
   With SearchMenu.OriginSetMenu do begin
     var LBtn: TControl := Menu.GetControlByValue(PROVIDERS.Pseudo.id);
