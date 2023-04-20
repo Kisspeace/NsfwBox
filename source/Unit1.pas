@@ -77,6 +77,7 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
     FLock: TMREWSync;
@@ -126,8 +127,11 @@ type
     TabsScroll: TVertScrollBox;
     Browsers: TNBoxBrowserList;
     Tabs: TNBoxTabList;
+
+    { OnBrowserLayout }
     BtnNext: TRectButton;
     BtnPrev: TRectButton;
+    BtnStatus: TRectButton;
 
     { DialogYesOrNo }
     UserSayYes: boolean;
@@ -285,6 +289,7 @@ type
     procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = -999);
     procedure ToastMessage(const AMessage: string; AShort: boolean);
     procedure OnIWUManagerCreateWebClient(Sender: TObject; AClient: TNetHttpClient);
+    procedure SetBrowserStatus(const AStr: string; AImagePath: string = '');
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -357,6 +362,7 @@ type
     { -> Browsers ----------------- }
     procedure OnBrowserViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean);
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient; AOrigin: integer);
+    procedure OnBrowserExcept(Sender: TObject; const AExcept: Exception);
     procedure OnBrowserScraperCreate(Sender: TObject; var AScraper: TNBoxScraper);
     procedure OnBrowserReqChanged(Sender: TObject);
     procedure BrowserBeforeBrowse(Sender: TObject);
@@ -830,6 +836,9 @@ begin
   try
     LReq := (Sender as TNBoxBrowser).Request;
     HistoryDb.SearchGroup.Add(LReq);
+    if CurrentBrowser = Sender then
+      SetBrowserStatus('Search ' + LReq.PageId.ToString + ': '
+      + PROVIDERS.ById(LReq.Origin).TitleName, AppStyle.GetImagePath(LReq.Origin));
   finally
     FreeInterfaced(LReq);
   end;
@@ -1464,8 +1473,9 @@ begin
     ColumnsCount   := Settings.ContentLayoutsCount;
     ItemsIndent    := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
     Request                  := nil;
-    Result.OnWebClientCreate := OnBrowserSetWebClient;
-    Result.OnScraperCreate   := form1.OnBrowserScraperCreate;
+    OnWebClientCreate := OnBrowserSetWebClient;
+    OnScraperCreate   := OnBrowserScraperCreate;
+    OnException       := OnBrowserExcept;
     visible                  := false;
     ImageManager             := BrowsersIWUContentManager;
     OnViewportPositionChange := OnBrowserViewportPositionChange;
@@ -1761,7 +1771,10 @@ var
   LTab: TNBoxTab;
 begin
   if ABrowser = FCurrentBrowser then
+  begin
     FCurrentBrowser := nil;
+    BtnStatus.Visible := False;
+  end;
 
   LBrowserIndex := Browsers.IndexOf(ABrowser);
   if ( LBrowserIndex = -1 ) then
@@ -2660,8 +2673,6 @@ begin
     OnTap := BtnSendMsgForDevOnTap;
   end;
 
-
-
   { MenuSearchDoList }
   BtnSearchAddBookmark := AddMenuSearchBtn('Add current request to bookmarks', ICON_BOOKMARKS, BtnSearchAddBookmarkOnTap);
 
@@ -2694,6 +2705,21 @@ begin
 
   if Settings.AutoSaveSession then
     loadSession;
+
+  BtnStatus := CreateDefButton(LayoutDialogYesOrNo);
+  with BtnStatus do begin
+    Parent := OnBrowserLayout;
+    Position.Point := TPointF.Create(10, 10);
+    Height := 28;
+    AppStyle.SettingsRect.Apply(BtnStatus);
+    ImageControl.Margins.Rect := TRectF.Create(4, 4, 5, 4);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_DONE);
+    Text.Color := TAlphaColorRec.White;
+    Text.Font.Size := 10;
+    FillMove := FillDef;
+    StrokeMove.Kind := TBrushKind.None;
+    Text.Text := 'Status bar.';
+  end;
 
   if Browsers.Count < 1 then
     AddBrowser(nil);
@@ -2790,12 +2816,6 @@ begin
 
     end).Start;
   end;
-
-  //var LStr, LEncStr: string;
-  //LStr := '' + '?wait=true';
-  //LEncStr := TNetEncoding.Base64String.Encode(LStr);
-  //unit1.Log(LEncStr);
-
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -2871,6 +2891,20 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TForm1.FormResize(Sender: TObject);
+const
+  MAX_STATUS_BAR_WIDTH = 216;
+var
+  W: Single;
+begin
+  W := ((OnBrowserLayout.Width - BtnStatus.Position.X) / 100) * 35;
+  if W < MAX_STATUS_BAR_WIDTH then
+    W := OnBrowserLayout.Width - (BtnStatus.Position.X * 2);
+  if W > MAX_STATUS_BAR_WIDTH then
+    W := MAX_STATUS_BAR_WIDTH;
+  BtnStatus.width := W;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -3095,6 +3129,19 @@ begin
     if Items.Count = 0 then
       GoBrowse;
   end;
+end;
+
+procedure TForm1.OnBrowserExcept(Sender: TObject; const AExcept: Exception);
+var
+  LBrowser: TNBoxBrowser;
+begin
+  LBrowser := Sender as TNBoxBrowser;
+  TThread.Synchronize(TThread.Current,
+  procedure
+  begin
+    if (CurrentBrowser = LBrowser) then
+      SetBrowserStatus(AExcept.Message, AppStyle.GetImagePath(ICON_WARNING));
+  end);
 end;
 
 procedure TForm1.OnBrowserGesture(Sender: TObject;
@@ -4169,6 +4216,14 @@ begin
   FAppStyle.Multiview.Apply(MVRect.Fill);
 end;
 
+procedure TForm1.SetBrowserStatus(const AStr: string; AImagePath: string);
+begin
+  BtnStatus.Visible := True;
+  if not AImagePath.IsEmpty then
+    BtnStatus.Image.ImageUrl := AImagePath;
+  BtnStatus.Text.Text := AStr;
+end;
+
 procedure TForm1.SetCurrentBookmarkControl(const value: TNBoxSettingsCheck);
 begin
   FCurrentBookmarkControl := Value;
@@ -4205,6 +4260,8 @@ begin
   finally
     FreeInterfaced(LReq);
   end;
+
+  BtnStatus.Visible := False;
 end;
 
 procedure TForm1.SetCurrentItem(const value: TNBoxCardBase);

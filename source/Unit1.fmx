@@ -25,6 +25,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyUp = FormKeyUp
+  OnResize = FormResize
   OnShow = FormShow
   DesignerMasterStyle = 0
   object MainLayout: TLayout
