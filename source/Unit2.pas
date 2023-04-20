@@ -159,6 +159,7 @@ type
       FProviderMenus: TNBoxSearchSubMenuBaseList;
       procedure OnOriginChanged(Sender: TObject);
       procedure OnCoomerPartyHostChanged(Sender: TObject);
+      procedure OnCoomerPartyServiceChanged(Sender: TObject);
       procedure DefaultSelectMenuOnChanged(Sender: TObject);
       procedure BtnSelectMenuOnTap(Sender: TObject; const Point: TPointF);
       procedure SetRequest(const value: INBoxSearchRequest);
@@ -183,6 +184,7 @@ type
       procedure InitFapelloMenu;
       procedure InitGmpClubMenu;
       procedure InitR34AppMenu;
+    function NewSelectMenuStr(AParent: TControl): TNBoxSelectMenuStr;
     public
       OriginSetMenu,
       NsfwXxxSortMenu,
@@ -201,7 +203,9 @@ type
       BepisDbKKPersonalityMenu,
       BepisDbKKGameTypeMenu
       : TNBoxSelectMenuInt;
-      CoomerPartyHostChangeMenu: TNBoxSelectMenuStr;
+      CoomerPartyHostChangeMenu,
+      CoomerPartyServiceChangeMenu
+      : TNBoxSelectMenuStr;
       //-------------------//
       MainMenu: TVertScrollBox;
         EditRequest: TNBoxEdit;
@@ -231,7 +235,9 @@ type
           EditCoomerPartyUserId,
           EditCoomerPartyService
           : TNBoxEdit;
-          BtnCoomerPartyChangeSite: TRectButton;
+          BtnCoomerPartyChangeSite,
+          BtnCoomerPartyChangeService
+          : TRectButton;
         MotherlessMenu: TNBoxSearchSubMenuBase;
           BtnMotherlessChangeSort: TRectButton;
           BtnMotherlessChangeMedia: TRectButton;
@@ -362,6 +368,12 @@ begin
   AMenu := TNBoxSelectMenuStr.Create(Self);
   Result := AMenu;
   FinishNewSelectMenu(AMenu, AParent, ARepresentButton);
+end;
+
+function TNBoxSearchMenu.NewSelectMenuStr(
+  AParent: TControl): TNBoxSelectMenuStr;
+begin
+
 end;
 
 function TNBoxSearchMenu.NewSelectMenu(out AMenu: TNBoxSelectMenuInt;
@@ -717,6 +729,8 @@ begin
 end;
 
 procedure TNBoxSearchMenu.InitCoomerPartyMenu;
+var
+  LBtn: TRectButton;
 begin
   if Assigned(EditCoomerPartyHost) then Exit;
   NewEdit(EditCoomerPartyHost, CoomerPartyMenu, 'Host URL', Nil, URL_COOMER_PARTY);
@@ -733,6 +747,22 @@ begin
 
   NewEdit(EditCoomerPartyUserId, CoomerPartyMenu, 'Artist Id', BtnCoomerPartyChangeSite);
   NewEdit(EditCoomerPartyService, CoomerPartyMenu, 'Service name (onlyfans, patreon..)', EditCoomerPartyUserId);
+
+  with NewSelectMenu(CoomerPartyServiceChangeMenu, CoomerPartyMenu, BtnCoomerPartyChangeService) do
+  begin
+    AddBtn('OnlyFans', 'onlyfans', FDefIconPath);
+    AddBtn('Patreon', 'patreon', FDefIconPath);
+    AddBtn('Pixiv fanbox', 'fanbox', FDefIconPath);
+    AddBtn('Fantia', 'fantia', FDefIconPath);
+    AddBtn('Boosty', 'boosty', FDefIconPath);
+    AddBtn('Gumroad', 'gumroad', FDefIconPath);
+    AddBtn('SubscribeStar', 'subscribestar', FDefIconPath);
+    AddBtn('DLsite', 'dlsite', FDefIconPath);
+    AddBtn('Discord', 'discord', FDefIconPath);
+    Menu.OnSelected := OnCoomerPartyServiceChanged;
+  end;
+  BtnCoomerPartyChangeService.Text.Text := 'Change service';
+  BeBottom(BtnCoomerPartyChangeService, EditCoomerPartyService);
 end;
 
 procedure TNBoxSearchMenu.InitFapelloMenu;
@@ -921,6 +951,19 @@ procedure TNBoxSearchMenu.OnCoomerPartyHostChanged(Sender: TObject);
 begin
   ShowMainMenu;
   Self.EditCoomerPartyHost.Edit.Text := CoomerPartyHostChangeMenu.Selected;
+end;
+
+procedure TNBoxSearchMenu.OnCoomerPartyServiceChanged(Sender: TObject);
+var
+  LStr: string;
+begin
+  ShowMainMenu;
+  LStr := CoomerPartyServiceChangeMenu.Selected;
+  EditCoomerPartyService.Edit.Text := LStr;
+  if LStr <> 'onlyfans' then
+    CoomerPartyHostChangeMenu.Selected := URL_KEMONO_PARTY
+  else
+    CoomerPartyHostChangeMenu.Selected := URL_COOMER_PARTY;
 end;
 
 procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
