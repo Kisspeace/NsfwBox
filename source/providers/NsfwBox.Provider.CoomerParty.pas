@@ -78,6 +78,7 @@ implementation
 
 function TPartyPostToTPartyPostPage(A: TPartyPost): TPartyPostPage;
 begin
+  Result := TPartyPostPage.New;
   Result.Author := A.Author;
   Result.Content := A.Content;
   Result.Timestamp := A.Timestamp;
