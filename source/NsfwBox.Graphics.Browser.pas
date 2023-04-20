@@ -23,6 +23,7 @@ type
 
   TBrowserItemCreateEvent = procedure (Sender: TObject; var AItem: TNBoxCardBase) of object;
   TScraperCreateEvent = procedure (Sender: TObject; var AScraper: TNBoxScraper) of object;
+  TBrowserExceptEvent = procedure (Sender: TObject; const AExcept: Exception) of object;
 
   TNBoxBrowser = class(TColumnsView, IAbortableAndWaitable)
     protected
@@ -41,10 +42,12 @@ type
       FOnScraperCreate: TScraperCreateEvent;
       FOnRequestChanged: TNotifyEvent;
       FBeforeBrowse: TNotifyEvent;
+      FOnException: TBrowserExceptEvent;
       FImageManager: IImageWithUrlManager;
       function GetRequest: INBoxSearchRequest;
       procedure SetRequest(const value: INBoxSearchRequest);
       procedure OnItemImageLoadFinished(Sender: TObject; ASuccess: boolean);
+      procedure DoOnException(const AExcept: Exception);
     public
       Items: TNBoxCardObjList;
       DummyImage: TBitmap;
@@ -68,6 +71,7 @@ type
       property OnScraperCreate: TScraperCreateEvent read FOnScraperCreate write FOnScraperCreate;
       property OnWebClientCreate: TWebClientSetEvent read FOnWebClientCreate write FOnWebClientCreate;
       property OnRequestChanged: TNotifyEvent read FOnRequestChanged write FOnRequestChanged;
+      property OnException: TBrowserExceptEvent read FOnException write FOnException;
       constructor Create(Aowner: Tcomponent); override;
       destructor Destroy; override;
   end;
@@ -143,6 +147,12 @@ begin
     (FRequest as TObject).Free;
   FRequest := nil;
   inherited;
+end;
+
+procedure TNBoxBrowser.DoOnException(const AExcept: Exception);
+begin
+  if Assigned(FOnException) then
+    FOnException(self, AExcept);
 end;
 
 function TNBoxBrowser.GetRequest: INBoxSearchRequest;
@@ -303,6 +313,7 @@ begin
       except
         on E: Exception do begin
           Log('Provider: ' + AItem.Origin.ToString + ' Browser -> Scraper.GetContent', E);
+          Browser.DoOnException(E);
           exit;
         end;
       end;
