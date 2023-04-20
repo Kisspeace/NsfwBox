@@ -1446,10 +1446,9 @@ begin
     LTab := (TControl(Sender).Parent as TNBoxTab);
     if Assigned(LTab.TagObject) then begin
       Loader := (LTab.TagObject as TNBoxDownloader);
-      if Loader.IsRunning And (not Loader.IsAborted) then begin
+      if Loader.IsRunning And (not Loader.IsAborted) then
         DownloadManager.AbortDownload(Loader);
-        LTab.Visible := False;
-      end;
+      LTab.Visible := False;
     end;
   except
     On E: Exception do begin
