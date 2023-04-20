@@ -3287,7 +3287,17 @@ begin
       AppStyle.ItemCard.Fill2.Apply(LCardS.Rect.Fill);
 
       if LCards.Rect.Visible then
-        LCardS.Rect.Visible := Settings.ShowCaptions;
+      begin
+        var LCaptionInterface: IHasCaption;
+
+        var LHasCaption := LCardS.HasPost
+          and Supports(LCardS.Post, IHasCaption, LCaptionInterface)
+          and (not LCaptionInterface.Caption.IsEmpty);
+
+        LCardS.Rect.Visible := Settings.ShowCaptions
+          and LHasCaption
+          or (LCardS.Rect.Align = TAlignlayout.Client);
+      end;
     end;
   end else if ( LCard.HasBookmark and LCard.Bookmark.IsRequest ) then begin
 //    AppStyle.ItemCardRequest.Apply(LCard);
@@ -3469,7 +3479,7 @@ end;
 
 procedure TForm1.OnSimpleCardResize(Sender: TObject);
 const
-  MAX_FONT_SIZE = 18;
+  MAX_FONT_SIZE = 16;
 var
   S: TSize;
   M: single;
