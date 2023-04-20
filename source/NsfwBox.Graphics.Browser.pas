@@ -56,7 +56,7 @@ type
       procedure IAbortableAndWaitable.AbortExecution = AbortBrowsing;
       procedure IAbortableAndWaitable.WaitFor = WaitFor;
       { --------------------- }
-      function NewItem: TNBoxCardBase;
+      function NewItem(ASetDummyImage: boolean = True; AData: IHasOrigin = Nil): TNBoxCardBase;
       procedure GoBrowse;
       procedure GoNextPage;
       procedure GoPrevPage;
@@ -205,7 +205,9 @@ begin
   Result := FWorker.GetIsRunning;
 end;
 
-function TNBoxBrowser.NewItem: TNBoxCardBase;
+function TNBoxBrowser.NewItem(ASetDummyImage: boolean; AData: IHasOrigin): TNBoxCardBase;
+const
+  START_ITEM_HEIGHT: single = 320;
 begin
   try
     Result := TNBoxCardSimple.Create(Nil);
@@ -216,7 +218,7 @@ begin
     FSync.BeginWrite;
     try
       Items.Add(Result);
-      if Assigned(Self.DummyImage) then
+      if ASetDummyImage and Assigned(Self.DummyImage) then
         Result.BitmapIWU.Assign(Self.DummyImage);
 
       Result.Parent := Self;
@@ -224,8 +226,13 @@ begin
       FSync.EndWrite;
     end;
 
+    if Assigned(AData) then
+      Result.Item := AData;
+
     if Assigned(OnItemCreate) then
       OnItemCreate(Self, Result);
+
+    Result.Height := START_ITEM_HEIGHT;
   except
     On E: Exception do begin
       Log('TNBoxBrowser.NewItem', E);
@@ -279,8 +286,6 @@ end;
 { TNBoxBrowser.TBrowserWorker }
 
 procedure TNBoxBrowser.TBrowserWorker.SubThreadExecute(AItem: TNBoxSearchRequestBase);
-const
-  START_ITEM_HEIGHT: single = 320;
 var
   I: integer;
   Scraper: TNBoxScraper;
@@ -337,23 +342,21 @@ begin
             LRequest := LBookmark.AsRequest;
         end;
 
+        var LWillLoadImage := (Assigned(LPost)
+          and (not LPost.ThumbnailUrl.IsEmpty));
+
+        var LCardData: IHasOrigin;
+        if Assigned(LBookmark) then
+          LCardData := LBookmark
+        else
+          LCardData := LPost;
+
         TThread.Synchronize(TThread.Current,
         procedure
         begin
-          LNewItem := Self.Browser.NewItem;
-
-          With LNewItem do begin
-            Height := START_ITEM_HEIGHT;
-
-            if Assigned(LBookmark) then
-              LNewItem.Item := LBookmark
-            else
-              LNewItem.Item := LPost;
-
-            if (Assigned(LPost) and (not LPost.ThumbnailUrl.IsEmpty)) then
-              ImageURL := LPost.ThumbnailUrl;
-          end;
-
+          LNewItem := Self.Browser.NewItem(LWillLoadImage, LCardData);
+          if LWillLoadImage then
+            LNewItem.ImageURL := LPost.ThumbnailUrl;
           Self.Browser.RecalcColumns;
         end);
 

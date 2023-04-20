@@ -3280,7 +3280,7 @@ begin
   else
     LCardS := nil;
 
-  AppStyle.ItemCard.Apply(LCard);
+//  AppStyle.ItemCard.Apply(LCard);
   if LCard.HasPost then begin
     if Assigned(LCardS) then begin
       LCardS.Text.Color := AppStyle.TextColors[0];
@@ -3468,24 +3468,35 @@ begin
 end;
 
 procedure TForm1.OnSimpleCardResize(Sender: TObject);
+const
+  MAX_FONT_SIZE = 18;
 var
   S: TSize;
   M: single;
 begin
   with (Sender as TNBoxCardSimple) do begin
 
-    if fill.Bitmap.Bitmap.IsEmpty then begin
+    if fill.Bitmap.Bitmap.IsEmpty then
+    begin
       Size.Height := Size.Width;
-      exit;
+      if not (Rect.Align = TAlignLayout.Client) then Exit;
     end;
 
-    S := TSize.Create(fill.bitmap.Bitmap.Size);
-    M := S.Width / S.Height;
-    Size.Height := Size.Width / M;
+    if not (Rect.Align = TAlignLayout.Client) then
+    begin
+      S := TSize.Create(fill.bitmap.Bitmap.Size);
+      M := S.Width / S.Height;
+      Size.Height := Size.Width / M;
 
-    Rect.Height := round( size.Height / 3.6 );
-    text.Font.Size := round( size.Width / 18 );
-    text.Height := Rect.Height - ( Rect.Padding.Top + Rect.Padding.Bottom );
+      Rect.Height := round( size.Height / 3.6 );
+      text.Font.Size := round( size.Width / 18 );
+      text.Height := Rect.Height - ( Rect.Padding.Top + Rect.Padding.Bottom );
+    end else begin
+      M := round(size.Width / 12);
+      if M > MAX_FONT_SIZE then
+        M := MAX_FONT_SIZE;
+      Text.Font.Size := M;
+    end;
   end;
 end;
 
@@ -3497,7 +3508,6 @@ begin
   with AItem do begin
     OnTap := CardOnTap;
     OnAutoLook := OnCardAutoLook;
-
     AppStyle.ItemCard.Apply(AItem);
 
     if AItem is TNBoxCardSimple then
@@ -3507,6 +3517,17 @@ begin
     {$IFDEF MSWINDOWS}
     OnClick := ClickTapRef;
     {$ENDIF}
+
+    if Aitem.HasPost and (AItem is TNBoxCardSimple)
+    and AItem.Post.ThumbnailUrl.IsEmpty then
+    begin
+      with TNBoxCardSimple(AItem) do begin
+        Rect.Align := TAlignLayout.Client;
+        Text.Align := TAlignLayout.Client;
+      end;
+    end;
+
+    OnAutoLook(AItem);
   end;
 
   B := TNboxBrowser(Sender);
