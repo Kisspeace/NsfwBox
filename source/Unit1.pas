@@ -3025,7 +3025,7 @@ begin
 
     LExt := TPath.GetExtension(LDownloadedFilename);
     if StrIn(FILE_EXTS, LExt) then
-      ImageViewer.ImageURL := LDownloadedFilename;
+      AImageUrl := LDownloadedFilename;
 
   end else begin
 
