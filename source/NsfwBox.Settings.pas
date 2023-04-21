@@ -71,6 +71,8 @@ type
       ShowNavigateBackButton: boolean;
       EnableAllContent: boolean;
       FetchAllBeforeAddBookmark: boolean;
+      ShowBrowserStatusBar: boolean;
+      ShowImageViewerStatusBar: boolean;
       {$IFDEF MSWINDOWS}
         UseNewAppTitlebar: boolean;
         ContentPlayApp: string;
@@ -146,6 +148,8 @@ begin
   ShowNavigateBackButton := True;
   EnableAllContent       := True;
   FetchAllBeforeAddBookmark := False;
+  ShowBrowserStatusBar := True;
+  ShowImageViewerStatusBar := True;
   {$IFDEF MSWINDOWS}
     ShowScrollBars       := false;
     ContentPlayApp       := 'C:\Program Files\VideoLAN\VLC\vlc.exe';

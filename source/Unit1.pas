@@ -210,6 +210,8 @@ type
     CheckSetSaveDownloadHistory,
     CheckSetSaveTabHistory,
     CheckSetShowCaptions,
+    CheckSetShowBrowserStatus,
+    CheckSetShowImageViewerStatus,
     CheckSetAllowDuplicateTabs,
     CheckSetAutoStartBrowse,
     CheckSetAutoCloseItemMenu,
@@ -841,7 +843,7 @@ begin
   try
     LReq := (Sender as TNBoxBrowser).Request;
     HistoryDb.SearchGroup.Add(LReq);
-    if CurrentBrowser = Sender then
+    if (CurrentBrowser = Sender) and Settings.ShowBrowserStatusBar then
       SetBrowserStatus('Search ' + LReq.PageId.ToString + ': '
       + PROVIDERS.ById(LReq.Origin).TitleName, AppStyle.GetImagePath(LReq.Origin));
   finally
@@ -2461,6 +2463,8 @@ begin
   CheckSetSaveTapHistory      := AddSettingsCheck('Save tap history');
   CheckSetSaveTabHistory      := AddSettingsCheck('Save closed tab history');
   CheckSetShowCaptions        := AddSettingsCheck('Show content caption');
+  CheckSetShowBrowserStatus   := AddSettingsCheck('Show browser status bar');
+  CheckSetShowImageViewerStatus := AddSettingsCheck('Show image viewer status bar');
   CheckSetImageCacheSave      := AddSettingsCheck('Cache thumbnails');
   CheckSetImageCacheLoad      := AddSettingsCheck('Load thumbnails from cache');
   CheckSetYDWSyncLoadFromFile := AddSettingsCheck('YDW full sync load images from file');
@@ -3161,7 +3165,7 @@ begin
   TThread.Synchronize(TThread.Current,
   procedure
   begin
-    if (CurrentBrowser = LBrowser) then
+    if (CurrentBrowser = LBrowser) and Settings.ShowBrowserStatusBar then
       SetBrowserStatus(AExcept.Message, AppStyle.GetImagePath(ICON_WARNING));
   end);
 end;
@@ -3403,6 +3407,7 @@ procedure TForm1.OnImageViewerReceiveData(const Sender: TObject;
 begin
   TThread.Synchronize(TThread.Current,
   procedure begin
+    if not Settings.ShowImageViewerStatusBar then Exit;
     with BtnStatusImageView do begin
       Visible := not (AContentLength = AReadCount);
       if Visible then begin
@@ -4228,6 +4233,8 @@ begin
 
     Fullscreen           := CheckSetFullscreen.IsChecked;
     ShowCaptions         := CheckSetShowCaptions.IsChecked;
+    ShowBrowserStatusBar := CheckSetShowBrowserStatus.IsChecked;
+    ShowImageViewerStatusBar := CheckSetShowImageViewerStatus.IsChecked;
     AutoStartBrowse      := CheckSetAutoStartBrowse.IsChecked;
     AutoCloseItemMenu    := CheckSetAutoCloseItemMenu.IsChecked;
     FetchAllBeforeAddBookmark := CheckSetFetchAllBeforeAddBookmark.IsChecked;
@@ -4372,6 +4379,8 @@ begin
 
   CheckSetAllowCookies.IsChecked        := Settings.AllowCookies;
   CheckSetShowCaptions.IsChecked        := Settings.ShowCaptions;
+  CheckSetShowBrowserStatus.IsChecked   := Settings.ShowBrowserStatusBar;
+  CheckSetShowImageViewerStatus.IsChecked := Settings.ShowImageViewerStatusBar;
   CheckSetAllowDuplicateTabs.IsChecked  := Settings.AllowDuplicateTabs;
   CheckSetAutoStartBrowse.IsChecked     := Settings.AutoStartBrowse;
   CheckSetAutoCloseItemMenu.IsChecked   := Settings.AutoCloseItemMenu;
