@@ -73,6 +73,7 @@ type
     BrowserBtnsLayout2: TLayout;
     OnBrowserLayout: TLayout;
     MenuHistory: TVertScrollBox;
+    MenuImageViewer: TVertScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
@@ -253,7 +254,8 @@ type
     MenuItemTagsOrigin: integer;
 
     { Image viewer menu }
-    MenuImageViewer: TNBoxImageViewer;
+    ImageViewer: TNBoxImageViewer;
+    BtnStatusImageView: TRectButton;
 
     { Anonymous message menu (MenuAnonMessage) }
     EditNickMsgForDev: TNBoxEdit;
@@ -289,7 +291,10 @@ type
     procedure SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer = -999);
     procedure ToastMessage(const AMessage: string; AShort: boolean);
     procedure OnIWUManagerCreateWebClient(Sender: TObject; AClient: TNetHttpClient);
+    procedure OnImageViewerWebClient(Sender: TObject; AClient: TNetHttpClient);
+    procedure OnImageViewerReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
     procedure SetBrowserStatus(const AStr: string; AImagePath: string = '');
+    procedure SetImageViewerStatus(const AStr: string; AImagePath: string = '');
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -337,7 +342,7 @@ type
     procedure DownloaderOnReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
     procedure DownloaderOnException(const Sender: TObject; const AError: Exception);
     procedure DownloaderOnFinish(Sender: TObject);
-    procedure OnMenuImageViewerFinished(Sender: TObject; ASuccess: boolean);
+    procedure OnImageViewerFinished(Sender: TObject; ASuccess: boolean);
     { ----------------------------- }
     procedure ExecItemInteraction(AItem: TNBoxCardBase; AInteraction: TNBoxItemInteraction);
     procedure OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser; Action: TCollectionNotification);
@@ -656,7 +661,7 @@ begin
       CreateDir(LFull);
 
     var LPreviewed: string;
-    with MenuImageViewer.ImageManager.CacheManager
+    with ImageViewer.ImageManager.CacheManager
       as TImageWithURLCahceManager do
     begin
       LPreviewed := FindCachedFilename(LUrl);
@@ -1334,7 +1339,7 @@ var
 begin
   { Need to free bitmap on image viewer }
   if MenuImageViewer.Visible then
-    Form1.ClearControlBitmap(MenuImageViewer);
+    Form1.ClearControlBitmap(ImageViewer);
 
   { Clear lines from log memo when user go away }
   if MenuLog.Visible then
@@ -2190,16 +2195,34 @@ begin
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
   DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
 
-  MenuImageViewer := TNBoxImageViewer.Create(Form1.MainLayout);
-  MenuImageViewer.Align := TAlignLayout.Client;
-  MenuImageViewer.Parent := Form1.MainLayout;
-  MenuImageViewer.OnLoadingFinished := OnMenuImageViewerFinished;
-
-  with MenuImageViewer.ImageManager as TIWUContentManager do begin
-    OnWebClientCreate := OnIWUManagerCreateWebClient;
+  ImageViewer := TNBoxImageViewer.Create(Form1.MainLayout);
+  with ImageViewer do begin
+    Align := TAlignLayout.Client;
+    Parent := MenuImageViewer;
+    OnLoadingFinished := OnImageViewerFinished;
+    with ImageManager as TIWUContentManager do begin
+      OnWebClientCreate := OnImageViewerWebClient;
+      OnFilterResponse := OnIWUFilterResponse;
+      OnImageLoadException := OnIWUException;
+    end;
   end;
 
-  with MenuImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
+  BtnStatusImageView := CreateDefButton(MenuImageViewer);
+  with BtnStatusImageView do begin
+    Parent := MenuImageViewer;
+    Position.Point := TPointF.Create(10, 10);
+    Height := 28;
+    AppStyle.SettingsRect.Apply(BtnStatusImageView);
+    ImageControl.Margins.Rect := TRectF.Create(4, 4, 5, 4);
+    Image.ImageURL := AppStyle.GetImagePath(ICON_NEXT);
+    Text.Color := TAlphaColorRec.White;
+    Text.Font.Size := 10;
+    FillMove := FillDef;
+    StrokeMove.Kind := TBrushKind.None;
+    Visible := False;
+  end;
+
+  with ImageViewer.ImageManager.CacheManager as TImageWithURLCahceManager do
   begin
     SetSaveAndLoadPath(TPath.Combine(TNBoxPath.GetCachePath, 'previewed'));
   end;
@@ -2903,6 +2926,7 @@ begin
   if W > MAX_STATUS_BAR_WIDTH then
     W := MAX_STATUS_BAR_WIDTH;
   BtnStatus.width := W;
+  BtnStatusImageView.Width := W;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -2989,7 +3013,7 @@ var
   LUri: TURI;
   LExt: string;
 begin
-  Self.ClearControlBitmap(MenuImageViewer);
+  Self.ClearControlBitmap(ImageViewer);
   ChangeInterface(MenuImageViewer);
   LDownloadedFilename := Self.FindDownloadedFullFilename(AImageUrl);
 
@@ -2997,7 +3021,7 @@ begin
 
     LExt := TPath.GetExtension(LDownloadedFilename);
     if StrIn(FILE_EXTS, LExt) then
-      MenuImageViewer.ImageURL := LDownloadedFilename;
+      ImageViewer.ImageURL := LDownloadedFilename;
 
   end else begin
 
@@ -3025,7 +3049,7 @@ begin
 
   end;
 
-  MenuImageViewer.ImageURL := AImageUrl;
+  ImageViewer.ImageURL := AImageUrl;
 end;
 
 procedure TForm1.GotoItemMenu(AItem: TNBoxCardBase);
@@ -3225,6 +3249,20 @@ begin
   end;
 end;
 
+procedure SetBtnStatus(ABtn: TRectButton; const AStr: string; const AImagePath: string);
+begin
+  ABtn.Visible := True;
+  if not AImagePath.IsEmpty
+  and (ABtn.Image.ImageUrl <> AImagePath) then
+    ABtn.Image.ImageUrl := AImagePath;
+  ABtn.Text.Text := AStr;
+end;
+
+procedure TForm1.SetImageViewerStatus(const AStr: string; AImagePath: string);
+begin
+  SetBtnStatus(BtnStatusImageView, AStr, AImagePath);
+end;
+
 procedure TForm1.OnBrowserScraperCreate(Sender: TObject;
   var AScraper: TNBoxScraper);
 begin
@@ -3336,6 +3374,8 @@ begin
   procedure
   begin
     Log('OnIWUException ' + AUrl, AException);
+    if Sender = (ImageViewer.ImageManager as TObject) then
+      SetImageViewerStatus(AException.Message, AppStyle.GetImagePath(ICON_WARNING));
   end);
 end;
 
@@ -3346,44 +3386,54 @@ begin
     AAllow := True
   else begin
     AAllow := False;
-//    Log('Disallow MimeType: "' + AResponse.MimeType + '" from: ' + AUrl);
+    if Sender = (ImageViewer.ImageManager as TObject) then
+    TThread.Synchronize(TThread.Current, procedure begin
+      SetImageViewerStatus('MimeType: ' + AResponse.MimeType, AppStyle.GetImagePath(ICON_WARNING));
+    end);
   end;
 end;
 
-procedure TForm1.OnMenuImageViewerFinished(Sender: TObject; ASuccess: boolean);
+procedure TForm1.OnImageViewerFinished(Sender: TObject; ASuccess: boolean);
 begin
-  MenuImageViewer.BestFit;
+  ImageViewer.BestFit;
+end;
+
+procedure TForm1.OnImageViewerReceiveData(const Sender: TObject;
+  AContentLength, AReadCount: Int64; var AAbort: Boolean);
+begin
+  TThread.Synchronize(TThread.Current,
+  procedure begin
+    with BtnStatusImageView do begin
+      Visible := not (AContentLength = AReadCount);
+      if Visible then begin
+        var LFileSizeStr := BytesCountToSizeStr(AContentLength);
+        SetImageViewerStatus(
+          '[ ' + GetPercents(AContentLength, AReadCount).toString + '% ] of ' + LFileSizeStr,
+          AppStyle.GetImagePath(ICON_NEXT)
+        );
+      end;
+    end;
+  end);
+end;
+
+procedure TForm1.OnImageViewerWebClient(Sender: TObject;
+  AClient: TNetHttpClient);
+begin
+  OnIWUManagerCreateWebClient(Sender, AClient);
+  with AClient do begin
+    OnReceiveData := OnImageViewerReceiveData;
+  end;
 end;
 
 function DownloadItemText(A: TNetHttpDownloader): string;
 var
   ContentSize: int64;
   FileSizeStr: string;
-
-  function GetPercents: integer;
-  var
-    X: real;
-  begin
-    Result := 0;
-    try
-      if ContentSize > 0 then begin
-        X := ContentSize / 100;
-        Result := Round(A.ReadCount / X);
-        if Result > 100 then Result := 100;
-      end;
-    except
-      On E: Exception do begin
-        Log('GetPercents', E);
-      end;
-    end;
-  end;
-
 begin
   ContentSize := A.ContentLength;
-
   if ContentSize > 0 then begin
     FileSizeStr := BytesCountToSizeStr(ContentSize);
-    Result := '[ ' + GetPercents.ToString + '% ] of ' + FileSizeStr;
+    Result := '[ ' + GetPercents(ContentSize, A.ReadCount).ToString + '% ] of ' + FileSizeStr;
   end else
     Result := 'Unknown size. Ready: ' + BytesCountToSizeStr(A.ReadCount);
 end;
@@ -4247,10 +4297,7 @@ end;
 
 procedure TForm1.SetBrowserStatus(const AStr: string; AImagePath: string);
 begin
-  BtnStatus.Visible := True;
-  if not AImagePath.IsEmpty then
-    BtnStatus.Image.ImageUrl := AImagePath;
-  BtnStatus.Text.Text := AStr;
+  SetBtnStatus(BtnStatus, AStr, AImagePath);
 end;
 
 procedure TForm1.SetCurrentBookmarkControl(const value: TNBoxSettingsCheck);

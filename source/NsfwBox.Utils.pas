@@ -12,6 +12,7 @@ type
   function GetFirstStr(Ar: TArray<string>): string;
   function StrIn(const Ar: TArray<string>; AStr: string; AIgnoreCase: boolean = True): boolean;
   function BytesCountToSizeStr(ABytesCount: int64): string;
+  function GetPercents(AFull, APiece: Real): integer;
 
   ///<summary>FreeAndNil for interfaced objects without reference counting.</summary>
   procedure FreeInterfaced(const [ref] AObject: IInterface);
@@ -45,6 +46,24 @@ begin
       Break;
   end;
   Result := LValue.ToString + ' ' + UNITS[I];
+end;
+
+function GetPercents(AFull, APiece: Real): integer;
+var
+  X: Real;
+begin
+  Result := 0;
+  try
+    if AFull > 0 then begin
+      X := AFull / 100;
+      Result := Round(APiece / X);
+      if Result > 100 then Result := 100;
+    end;
+  except
+    On E: Exception do begin
+      Log('GetPercents', E);
+    end;
+  end;
 end;
 
 function GetFirstStr(Ar: TArray<string>): string;

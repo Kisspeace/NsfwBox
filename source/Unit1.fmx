@@ -96,7 +96,7 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 7
+      TabOrder = 8
       Visible = False
       Viewport.Width = 305.000000000000000000
       Viewport.Height = 477.000000000000000000
@@ -106,7 +106,7 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 12
+      TabOrder = 13
       Visible = False
       Viewport.Width = 305.000000000000000000
       Viewport.Height = 477.000000000000000000
@@ -116,7 +116,7 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 11
+      TabOrder = 12
       Visible = False
       Viewport.Width = 305.000000000000000000
       Viewport.Height = 477.000000000000000000
@@ -126,7 +126,7 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 8
+      TabOrder = 9
       Visible = False
       Viewport.Width = 305.000000000000000000
       Viewport.Height = 477.000000000000000000
@@ -176,7 +176,7 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 9
+      TabOrder = 10
       Visible = False
       Viewport.Width = 305.000000000000000000
       Viewport.Height = 477.000000000000000000
@@ -186,7 +186,17 @@ object Form1: TForm1
       Size.Width = 305.000000000000000000
       Size.Height = 477.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 10
+      TabOrder = 11
+      Visible = False
+      Viewport.Width = 305.000000000000000000
+      Viewport.Height = 477.000000000000000000
+    end
+    object MenuImageViewer: TVertScrollBox
+      Align = Client
+      Size.Width = 305.000000000000000000
+      Size.Height = 477.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 7
       Visible = False
       Viewport.Width = 305.000000000000000000
       Viewport.Height = 477.000000000000000000
