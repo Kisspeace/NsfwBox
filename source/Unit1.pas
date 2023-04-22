@@ -220,6 +220,7 @@ type
     CheckSetShowScrollBars,
     CheckSetShowNavigateBackButton,
     CheckSetBrowseNextPageByScrollDown,
+    CheckSetPlayExterWhenCantInter,
     CheckSetImageCacheSave,
     CheckSetImageCacheLoad,
     CheckSetAutoAcceptAllCertificates,
@@ -365,7 +366,7 @@ type
     procedure GotoDownloadsMenu;
     procedure GotoItemTagsMenu(ATags: TNBoxItemTagAr; AOrigin: integer);
     procedure GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
-    procedure GotoImageViewer(AImageUrl: string);
+    function GotoImageViewer(AImageUrl: string; AQuietFail: boolean = False): boolean; { FALS when cant show image by given URL }
     { -> Browsers ----------------- }
     procedure OnBrowserViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean);
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient; AOrigin: integer);
@@ -1887,7 +1888,9 @@ begin
     begin
       if not AItem.HasPost then exit;
       LTryFetchIfEmpty;
-      GotoImageViewer(LPost.ContentUrl);
+      if not GotoImageViewer(LPost.ContentUrl, Settings.PlayExterWhenCantInter)
+      and Settings.PlayExterWhenCantInter
+        then ExecItemInteraction(AItem, ACTION_PLAY_EXTERNALY);
     end;
 
     ACTION_PLAY_EXTERNALY:
@@ -2472,6 +2475,8 @@ begin
   CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs');
   CheckSetAllowDuplicateTabs.Visible := false; // FIXME
 
+  CheckSetPlayExterWhenCantInter := AddSettingsCheck('Play file externally on fail',
+    'The file will be played externally when the application cannot play it on its own.');
   CheckSetBrowseNextPageByScrollDown := AddSettingsCheck('Browse next page by scrolling down');
   CheckSetAutoStartBrowse     := AddSettingsCheck('Auto start browse');
   CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu');
@@ -3008,7 +3013,7 @@ begin
   ChangeInterface(MenuDownloads);
 end;
 
-procedure TForm1.GotoImageViewer(AImageUrl: string);
+function TForm1.GotoImageViewer(AImageUrl: string; AQuietFail: boolean): boolean;
 const
   FILE_EXTS: TArray<string> = ['.jpg', '.jpeg', '.png', '.gif'];
   DENY_HOSTS: TArray<string> = ['external-preview.redd.it', 'preview.redd.it'];
@@ -3017,18 +3022,17 @@ var
   LUri: TURI;
   LExt: string;
 begin
+  Result := True;
   Self.ClearControlBitmap(ImageViewer);
-  ChangeInterface(MenuImageViewer);
   LDownloadedFilename := Self.FindDownloadedFullFilename(AImageUrl);
 
-  if (not LDownloadedFilename.IsEmpty) then begin
-
+  if (not LDownloadedFilename.IsEmpty) then
+  begin
     LExt := TPath.GetExtension(LDownloadedFilename);
     if StrIn(FILE_EXTS, LExt) then
       AImageUrl := LDownloadedFilename;
 
   end else begin
-
     try
       LUri := TURI.Create(AImageUrl);
       LExt := TPath.GetExtension(LUri.Path);
@@ -3039,20 +3043,20 @@ begin
     if not StrIn(FILE_EXTS, LExt)
     or StrIn(DENY_HOSTS, LUri.Host) then begin
       { Looks like not a picture }
-
-      ChangeInterface(BrowserLayout);
-      var LMsgForUser := 'Unsupported image format: ' + AImageUrl;
-      {$IFDEF MSWINDOWS}
-      ShowMessage(LMsgForUser);
-      {$ENDIF} {$IFDEF ANDROID}
-      ToastMessage(LMsgForUser, False);
-      {$ENDIF}
-
-      Exit;
+      if not AQuietFail then
+      begin
+        var LMsgForUser := 'Unsupported image format: ' + AImageUrl;
+        {$IFDEF MSWINDOWS}
+        ShowMessage(LMsgForUser);
+        {$ENDIF} {$IFDEF ANDROID}
+        ToastMessage(LMsgForUser, False);
+        {$ENDIF}
+      end;
+      Exit(False);
     end;
-
   end;
 
+  ChangeInterface(MenuImageViewer);
   ImageViewer.ImageURL := AImageUrl;
 end;
 
@@ -4249,6 +4253,7 @@ begin
     ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
     ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
     BrowseNextPageByScrollDown := CheckSetBrowseNextPageByScrollDown.IsChecked;
+    PlayExterWhenCantInter := CheckSetPlayExterWhenCantInter.IsChecked;
 
     ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
     ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
@@ -4397,6 +4402,7 @@ begin
   CheckSetAutoAcceptAllCertificates.IsChecked := Settings.AutoAcceptAllCertificates;
   CheckSetEnableAllContent.IsChecked    := Settings.EnableAllContent;
   CheckSetYDWSyncLoadFromFile.IsChecked := Settings.YDWSyncLoadFromFile;
+  CheckSetPlayExterWhenCantInter.IsChecked := Settings.PlayExterWhenCantInter;
 
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;

@@ -73,6 +73,7 @@ type
       FetchAllBeforeAddBookmark: boolean;
       ShowBrowserStatusBar: boolean;
       ShowImageViewerStatusBar: boolean;
+      PlayExterWhenCantInter: boolean;
       {$IFDEF MSWINDOWS}
         UseNewAppTitlebar: boolean;
         ContentPlayApp: string;
@@ -150,6 +151,7 @@ begin
   FetchAllBeforeAddBookmark := False;
   ShowBrowserStatusBar := True;
   ShowImageViewerStatusBar := True;
+  PlayExterWhenCantInter := False;
   {$IFDEF MSWINDOWS}
     ShowScrollBars       := false;
     ContentPlayApp       := 'C:\Program Files\VideoLAN\VLC\vlc.exe';
