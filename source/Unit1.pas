@@ -2179,23 +2179,27 @@ begin
 
   // IWU content manager for browsers only
   BrowsersIWUContentManager := TIWUContentManager.Create(Self);
-  BrowsersIWUContentManager.OnImageLoadException := OnIWUException;
-  BrowsersIWUContentManager.OnFilterResponse := OnIWUFilterResponse;
-  BrowsersIWUContentManager.LoadThumbnailFromFile := True;
-  BrowsersIWUContentManager.CacheManager := IWUCacheManager;
-  BrowsersIWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
-  BrowsersIWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
-  BrowsersIWUContentManager.OnWebClientCreate := OnIWUManagerCreateWebClient;
+  with BrowsersIWUContentManager do begin
+    OnImageLoadException := OnIWUException;
+    OnFilterResponse := OnIWUFilterResponse;
+    LoadThumbnailFromFile := True;
+    CacheManager := IWUCacheManager;
+    EnableSaveToCache := Settings.ImageCacheSave;
+    EnableLoadFromCache := Settings.ImageCacheLoad;
+    OnWebClientCreate := OnIWUManagerCreateWebClient;
+  end;
 
   // IWU content manager for other app images (like buttons)
   IWUContentManager := TIWUContentManager.Create(Self);
-  IWUContentManager.OnImageLoadException := OnIWUException;
-  IWUContentManager.OnFilterResponse := OnIWUFilterResponse;
-  IWUContentManager.LoadThumbnailFromFile := False;
-  IWUContentManager.CacheManager := IWUCacheManager;
-  IWUContentManager.EnableSaveToCache := Settings.ImageCacheSave;
-  IWUContentManager.EnableLoadFromCache := Settings.ImageCacheLoad;
-  IWUContentManager.OnWebClientCreate := OnIWUManagerCreateWebClient;
+  with IWUContentManager do begin
+    OnImageLoadException := OnIWUException;
+    OnFilterResponse := OnIWUFilterResponse;
+    LoadThumbnailFromFile := False;
+    CacheManager := IWUCacheManager;
+    EnableSaveToCache := Settings.ImageCacheSave;
+    EnableLoadFromCache := Settings.ImageCacheLoad;
+    OnWebClientCreate := OnIWUManagerCreateWebClient;
+  end;
 
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
   DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
