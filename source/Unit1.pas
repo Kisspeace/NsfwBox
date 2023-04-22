@@ -2202,7 +2202,11 @@ begin
   end;
 
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
-  DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
+  try
+    DummyLoadingImage.LoadFromFile(FAppStyle.GetImagePath(IMAGE_LOADING));
+  except
+    On E: Exception do Log('DummyLoadingImage.LoadFromFile', E);
+  end;
 
   ImageViewer := TNBoxImageViewer.Create(Form1.MainLayout);
   with ImageViewer do begin
