@@ -1888,7 +1888,7 @@ begin
     begin
       if not AItem.HasPost then exit;
       LTryFetchIfEmpty;
-      if not GotoImageViewer(LPost.ContentUrl, Settings.PlayExterWhenCantInter)
+      if not GotoImageViewer(LPost.ContentUrl, Settings.PlayExterWhenCantInter or AutopilotEnabled)
       and Settings.PlayExterWhenCantInter
         then ExecItemInteraction(AItem, ACTION_PLAY_EXTERNALY);
     end;
@@ -2854,6 +2854,15 @@ begin
 
     end).Start;
   end;
+
+  { Read command line parameters }
+  {$IFDEF MSWINDOWS}
+  if paramcount >= 0 then begin
+    for I := 1 to ParamCount do
+      if ParamStr(I) = '--autopilot' then
+        NsfwBox.Tests.TNBoxTests.StartAutopilot;
+  end;
+  {$ENDIF}
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
