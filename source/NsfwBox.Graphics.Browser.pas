@@ -302,6 +302,7 @@ begin
     Fetched := false;
     Scraper := TNBoxScraper.Create;
     Content := INBoxHasOriginList.Create;
+    I := 0;
     try
 
       if Assigned(Browser.OnWebClientCreate) then
@@ -324,9 +325,9 @@ begin
       end;
 
       for I := 0 to Content.Count - 1 do begin
-        var LContentItem := Content[I];
-
         if TThread.Current.CheckTerminated then exit;
+        var LContentItem := Content[I];
+        Content[I] := Nil;
 
         LBookmark := nil;
         LPost     := nil;
@@ -378,13 +379,13 @@ begin
         begin
           LBookmark := (LContentItem as TNBoxBookmark);
           LBookmark.FreeObj;
+          LBookmark := Nil;
         end;
 
         FreeInterfaced(LContentItem);
       end;
 
       Content.Free;
-
     end;
   except
     On E: Exception do
