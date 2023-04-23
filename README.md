@@ -46,6 +46,9 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="assets/themes/default/content-origin-14.png" width="24" align="left">[hypnohub.net](https://hypnohub.net)
 * <img src="assets/themes/default/content-origin-17.png" width="24" align="left">[booru.allthefallen.moe](https://Booru.allthefallen.moe)
 * <img src="assets/themes/default/content-origin-16.png" width="24" align="left">[bleachbooru.org](https://bleachbooru.org)
+* <img src="assets/themes/default/content-origin-21.png" width="24" align="left">[hgoon.booru.org](https://hgoon.booru.org)
+* <img src="assets/themes/default/content-origin-19.png" width="24" align="left">[illusioncards.booru.org](https://illusioncards.booru.org)
+* <img src="assets/themes/default/content-origin-20.png" width="24" align="left">[db.bepis.moe](https://db.bepis.moe/)
 <!-- * <img src="assets/themes/default/" width="24" align="left">[]() -->
 
 <details>
@@ -73,6 +76,6 @@ Developed on RAD Studio 11 Alexandria.
    
 
 ### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.4.0/Kisspeace.NsfwBox.v2.4.0.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.4.0/Kisspeace.NsfwBox-ins32.v2.4.0.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.4.0/Kisspeace.NsfwBox-ins64.v2.4.0.exe)  
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.5.0/Kisspeace.NsfwBox.v2.5.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.5.0/Kisspeace.NsfwBox-ins32.v2.5.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/download/v2.5.0/Kisspeace.NsfwBox-ins64.v2.5.0.exe)  

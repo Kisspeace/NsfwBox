@@ -51,6 +51,9 @@
 * <img src="default/content-origin-15.png" width="24" align="left"> [tbib.org](https://tbib.org) favicon (upscaled) -> [Item page](https://tbib.org/favicon.ico)
 * <img src="default/content-origin-16.png" width="24" align="left"> [danbooru.donmai.us](https://danbooru.donmai.us) favicon (upscaled) -> [Item page](https://danbooru.donmai.us/favicon.svg)
 * <img src="default/content-origin-17.png" width="24" align="left"> [allthefallen.moe](https://allthefallen.moe) favicon (upscaled) -> [Item page](https://allthefallen.moe/catchpage/favicon.ico)
+* <img src="default/content-origin-21.png" width="24" align="left"> [hgoon.booru.org](https://hgoon.booru.org) favicon -> [Item page](https://hgoon.booru.org/favicon.ico)
+* <img src="default/content-origin-20.png" width="24" align="left"> [db.bepis.moe](https://db.bepis.moe) favicon -> [Item page](https://db.bepis.moe/favicon-bepisdb.ico)
+* <img src="default/content-origin-19.png" width="24" align="left"> [illusioncards.booru.org](https://illusioncards.booru.org) favicon (upscaled) -> [Item page](https://illusioncards.booru.org/favicon.ico)
 <!-- * <img src="default/" width="24" align="left"> ATTRIBUTION_HERE -> [Item page](ITEM_ICON_URL) -->
 
 
