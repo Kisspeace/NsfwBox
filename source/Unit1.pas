@@ -2953,6 +2953,8 @@ begin
     W := MAX_STATUS_BAR_WIDTH;
   BtnStatus.width := W;
   BtnStatusImageView.Width := W;
+  if MenuImageViewer.Visible then
+    ImageViewer.BestFit;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
