@@ -3074,6 +3074,8 @@ begin
   end;
 
   ChangeInterface(MenuImageViewer);
+  SetImageViewerStatus(AImageUrl);
+  BtnStatusImageView.Visible := settings.ShowImageViewerStatusBar;
   ImageViewer.ImageURL := AImageUrl;
 end;
 
@@ -4283,6 +4285,9 @@ begin
 
     BrowsersIWUContentManager.EnableSaveToCache := ImageCacheSave;
     BrowsersIWUContentManager.EnableLoadFromCache := ImageCacheLoad;
+
+    if not ShowImageViewerStatusBar then
+      BtnStatusImageView.Visible := False;
 
     if AutoSaveSession then
       ConnectSession;
