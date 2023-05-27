@@ -59,7 +59,7 @@ Developed on RAD Studio 11 Alexandria.
     <a href="https://github.com/csm101/x-superobject">x-superobject</a>
     <a href="https://github.com/Kisspeace/you-did-well">you-did-well</a>
     <a href="https://github.com/RomanYankovsky/HTMLp">HTMLp</a>
-    <a href="https://github.com/ying32/htmlparser">htmlparser</a>
+    <a href="https://github.com/radprogrammer/HTMLParserEx">HTMLParserEx</a>
     <a href="https://github.com/Kisspeace/delphi-r34.app-api-wrapper">delphi-r34.app-api-wrapper</a>
     <a href="https://github.com/Kisspeace/delphi-r34-json-api-wrapper">delphi-r34-json-api-wrapper</a>
     <a href="https://github.com/Kisspeace/delphi-nsfw.xxx-scraper">delphi-nsfw.xxx-scraper</a>
