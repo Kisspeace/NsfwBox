@@ -272,6 +272,9 @@ type
     MenuBackup: TVertScrollBox;
     EdtBackupFilename: TNBoxEdit;
     BtnCreateBackup: TRectButton;
+    SelectMenuBackupFiles: TNBoxSelectMenuStr;
+    EdtApplyBackupFilename: TNBoxEdit;
+    BtnApplyBackup: TRectButton;
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
     procedure AppOnException(Sender: TObject; E: Exception);
@@ -366,6 +369,8 @@ type
     {$ENDIF}
     { Menu for manage backups ----- }
     procedure BtnCreateBackupOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnApplyBackupOnTap(Sender: TObject; const Point: TPointF);
+    procedure MenuBackupFilesOnSelect(Sender: TObject);
     { ----------------------------- }
     procedure ChangeInterface(ALayout: TControl);
     procedure UserSelectBookmarkList(AWhenSelected: TProcedureRef);
@@ -862,6 +867,28 @@ begin
   end;
 end;
 
+procedure TForm1.BtnApplyBackupOnTap(Sender: TObject;
+  const Point: TPointF);
+var
+  LFilename: string;
+begin
+  LFilename := EdtApplyBackupFilename.Edit.Text;
+  if FileExists(LFilename) then
+  begin
+    try
+      ImportAppData(LFilename, DEF_EXIM_OPTIONS);
+      ShowMessage('Success.');
+    except
+      On E: Exception do
+      begin
+        Log('ApplyBackup', E);
+        ShowMessage('Error: ' + E.Message);
+      end;
+    end;
+  end else
+    ShowMessage(LFilename + ' does not exist.');
+end;
+
 procedure TForm1.BtnBMarkChangeOnTap(Sender: TObject; const Point: TPointF);
 begin
   ChangeInterface(MenuBookmarksChange);
@@ -1291,8 +1318,29 @@ end;
 
 procedure TForm1.BtnSetManageBackupsOnTap(Sender: TObject;
   const Point: TPointF);
+var
+  I: integer;
+  LDirectory: string;
+  LFiles: TSearchRecAr;
 begin
-  EdtBackupFilename.Edit.Text := TPath.Combine(Settings.DefaultBackupPath, GenerateNewBackupFilename);
+  LDirectory := Settings.DefaultBackupPath;
+  EdtBackupFilename.Edit.Text := TPath.Combine(LDirectory, GenerateNewBackupFilename);
+
+  if DirectoryExists(LDirectory) then
+  begin
+    LFiles := GetFiles(LDirectory + PathDelim + 'NsfwBox-*.zip');
+    SelectMenuBackupFiles.Menu.FreeControls;
+    for I := High(LFiles) downto Low(LFiles) do
+    begin
+      var LFile := LFiles[I];
+      var LNewBtn := SelectMenuBackupFiles.AddBtn(TRectButton,
+        LFile.Name + ' (' + BytesCountToSizeStr(LFile.Size) + ')',
+        TPath.Combine(LDirectory, LFile.Name));
+      LNewBtn.ImageControl.Visible := False;
+      LNewBtn.Text.Margins.Left := 5;
+    end;
+  end;
+
   ChangeInterface(MenuBackup);
 end;
 
@@ -2790,7 +2838,7 @@ begin
     parent := MenuBackup;
   end;
 
-  BtnCreateBackup := Form1.CreateDefButton(MenuBackup, BTN_STYLE_DEF2);
+  BtnCreateBackup := CreateDefButton(MenuBackup, BTN_STYLE_DEF2);
   With BtnCreateBackup do
   begin
     Align := TAlignlayout.Top;
@@ -2799,6 +2847,35 @@ begin
     Image.ImageURL := AppStyle.GetImagePath(ICON_SAVE);
     Parent := MenuBackup;
     OnTap := BtnCreateBackupOnTap;
+  end;
+
+  EdtApplyBackupFilename := Form1.CreateDefEdit(MenuBackup);
+  with EdtApplyBackupFilename do
+  begin
+    Margins.Rect := TRectF.Create(10, 10, 10, 0);
+    Align := TAlignLayout.Top;
+    Edit.TextPrompt := 'Full backup file name';
+    parent := MenuBackup;
+  end;
+
+  BtnApplyBackup := CreateDefButton(MenuBackup, BTN_STYLE_DEF2);
+  with BtnApplyBackup do
+  begin
+    Align := TAlignlayout.Top;
+    Margins := EdtBackupFilename.Margins;
+    Text.Text := 'Restore from backup archive';
+    Image.ImageURL := AppStyle.GetImagePath(ICON_SAVE);
+    Parent := MenuBackup;
+    OnTap := BtnApplyBackupOnTap;
+  end;
+
+  SelectMenuBackupFiles := TNBoxSelectMenuStr.Create(MenuBackup);
+  with SelectMenuBackupFiles do
+  begin
+    Parent := MenuBackup;
+    Menu.OnSelected := MenuBackupFilesOnSelect;
+    Align := TAlignLayout.Client;
+    Margins.Rect := TRectF.Create(10, 10, 10, 10);
   end;
 
   { Database update }
@@ -3863,6 +3940,11 @@ begin
   finally
     if assigned(NewStyle) then NewStyle.Free;
   end;
+end;
+
+procedure TForm1.MenuBackupFilesOnSelect(Sender: TObject);
+begin
+  EdtApplyBackupFilename.Edit.Text := SelectMenuBackupFiles.Selected;
 end;
 
 procedure TForm1.MenuBtnBookmarksOnTap(Sender: TObject; const Point: TPointF);
