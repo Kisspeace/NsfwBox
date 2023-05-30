@@ -5,7 +5,7 @@ unit NsfwBox.Settings;
 interface
 uses
   Classes, System.SysUtils, XSuperObject, system.Generics.Collections,
-  NsfwBox.UpdateChecker,
+  NsfwBox.UpdateChecker, NsfwBox.FileSystem,
   NsfwBox.Logging;
 
 Const
@@ -74,6 +74,7 @@ type
       ShowBrowserStatusBar: boolean;
       ShowImageViewerStatusBar: boolean;
       PlayExterWhenCantInter: boolean;
+      DefaultBackupPath: string;
       {$IFDEF MSWINDOWS}
         UseNewAppTitlebar: boolean;
         ContentPlayApp: string;
@@ -161,6 +162,7 @@ begin
   {$ELSE IF ANDROID}
     Fullscreen           := True;
   {$ENDIF}
+  DefaultBackupPath := TNBoxPath.GetDefaultBackupPath;
   ImageCacheSave := True;
   ImageCacheLoad := True;
   AutoAcceptAllCertificates := False;

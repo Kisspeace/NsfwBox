@@ -237,7 +237,8 @@ type
     EditSetItemIndent,
     EditSetFilenameLogUrls,
     EditSetPlayParams,
-    EditSetPlayApp
+    EditSetPlayApp,
+    EditSetDefBackupPath
     : TNBoxSettingsEdit;
 
     BtnSetAnonMsg,
@@ -1087,7 +1088,7 @@ begin
       Showmessage('Error: ' + E.Message);
     end;
   end;
-  EdtBackupFilename.Edit.Text := TPath.Combine(TNBoxPath.GetDefaultBackupPath, GenerateNewBackupFilename);
+  EdtBackupFilename.Edit.Text := TPath.Combine(Settings.DefaultBackupPath, GenerateNewBackupFilename);
 end;
 
 procedure TForm1.BtnDialogNoOnTap(Sender: TObject; const Point: TPointF);
@@ -1291,7 +1292,7 @@ end;
 procedure TForm1.BtnSetManageBackupsOnTap(Sender: TObject;
   const Point: TPointF);
 begin
-  EdtBackupFilename.Edit.Text := TPath.Combine(TNBoxPath.GetDefaultBackupPath, GenerateNewBackupFilename);
+  EdtBackupFilename.Edit.Text := TPath.Combine(Settings.DefaultBackupPath, GenerateNewBackupFilename);
   ChangeInterface(MenuBackup);
 end;
 
@@ -2194,21 +2195,25 @@ begin
     form1.RestoreDefaultSettings;
     SaveSettings;
   end else begin
-    {$IFDEF ANDROID}
-    try
-      if (Settings.SemVer < APP_VERSION) then begin
+    if (Settings.SemVer < APP_VERSION) then
+    begin
+      {$IFDEF ANDROID}
+      try
         Log('Refreshing assets begin');
         TDirectory.Delete(TNBoxPath.GetThemesPath, TRUE);
         TDirectory.CreateDirectory(TNBoxPath.GetThemesPath);
         System.StartUpCopy.CopyStartUpFiles;
         Log('Refreshing assets end.');
-        SaveSettings;
+      except
+        On E: Exception do Log('Refreshing with StartUpCopy', E);
       end;
-    except
-      On E: Exception do
-        Log('Refreshing with StartUpCopy', E);
+      {$ENDIF}
+
+      if (Settings.SemVer < TSemVer.Create(3, 0, 0)) then
+        Settings.DefaultBackupPath := TNBoxPath.GetDefaultBackupPath;
+      SaveSettings;
     end;
-    {$ENDIF}
+
   end;
 
   LoadStyle;
@@ -2541,6 +2546,7 @@ begin
   EditSetPlayApp              := AddSettingsEdit('Player application path');
   EditSetPlayParams           := AddSettingsEdit('Player params', FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.');
   {$ENDIF}
+  EditSetDefBackupPath        := AddSettingsEdit('Default backup import \ export path');
   CheckSetDevMode             := AddSettingsCheck('Developer mode');
   CheckSetAutoCheckUpdates    := AddSettingsCheck('Auto check updates');
 
@@ -4305,6 +4311,7 @@ begin
     ContentPlayParams := EditSetPlayParams.Edit.Edit.Text;
     UseNewAppTitlebar   := CheckSetUseNewAppTitlebar.IsChecked;
     {$ENDIF}
+    DefaultBackupPath := EditSetDefBackupPath.Edit.Edit.Text;
 
     if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
       ThreadsCount := tmp
@@ -4505,6 +4512,7 @@ begin
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
   CheckSetUseNewAppTitlebar.IsChecked   := Settings.UseNewAppTitlebar;
   {$ENDIF}
+  EditSetDefBackupPath.Edit.Edit.Text   := Settings.DefaultBackupPath;
 
   if Settings.DevMode then NsfwBox.Tests.Init;
 
