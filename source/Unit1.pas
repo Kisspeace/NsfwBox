@@ -877,7 +877,8 @@ begin
   begin
     try
       ImportAppData(LFilename, DEF_EXIM_OPTIONS);
-      ShowMessage('Success.');
+      ShowMessage('Success. Please restart application.');
+      Application.Terminate;
     except
       On E: Exception do
       begin
