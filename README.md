@@ -76,6 +76,6 @@ Developed on RAD Studio 11 Alexandria.
    
 
 ### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox.v2.5.2.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins32.v2.5.2.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins64.v2.5.2.exe)  
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox.v3.0.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins32.v3.0.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins64.v3.0.0.exe)  
