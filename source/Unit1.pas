@@ -1330,6 +1330,7 @@ begin
   if DirectoryExists(LDirectory) then
   begin
     LFiles := GetFiles(LDirectory + PathDelim + 'NsfwBox-*.zip');
+
     SelectMenuBackupFiles.Menu.FreeControls;
     for I := High(LFiles) downto Low(LFiles) do
     begin
@@ -1339,6 +1340,7 @@ begin
         TPath.Combine(LDirectory, LFile.Name));
       LNewBtn.ImageControl.Visible := False;
       LNewBtn.Text.Margins.Left := 5;
+      LNewBtn.Position.Y := Single.MaxValue;
     end;
   end;
 
