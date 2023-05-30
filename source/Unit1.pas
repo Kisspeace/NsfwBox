@@ -877,8 +877,15 @@ begin
   begin
     try
       ImportAppData(LFilename, DEF_EXIM_OPTIONS);
+      {$IFDEF MSWINDOWS}
       ShowMessage('Success. Please restart application.');
       Application.Terminate;
+      {$ELSE}
+      UserBooleanDialog('Success. Please restart application.',
+        procedure begin
+         Application.Terminate;
+        end);
+      {$ENDIF}
     except
       On E: Exception do
       begin
@@ -1329,15 +1336,18 @@ begin
 
   if DirectoryExists(LDirectory) then
   begin
-    LFiles := GetFiles(LDirectory + PathDelim + 'NsfwBox-*.zip');
+    LFiles := GetFiles(LDirectory + PathDelim);
 
     SelectMenuBackupFiles.Menu.FreeControls;
     for I := High(LFiles) downto Low(LFiles) do
     begin
       var LFile := LFiles[I];
+      if (LFile.Name = '.') or (LFile.Name = '..') then continue;
+
       var LNewBtn := SelectMenuBackupFiles.AddBtn(TRectButton,
         LFile.Name + ' (' + BytesCountToSizeStr(LFile.Size) + ')',
         TPath.Combine(LDirectory, LFile.Name));
+
       LNewBtn.ImageControl.Visible := False;
       LNewBtn.Text.Margins.Left := 5;
       LNewBtn.Position.Y := Single.MaxValue;
