@@ -21,6 +21,7 @@ type
       class function GetThumbnailByUrl(AUrl: string): string; static;
       class function GetLibPath(ALibFilename: string): string; static;
       class function GetHashedDownloadedFilename(AFilename: string; AOrigin: integer = -2; AWithExtension: boolean = True): string; static;
+      class function GetDefaultBackupPath: string; static;
       class procedure CreateThumbnailsDir; static;
   end;
 
@@ -79,6 +80,18 @@ begin
 
   {$IFDEF ANDROID}
   Result := TPath.GetCachePath;
+  {$ENDIF}
+end;
+
+class function TNBoxPath.GetDefaultBackupPath: string;
+var
+  LSubDirs: string;
+begin
+  LSubDirs := TPath.Combine('NsfwBox', 'Backups');
+  {$IFDEF MSWINDOWS}
+  Result := TPath.Combine(TPath.GetDocumentsPath, LSubDirs);
+  {$ELSE}
+  Result := TPath.Combine(TPath.GetSharedDocumentsPath, LSubDirs);
   {$ENDIF}
 end;
 

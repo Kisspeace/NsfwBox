@@ -38,7 +38,7 @@ uses
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
   NsfwBox.Tests, NsfwBox.Logging, NsfwBox.Graphics.ImageViewer,
-  NsfwBox.Utils, NsfwBox.GarbageCollector,
+  NsfwBox.Utils, NsfwBox.GarbageCollector, NsfwBox.DataExportImport,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces,
@@ -244,7 +244,8 @@ type
     BtnSetViewLog,
     BtnSetChangeOnItemTap,
     BtnSetChangeTheme,
-    BtnSetSave
+    BtnSetSave,
+    BtnSetManageBackups
     : TRectButton;
 
     MenuChangeTheme: TNBoxSelectMenuStr;
@@ -266,6 +267,10 @@ type
     BtnSendMsgForDev: TRectButton;
     BtnSendLogs: TRectButton;
 
+    { Menu for manage backups }
+    MenuBackup: TVertScrollBox;
+    EdtBackupFilename: TNBoxEdit;
+    BtnCreateBackup: TRectButton;
 
     function CreateTabText(ABrowser: TNBoxBrowser): string;
     procedure AppOnException(Sender: TObject; E: Exception);
@@ -308,6 +313,7 @@ type
     { ----------------------------- }
     procedure BtnOpenAppRepOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetChangeThemeOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnSetManageBackupsOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnItemMenuOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetViewLogOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetSaveOnTap(Sender: TObject; const Point: TPointF);
@@ -357,6 +363,8 @@ type
     {$IFDEF MSWINDOWS}
     procedure RestoreDefaultStyle;
     {$ENDIF}
+    { Menu for manage backups ----- }
+    procedure BtnCreateBackupOnTap(Sender: TObject; const Point: TPointF);
     { ----------------------------- }
     procedure ChangeInterface(ALayout: TControl);
     procedure UserSelectBookmarkList(AWhenSelected: TProcedureRef);
@@ -407,6 +415,7 @@ type
     function CreateDefSettingsCheck(AOwner: TComponent): TNBoxSettingsCheck;
     function CreateDefSettingsEdit(AOwner: TComponent; AStyle: integer = 0): TNBoxSettingsEdit;
     function CreateDefScraper: TNBoxScraper;
+    function NewMenu: TVertScrollBox;
     { -> Download ----------------- }
     function AddDownload(AItem: INBoxItem; ADontFetch: boolean = False): TNBoxTab; overload;
     function AddDownload(AUrl, AFullFilename: string): TNBoxTab; overload;
@@ -1058,6 +1067,29 @@ begin
   end;
 end;
 
+procedure TForm1.BtnCreateBackupOnTap(Sender: TObject; const Point: TPointF);
+var
+  LDirectory: string;
+  LFilename: string;
+begin
+  LFilename := EdtBackupFilename.Edit.Text;
+  LDirectory := TPath.GetDirectoryName(LFilename);
+  try
+    if not DirectoryExists(LDirectory) then
+      ForceDirectories(LDirectory);
+
+    ExportAppData(LFilename, DEF_EXIM_OPTIONS);
+    Log('New backup: ' + LFilename);
+    ShowMessage('Success.');
+  except
+    On E: Exception do begin
+      Log('CreateBackup', E);
+      Showmessage('Error: ' + E.Message);
+    end;
+  end;
+  EdtBackupFilename.Edit.Text := TPath.Combine(TNBoxPath.GetDefaultBackupPath, GenerateNewBackupFilename);
+end;
+
 procedure TForm1.BtnDialogNoOnTap(Sender: TObject; const Point: TPointF);
 begin
   UserSayYes := false;
@@ -1254,6 +1286,13 @@ end;
 procedure TForm1.BtnSetChangeThemeOnTap(Sender: TObject; const Point: TPointF);
 begin
   ChangeInterface(MenuChangeTheme);
+end;
+
+procedure TForm1.BtnSetManageBackupsOnTap(Sender: TObject;
+  const Point: TPointF);
+begin
+  EdtBackupFilename.Edit.Text := TPath.Combine(TNBoxPath.GetDefaultBackupPath, GenerateNewBackupFilename);
+  ChangeInterface(MenuBackup);
 end;
 
 procedure TForm1.BtnSetSaveOnItemTapOnTap(Sender: TObject;
@@ -2569,6 +2608,9 @@ begin
   with BtnSetChangeTheme do
     OnTap := BtnSetChangeThemeOnTap;
 
+  BtnSetManageBackups := AddSettingsButton('Manage backups', ICON_SETTINGS);
+  BtnSetManageBackups.OnTap := BtnSetManageBackupsOnTap;
+
   BtnSetSave := AddSettingsButton('Save settings', ICON_SAVE);
   with BtnSetSave do begin
     OnTap := BtnSetSaveOnTap;
@@ -2731,7 +2773,29 @@ begin
   Session.PageSize := 100;
   ConnectSession;
 
-  { Data base update }
+  { Menu manage backups }
+  MenuBackup := NewMenu;
+  EdtBackupFilename := Form1.CreateDefEdit(MenuBackup);
+  with EdtBackupFilename do
+  begin
+    Margins.Rect := TRectF.Create(10, 10, 10, 0);
+    Align := TAlignLayout.MostTop;
+    Edit.TextPrompt := 'Full file name';
+    parent := MenuBackup;
+  end;
+
+  BtnCreateBackup := Form1.CreateDefButton(MenuBackup, BTN_STYLE_DEF2);
+  With BtnCreateBackup do
+  begin
+    Align := TAlignlayout.Top;
+    Margins := EdtBackupFilename.Margins;
+    Text.Text := 'Create new backup archive';
+    Image.ImageURL := AppStyle.GetImagePath(ICON_SAVE);
+    Parent := MenuBackup;
+    OnTap := BtnCreateBackupOnTap;
+  end;
+
+  { Database update }
   if not HistoryDb.HasGroup(HistoryDb.NAME_TABS_HISTORY) then begin
     { v1.3.0 }
     HistoryDb.AddGroup(HistoryDb.NAME_TABS_HISTORY, 'all tabs that been closed.');
@@ -3858,6 +3922,14 @@ procedure TForm1.NetHttpOnValidateCertAutoAccept(const Sender: TObject;
   var Accepted: Boolean);
 begin
   Accepted := TRUE;
+end;
+
+function TForm1.NewMenu: TVertScrollBox;
+begin
+  Result := TVertScrollBox.Create(MainLayout);
+  Result.Parent := MainLayout;
+  Result.Visible := False;
+  Result.Align := TAlignLayout.Client;
 end;
 
 procedure TForm1.ReloadBookmarks(ADataBase: TNBoxBookmarksDb; ALayout: TControl);

@@ -28,6 +28,7 @@ type
     public
       Connection: TZConnection;
       procedure ForceConnect;
+      procedure Disconnet;
       property Filename: string read GetFilename write SetFilename;
       constructor Create(ADbFilename: string); virtual;
       destructor Destroy; override;
@@ -75,6 +76,11 @@ begin
   Connection.Free;
   SqlProc.Free;
   Query.Free;
+end;
+
+procedure TDbHelper.Disconnet;
+begin
+  Connection.Disconnect;
 end;
 
 procedure TDbHelper.ForceConnect;
