@@ -44,6 +44,7 @@ const
   ICON_ORIGIN_PREFIX = 'content-origin-';
 
   IMAGE_LOADING    = 'image-loading.png';
+  IMAGE_LOAD_ERROR = 'image-loading-error.png';
   IMAGE_REQUEST_ITEM = 'request-item.png';
 
   { HTML COLORS }

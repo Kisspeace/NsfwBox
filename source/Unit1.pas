@@ -3563,10 +3563,13 @@ end;
 procedure TForm1.OnIWUException(Sender: TObject; AImage: IImageWithURL;
   const AUrl: string; const AException: Exception);
 begin
+  Log('OnIWUException ' + AUrl, AException);
   TThread.Synchronize(nil,
   procedure
   begin
-    Log('OnIWUException ' + AUrl, AException);
+    try
+      AImage.BitmapIWU.LoadFromFile(AppStyle.GetImagePath(IMAGE_LOAD_ERROR));
+    except end;
     if Sender = (ImageViewer.ImageManager as TObject) then
       SetImageViewerStatus(AException.Message, AppStyle.GetImagePath(ICON_WARNING));
   end);
