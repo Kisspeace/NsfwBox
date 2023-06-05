@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg2"
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   sodipodi:docname="image-loading.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:export-filename="image-loading.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs6">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-26.668833 : 260.69471 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="485.33117 : 260.69471 : 1"
+       inkscape:persp3d-origin="229.33117 : 175.36138 : 1"
+       id="perspective2439" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-46.185791 : 267.49718 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="465.81421 : 267.49718 : 1"
+       inkscape:persp3d-origin="209.81421 : 182.16385 : 1"
+       id="perspective2437" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-19.87227 : 231.2112 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="492.12773 : 231.2112 : 1"
+       inkscape:persp3d-origin="236.12773 : 145.87787 : 1"
+       id="perspective2435" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="-373.50888 : 423.82444 : 1"
+       inkscape:vp_y="0 : 6411.3023 : 0"
+       inkscape:vp_z="1302.9069 : 705.20931 : 1"
+       inkscape:persp3d-origin="1503.0512 : -896.07299 : 1"
+       id="perspective2349" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="0.82714844"
+     inkscape:cx="75.560803"
+     inkscape:cy="281.69067"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g8" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g8">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:6px;fill:#ffffff;fill-opacity:1;stroke:none"
+       x="34.432297"
+       y="460.56235"
+       id="text1072"><tspan
+         sodipodi:role="line"
+         x="34.432297"
+         y="460.56235"
+         id="tspan1434">Loading...</tspan></text>
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:6.489;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:6.489,19.46702325;stroke-dashoffset:188.18120922;paint-order:normal;stroke-miterlimit:5"
+       id="rect2347"
+       width="505.61075"
+       height="505.61075"
+       x="3.1946301"
+       y="3.1946301" />
+  </g>
+</svg>
