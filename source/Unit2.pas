@@ -739,6 +739,8 @@ begin
   begin
     AddBtn('coomer.party', URL_COOMER_PARTY, FDefIconPath);
     AddBtn('kemono.party', URL_KEMONO_PARTY, FDefIconPath);
+    AddBtn('coomer.su', URL_COOMER_SU, FDefIconPath);
+    AddBtn('kemono.su', URL_KEMONO_SU, FDefIconPath);
     Menu.OnSelected := OnCoomerPartyHostChanged;
     Menu.SelectFirst;
   end;
@@ -751,6 +753,7 @@ begin
   with NewSelectMenu(CoomerPartyServiceChangeMenu, CoomerPartyMenu, BtnCoomerPartyChangeService) do
   begin
     AddBtn('OnlyFans', 'onlyfans', FDefIconPath);
+    AddBtn('Fansly', 'fansly', FDefIconPath);
     AddBtn('Patreon', 'patreon', FDefIconPath);
     AddBtn('Pixiv fanbox', 'fanbox', FDefIconPath);
     AddBtn('Fantia', 'fantia', FDefIconPath);
