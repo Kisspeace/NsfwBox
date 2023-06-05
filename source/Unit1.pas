@@ -2150,7 +2150,11 @@ begin
         if LPost is TNBoxCoomerPartyItem then begin
           var LCoomerPost := (LPost as TNBoxCoomerPartyItem);
           if I < Length(LCoomerPost.Item.Thumbnails) then begin
-            LFileItem.ThumbnailUrl := LCoomerPost.Site + LCoomerPost.Item.Thumbnails[I];
+            if LCoomerPost.Item.Thumbnails[I].StartsWith('http') then
+              LFileItem.ThumbnailUrl := LCoomerPost.Item.Thumbnails[I]
+            else
+              { Backwards compatibility }
+              LFileItem.ThumbnailUrl := LCoomerPost.Site + LCoomerPost.Item.Thumbnails[I];
             LThumbSet := True;
           end;
         end else if LPost is TNBox9HentaitoItem then begin

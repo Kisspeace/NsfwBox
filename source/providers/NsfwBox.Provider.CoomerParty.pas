@@ -137,15 +137,25 @@ function TNBoxCoomerPartyItem.GetContentUrls: TArray<string>;
 var
   I: integer;
 begin
+  SetLength(Result, Length(FItem.Files));
   for I := 0 to High(FItem.Files) do
-    Result := Result + [Self.Site + FItem.Files[I]];
+  begin
+    if FItem.Files[I].StartsWith('http') then
+      Result[I] := FItem.Files[I]
+    else
+      Result[I] := Self.Site + FItem.Files[I]; { Backwards compatibility }
+  end;
 end;
 
 function TNBoxCoomerPartyItem.GetThumbnailUrl: string;
 begin
   if ( length(FItem.Thumbnails) > 0 ) then
-    Result := Self.Site + Fitem.Thumbnails[0]
-  else
+  begin
+    if Fitem.Thumbnails[0].StartsWith('http') then
+      Result := Fitem.Thumbnails[0]
+    else
+      Result := Self.Site + Fitem.Thumbnails[0]; { Backwards compatibility }
+  end else
     Result := '';
 end;
 
