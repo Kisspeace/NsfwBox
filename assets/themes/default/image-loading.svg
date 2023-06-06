@@ -58,7 +58,7 @@
      inkscape:deskcolor="#505050"
      showgrid="false"
      inkscape:zoom="0.82714844"
-     inkscape:cx="75.560803"
+     inkscape:cx="0"
      inkscape:cy="281.69067"
      inkscape:window-width="1920"
      inkscape:window-height="1027"
@@ -74,11 +74,11 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3333px;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:6px;fill:#ffffff;fill-opacity:1;stroke:none"
        x="34.432297"
-       y="460.56235"
+       y="72.109352"
        id="text1072"><tspan
          sodipodi:role="line"
          x="34.432297"
-         y="460.56235"
+         y="72.109352"
          id="tspan1434">Loading...</tspan></text>
     <rect
        style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:6.489;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:6.489,19.46702325;stroke-dashoffset:188.18120922;paint-order:normal;stroke-miterlimit:5"
