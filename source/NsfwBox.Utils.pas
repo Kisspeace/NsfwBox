@@ -3,7 +3,7 @@
 interface
 
 uses
-  Classes, SysUtils, System.Generics.Collections,
+  Classes, SysUtils, System.Generics.Collections, System.IOUtils,
   NsfwBox.Logging;
 
 type
@@ -13,11 +13,14 @@ type
   function StrIn(const Ar: TArray<string>; AStr: string; AIgnoreCase: boolean = True): boolean;
   function BytesCountToSizeStr(ABytesCount: int64): string;
   function GetPercents(AFull, APiece: Real): integer;
+  function GetThumbByFileExt(const AFilename: string): string;
 
   ///<summary>FreeAndNil for interfaced objects without reference counting.</summary>
   procedure FreeInterfaced(const [ref] AObject: IInterface);
 
+
 implementation
+uses Unit1, NsfwBox.Styling;
 
 procedure FreeInterfaced(const [ref] AObject: IInterface);
 var
@@ -87,6 +90,22 @@ begin
 
     if Result then Exit;
   end;
+end;
+
+function GetThumbByFileExt(const AFilename: string): string;
+const
+  VIDEO: TArray<string> = ['.m4v', '.mp4', '.webm'];
+  AUDIO: TArray<string> = ['.mp3', '.m4a', '.ogg', '.wav'];
+var
+  LExt: string;
+begin
+  LExt := TPath.GetExtension(AFilename);
+  if StrIn(VIDEO, LExt, True) then
+    Result := Form1.AppStyle.GetImagePath(IMAGE_DUMMY_VIDEO)
+  else if StrIn(AUDIO, LExt, True) then
+    Result := Form1.AppStyle.GetImagePath(IMAGE_DUMMY_AUDIO)
+  else
+    Result := Form1.AppStyle.GetImagePath(IMAGE_LOADING);
 end;
 
 end.

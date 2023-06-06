@@ -2171,9 +2171,11 @@ begin
           end;
         end;
 
-        if not LThumbSet then
-          LFileItem.ThumbnailUrl := LPost.ThumbnailUrl;  
-        
+        if (not LThumbSet) and (not LPost.ThumbnailUrl.IsEmpty) then
+          LFileItem.ThumbnailUrl := LPost.ThumbnailUrl
+        else
+          LFileItem.ThumbnailUrl := GetThumbByFileExt(LFileItem.ContentUrl);
+
         LNewCard.Item := LFileItem;   
         LNewCard.Fill.Kind := TBrushkind.Bitmap;
         LNewCard.ImageURL := LNewCard.Post.ThumbnailUrl; // Start thumbnail load image
