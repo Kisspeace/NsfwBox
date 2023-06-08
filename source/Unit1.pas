@@ -2126,7 +2126,11 @@ begin
       LTryFetchIfEmpty;
 
       if (LPost.ContentUrlCount < 1) then begin
+        {$IFDEF ANDROID}
+        ToastMessage('Have no files', True);
+        {$ELSE}
         showmessage('Have no files');
+        {$ENDIF}
         exit;
       end;
 
