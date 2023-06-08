@@ -94,12 +94,17 @@ type
   private
     FOnWebClientSet: TWebClientSetEvent;
     FOnFetched: TINBoxItemEvent;
+    function GetPushToQueueEndOnFail: boolean;
+    procedure SetPushToQueueEndOnFail(const value: boolean);
   protected
+    FPushToQueueEndOnFail: boolean;
     procedure SubThreadExecute(AItem: INBoxItem); override;
   public
+    property PushToQueueEndOnFail: boolean read GetPushToQueueEndOnFail write SetPushToQueueEndOnFail;
     property OnFetched: TINBoxItemEvent read FOnFetched write FOnFetched;
     property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
     procedure Add(AItem: INBoxItem);
+    constructor Create; override;
   End;
 
 implementation
@@ -859,6 +864,32 @@ begin
   QueueAdd(AItem);
 end;
 
+constructor TNBoxFetchManager.Create;
+begin
+  inherited;
+  FPushToQueueEndOnFail := True;
+end;
+
+function TNBoxFetchManager.GetPushToQueueEndOnFail: boolean;
+begin
+  FLock.BeginRead;
+  try
+    Result := FPushToQueueEndOnFail;
+  finally
+    FLock.EndRead;
+  end;
+end;
+
+procedure TNBoxFetchManager.SetPushToQueueEndOnFail(const value: boolean);
+begin
+  FLock.BeginWrite;
+  try
+    FPushToQueueEndOnFail := value;
+  finally
+    FLock.EndWrite;
+  end;
+end;
+
 procedure TNBoxFetchManager.SubThreadExecute(AItem: INBoxItem);
 var
   LScraper: TNBoxScraper;
@@ -867,17 +898,22 @@ begin
     LScraper := TNBoxScraper.Create;
     try
       LScraper.OnWebClientSet := Self.OnWebClientSet;
+
       while not LScraper.TryFetchContentUrls(AItem) do
       begin
         if TThread.Current.CheckTerminated then exit;
+        if PushToQueueEndOnFail then
+        begin
+          Self.Add(AItem);
+          Exit;
+        end;
       end;
+
       // Fetched
       if TThread.Current.CheckTerminated then exit;
       if (Assigned(Self.OnFetched)) then
         Self.OnFetched(Self, AItem);
     finally
-//      FreeAndNil(AItem as TObject);
-//      AItem := nil;
       LScraper.Free;
     end;
   Except
