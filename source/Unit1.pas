@@ -2171,9 +2171,9 @@ begin
           end;
         end;
 
-        if (not LThumbSet) and (not LPost.ThumbnailUrl.IsEmpty) then
+        if ((not LThumbSet) and (not LPost.ThumbnailUrl.IsEmpty)) then
           LFileItem.ThumbnailUrl := LPost.ThumbnailUrl
-        else
+        else if not LThumbSet then
           LFileItem.ThumbnailUrl := GetThumbByFileExt(LFileItem.ContentUrl);
 
         LNewCard.Item := LFileItem;   
