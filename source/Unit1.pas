@@ -39,6 +39,7 @@ uses
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
   NsfwBox.Tests, NsfwBox.Logging, NsfwBox.Graphics.ImageViewer,
   NsfwBox.Utils, NsfwBox.GarbageCollector, NsfwBox.DataExportImport,
+  NsfwBox.Cache,
   { you-did-well! ---- }
   YDW.FMX.ImageWithURL.AlRectangle, YDW.FMX.ImageWithURLManager,
   YDW.FMX.ImageWithURLCacheManager, YDW.FMX.ImageWithURL.Interfaces,
@@ -469,10 +470,11 @@ var
   HistoryDb: TNBoxBookmarksHistoryDb;
   Session: TNBoxBookmarksDb;
 
+  FetchedItemsCache: TFetchedItemsCache;
+
   NowLoadingSession: boolean   = false;
   NowUserSelect: boolean = false;
   DoWithAllItems: boolean = false;
-  BadThingsNum: integer = 0;
 
   { Static Images }
   DummyLoadingImage: Fmx.Graphics.TBitmap;
@@ -657,9 +659,10 @@ var
   LUrlsAr: TArray<String>;
 begin
   Result := Nil;
-  if (Not ADontFetch)
+  if Not ADontFetch
   And Supports(AItem, IFetchableContent, LFetchable)
-  And (Not LFetchable.ContentFetched)
+  And Not LFetchable.ContentFetched
+  And not FetchedItemsCache.UpdateWithCached(AItem)
   then begin
     DownloadFetcher.Add(AItem.Clone);
     exit;
@@ -1935,10 +1938,13 @@ var
   begin
     if Supports(LPost, IFetchableContent, LFetchable)
     And ( not LFetchable.ContentFetched ) then begin
+      if FetchedItemsCache.UpdateWithCached(LPost) then Exit;
+
       LScraper := Form1.CreateDefScraper;
       try
         try
           LScraper.FetchContentUrls(LPost);
+          FetchedItemsCache.Save(LPost);
         finally
           LScraper.Free;
         end;
@@ -2315,6 +2321,9 @@ begin
     EnableLoadFromCache := Settings.ImageCacheLoad;
     OnWebClientCreate := OnIWUManagerCreateWebClient;
   end;
+
+  FetchedItemsCache := TFetchedItemsCache.Create(Self);
+  FetchedItemsCache.StoragePath := TNBoxPath.GetFetchedItemsCachePath;
 
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
   try
@@ -3712,6 +3721,7 @@ var
   LItem: INBoxItem;
 begin
   LItem := AItem;
+  FetchedItemsCache.Save(LItem);
   TThread.Synchronize(TThread.Current,
   procedure begin
     try
