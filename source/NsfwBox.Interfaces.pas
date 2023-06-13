@@ -37,6 +37,14 @@ type
     property UIdInt: int64 read GetUIdInt; // write SetUIdInt;
   end;
 
+  IUIdAsStr = interface
+    ['{ED700226-7A55-4A06-81A1-13DF2CC3EF8B}']
+    { private \ protected }
+    function GetUidStr: string;
+    { public }
+    property UIdStr: string read GetUIdStr;
+  end;
+
   INBoxItemTag = interface
     ['{461DACE2-B4A1-4DB4-925F-C7B16F06CF75}']
     { private \ protected }
