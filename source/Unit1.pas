@@ -308,6 +308,7 @@ type
     procedure OnImageViewerReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
     procedure SetBrowserStatus(const AStr: string; AImagePath: string = '');
     procedure SetImageViewerStatus(const AStr: string; AImagePath: string = '');
+    procedure ContentFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
     procedure TabOnTap(Sender: TObject; const Point: TPointF);
@@ -470,6 +471,7 @@ var
   HistoryDb: TNBoxBookmarksHistoryDb;
   Session: TNBoxBookmarksDb;
 
+  ContentFetcher: TNBoxFetchManager;
   FetchedItemsCache: TFetchedItemsCache;
 
   NowLoadingSession: boolean   = false;
@@ -1576,6 +1578,11 @@ begin
   end;
 end;
 
+procedure TForm1.ContentFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
+begin
+  FetchedItemsCache.Save(AItem, True);
+end;
+
 function TForm1.CreateDefBrowser(AOwner: TComponent): TNBoxBrowser;
 begin
   Result := TNBoxBrowser.Create(AOwner);
@@ -2324,6 +2331,8 @@ begin
 
   FetchedItemsCache := TFetchedItemsCache.Create(Self);
   FetchedItemsCache.StoragePath := TNBoxPath.GetFetchedItemsCachePath;
+  ContentFetcher := TNBoxFetchManager.Create;
+  ContentFetcher.OnFetched := ContentFetcherOnFetched;
 
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
   try
