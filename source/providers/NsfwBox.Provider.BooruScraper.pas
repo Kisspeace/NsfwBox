@@ -37,7 +37,7 @@ type
       property ContentCount: integer read GetContentCount;
   End;
 
-  TNBoxBooruItemBase = class(TNBoxItemBase,
+  TNBoxBooruItemBase = class(TNBoxItemBase, IUIdAsInt,
    IHasArtists, IHasTags, IFetchableTags, IFetchableContent, IFetchableAuthors)
     private
       FFull: IBooruPost;
@@ -49,6 +49,7 @@ type
       function GetTags: TNBoxItemTagAr;
       procedure SetFull(const value: IBooruPost); virtual;
       function GetFull: IBooruPost; virtual;
+      function GetUidInt: int64;
     public
       procedure MergeFull(const APost: IBooruPost);
       function IsAuthorsFetched: boolean;
@@ -157,6 +158,11 @@ end;
 function TNBoxBooruItemBase.GetThumbnailUrl: string;
 begin
   Result := Self.FFull.Thumbnail;
+end;
+
+function TNBoxBooruItemBase.GetUidInt: int64;
+begin
+  Result := FFull.Id;
 end;
 
 function TNBoxBooruItemBase.IsAuthorsFetched: boolean;
