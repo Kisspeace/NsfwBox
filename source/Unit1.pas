@@ -21,7 +21,7 @@ uses
   system.NetEncoding, System.Net.URLClient, System.StartUpCopy,
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections, BooruScraper.Interfaces,
-  NinehentaiTo.APITypes,
+  NinehentaiTo.APITypes, System.SyncObjs,
   { Alcinoe ---------- }
   Alcinoe.FMX.Graphics, Alcinoe.FMX.Objects,
   { Kastri ----------- }
@@ -92,6 +92,8 @@ type
     FCurrentBookmarksDb: TNBoxBookmarksDb;
     FCurrentBookmarkControl: TNBoxSettingsCheck;
     FCurrentBookmarkGroup: TBookmarkGroupRec;
+    FCurrentItemForWaitFetch: INBoxItem;
+    FCurrentItemForWaitFetchEvent: TEvent;
     function GetAppDestroying: boolean;
     procedure SetSettings(const value: TNsfwBoxSettings);
     function GetSettings: TNsfwBoxSettings;
@@ -105,6 +107,7 @@ type
     procedure SetSubHeader(const Value: string);
     function GetAppFullscreen: boolean;
     procedure SetAppFullscreen(const Value: boolean);
+    procedure SetCurrentItemForWaitFetch(const Value: INBoxItem);
   public
     { Public declarations }
     {$IFDEF MSWINDOWS}
@@ -308,6 +311,7 @@ type
     procedure OnImageViewerReceiveData(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean);
     procedure SetBrowserStatus(const AStr: string; AImagePath: string = '');
     procedure SetImageViewerStatus(const AStr: string; AImagePath: string = '');
+    function FetchContent(AItem: INBoxItem): INBoxItem;
     procedure ContentFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
     { -> Tabs --------------------- }
     procedure BtnTabCloseOnTap(Sender: TObject; const Point: TPointF);
@@ -445,6 +449,7 @@ type
     property CurrentBookmarksDb: TNBoxBookmarksDb read FCurrentBookmarksDb write SetCurrentBookmarksDb;
     property CurrentBookmarkControl: TNBoxSettingsCheck read FCurrentBookmarkControl write SetCurrentBookmarkControl;
     property CurrentBookmarkGroup: TBookmarkGroupRec read FCurrentBookmarkGroup;
+    property CurrentItemForWaitFetch: INBoxItem read FCurrentItemForWaitFetch write SetCurrentItemForWaitFetch;
     property AppStyle: TNBoxGUIStyle read GetAppStyle write SetAppStyle;
     property Settings: TNsfwBoxSettings read GetSettings write SetSettings;
     property SubHeader: string read GetSubHeader write SetSubHeader;
@@ -1580,7 +1585,23 @@ end;
 
 procedure TForm1.ContentFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
 begin
-  FetchedItemsCache.Save(AItem, True);
+  try
+    FetchedItemsCache.Save(AItem, True);
+    FLock.BeginWrite;
+    try
+      if AItem = FCurrentItemForWaitFetch then
+      begin
+        FCurrentItemForWaitFetch := Nil;
+        FCurrentItemForWaitFetchEvent.SetEvent;
+      end;
+    finally
+      FLock.EndWrite;
+    end;
+    FreeInterfaced(AItem);
+  except
+    On E: Exception do
+      Log('ContentFetcherOnFetched', E);
+  end;
 end;
 
 function TForm1.CreateDefBrowser(AOwner: TComponent): TNBoxBrowser;
@@ -1940,27 +1961,15 @@ var
 
   procedure LTryFetchIfEmpty;
   var
-    LScraper: TNBoxScraper;
     LFetchable: IFetchableContent;
   begin
     if Supports(LPost, IFetchableContent, LFetchable)
-    And ( not LFetchable.ContentFetched ) then begin
-      if FetchedItemsCache.UpdateWithCached(LPost) then Exit;
-
-      LScraper := Form1.CreateDefScraper;
-      try
-        try
-          LScraper.FetchContentUrls(LPost);
-          FetchedItemsCache.Save(LPost);
-        finally
-          LScraper.Free;
-        end;
-      except
-        On E: Exception do begin
-          Log('ExecItemInteraction TryFetchContent', E);
-          ShowMessage(E.Message);
-        end;
-      end;
+    And ( not LFetchable.ContentFetched ) then
+    begin
+      if (FCurrentItemForWaitFetchEvent.WaitFor(3000) = wrSignaled) then
+        FetchedItemsCache.UpdateWithCached(LPost)
+     else
+        Showmessage('Waiting too long.');
     end;
   end;
 
@@ -2210,6 +2219,22 @@ begin
   end;
 end;
 
+function TForm1.FetchContent(AItem: INBoxItem): INBoxItem;
+var
+  LFetchable: IFetchableContent;
+begin
+  Result := Nil;
+  if Supports(AItem, IFetchableContent, LFetchable)
+  and not LFetchable.ContentFetched then
+  begin
+    if not FetchedItemsCache.UpdateWithCached(AItem) then
+    begin
+      Result := AItem.Clone;
+      ContentFetcher.Add(Result);
+    end;
+  end;
+end;
+
 function TForm1.FindDownloadedFullFilename(AUrl: string): string;
 var
   LFiles: TSearchRecAr;
@@ -2253,6 +2278,7 @@ var
 begin
   FFormCreated := false;
   FLock := TMREWSync.Create;
+  FCurrentItemForWaitFetchEvent := TEvent.Create;
 
   APP_VERSION := GetAppVersion;
   FCurrentBrowser := nil;
@@ -3853,8 +3879,12 @@ var
 begin
   Item := ( Sender as TNBoxCardBase );
 
-  if ( Settings.SaveTapHistory and Item.HasPost ) then
-    HistoryDb.TapGroup.Add(Item.Post);
+  if Item.HasPost then
+  begin
+    CurrentItemForWaitFetch := FetchContent(Item.Post);
+    if Settings.SaveTapHistory then
+      HistoryDb.TapGroup.Add(Item.Post);
+  end;
 
   Interactions := Settings.ItemInteractions;
   for I := 0 to High(Interactions) do begin
@@ -3865,7 +3895,6 @@ begin
       exit;
     end;
   end;
-
 end;
 
 procedure TForm1.LayoutDialogYesOrNoOnResize(Sender: TObject);
@@ -4585,6 +4614,17 @@ end;
 procedure TForm1.SetCurrentItem(const value: TNBoxCardBase);
 begin
   FCurrentItem := Value;
+end;
+
+procedure TForm1.SetCurrentItemForWaitFetch(const Value: INBoxItem);
+begin
+  FLock.BeginWrite;
+  try
+    FCurrentItemForWaitFetch := Value;
+    FCurrentItemForWaitFetchEvent.ResetEvent;
+  finally
+    FLock.EndWrite;
+  end;
 end;
 
 procedure TForm1.SetSettings(const value: TNsfwBoxSettings);
