@@ -129,10 +129,13 @@ const
   FILE_EXT: string = '.json';
 var
   LId: IUIdAsInt;
+  LIdS: IUIdAsStr;
 begin
   Result := AKey.Origin.ToString;
   if Supports(AKey, IUIdAsInt, LId) then
-    Result := Result + '-id' + LId.UIdInt.ToString;
+    Result := Result + '-id' + LId.UIdInt.ToString
+  else if Supports(AKey, IUIdAsStr, LIdS) then
+    Result := Result + '-id' + LIdS.UIdStr;
 
   Result := TPath.ChangeExtension(Result, FILE_EXT);
   Result := TPath.Combine(FStoragePath, Result);
