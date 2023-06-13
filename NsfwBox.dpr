@@ -48,7 +48,8 @@ uses
   NsfwBox.Provider.Randomizer in 'source\providers\NsfwBox.Provider.Randomizer.pas',
   NsfwBox.GarbageCollector in 'source\NsfwBox.GarbageCollector.pas',
   NsfwBox.Provider.BepisDb in 'source\providers\NsfwBox.Provider.BepisDb.pas',
-  NsfwBox.DataExportImport in 'source\NsfwBox.DataExportImport.pas';
+  NsfwBox.DataExportImport in 'source\NsfwBox.DataExportImport.pas',
+  NsfwBox.Cache in 'source\NsfwBox.Cache.pas';
 
 {$R *.res}
 
