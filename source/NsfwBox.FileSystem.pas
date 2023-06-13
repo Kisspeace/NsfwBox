@@ -75,7 +75,7 @@ end;
 class function TNBoxPath.GetCachePath: string;
 begin
   {$IFDEF MSWINDOWS}
-  Result := TNBoxPath.GetAppMainPath;
+  Result := TPath.Combine(TNBoxPath.GetAppMainPath, 'cache');
   {$ENDIF}
 
   {$IFDEF ANDROID}
