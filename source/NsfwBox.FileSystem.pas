@@ -18,6 +18,7 @@ type
       class function GetAppMainPath: string; static;
       class function GetThemesPath: string; static;
       class function GetThumbnailsPath: string; static;
+      class function GetFetchedItemsCachePath: string; static;
       class function GetThumbnailByUrl(AUrl: string): string; static;
       class function GetLibPath(ALibFilename: string): string; static;
       class function GetHashedDownloadedFilename(AFilename: string; AOrigin: integer = -2; AWithExtension: boolean = True): string; static;
@@ -93,6 +94,11 @@ begin
   {$ELSE}
   Result := TPath.Combine(TPath.GetSharedDocumentsPath, LSubDirs);
   {$ENDIF}
+end;
+
+class function TNBoxPath.GetFetchedItemsCachePath: string;
+begin
+  Result := TPath.Combine(TNBoxPath.GetCachePath, 'fetched-posts');
 end;
 
 class function TNBoxPath.GetHashedDownloadedFilename(AFilename: string;
