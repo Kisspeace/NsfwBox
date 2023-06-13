@@ -138,6 +138,8 @@ type
   function ToJsonObj(AObject: TObject): TJsonObject;
   function ToJsonStr(AObject: TObject): String;
 
+  function INBoxItemFromJson(const AJson: string): INBoxItem;
+
 implementation
 
 
@@ -188,6 +190,17 @@ begin
       Log('ToJsonStr', E);
     end;
   end;
+end;
+
+function INBoxItemFromJson(const AJson: string): INBoxItem;
+var
+  LJson: ISuperObject;
+  LProviderId: integer;
+begin
+  LJson := SO(AJson);
+  LProviderId := LJson.I['Origin'];
+  Result := CreateItemByOrigin(LProviderId);
+  SafeAssignFromJSON(Result as TObject, LJson);
 end;
 
 Procedure SafeAssignFromJSON(AObject: TObject; JSON: ISuperObject);
