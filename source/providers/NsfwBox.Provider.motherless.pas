@@ -9,7 +9,7 @@ uses
 
 type
 
-  TNBoxMotherlessItem = class(TNBoxItemBase, IHasTags, IHasArtists,
+  TNBoxMotherlessItem = class(TNBoxItemBase, IUIdAsStr, IHasTags, IHasArtists,
    IHasCaption, IFetchableContent, IFetchableTags)
     protected
       FPage: TMotherlessPostPage;
@@ -22,6 +22,7 @@ type
       function GetContentUrls: TArray<string>; override;
       function GetThumbnailUrl: string; override;
       function GetHasAuthorName: boolean;
+      function GetUidStr: string;
     public
       procedure Assign(ASource: INBoxItem); override;
       function Clone: INBoxItem; override;
@@ -172,6 +173,11 @@ end;
 function TNBoxMotherlessItem.GetThumbnailUrl: string;
 begin
   Result := FPage.Item.ThumbnailUrl;
+end;
+
+function TNBoxMotherlessItem.GetUidStr: string;
+begin
+  Result := FPage.Item.Id;
 end;
 
 { TNBoxSearchReqNsfwXxx }
