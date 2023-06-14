@@ -71,7 +71,9 @@ type
       constructor Create(Aowner: Tcomponent); override;
   end;
 
-  TNBoxTabList = Tlist<TNBoxTab>;
+  TNBoxTabClass = Class of TNBoxTab;
+
+  TNBoxTabList = TList<TNBoxTab>;
 
   TNBoxEdit = class(TAlRectangle)
     public

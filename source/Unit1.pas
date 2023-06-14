@@ -131,7 +131,7 @@ type
         MenuTestButtons: TList<TRectButton>;
     TabsScroll: TVertScrollBox;
     Browsers: TNBoxBrowserList;
-    Tabs: TNBoxTabList;
+    Tabs: TNBoxBrowserTabList;
 
     { OnBrowserLayout }
     BtnNext: TRectButton;
@@ -367,7 +367,6 @@ type
     procedure OnBrowsersNotify(Sender: TObject; const Item: TNBoxBrowser; Action: TCollectionNotification);
     { ----------------------------- }
     function IndexTabByBrowser(ABrowser: TNBoxBrowser): integer;
-    function GetTab(ABrowser: TNBoxBrowser): TNBoxTab;
     { ----------------------------- }
     procedure RestoreDefaultSettings;
     {$IFDEF MSWINDOWS}
@@ -415,7 +414,8 @@ type
     function CreateDefScroll(AOwner: TComponent): TVertScrollBox;
     function CreateDefRect(AOwner: TComponent): TAlRectangle;
     function CreateDefBrowser(AOwner: TComponent): TNBoxBrowser;
-    function CreateDefTab(AOwner: TComponent): TNBoxTab;
+    function CreateDefTab(AOwner: TComponent; AClass: TNBoxTabClass): TNBoxTab; overload;
+    function CreateDefTab(AOwner: TComponent): TNBoxTab; overload;
     function CreateDefCheck(AOwner: TComponent): TRectTextCheck;
     function CreateDefCheckButton(AOwner: TComponent; AStyle: integer = 0): TNBoxCheckButton;
     function CreateDefRadioButton(AOwner: TComponent; AStyle: integer = 0): TNBoxRadioButton;
@@ -440,7 +440,7 @@ type
     function AddMenuBtn: TRectButton;
     function AddMenuSearchBtn(AText: string; AImageName: string = ''; AOnTap: TTapEvent = nil): TRectButton;
     function AddItemMenuBtn(ACaption: string; AAction: TNBoxItemInteraction; AImageName: string = ''; ATag: string = ''): TRectButton;
-    function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxTab;
+    function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxBrowser.TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean = True);
     procedure DeleteAllBrowsers(ADeleteFromSession: boolean = True);
     { -> Properies ---------------- }
@@ -610,15 +610,16 @@ begin
   end;
 end;
 
-function TForm1.AddBrowser(ARequest: INBoxSearchRequest; AAutoStartBrowse: boolean): TNBoxTab;
+function TForm1.AddBrowser(ARequest: INBoxSearchRequest; AAutoStartBrowse: boolean): TNBoxBrowser.TNBoxTab;
 var
-  B: TNBoxBrowser;
-  T: TNBoxTab;
+  LBrowser: TNBoxBrowser;
+  LTab: TNBoxBrowser.TNBoxTab;
 begin
   try
-    B := Form1.CreateDefBrowser(BrowserLayout);
-    Browsers.Add(B);
-    with B do begin
+    LBrowser := Form1.CreateDefBrowser(BrowserLayout);
+    Browsers.Add(LBrowser);
+    with LBrowser do
+    begin
       Tag              := -1;
       Parent           := BrowserLayout;
       OnRequestChanged := OnBrowserReqChanged;
@@ -627,9 +628,10 @@ begin
       DummyImage       := DummyLoadingImage;
     end;
 
-    T := Form1.CreateDefTab(B);
-    Tabs.Add(T);
-    with T do begin
+    LTab := TNBoxBrowser.TNBoxTab(Form1.CreateDefTab(LBrowser, TNBoxBrowser.TNBoxTab));
+    Tabs.Add(LTab);
+    with LTab do
+    begin
       ImageControl.Visible := false;
       Align         := TAlignlayout.Top;
       Text.Text     := 'Empty tab';
@@ -641,18 +643,21 @@ begin
       Closebtn.OnClick := form1.ClickTapRef;
       OnTap            := form1.TabOnTap;
       OnClick          := ClickTapRef;
+      Browser := LBrowser;
     end;
 
+    LBrowser.Tab := LTab;
+
     try
-      B.Request := ARequest;
+      LBrowser.Request := ARequest;
     except
       On E: Exception do Log('AddBrowser B.Request := ARequest;', E);
     end;
     Form1.OnBrowserLayout.BringToFront;
-    Result := T;
+    Result := LTab;
 
     if AAutoStartBrowse then
-      B.GoBrowse;
+      LBrowser.GoBrowse;
   except
     On E: Exception do Log('AddBrowser', E);
   end;
@@ -1828,9 +1833,9 @@ begin
   end;
 end;
 
-function TForm1.CreateDefTab(AOwner: TComponent): TNBoxTab;
+function TForm1.CreateDefTab(AOwner: TComponent; AClass: TNBoxTabClass): TNBoxTab;
 begin
-  Result := TNBoxTab.Create(AOwner);
+  Result := AClass.Create(AOwner);
   with Result do begin
     SetStretchImage(ImageControl);
     ImageControl.OnResize := IconOnResize;
@@ -1844,6 +1849,11 @@ begin
     AppStyle.tab.Apply(result);
     Height := TAB_DEF_HEIGHT;
   end;
+end;
+
+function TForm1.CreateDefTab(AOwner: TComponent): TNBoxTab;
+begin
+  Result := CreateDefTab(AOwner, TNBoxTab);
 end;
 
 function TForm1.CreateDefText(AOwner: TComponent; AStyle: integer): TAlText;
@@ -2460,7 +2470,7 @@ begin
   DownloadFetcher.OnWebClientSet := Self.OnBrowserSetWebClient;
   DownloadFetcher.OnFetched := Self.DownloadFetcherOnFetched;
 
-  Tabs := TNBoxTabList.Create;
+  Tabs := TNBoxBrowserTabList.Create;
   Browsers := TNBoxBrowserList.Create;
   Browsers.OnNotify := OnBrowsersNotify;
   ButtonsItemMenu := TControlList.Create;
@@ -3253,17 +3263,6 @@ begin
   Result := TopBottomText.Text;
 end;
 
-function TForm1.GetTab(ABrowser: TNBoxBrowser): TNBoxTab;
-var
-  N: integer;
-begin
-  N := form1.IndexTabByBrowser(ABrowser);
-  if N <> -1 then
-    Result := Tabs.Items[N]
-  else
-    Result := nil;
-end;
-
 procedure TForm1.GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
 begin
   try
@@ -3459,7 +3458,6 @@ end;
 
 procedure TForm1.OnBrowserReqChanged(Sender: TObject);
 var
-  LTab: TNBoxTab;
   LNewTabImageName: string;
   LBrowser: TNBoxBrowser;
   Groups: TBookmarkGroupRecAr;
@@ -3467,16 +3465,15 @@ var
   LReq: INBoxSearchRequest;
 begin
   LBrowser := TNBoxBrowser(Sender);
-  LTab := GetTab(Sender as TNBoxBrowser);
   LReq := LBrowser.Request;
   try
-    if not Assigned(LTab) then Exit;
+    if not Assigned(LBrowser.Tab) then Exit;
 
-    LTab.Text.TextIsHtml := True;
-    LTab.Text.Text := CreateTabText(LBrowser);
+    LBrowser.Tab.Text.TextIsHtml := True;
+    LBrowser.Tab.Text.Text := CreateTabText(LBrowser);
     LNewTabImageName := AppStyle.GetImagePath(LReq.Origin);
-    if LNewTabImageName <> LTab.Image.ImageURL then
-      LTab.Image.ImageURL := LNewTabImageName;
+    if LNewTabImageName <> LBrowser.Tab.Image.ImageURL then
+      LBrowser.Tab.Image.ImageURL := LNewTabImageName;
 
     if ( not NowLoadingSession ) And Settings.AutoSaveSession then
     begin
@@ -3851,8 +3848,7 @@ end;
 
 procedure TForm1.OnNewItem(Sender: TObject; var AItem: TNBoxCardBase);
 var
-  B: TNBoxBrowser;
-  T: TNBoxTab;
+  LBrowser: TNBoxBrowser;
 begin
   with AItem do begin
     OnTap := CardOnTap;
@@ -3879,10 +3875,9 @@ begin
     OnAutoLook(AItem);
   end;
 
-  B := TNboxBrowser(Sender);
-  T := GetTab(B);
-  if Assigned(T) then
-    T.Text.Text := CreateTabText(B);
+  LBrowser := TNboxBrowser(Sender);
+  if Assigned(LBrowser.Tab) then
+    LBrowser.Tab.Text.Text := CreateTabText(LBrowser);
 end;
 
 procedure TForm1.OnStartDownloader(Sender: Tobject;
@@ -3904,7 +3899,7 @@ begin
   result := -1;
   for I := 0 to Tabs.Count - 1 do
   begin
-    if Tabs.Items[I].Owner = ABrowser then
+    if Tabs.Items[I].Browser = ABrowser then
     begin
       Result := I;
       Exit;
@@ -4638,24 +4633,21 @@ end;
 
 procedure TForm1.SetCurrentBrowser(const Value: TNBoxBrowser);
 var
-  Tab: TNBoxTab;
   LReq: INBoxSearchRequest;
 begin
   if Assigned(FCurrentBrowser) then
   begin
-    Tab := self.GetTab(FCurrentBrowser);
-    Tab.ImageControl.Visible := false;
-    ClearControlBitmap(Tab.ImageControl);
+    FCurrentBrowser.Tab.ImageControl.Visible := false;
+    ClearControlBitmap(FCurrentBrowser.Tab.ImageControl);
     FCurrentBrowser.Visible := false;
   end;
 
   FCurrentBrowser := Value;
-  Tab := self.GetTab(FCurrentBrowser);
-  Tab.ImageControl.Visible := true;
+  FCurrentBrowser.Tab.ImageControl.Visible := true;
 
   LReq := FCurrentBrowser.Request;
   try
-    Tab.Image.ImageURL := AppStyle.GetImagePath(LReq.Origin);
+    FCurrentBrowser.Tab.Image.ImageURL := AppStyle.GetImagePath(LReq.Origin);
     FCurrentBrowser.Visible := true;
   finally
     FreeInterfaced(LReq);

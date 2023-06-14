@@ -26,14 +26,21 @@ type
   TBrowserExceptEvent = procedure (Sender: TObject; const AExcept: Exception) of object;
 
   TNBoxBrowser = class(TColumnsView, IAbortableAndWaitable)
-    protected
-      type
-        TBrowserWorker = Class(TGenericYDWQueuedThreadObject<TNBoxSearchRequestBase>)
-          protected
-            Browser: TNBoxBrowser;
-            procedure SubThreadExecute(AItem: TNBoxSearchRequestBase); override;
-        End;
+    public type
+      TNBoxTab = Class(NsfwBox.Graphics.TNBoxTab)
+        private
+          FBrowser: TNBoxBrowser;
+        public
+          property Browser: TNBoxBrowser read FBrowser write FBrowser;
+      End;
+    protected type
+      TBrowserWorker = Class(TGenericYDWQueuedThreadObject<TNBoxSearchRequestBase>)
+        protected
+          Browser: TNBoxBrowser;
+          procedure SubThreadExecute(AItem: TNBoxSearchRequestBase); override;
+      End;
     private
+      FTab: TNBoxBrowser.TNBoxTab;
       FSync: TMREWSync;
       FWorker: TBrowserWorker;
       FRequest: INBoxSearchRequest;
@@ -64,6 +71,7 @@ type
       procedure WaitFor;
       procedure Clear;
       function IsBrowsingNow: boolean;
+      property Tab: TNBoxBrowser.TNBoxTab read FTab write FTab;
       property Request: INBoxSearchRequest read GetRequest write SetRequest;
       property ImageManager: IImageWithUrlManager read FImageManager write FImageManager; //FIXME
       property BeforeBrowse: TNotifyEvent read FBeforeBrowse write FBeforeBrowse;
@@ -75,6 +83,8 @@ type
       constructor Create(Aowner: Tcomponent); override;
       destructor Destroy; override;
   end;
+
+  TNBoxBrowserTabList = TList<TNBoxBrowser.TNBoxTab>;
 
   TNBoxBrowserList = TList<TNBoxBrowser>;
 
@@ -94,6 +104,7 @@ begin
   FOnWebClientCreate    := nil;
   FOnRequestChanged     := nil;
   DummyImage            := nil;
+  FTab                  := nil;
   items := TNBoxCardObjList.Create(False);
   ColumnsCount := 2;
   FRequest := TNBoxSearchReqNsfwXxx.create;
