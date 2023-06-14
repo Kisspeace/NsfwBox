@@ -666,6 +666,7 @@ var
   LUrlsAr: TArray<String>;
 begin
   Result := Nil;
+
   if Not ADontFetch
   And Supports(AItem, IFetchableContent, LFetchable)
   And Not LFetchable.ContentFetched
@@ -675,13 +676,12 @@ begin
     exit;
   end;
 
-  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
   if Settings.SaveDownloadHistory then
     HistoryDb.DownloadGroup.Add(AItem);
 
   LUrlsAr := AItem.ContentUrls;
-  for I := 0 to High(LUrlsAr) do begin
+  for I := 0 to High(LUrlsAr) do
+  begin
     LUrl := LUrlsAr[I];
     LFull := Settings.DefDownloadPath;
 
@@ -691,15 +691,14 @@ begin
     var LPreviewed: string;
     with ImageViewer.ImageManager.CacheManager
       as TImageWithURLCahceManager do
-    begin
-      LPreviewed := FindCachedFilename(LUrl);
-    end;
+        LPreviewed := FindCachedFilename(LUrl);
 
     LFull := GetHashedDownloadFullFilename(LUrl, AItem.Origin);
 
-    if not fileexists(LFull) then begin
-
-      if (not LPreviewed.IsEmpty) then begin
+    if not fileexists(LFull) then
+    begin
+      if (not LPreviewed.IsEmpty) then
+      begin
         try
           TFile.Move(PChar(LPreviewed), PChar(LFull));
         except on E: Exception do
@@ -707,9 +706,7 @@ begin
         end;
       end else
         AddDownload(LUrl, LFull);
-
     end;
-
   end;
 end;
 
@@ -720,7 +717,8 @@ begin
   if not Fileexists(AFullFilename) then begin
 
     Result := CreateDefTab(MenuDownloads);
-    with Result do begin
+    with Result do
+    begin
       Align := TAlignLayout.Top;
       Position.Y := 0;
       margins.Rect := TRectF.Create(10, 10, 10, 0);
@@ -849,7 +847,8 @@ procedure TForm1.BookmarksControlOnTap(Sender: TObject; const Point: TPointF);
 begin
   CurrentBookmarkControl := ( Sender As TNBoxSettingsCheck );
 
-  if not NowUserSelect then begin
+  if not NowUserSelect then
+  begin
     DoWithAllItems := false;
     ChangeInterface(MenuBookmarksDoList);
   end else begin
@@ -1139,7 +1138,8 @@ end;
 procedure TForm1.BtnDialogNoOnTap(Sender: TObject; const Point: TPointF);
 begin
   UserSayYes := false;
-  if Assigned(AfterUserEvent) then begin
+  if Assigned(AfterUserEvent) then
+  begin
     AfterUserEvent();
     AfterUserEvent := nil;
   end;
@@ -1148,7 +1148,8 @@ end;
 procedure TForm1.BtnDialogYesOnTap(Sender: TObject; const Point: TPointF);
 begin
   UserSayYes := true;
-  if Assigned(AfterUserEvent) then begin
+  if Assigned(AfterUserEvent) then
+  begin
     AfterUserEvent();
     AfterUserEvent := nil;
   end;
@@ -1250,7 +1251,8 @@ procedure TForm1.BtnSearchAddBookmarkOnTap(Sender: TObject;
 begin
   UserSelectBookmarkList(procedure
   begin
-    if Assigned(CurrentBookmarkControl) then begin
+    if Assigned(CurrentBookmarkControl) then
+    begin
       if ( CurrentBookmarkGroup.Id <> -1 ) then
       begin
         var LReq := SearchMenu.Request;
@@ -1279,7 +1281,8 @@ var
   LSuccess: boolean;
 begin
   try
-    if FileExists(YDW_LOG_FILENAME) then begin
+    if FileExists(YDW_LOG_FILENAME) then
+    begin
       LFinalMsg := TFile.ReadAllText(YDW_LOG_FILENAME);
       LFinalMsg := LFinalMsg + SLineBreak;
     end;
@@ -1292,7 +1295,8 @@ begin
     LSuccess := False;
   end;
 
-  if LSuccess then begin
+  if LSuccess then
+  begin
     Showmessage('Logs sended successfully!');
     BtnSendLogs.Visible := False;
   end else
@@ -1311,7 +1315,8 @@ begin
     Success := false;
   end;
 
-  if Success then begin
+  if Success then
+  begin
     MemoMsgForDev.Memo.Lines.Clear;
     Showmessage('Success!');
   end else
@@ -1405,7 +1410,8 @@ begin
 
   NewCount := Browsers.Count - 1;
 
-  if (CurrentBrowser = LBrowser) and (NewCount > 0) then begin
+  if (CurrentBrowser = LBrowser) and (NewCount > 0) then
+  begin
     if (CurrentBrowser = Browsers.Last) then
       CurrentBrowser := Browsers.First
     else
@@ -1425,7 +1431,8 @@ var
     I: integer;
     LControl: TControl;
   begin
-    For I := 0 to AControls.Count - 1 do begin
+    For I := 0 to AControls.Count - 1 do
+    begin
       LControl := AControls.Items[I];
       if AMultiple then
         LControl.Visible := ( LControl.TagString = TAG_CAN_USE_MORE_THAN_ONE )
@@ -1460,9 +1467,8 @@ begin
     MemoLog.Memo.Lines.Clear;
 
   Form1.MVMenu.HideMaster;
-  for I := 0 to MainLayout.Controls.Count - 1 do begin
+  for I := 0 to MainLayout.Controls.Count - 1 do
     MainLayout.Controls.Items[I].Visible := false;
-  end;
 
   if ( ALayout = BrowserLayout ) then begin
   { Browser }
@@ -1481,7 +1487,8 @@ begin
     var ThemeFiles: TSearchRecAr;
     ThemeFiles := GetFiles(TPath.Combine(TNBoxPath.GetThemesPath, '*'));
     MenuChangeTheme.Menu.FreeControls;
-    for I := 0 to High(ThemeFiles) do begin
+    for I := 0 to High(ThemeFiles) do
+    begin
       if (pos('.json', ThemeFiles[I].Name) > 0) then
         MenuChangeTheme.AddBtn(
           TPath.GetFileNameWithoutExtension(ThemeFiles[I].Name),
@@ -1521,9 +1528,10 @@ begin
 
   end else if ( ALayout = MenuItem ) then begin
   { Menu with CurrentItem (card) actions }
-    if not DoWithAllItems then begin
-
-      if CurrentItem.HasPost then begin
+    if not DoWithAllItems then
+    begin
+      if CurrentItem.HasPost then
+      begin
         _SetVisible(ButtonsItemMenu, true);
         Post := CurrentItem.Post;
         BtnShowTags.Visible    := Supports(Post, IHasTags);
@@ -1550,9 +1558,8 @@ end;
 procedure TForm1.ClickTapRef(Sender: TObject);
 begin
   {$IFDEF MSWINDOWS}
-  with Sender as TControl do begin
+  with Sender as TControl do
     Ontap(Sender, TPointF.Create(0, 0));
-  end;
   {$ENDIF}
 end;
 
@@ -1563,7 +1570,8 @@ var
 begin
   try
     LTab := (TControl(Sender).Parent as TNBoxTab);
-    if Assigned(LTab.TagObject) then begin
+    if Assigned(LTab.TagObject) then
+    begin
       Loader := (LTab.TagObject as TNBoxDownloader);
       if Loader.IsRunning And (not Loader.IsAborted) then
         DownloadManager.AbortDownload(Loader);
@@ -1578,9 +1586,8 @@ end;
 
 procedure TForm1.ConnectSession;
 begin
-  if Length(Session.GetBookmarksGroups) < 1 then begin
+  if Length(Session.GetBookmarksGroups) < 1 then
     Session.AddGroup('session', 'tabs here');
-  end;
 end;
 
 procedure TForm1.ContentFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
@@ -1597,7 +1604,7 @@ begin
     finally
       FLock.EndWrite;
     end;
-    FreeInterfaced(AItem);
+    FreeInterfaced(AItem); { FIXME: Access violation! }
   except
     On E: Exception do
       Log('ContentFetcherOnFetched', E);
@@ -1608,22 +1615,22 @@ function TForm1.CreateDefBrowser(AOwner: TComponent): TNBoxBrowser;
 begin
   Result := TNBoxBrowser.Create(AOwner);
   with Result do begin
-    Align                    := TAlignlayout.Contents;
-    ColumnsCount   := Settings.ContentLayoutsCount;
-    ItemsIndent    := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
-    Request                  := nil;
+    Align        := TAlignlayout.Contents;
+    ColumnsCount := Settings.ContentLayoutsCount;
+    ItemsIndent  := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
+    Request           := nil;
     OnWebClientCreate := OnBrowserSetWebClient;
     OnScraperCreate   := OnBrowserScraperCreate;
     OnException       := OnBrowserExcept;
-    visible                  := false;
-    ImageManager             := BrowsersIWUContentManager;
+    visible           := false;
+    ImageManager      := BrowsersIWUContentManager;
     OnViewportPositionChange := OnBrowserViewportPositionChange;
     {$IFDEF MSWINDOWS}
     OnDblClick               := OnBrowserDblClick;
     {$ENDIF} {$IFDEF ANDROID}
     Touch.InteractiveGestures := [TInteractiveGesture.DoubleTap,
                                   TInteractiveGesture.Pan];
-    OnGesture                := OnBrowserGesture;
+    OnGesture := OnBrowserGesture;
     {$ENDIF}
 
     if Self.FFormCreated then
@@ -1758,18 +1765,15 @@ end;
 function TForm1.CreateDefRect(AOwner: TComponent): TAlRectangle;
 begin
   Result := TAlRectAngle.Create(AOwner);
-  with Result do begin
-
+  with Result do
     Stroke.Kind := TBrushKind.None;
-  end;
 end;
 
 function TForm1.CreateDefScraper: TNBoxScraper;
 begin
   Result := TNBoxScraper.Create;
-  with Result do begin
+  with Result do
     OnWebClientSet := Form1.OnBrowserSetWebClient;
-  end;
 end;
 
 function TForm1.CreateDefScroll(AOwner: TComponent): TVertScrollBox;
@@ -1807,11 +1811,13 @@ function TForm1.CreateDefSettingsEdit(AOwner: TComponent; AStyle: integer): TNBo
 begin
   Result := TNBoxSettingsEdit.Create(AOwner);
   _CreateDefSettingsCheckDef(Result);
-  with Result do begin
+  with Result do
+  begin
     Edit.Margins.Top := 7;
     case AStyle of
       EDIT_STYLE_INT: begin
-        with Edit.Edit do begin
+        with Edit.Edit do
+        begin
           Textsettings.HorzAlign := TtextAlign.Center;
           KeyboardType := TVirtualKeyboardType.NumberPad;
           FilterChar := '1234567890';
@@ -1862,9 +1868,10 @@ begin
   try
     Result := Req.Request;
 
-    if ( Result.IsEmpty ) then begin
-
-      if ( Req is TNBoxSearchReqCoomerParty ) then begin
+    if ( Result.IsEmpty ) then
+    begin
+      if ( Req is TNBoxSearchReqCoomerParty ) then
+      begin
         var LReq := (Req as TNBoxSearchReqCoomerParty);
         if (not LReq.UserId.IsEmpty) then
           Result := LReq.UserId;
@@ -1873,7 +1880,6 @@ begin
 
       if ( Result.IsEmpty ) then
         Result := 'Empty';
-
     end;
 
     Result := Result + ' '
@@ -1897,9 +1903,8 @@ procedure TForm1.DeleteAllBrowsers(ADeleteFromSession: boolean = True);
 var
   I: integer;
 begin
-  for I := 0 to Browsers.Count - 1 do begin
+  for I := 0 to Browsers.Count - 1 do
     DeleteBrowser(Browsers.First, ADeleteFromSession);
-  end;
 end;
 
 procedure TForm1.DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean);
@@ -1924,9 +1929,11 @@ begin
     exit;
   LTab := Tabs.Items[LTabIndex];
 
-  if (ABrowser.Tag <> -1) and ADeleteFromSession then begin
+  if (ABrowser.Tag <> -1) and ADeleteFromSession then
+  begin
     Groups := Session.GetBookmarksGroups;
-    if Length(Groups) > 0 then begin
+    if Length(Groups) > 0 then
+    begin
       Group := Groups[0];
       Group.Delete(ABrowser.Tag);
     end;
@@ -1962,14 +1969,33 @@ var
   procedure LTryFetchIfEmpty;
   var
     LFetchable: IFetchableContent;
+    LWaitItemAssigned: boolean;
   begin
     if Supports(LPost, IFetchableContent, LFetchable)
     And ( not LFetchable.ContentFetched ) then
     begin
-      if (FCurrentItemForWaitFetchEvent.WaitFor(3000) = wrSignaled) then
-        FetchedItemsCache.UpdateWithCached(LPost)
-     else
-        Showmessage('Waiting too long.');
+      FLock.BeginRead;
+      try
+        LWaitItemAssigned := Assigned(CurrentItemForWaitFetch);
+      finally
+        FLock.EndRead;
+      end;
+
+      if not LWaitItemAssigned then
+        LWaitItemAssigned := (FCurrentItemForWaitFetchEvent.WaitFor(1) = wrSignaled);
+
+      if LWaitItemAssigned then
+      begin
+        if (FCurrentItemForWaitFetchEvent.WaitFor(3000) = wrSignaled) then
+          FetchedItemsCache.UpdateWithCached(LPost)
+        else
+          Showmessage('Waiting too long.');
+      end else
+        {$IFDEF ANDROID}
+        Form1.ToastMessage('Looks like nothing to fetch.', True);
+        {$ELSE}
+        Showmessage('Looks like nothing to fetch.');
+        {$ENDIF}
     end;
   end;
 
@@ -1986,7 +2012,8 @@ begin
 
     ACTION_DELETE_CARD:
     begin
-      if Assigned(CurrentBrowser) then begin
+      if Assigned(CurrentBrowser) then
+      begin
         I := CurrentBrowser.Items.IndexOf(Aitem);
         if ( I <> -1 ) then
           CurrentBrowser.Items.Delete(I);
@@ -2011,7 +2038,8 @@ begin
     begin
       if not AItem.HasPost then exit;
       LTryFetchIfEmpty;
-      if not GotoImageViewer(LPost.ContentUrl, Settings.PlayExterWhenCantInter or AutopilotEnabled)
+      if not GotoImageViewer(LPost.ContentUrl,
+        Settings.PlayExterWhenCantInter or AutopilotEnabled)
       and Settings.PlayExterWhenCantInter
         then ExecItemInteraction(AItem, ACTION_PLAY_EXTERNALY);
     end;
@@ -2024,7 +2052,8 @@ begin
       if ( LPost.ContentUrlCount > 0 ) then
         StartActivityViewVideo(LPost.ContentUrl);
       {$ELSE IF MSWINDOWS}
-      if ( LPost.ContentUrlCount > 0 ) then begin
+      if ( LPost.ContentUrlCount > 0 ) then
+      begin
         var LParams: string;
         LParams := Settings.ContentPlayParams.Replace(FORMAT_VAR_CONTENT_URL, LPost.ContentUrl);
         ShellExecute(0, 'open', PChar(Settings.ContentPlayApp), PChar(LParams), nil, SW_SHOWNORMAL);
@@ -2054,28 +2083,26 @@ begin
     begin
       if not AItem.HasPost then exit;
       LTmpReq := CreateRelatedReq(LPost);
-      if Assigned(LTmpReq) then begin
+      if Assigned(LTmpReq) then
         AddBrowser(LTmpReq, Settings.AutoStartBrowse);
-      end;
     end;
 
     ACTION_OPEN_AUTHOR:
     begin
       if not AItem.HasPost then exit;
       var LPostArtists: IHasArtists;
-      if Supports(LPost, IHasArtists, LPostArtists) then begin
-
+      if Supports(LPost, IHasArtists, LPostArtists) then
+      begin
         if Supports(LPost, IFetchableAuthors) then
           LTryFetchIfEmpty;
 
         var LArtists := LPostArtists.Artists;
 
-        for i := 0 to High(LArtists) do begin
+        for i := 0 to High(LArtists) do
+        begin
           LTmpReq := CreateArtistReq(LPost, LArtists[I]);
-
-          if Assigned(LTmpReq) then begin
+          if Assigned(LTmpReq) then
             AddBrowser(LTmpReq, Settings.AutoStartBrowse);
-          end;
         end;
 
       end;
@@ -2092,10 +2119,13 @@ begin
       var
         LTable: TBookmarkGroupRec;
       begin
-        if Assigned(CurrentBookmarkControl) then begin
+        if Assigned(CurrentBookmarkControl) then
+        begin
           LTable := BookmarksDb.GetGroupById(CurrentBookmarkControl.Tag);
           ToastMessage(LTable.Name + ' choosed.', True);
-          if ( LTable.Id <> -1 ) then begin
+
+          if ( LTable.Id <> -1 ) then
+          begin
             if Assigned(LRequest) then
               LTable.Add(LRequest) { LRequest can be Nil at this time. }
             else
@@ -2117,15 +2147,14 @@ begin
     ACTION_SHOW_TAGS:
     begin
       if not Aitem.HasPost then exit;
-      if Supports(LPost, IHasTags) then begin
-
+      if Supports(LPost, IHasTags) then
+      begin
         if Supports(LPost, IFetchableTags) then
           LTryFetchIfEmpty;
 
         var LTags: TNBoxItemTagAr;
         LTags := (LPost as IHasTags).Tags;
         GotoItemTagsMenu(LTags, LPost.Origin);
-
       end;
     end;
 
@@ -2147,7 +2176,8 @@ begin
       if not Assigned(LPost) then exit;
       LTryFetchIfEmpty;
 
-      if (LPost.ContentUrlCount < 1) then begin
+      if (LPost.ContentUrlCount < 1) then
+      begin
         {$IFDEF ANDROID}
         ToastMessage('Have no files', True);
         {$ELSE}
@@ -2166,16 +2196,19 @@ begin
       LBrowserTab := self.AddBrowser(LReq, false);
       LBrowser := TNBoxBrowser(LBrowserTab.Owner);
 
-      for I := 0 to LPost.ContentUrlCount - 1 do begin
+      for I := 0 to LPost.ContentUrlCount - 1 do
+      begin
         var LNewCard := LBrowser.NewItem;
         var LFileItem := TNBoxPseudoItem.Create;
         var LThumbSet: boolean := false;
 
         LFileItem.ContentUrls := [LPost.ContentUrls[I]]; // One URL per file
 
-        if LPost is TNBoxCoomerPartyItem then begin
+        if LPost is TNBoxCoomerPartyItem then
+        begin
           var LCoomerPost := (LPost as TNBoxCoomerPartyItem);
-          if I < Length(LCoomerPost.Item.Thumbnails) then begin
+          if I < Length(LCoomerPost.Item.Thumbnails) then
+          begin
             if LCoomerPost.Item.Thumbnails[I].StartsWith('http') then
               LFileItem.ThumbnailUrl := LCoomerPost.Item.Thumbnails[I]
             else
@@ -2185,13 +2218,15 @@ begin
           end;
         end else if LPost is TNBox9HentaitoItem then begin
           var L9HentItem := (LPost as TNBox9HentaitoItem);
-          if I <= L9HentItem.Item.TotalPage then begin
+          if I <= L9HentItem.Item.TotalPage then
+          begin
             LFileItem.ThumbnailUrl := L9HentItem.Item.GetImageThumbUrl(I + 1);
             LThumbSet := True;
           end;
         end else if LPost is TNBoxNsfwXxxItem then begin
           var LNsfwXxxItem := (LPost as TNBoxNsfwXxxItem);
-          if I < Length(LNsfwXxxItem.Item.Thumbnails) then begin
+          if I < Length(LNsfwXxxItem.Item.Thumbnails) then
+          begin
             LFileItem.ThumbnailUrl := LNsfwXxxItem.Item.Thumbnails[I];
             LThumbSet := True;
           end;
@@ -2202,21 +2237,18 @@ begin
         else if not LThumbSet then
           LFileItem.ThumbnailUrl := GetThumbByFileExt(LFileItem.ContentUrl);
 
-        LNewCard.Item := LFileItem;   
+        LNewCard.Item := LFileItem;
         LNewCard.Fill.Kind := TBrushkind.Bitmap;
         LNewCard.ImageURL := LNewCard.Post.ThumbnailUrl; // Start thumbnail load image
       end;
 
       Self.CurrentBrowser := LBrowser;
       LBrowserTab.Text.Text := 'Files list (' + LBrowser.Items.Count.ToString + ')';
-      
     end;
-
   end;
 
-  if Assigned(LTmpReq) then begin
+  if Assigned(LTmpReq) then
     FreeInterfaced(LTmpReq);
-  end;
 end;
 
 function TForm1.FetchContent(AItem: INBoxItem): INBoxItem;
@@ -2254,9 +2286,8 @@ var
 begin
   if Assigned(A.OnTap) then
     A.OnClick := ClickTapRef;
-  for I := 0 to A.Controls.Count - 1 do begin
+  for I := 0 to A.Controls.Count - 1 do
     SetClick(A.Controls.Items[I]);
-  end;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -2301,7 +2332,8 @@ begin
 
   Log('|-----------Application start ' + APP_VERSION.ToGhTagString + '---------------|');
 
-  if not loadSettings then begin
+  if not loadSettings then
+  begin
     form1.RestoreDefaultSettings;
     SaveSettings;
   end else begin
@@ -2607,7 +2639,8 @@ begin
     Text.TextIsHtml := True;
   end;
 
-  BtnSetAnonMsg := AddSettingsButtonC('Anonymous message for <font color="' + COLOR_TAG_CHARACTER + '">developer</font>', '', TNBoxImageTypes.AlRect);
+  BtnSetAnonMsg := AddSettingsButtonC('Anonymous message for <font color="'
+    + COLOR_TAG_CHARACTER + '">developer</font>', '', TNBoxImageTypes.AlRect);
   with BtnSetAnonMsg do begin
     OnTap := BtnSetAnonMsgOnTap;
     Height := Height * 1.25;
@@ -2687,7 +2720,8 @@ begin
     AddCheck('Browse search request', ACTION_BROWSE);
     AddCheck('Delete (or hide) item', ACTION_DELETE_CARD);
 
-    for I := 0 to Content.Controls.Count - 1 do begin
+    for I := 0 to Content.Controls.Count - 1 do
+    begin
       Control := Content.Controls.Items[I];
       if Control is TNBoxCheckButton then
         (Control as TNBoxCheckButton).Image.ImageURL :=
@@ -2946,7 +2980,8 @@ begin
   end;
 
   { Database update }
-  if not HistoryDb.HasGroup(HistoryDb.NAME_TABS_HISTORY) then begin
+  if not HistoryDb.HasGroup(HistoryDb.NAME_TABS_HISTORY) then
+  begin
     { v1.3.0 }
     HistoryDb.AddGroup(HistoryDb.NAME_TABS_HISTORY, 'all tabs that been closed.');
     HistoryDb.Free;
@@ -2982,7 +3017,8 @@ begin
   {$IFDEF MSWINDOWS}
   MVMenu.Mode := TMultiviewMode.Panel;
   MvMenu.Width := 200;
-  for I := 0 to Form1.Children.Count - 1 do begin
+  for I := 0 to Form1.Children.Count - 1 do
+  begin
     var FmxObj: TFmxObject;
     FmxObj := Form1.Children.Items[I];
     if ( FmxObj is TControl ) then
@@ -2993,7 +3029,8 @@ begin
   {$ENDIF}
 
   { Update checker thread creates and starts here }
-  if Settings.AutoCheckUpdates then begin
+  if Settings.AutoCheckUpdates then
+  begin
     var LUpdateCheckTask: ITask;
     LUpdateCheckTask := TTask.Create(
     procedure
@@ -3357,18 +3394,17 @@ begin
     if FileExists(LImagePath) then
       LIconBmp.LoadFromFile(Form1.AppStyle.GetImagePath(ICON_TAG));
 
-    for I := low(ATags) to high(ATags) do begin
+    for I := low(ATags) to high(ATags) do
+    begin
       LNewBtn := MenuItemTags.AddBtn(
         ItemTagToCaption(ATags[I]),
         ATags[I]);
       LNewBtn.Text.TextIsHtml := True;
       LNewBtn.Image.BitmapIWU.Assign(LIconBmp);
     end;
-
   finally
     LIconBmp.Free;
   end;
-
   ChangeInterface(MenuItemTags);
 end;
 
@@ -3442,9 +3478,11 @@ begin
     if LNewTabImageName <> LTab.Image.ImageURL then
       LTab.Image.ImageURL := LNewTabImageName;
 
-    if ( not NowLoadingSession ) And Settings.AutoSaveSession then begin
+    if ( not NowLoadingSession ) And Settings.AutoSaveSession then
+    begin
       Groups := Session.GetBookmarksGroups;
-      if Length(Groups) > 0 then begin
+      if Length(Groups) > 0 then
+      begin
         Group := Groups[0];
         if ( LBrowser.Tag <> -1 ) then
           Group.Delete(LBrowser.Tag);
@@ -3462,11 +3500,12 @@ begin
   end;
 end;
 
-procedure TForm1.SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer); //AOrigin: integer = 0
+procedure TForm1.SetDefToWebClient(AClient: TNetHttpClient; AOrigin: integer);
 begin
   with AClient do begin
 
-    if not (AOrigin = PVR_DANBOORU) then begin
+    if not (AOrigin = PVR_DANBOORU) then
+    begin
       Useragent := Settings.DefaultUseragent;
       Customheaders['Accept'] := '*/*';
       CustomHeaders['Accept-Language'] := 'en-US,en;q=0.5';
@@ -3561,9 +3600,10 @@ begin
   else
     LCardS := nil;
 
-//  AppStyle.ItemCard.Apply(LCard);
-  if LCard.HasPost then begin
-    if Assigned(LCardS) then begin
+  if LCard.HasPost then
+  begin
+    if Assigned(LCardS) then
+    begin
       LCardS.Text.Color := AppStyle.TextColors[0];
       AppStyle.ItemCard.Fill2.Apply(LCardS.Rect.Fill);
 
@@ -3581,10 +3621,9 @@ begin
       end;
     end;
   end else if ( LCard.HasBookmark and LCard.Bookmark.IsRequest ) then begin
-//    AppStyle.ItemCardRequest.Apply(LCard);
-    if Assigned(LCardS) then begin
+    if Assigned(LCardS) then
+    begin
       LCardS.Text.Color := AppStyle.TextColors[0];
-//      AppStyle.ItemCardRequest.Fill2.Apply(LCardS.Rect.Fill);
       LCardS.ImageURL := AppStyle.GetImagePath(IMAGE_REQUEST_ITEM);
     end;
   end;
@@ -3650,9 +3689,11 @@ begin
   TThread.Synchronize(TThread.Current,
   procedure begin
     if not Settings.ShowImageViewerStatusBar then Exit;
-    with BtnStatusImageView do begin
+    with BtnStatusImageView do
+    begin
       Visible := not (AContentLength = AReadCount);
-      if Visible then begin
+      if Visible then
+      begin
         var LFileSizeStr := BytesCountToSizeStr(AContentLength);
         SetImageViewerStatus(
           '[ ' + GetPercents(AContentLength, AReadCount).toString + '% ] of ' + LFileSizeStr,
@@ -3667,9 +3708,8 @@ procedure TForm1.OnImageViewerWebClient(Sender: TObject;
   AClient: TNetHttpClient);
 begin
   OnIWUManagerCreateWebClient(Sender, AClient);
-  with AClient do begin
+  with AClient do
     OnReceiveData := OnImageViewerReceiveData;
-  end;
 end;
 
 function DownloadItemText(A: TNetHttpDownloader): string;
@@ -3678,9 +3718,11 @@ var
   FileSizeStr: string;
 begin
   ContentSize := A.ContentLength;
-  if ContentSize > 0 then begin
+  if ContentSize > 0 then
+  begin
     FileSizeStr := BytesCountToSizeStr(ContentSize);
-    Result := '[ ' + GetPercents(ContentSize, A.ReadCount).ToString + '% ] of ' + FileSizeStr;
+    Result := '[ ' + GetPercents(ContentSize, A.ReadCount).ToString
+      + '% ] of ' + FileSizeStr;
   end else
     Result := 'Unknown size. Ready: ' + BytesCountToSizeStr(A.ReadCount);
 end;
@@ -3693,7 +3735,6 @@ var
 begin
   try
     Loader := (Sender as TNBoxDownloader);
-
     TThread.Synchronize(TThread.Current,
     procedure
     begin
@@ -3714,9 +3755,9 @@ var
 begin
   try
     Loader := (Sender as TNBoxDownloader);
-
     var LIndex: integer := DownloadItems.IndexOf(Loader.Tab);
-    if Assigned(Loader.Tab) then begin
+    if Assigned(Loader.Tab) then
+    begin
       DownloadItems.Delete(LIndex);
       try
        { potential deadlock - Tab.CloseBtn have ImageWithUrl }
@@ -3726,7 +3767,6 @@ begin
       except
         On E: Exception do Log('LTab.Free; with index of ' + LIndex.ToString, E);
       end;
-
     end else
       Log('DownloaderOnFinish: Loader.Tab not Assigned.');
   except
@@ -3741,7 +3781,8 @@ var
 begin
   try
     Loader := (Sender as TNBoxDownloader);
-    if Loader.IsRunning then begin
+    if Loader.IsRunning then
+    begin
       if not Assigned(Loader.Tab) then exit;
       Loader.Tab.Text.Text := DownloadItemText(Loader);
     end;
@@ -3782,8 +3823,8 @@ var
   S: TSize;
   M: single;
 begin
-  with (Sender as TNBoxCardSimple) do begin
-
+  with (Sender as TNBoxCardSimple) do
+  begin
     if fill.Bitmap.Bitmap.IsEmpty then
     begin
       Size.Height := Size.Width;
@@ -3840,9 +3881,8 @@ begin
 
   B := TNboxBrowser(Sender);
   T := GetTab(B);
-  if Assigned(T) then begin
+  if Assigned(T) then
     T.Text.Text := CreateTabText(B);
-  end;
 end;
 
 procedure TForm1.OnStartDownloader(Sender: Tobject;
@@ -3853,9 +3893,8 @@ end;
 
 procedure TForm1.IconOnResize(Sender: TObject);
 begin
-  with ( Sender as TControl ) do begin
+  with ( Sender as TControl ) do
     Width := Height;
-  end;
 end;
 
 function TForm1.IndexTabByBrowser(ABrowser: TNBoxBrowser): integer;
@@ -3863,8 +3902,10 @@ var
   I: integer;
 begin
   result := -1;
-  for I := 0 to Tabs.Count - 1 do begin
-    if Tabs.Items[I].Owner = ABrowser then begin
+  for I := 0 to Tabs.Count - 1 do
+  begin
+    if Tabs.Items[I].Owner = ABrowser then
+    begin
       Result := I;
       Exit;
     end;
@@ -3887,9 +3928,11 @@ begin
   end;
 
   Interactions := Settings.ItemInteractions;
-  for I := 0 to High(Interactions) do begin
+  for I := 0 to High(Interactions) do
+  begin
     Self.ExecItemInteraction(Item, Interactions[I]);
-    if ( Interactions[I] = ACTION_DELETE_CARD ) then begin
+    if ( Interactions[I] = ACTION_DELETE_CARD ) then
+    begin
       if MenuItem.Visible then
         ChangeInterface(BrowserLayout);
       exit;
@@ -3921,7 +3964,8 @@ begin
 
       Group := Groups[0];
       LBookmarks := Group.GetPage;
-      for I := High(LBookmarks) Downto Low(LBookmarks) do begin
+      for I := High(LBookmarks) Downto Low(LBookmarks) do
+      begin
         LBookmark := LBookmarks[I];
 
         if not ( LBookmark.BookmarkType = SearchRequest ) then
@@ -3969,7 +4013,8 @@ begin
     NewSettings := nil;
     Result := fileexists(SETTINGS_FILENAME);
     try
-      if Result then begin
+      if Result then
+      begin
         X := TSuperObject.ParseFile(SETTINGS_FILENAME);
         JsonStr := X.AsJSON;
         NewSettings := TNSfwBoxSettings.Create;
@@ -3977,7 +4022,8 @@ begin
         Settings := NewSettings;
       end;
     except
-      on E: Exception do begin
+      on E: Exception do
+      begin
         Result := false;
         Log('LoadSettings', E);
       end;
@@ -3999,14 +4045,16 @@ begin
   try
     try
       Result := FileExists(Fname);
-      if Result then begin
+      if Result then
+      begin
         NewStyle := TNBoxGUIStyle.create;
         X := TSuperobject.ParseFile(Fname);
         NewStyle.AssignFromJSON(X);
         AppStyle := NewStyle;
       end;
     except
-      On E: Exception do begin
+      On E: Exception do
+      begin
         Result := false;
         Log('LoadStyle', E);
       end;
@@ -4113,8 +4161,10 @@ var
   var
     I: integer;
   begin
-    for I := 0 to LControls.Count - 1 do begin
-      if (LControls[I].Tag = AId) then begin
+    for I := 0 to LControls.Count - 1 do
+    begin
+      if (LControls[I].Tag = AId) then
+      begin
         Result := LControls[I] as TNBoxSettingsCheck;
         Exit;
       end;
@@ -4131,11 +4181,13 @@ begin
 
     LGroups := ADataBase.GetBookmarksGroups;
 
-    for I := Low(LGroups) to High(LGroups) do begin
+    for I := Low(LGroups) to High(LGroups) do
+    begin
       LGroup := LGroups[I];
       LControl := BookmarkControlById(LGroup.Id);
 
-      if assigned(LControl) then begin
+      if assigned(LControl) then
+      begin
       { Changing already exists control }
         with LControl do begin
           Check.Text.TextIsHtml := True;
@@ -4146,7 +4198,8 @@ begin
       end else begin
       { Making new control }
         LControl := Self.CreateDefSettingsCheck(ALayout);
-        with LControl do begin
+        with LControl do
+        begin
           Parent := ALayout;
           Check.ImageControl.Visible := true;
           Check.ImageControl.Margins.Rect := TRectF.Create(0, 5, 0, 5);
@@ -4173,9 +4226,7 @@ begin
           {$IFDEF MSWINDOWS}
           LControl.OnClick := ClickTapRef;
           {$ENDIF}
-
         end;
-
         LControls.Add(LControl);
       end;
     end;
@@ -4546,7 +4597,8 @@ begin
   {$IFDEF MSWINDOWS}
     if Assigned(TitleBar) and Settings.UseNewAppTitlebar then
       TitleBar.Visible := Not Value; // if fullscreen then hide
-    if Value then begin // fix position
+    if Value then
+    begin // fix position
       Form1.Top := 0;
       Form1.Left := 0;
     end;
@@ -4589,7 +4641,8 @@ var
   Tab: TNBoxTab;
   LReq: INBoxSearchRequest;
 begin
-  if Assigned(FCurrentBrowser) then begin
+  if Assigned(FCurrentBrowser) then
+  begin
     Tab := self.GetTab(FCurrentBrowser);
     Tab.ImageControl.Visible := false;
     ClearControlBitmap(Tab.ImageControl);
@@ -4639,7 +4692,6 @@ begin
     exit;
 
   BrowsersIWUContentManager.ThreadsCount := Settings.ThreadsCount;
-//  IWUContentManager.EnableSaveToCache := Settings.
 
   EditSetDefUseragent.Edit.Edit.Text    := Settings.DefaultUseragent;
   EditSetDefDownloadPath.Edit.Edit.Text := Settings.DefDownloadPath;
@@ -4683,7 +4735,8 @@ begin
 
   if Settings.DevMode then NsfwBox.Tests.Init;
 
-  With SearchMenu.OriginSetMenu do begin
+  With SearchMenu.OriginSetMenu do
+  begin
     var LBtn: TControl := Menu.GetControlByValue(PROVIDERS.Pseudo.id);
     if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
     LBtn := Menu.GetControlByValue(PROVIDERS.Bookmarks.id);
@@ -4699,10 +4752,12 @@ begin
   for I := 0 to MenuTestButtons.Count - 1 do
     MenuTestButtons[I].Visible := Settings.DevMode;
 
-  for I := 0 to Browsers.Count - 1 do begin
-    with Browsers[I] do begin
-      ColumnsCount   := Settings.ContentLayoutsCount;
-      ItemsIndent    := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
+  for I := 0 to Browsers.Count - 1 do
+  begin
+    with Browsers[I] do
+    begin
+      ColumnsCount := Settings.ContentLayoutsCount;
+      ItemsIndent := TPointF.Create(Settings.ItemIndent, Settings.ItemIndent);
     end;
   end;
 end;
@@ -4747,7 +4802,8 @@ end;
 
 procedure TForm1.TopBtnPopMenuOnTap(Sender: TObject; const Point: TPointF);
 begin
-  if MenuBookmarks.Visible then begin
+  if MenuBookmarks.Visible then
+  begin
     DoWithAllItems := true;
     ChangeInterface(MenuBookmarksDoList);
   end else if MenuSearchSettings.Visible then begin
@@ -4763,7 +4819,8 @@ procedure TForm1.TopBtnSearchOnTap(Sender: TObject; const Point: TPointF);
 var
   LReq: INBoxSearchRequest;
 begin
-  if MenuSearchSettings.Visible then begin
+  if MenuSearchSettings.Visible then
+  begin
     if not Assigned(CurrentBrowser) then
       CurrentBrowser := AddBrowser(nil, false).Owner as TNBoxBrowser;
 
@@ -4778,7 +4835,8 @@ begin
 
   end else begin
 
-    if not Assigned(CurrentBrowser) then begin
+    if not Assigned(CurrentBrowser) then
+    begin
       AddBrowser(nil);
       CurrentBrowser := Browsers.Last;
     end;

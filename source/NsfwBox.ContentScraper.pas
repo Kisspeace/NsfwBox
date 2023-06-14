@@ -45,33 +45,42 @@ type
     FOnWebClientSet: TWebClientSetEvent;
     procedure SyncWebClientSet(AClient: TNetHttpClient; AOrigin: integer);
     procedure UploadItems(A: TNsfwXXXItemList; AList: INBoxHasOriginList);
+
     function GetContentPseudo(AList: INBoxHasOriginList;
       ARequest: string): boolean;
+
     function GetContentNsfwXxx(AList: INBoxHasOriginList; AReqParam: string;
       ASearchType: TNsfwUrlType; APageNum: integer; Asort: TnsfwSort;
       ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
       ASite: TNsfwXxxSite): boolean;
+
     function GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string = '';
       APageId: integer = 1; ALimit: integer = 20): boolean;
-    // function GetContentR34App(AList: INBoxHasOriginList; ATags: string; APageId: integer; ALimit: integer; ABooru: TR34AppFreeBooru): boolean;
+
     function GetContentGmpClub(AList: INBoxHasOriginList; AReqParam: string;
       ASearchType: TGmpClubSearchType; APageNum: integer): boolean;
+
     function GetContent9Hentaito(AList: INBoxHasOriginList;
       const ASearch: T9HentaiBookSearchRec): boolean;
+
     function GetContentCoomerParty(AList: INBoxHasOriginList; ASite: string;
       ARequest, AUserId, AService: string; APageNum: integer): boolean;
+
     function GetContentMotherless(AList: INBoxHasOriginList; ARequest: string;
       APage: integer; AMediaType: TMotherlessMediaType; Asort: TMotherLessSort;
+
       ASize: TMotherlessMediaSize; AUploadDate: TMotherLessUploadDate): boolean;
     function GetContentFapello(AList: INBoxHasOriginList; ARequest: string;
       APageNum: integer; ASearchType: TFapelloItemKind): boolean;
+
     function GetContentBooruScraper(ABooruClient: IBooruClient;
       AProviderId: integer;
       AList: INBoxHasOriginList; ARequest: string;
       APageNum: integer): boolean;
+
     function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string;
       ABookmarksListId: int64; APageId: integer = 1): boolean;
-    { ------------------------------------- }
+
     function GetContentRandomizer(AList: INBoxHasOriginList;
       AProviders: TArray<integer>): boolean;
   public
@@ -84,8 +93,7 @@ type
     function TryFetchTags(APost: INBoxItem): boolean;
     function TryFetchAuthors(APost: INBoxItem): boolean;
     function GetContent(ARequest: INBoxSearchRequest; AList: INBoxHasOriginList): boolean;
-    property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet
-      write FOnWebClientSet;
+    property OnWebClientSet: TWebClientSetEvent read FOnWebClientSet write FOnWebClientSet;
     constructor Create;
     destructor Destroy; override;
   end;
