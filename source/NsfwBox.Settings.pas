@@ -32,11 +32,9 @@ Const
 type
 
   TNBoxItemInteraction = NativeInt;
-
   TNBoxItemInteractions = TArray<TNBoxItemInteraction>;
 
   TInt64Ar = TArray<Int64>;
-
   TBookmarksOrderList = TThreadList<Int64>;
 
   { Application settings (Thread safe) }
@@ -99,8 +97,6 @@ type
       function GetBookmarksOrder: TBookmarksOrderList;
       function GetBrowseNextPageByScrollDown: boolean;
       function GetContentLayoutsCount: integer;
-      function GetContentPlayApp: string;
-      function GetContentPlayParams: string;
       function GetDefaultBackupPath: string;
       function GetDefaultUseragent: string;
       function GetDefDownloadPath: string;
@@ -127,7 +123,6 @@ type
       function GetShowScrollBars: boolean;
       function GetStyleName: string;
       function GetThreadsCount: integer;
-      function GetUseNewAppTitlebar: boolean;
       function GetYDWSyncLoadFromFile: boolean;
       procedure SetSaveDownloadHistory(const Value: boolean);
       procedure SetAllowCookies(const Value: boolean);
@@ -137,11 +132,8 @@ type
       procedure SetAutoCloseItemMenu(const Value: boolean);
       procedure SetAutoSaveSession(const Value: boolean);
       procedure SetAutoStartBrowse(const Value: boolean);
-      procedure SetBookmarksOrder(const Value: TList<Int64>);
       procedure SetBrowseNextPageByScrollDown(const Value: boolean);
       procedure SetContentLayoutsCount(const Value: integer);
-      procedure SetContentPlayApp(const Value: string);
-      procedure SetContentPlayParams(const Value: string);
       procedure SetDefaultBackupPath(const Value: string);
       procedure SetDefaultUseragent(const Value: string);
       procedure SetDefDownloadPath(const Value: string);
@@ -167,8 +159,15 @@ type
       procedure SetShowScrollBars(const Value: boolean);
       procedure SetStyleName(const Value: string);
       procedure SetThreadsCount(const Value: integer);
-      procedure SetUseNewAppTitlebar(const Value: boolean);
       procedure SetYDWSyncLoadFromFile(const Value: boolean);
+      {$IFDEF MSWINDOWS}
+        function GetUseNewAppTitlebar: boolean;
+        procedure SetUseNewAppTitlebar(const Value: boolean);
+        function GetContentPlayApp: string;
+        function GetContentPlayParams: string;
+        procedure SetContentPlayApp(const Value: string);
+        procedure SetContentPlayParams(const Value: string);
+      {$ENDIF}
     public
       property SemVer: TSemVer read GetSemVer write SetSemVer;
       property DefaultUseragent: string read GetDefaultUseragent write SetDefaultUseragent;
@@ -221,7 +220,6 @@ type
   end;
 
 implementation
-
 
 { TNsfwBoxSettings }
 
@@ -364,6 +362,7 @@ begin
   GetF<integer>(FContentLayoutsCount, Result);
 end;
 
+{$IFDEF MSWINDOWS}
 function TNsfwBoxSettings.GetContentPlayApp: string;
 begin
   GetF<string>(FContentPlayApp, Result);
@@ -373,6 +372,27 @@ function TNsfwBoxSettings.GetContentPlayParams: string;
 begin
   GetF<string>(FContentPlayParams, Result);
 end;
+
+function TNsfwBoxSettings.GetUseNewAppTitlebar: boolean;
+begin
+  GetF<boolean>(FUseNewAppTitlebar, Result);
+end;
+
+procedure TNsfwBoxSettings.SetContentPlayApp(const Value: string);
+begin
+  SetF<string>(FContentPlayApp, Value);
+end;
+
+procedure TNsfwBoxSettings.SetContentPlayParams(const Value: string);
+begin
+  SetF<string>(FContentPlayParams, Value);
+end;
+
+procedure TNsfwBoxSettings.SetUseNewAppTitlebar(const Value: boolean);
+begin
+  SetF<boolean>(FUseNewAppTitleBar, Value);
+end;
+{$ENDIF}
 
 function TNsfwBoxSettings.GetDefaultBackupPath: string;
 begin
@@ -519,11 +539,6 @@ begin
   GetF<integer>(FThreadsCount, Result);
 end;
 
-function TNsfwBoxSettings.GetUseNewAppTitlebar: boolean;
-begin
-  GetF<boolean>(FUseNewAppTitlebar, Result);
-end;
-
 function TNsfwBoxSettings.GetYDWSyncLoadFromFile: boolean;
 begin
   GetF<boolean>(FYDWSyncLoadFromFile, Result);
@@ -569,11 +584,6 @@ begin
   SetF<boolean>(FAutoStartBrowse, Value);
 end;
 
-procedure TNsfwBoxSettings.SetBookmarksOrder(const Value: TList<Int64>);
-begin
-  { FIXME!! }
-end;
-
 procedure TNsfwBoxSettings.SetBrowseNextPageByScrollDown(const Value: boolean);
 begin
   SetF<boolean>(FBrowseNextPageByScrollDown, Value);
@@ -582,16 +592,6 @@ end;
 procedure TNsfwBoxSettings.SetContentLayoutsCount(const Value: integer);
 begin
   SetF<integer>(FContentLayoutsCount, Value);
-end;
-
-procedure TNsfwBoxSettings.SetContentPlayApp(const Value: string);
-begin
-  SetF<string>(FContentPlayApp, Value);
-end;
-
-procedure TNsfwBoxSettings.SetContentPlayParams(const Value: string);
-begin
-  SetF<string>(FContentPlayParams, Value);
 end;
 
 procedure TNsfwBoxSettings.SetDefaultBackupPath(const Value: string);
@@ -733,11 +733,6 @@ end;
 procedure TNsfwBoxSettings.SetThreadsCount(const Value: integer);
 begin
   SetF<integer>(FThreadsCount, Value);
-end;
-
-procedure TNsfwBoxSettings.SetUseNewAppTitlebar(const Value: boolean);
-begin
-  SetF<boolean>(FUseNewAppTitleBar, Value);
 end;
 
 procedure TNsfwBoxSettings.SetYDWSyncLoadFromFile(const Value: boolean);

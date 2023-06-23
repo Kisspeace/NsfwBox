@@ -134,11 +134,11 @@ begin
   end;
 
   try
-  if Assigned(OnRequestChanged) then
-    OnRequestChanged(Self);
+    if Assigned(OnRequestChanged) then
+      OnRequestChanged(Self);
   except
-      On E: Exception do Log('TNBoxBrowser.SetRequest 124', E);
-    end;
+    On E: Exception do Log('TNBoxBrowser.SetRequest 124', E);
+  end;
 end;
 
 procedure TNBoxBrowser.WaitFor;
