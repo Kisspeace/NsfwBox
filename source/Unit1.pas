@@ -1074,26 +1074,29 @@ var
   LOrder: TList<Int64>;
 begin
   if AMoveValue = 0 then exit;
-  LOrder := Settings.BookmarksOrder;
-  LIndex := LOrder.IndexOf(AGroupId);
+  LOrder := Settings.BookmarksOrder.LockList;
+  try
+    LIndex := LOrder.IndexOf(AGroupId);
 
-  if (LIndex <> -1) then
-  begin
-    if AMoveValue < 0 then
-      LSwapWithIndex := LIndex - AMoveValue
-    else
-      LSwapWithIndex := LIndex - AMoveValue;
+    if (LIndex <> -1) then
+    begin
+      if AMoveValue < 0 then
+        LSwapWithIndex := LIndex - AMoveValue
+      else
+        LSwapWithIndex := LIndex - AMoveValue;
 
-    if LSwapWithIndex < 0 then
-      LSwapWithIndex := 0
-    else if LSwapWithIndex > (LOrder.Count - 1) then
-      LSwapWithIndex := LOrder.Count - 1;
+      if LSwapWithIndex < 0 then
+        LSwapWithIndex := 0
+      else if LSwapWithIndex > (LOrder.Count - 1) then
+        LSwapWithIndex := LOrder.Count - 1;
 
-    if LIndex = LSwapWithIndex then exit;
-    LOrder.Exchange(LIndex, LSwapWithIndex)
-  end else if (AMoveValue > 0) then
-    LOrder.Add(AGroupId);
-
+      if LIndex = LSwapWithIndex then exit;
+      LOrder.Exchange(LIndex, LSwapWithIndex)
+    end else if (AMoveValue > 0) then
+      LOrder.Add(AGroupId);
+  finally
+    Settings.BookmarksOrder.UnlockList;
+  end;
   SaveSettings;
 end;
 
@@ -1958,12 +1961,18 @@ end;
 procedure TForm1.DeleteFromBookmarkGroupOrder(AGroupId: UInt64);
 var
   LIndex: integer;
+  LOrder: TList<int64>;
 begin
-  LIndex := Settings.BookmarksOrder.IndexOf(AGroupId);
-  if (LIndex <> -1) then
-  begin
-    Settings.BookmarksOrder.Delete(LIndex);
-    SaveSettings;
+  LOrder := Settings.BookmarksOrder.LockList;
+  try
+    LIndex := LOrder.IndexOf(AGroupId);
+    if (LIndex <> -1) then
+    begin
+      LOrder.Delete(LIndex);
+      SaveSettings;
+    end;
+  finally
+    Settings.BookmarksOrder.UnlockList;
   end;
 end;
 
@@ -4228,22 +4237,26 @@ begin
 
     if ADataBase = BookmarksDb then
     begin
-      { Saving order of groups (v?.?.? -> >=v2.4.0) }
-      if (Settings.BookmarksOrder.Count = 0)
-      and (Length(LGroups) > 0) then
-      begin
-        for I := Low(LGroups) to High(LGroups) do
-          Settings.BookmarksOrder.Add(LGroups[I].Id);
-        SaveSettings;
-      end;
+      LOrder := Settings.BookmarksOrder.LockList;
+      try
+        { Saving order of groups (v?.?.? -> >=v2.4.0) }
+        if (LOrder.Count = 0)
+        and (Length(LGroups) > 0) then
+        begin
+          for I := Low(LGroups) to High(LGroups) do
+            LOrder.Add(LGroups[I].Id);
+          SaveSettings;
+        end;
 
-      { applying order of groups }
-      LOrder := Settings.BookmarksOrder;
-      for I := LOrder.Count - 1 downto 0 do
-      begin
-        LControl := BookmarkControlById(LOrder[I]);
-        if not Assigned(LControl) then Continue;
-        LControl.Position.Y := 0 + I; { push up }
+        { applying order of groups }
+        for I := LOrder.Count - 1 downto 0 do
+        begin
+          LControl := BookmarkControlById(LOrder[I]);
+          if not Assigned(LControl) then Continue;
+          LControl.Position.Y := 0 + I; { push up }
+        end;
+      finally
+        Settings.BookmarksOrder.UnlockList;
       end;
     end;
 
@@ -4576,8 +4589,19 @@ begin
       ConnectSession;
 
     if Assigned(Settings) then begin
-      BookmarksOrder.Clear;
-      BookmarksOrder.AddRange(Settings.BookmarksOrder.ToArray);
+      var LNewOrder, LOrder: TList<Int64>;
+      LNewOrder := BookmarksOrder.LockList;
+      try
+        LOrder := Settings.BookmarksOrder.LockList;
+        try
+          LNewOrder.Clear;
+          LNewOrder.AddRange(LOrder.ToArray);
+        finally
+          Settings.BookmarksOrder.UnlockList;
+        end;
+      finally
+        BookmarksOrder.UnlockList;
+      end;
     end;
   end;
 

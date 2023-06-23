@@ -4,10 +4,16 @@ interface
 
 uses
   Classes, SysUtils, System.Generics.Collections, System.IOUtils,
-  NsfwBox.Logging;
+  NsfwBox.Logging, XSuperObject;
 
 type
   PInterface = ^IInterface;
+
+  TJsonHelper = Class
+    public
+      class function ReadIntArray(const ASource: ISuperObject; AKeyName: string): TArray<Int64>; static;
+      class function ReadNativeIntArray(const ASource: ISuperObject; AKeyName: string): TArray<NativeInt>; static;
+  end;
 
   function GetFirstStr(Ar: TArray<string>): string;
   function StrIn(const Ar: TArray<string>; AStr: string; AIgnoreCase: boolean = True): boolean;
@@ -18,6 +24,7 @@ type
   ///<summary>FreeAndNil for interfaced objects without reference counting.</summary>
   procedure FreeInterfaced(const [ref] AObject: IInterface);
 
+  
 
 implementation
 uses Unit1, NsfwBox.Styling;
@@ -106,6 +113,41 @@ begin
     Result := Form1.AppStyle.GetImagePath(IMAGE_DUMMY_AUDIO)
   else
     Result := Form1.AppStyle.GetImagePath(IMAGE_LOADING);
+end;
+
+{ TJsonHelper }
+
+
+{ TJsonHelper }
+
+class function TJsonHelper.ReadIntArray(const ASource: ISuperObject;
+  AKeyName: string): TArray<Int64>;
+var
+  I: integer;
+begin
+  if ASource.Null[AKeyName] = jAssigned then
+  begin
+    var Ar: ISuperArray := ASource.A[AKeyName];
+    SetLength(Result, Ar.Length);
+    for I := 0 to High(Result) do
+      Result[I] := Ar.I[I];
+  end else
+    Result := Nil;
+end;
+
+class function TJsonHelper.ReadNativeIntArray(const ASource: ISuperObject;
+  AKeyName: string): TArray<NativeInt>;
+var
+  I: integer;
+begin
+  if ASource.Null[AKeyName] = jAssigned then
+  begin
+    var Ar: ISuperArray := ASource.A[AKeyName];
+    SetLength(Result, Ar.Length);
+    for I := 0 to High(Result) do
+      Result[I] := Ar.I[I];
+  end else
+    Result := Nil;
 end;
 
 end.
