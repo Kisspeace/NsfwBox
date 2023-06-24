@@ -6,7 +6,7 @@ interface
 uses
   Classes, System.SysUtils, XSuperObject, system.Generics.Collections,
   NsfwBox.UpdateChecker, NsfwBox.FileSystem,
-  NsfwBox.Logging, NsfwBox.Utils;
+  NsfwBox.Logging, NsfwBox.Utils, System.Rtti;
 
 Const
 
@@ -168,6 +168,8 @@ type
         procedure SetContentPlayApp(const Value: string);
         procedure SetContentPlayParams(const Value: string);
       {$ENDIF}
+      function GetAttribute(AName: string): variant;
+      procedure SetAttribute(AName: string; const Value: variant);
     public
       property SemVer: TSemVer read GetSemVer write SetSemVer;
       property DefaultUseragent: string read GetDefaultUseragent write SetDefaultUseragent;
@@ -179,7 +181,7 @@ type
       property ItemIndent: single read GetItemIndent write SetItemIndent;
       property Fullscreen: boolean read GetFullscreen write SetFullscreen;
       property AutoSaveSession: boolean read GetAutoSaveSession write SetAutoSaveSession;
-      property SaveSearchHistory : boolean read GetSaveSearchHistory write SetSaveSearchHistory;
+      property SaveSearchHistory: boolean read GetSaveSearchHistory write SetSaveSearchHistory;
       property SaveDownloadHistory: boolean read GetSaveDownloadHistory write SetSaveDownloadHistory;
       property SaveTapHistory: boolean read GetSaveTapHistory write SetSaveTapHistory;
       property SaveClosedTabHistory: boolean read GetSaveClosedTabHistory write SetSaveClosedTabHistory;
@@ -212,6 +214,8 @@ type
       {$ENDIF}
       [DISABLE]
       property BookmarksOrder: TBookmarksOrderList read GetBookmarksOrder; { order of items (ids) in bookmarks menu  }
+      [DISABLE]
+      property Attributes[AName: string]: variant read GetAttribute write SetAttribute;
       function ToJsonStr: String;
       procedure AssignFromJsonStr(const AJson: String);
       procedure Assign(ASource: TNsfwBoxSettings);
@@ -320,6 +324,25 @@ end;
 function TNsfwBoxSettings.GetAllowDuplicateTabs: boolean;
 begin
   GetF<boolean>(FAllowDuplicateTabs, Result);
+end;
+
+function TNsfwBoxSettings.GetAttribute(AName: string): variant;
+var
+  Context: TRttiContext;
+  Instance: TRttiInstanceType;
+  LProperty: TRttiProperty;
+begin
+  Context := TRttiContext.Create;
+  try
+    Instance := Context.GetType(TNsfwBoxSettings).AsInstance;
+    LProperty := Instance.GetProperty(AName);
+    if Assigned(LProperty) then
+    begin
+      Result := LProperty.GetValue(Self).AsVariant;
+    end;
+  finally
+    Context.Free;
+  end;
 end;
 
 function TNsfwBoxSettings.GetAutoAcceptAllCertificates: boolean;
@@ -557,6 +580,25 @@ end;
 procedure TNsfwBoxSettings.SetAllowDuplicateTabs(const Value: boolean);
 begin
   SetF<boolean>(FAllowDuplicateTabs, Value);
+end;
+
+procedure TNsfwBoxSettings.SetAttribute(AName: string; const Value: variant);
+var
+  Context: TRttiContext;
+  Instance: TRttiInstanceType;
+  LProperty: TRttiProperty;
+begin
+  Context := TRttiContext.Create;
+  try
+    Instance := Context.GetType(TNsfwBoxSettings).AsInstance;
+    LProperty := Instance.GetProperty(AName);
+    if Assigned(LProperty) then
+    begin
+      LProperty.SetValue(Self, TValue.FromVariant(Value));
+    end;
+  finally
+    Context.Free;
+  end;
 end;
 
 procedure TNsfwBoxSettings.SetAutoAcceptAllCertificates(const Value: boolean);
