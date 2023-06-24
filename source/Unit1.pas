@@ -2940,14 +2940,6 @@ begin
   HistoryDbControls := TControlObjList.Create;
   ChangeInterface(BrowserLayout);
 
-  FFormCreated := true;
-  Settings := Settings;
-  HistoryDb := TNBoxBookmarksHistoryDb.Create(HISTORY_FILENAME);
-  BookmarksDb := TNBoxBookmarksDb.Create(BOOKMARKSDB_FILENAME);
-  Session := TnBoxBookmarksDb.Create(SESSION_FILENAME);
-  Session.PageSize := 100;
-  ConnectSession;
-
   { Menu manage backups }
   MenuBackup := NewMenu;
   EdtBackupFilename := Form1.CreateDefEdit(MenuBackup);
@@ -2999,20 +2991,6 @@ begin
     Margins.Rect := TRectF.Create(10, 10, 10, 10);
   end;
 
-  { Database update }
-  if not HistoryDb.HasGroup(HistoryDb.NAME_TABS_HISTORY) then
-  begin
-    { v1.3.0 }
-    HistoryDb.AddGroup(HistoryDb.NAME_TABS_HISTORY, 'all tabs that been closed.');
-    HistoryDb.Free;
-    HistoryDb := TNBoxBookmarksHistoryDb.Create(HISTORY_FILENAME);
-  end;
-
-  CurrentBookmarksDb := BookmarksDb;
-
-  if Settings.AutoSaveSession then
-    loadSession;
-
   BtnStatus := CreateDefButton(LayoutDialogYesOrNo);
   with BtnStatus do begin
     Parent := OnBrowserLayout;
@@ -3027,6 +3005,28 @@ begin
     StrokeMove.Kind := TBrushKind.None;
     Text.Text := 'Status bar.';
   end;
+
+  FFormCreated := TRUE;
+  Settings := Settings;
+  HistoryDb := TNBoxBookmarksHistoryDb.Create(HISTORY_FILENAME);
+  BookmarksDb := TNBoxBookmarksDb.Create(BOOKMARKSDB_FILENAME);
+  Session := TnBoxBookmarksDb.Create(SESSION_FILENAME);
+  Session.PageSize := 100;
+  ConnectSession;
+
+  { Database update }
+  if not HistoryDb.HasGroup(HistoryDb.NAME_TABS_HISTORY) then
+  begin
+    { v1.3.0 }
+    HistoryDb.AddGroup(HistoryDb.NAME_TABS_HISTORY, 'all tabs that been closed.');
+    HistoryDb.Free;
+    HistoryDb := TNBoxBookmarksHistoryDb.Create(HISTORY_FILENAME);
+  end;
+
+  CurrentBookmarksDb := BookmarksDb;
+
+  if Settings.AutoSaveSession then
+    loadSession;
 
   if Browsers.Count < 1 then
     AddBrowser(nil);
@@ -3217,6 +3217,7 @@ const
 var
   W: Single;
 begin
+  if not FFormCreated then Exit;
   W := ((OnBrowserLayout.Width - BtnStatus.Position.X) / 100) * 35;
   if W < MAX_STATUS_BAR_WIDTH then
     W := OnBrowserLayout.Width - (BtnStatus.Position.X * 2);
@@ -4663,11 +4664,9 @@ begin
     FSettings := TNsfwBoxSettings.Create;
 
   FSettings.Assign(Value);
-  if not FFormCreated then
-    exit;
+  if not FFormCreated then Exit;
 
   BrowsersIWUContentManager.ThreadsCount := Settings.ThreadsCount;
-
   EditSetDefUseragent.Edit.Edit.Text    := Settings.DefaultUseragent;
   EditSetDefDownloadPath.Edit.Edit.Text := Settings.DefDownloadPath;
   EditSetThreadsCount.Edit.Edit.Text    := Settings.ThreadsCount.ToString;
@@ -4676,8 +4675,8 @@ begin
   EditSetFilenameLogUrls.Edit.Edit.Text := Settings.FilenameLogUrls;
   CheckSetFullscreen.IsChecked          := settings.Fullscreen;
 
-  if Form1.AppFullscreen <> FSettings.Fullscreen then
-    Form1.AppFullScreen := FSettings.Fullscreen;
+  if AppFullscreen <> FSettings.Fullscreen then
+    AppFullScreen := FSettings.Fullscreen;
 
   var LControls := Form1.MenuSettings.Content.Controls;
   var LSettingsCheck: TNBoxSettingsCheck;
