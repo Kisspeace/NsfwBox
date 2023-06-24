@@ -432,7 +432,7 @@ type
     function AddDownload(AItem: INBoxItem; ADontFetch: boolean = False): TNBoxTab; overload;
     function AddDownload(AUrl, AFullFilename: string): TNBoxTab; overload;
     { ----------------------------- }
-    function AddSettingsCheck(ACaption: string; AText: string = ''): TNBoxSettingsCheck;
+    function AddSettingsCheck(ACaption, AAttrName: string; AText: string = ''): TNBoxSettingsCheck;
     function AddSettingsEdit(ACaption: string; AText: string = ''; AStyle: integer = 0): TNBoxSettingsEdit;
     function AddSettingsButtonC(AText: string; AImageName: string; AImageClass: TControlClass): TRectButton;
     function AddSettingsButton(AText: string; AImageName: string = ''): TRectButton;
@@ -827,10 +827,11 @@ begin
   end;
 end;
 
-function TForm1.AddSettingsCheck(ACaption, AText: string): TNBoxSettingsCheck;
+function TForm1.AddSettingsCheck(ACaption, AAttrName, AText: string): TNBoxSettingsCheck;
 begin
   Result := CreateDefSettingsCheck(MenuSettings);
   _SetDefSettingsCheck(Result, ACaption, AText);
+  Result.TagString := AAttrName;
 end;
 
 function TForm1.AddSettingsEdit(ACaption, AText: string; AStyle: integer): TNBoxSettingsEdit;
@@ -2672,36 +2673,36 @@ begin
     Image.ImageURL := 'https://avatars.githubusercontent.com/u/101427274';
   end;
 
-  CheckSetFullscreen          := AddSettingsCheck('Fullscreen mode');
+  CheckSetFullscreen          := AddSettingsCheck('Fullscreen mode', 'Fullscreen');
   {$IFDEF MSWINDOWS}
-  CheckSetUseNewAppTitlebar   := AddSettingsCheck('Use new titlebar');
+  CheckSetUseNewAppTitlebar   := AddSettingsCheck('Use new titlebar', 'UseNewAppTitlebar');
   {$ENDIF}
-  CheckSetAllowCookies        := AddSettingsCheck('Allow cookies');
-  CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates'); { issues on ANDROID }
-  CheckSetEnableAllContent    := AddSettingsCheck('Enable all content (Gelbooru)');
-  CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session');
-  CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history');
-  CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history');
-  CheckSetSaveTapHistory      := AddSettingsCheck('Save tap history');
-  CheckSetSaveTabHistory      := AddSettingsCheck('Save closed tab history');
-  CheckSetShowCaptions        := AddSettingsCheck('Show content caption');
-  CheckSetShowBrowserStatus   := AddSettingsCheck('Show browser status bar');
-  CheckSetShowImageViewerStatus := AddSettingsCheck('Show image viewer status bar');
-  CheckSetImageCacheSave      := AddSettingsCheck('Cache thumbnails');
-  CheckSetImageCacheLoad      := AddSettingsCheck('Load thumbnails from cache');
-  CheckSetYDWSyncLoadFromFile := AddSettingsCheck('YDW full sync load images from file');
+  CheckSetAllowCookies        := AddSettingsCheck('Allow cookies', 'AllowCookies');
+  CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates', 'AutoAcceptAllCertificates'); { issues on ANDROID }
+  CheckSetEnableAllContent    := AddSettingsCheck('Enable all content (Gelbooru)', 'EnableAllContent');
+  CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session', 'AutoSaveSession');
+  CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history', 'SaveSearchHistory');
+  CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history', 'SaveDownloadHistory');
+  CheckSetSaveTapHistory      := AddSettingsCheck('Save tap history', 'SaveTapHistory');
+  CheckSetSaveTabHistory      := AddSettingsCheck('Save closed tab history', 'SaveClosedTabHistory');
+  CheckSetShowCaptions        := AddSettingsCheck('Show content caption', 'ShowCaptions');
+  CheckSetShowBrowserStatus   := AddSettingsCheck('Show browser status bar', 'ShowBrowserStatusBar');
+  CheckSetShowImageViewerStatus := AddSettingsCheck('Show image viewer status bar', 'ShowImageViewerStatusBar');
+  CheckSetImageCacheSave      := AddSettingsCheck('Cache thumbnails', 'ImageCacheSave');
+  CheckSetImageCacheLoad      := AddSettingsCheck('Load thumbnails from cache', 'ImageCacheLoad');
+  CheckSetYDWSyncLoadFromFile := AddSettingsCheck('YDW full sync load images from file', 'YDWSyncLoadFromFile');
 
-  CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs');
+  CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs', 'AllowDuplicateTabs');
   CheckSetAllowDuplicateTabs.Visible := false; // FIXME
 
-  CheckSetPlayExterWhenCantInter := AddSettingsCheck('Play file externally on fail',
+  CheckSetPlayExterWhenCantInter := AddSettingsCheck('Play file externally on fail', 'PlayExterWhenCantInter',
     'The file will be played externally when the application cannot play it on its own.');
-  CheckSetBrowseNextPageByScrollDown := AddSettingsCheck('Browse next page by scrolling down');
-  CheckSetAutoStartBrowse     := AddSettingsCheck('Auto start browse');
-  CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu');
-  CheckSetFetchAllBeforeAddBookmark := AddSettingsCheck('Fetch data before add to bookmarks', 'Not work in bulk mode.');
-  CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars');
-  CheckSetShowNavigateBackButton := AddSettingsCheck('Show navigate back button');
+  CheckSetBrowseNextPageByScrollDown := AddSettingsCheck('Browse next page by scrolling down', 'BrowseNextPageByScrollDown');
+  CheckSetAutoStartBrowse     := AddSettingsCheck('Auto start browse', 'AutoStartBrowse');
+  CheckSetAutoCloseItemMenu   := AddSettingsCheck('Auto close item menu', 'AutoCloseItemMenu');
+  CheckSetFetchAllBeforeAddBookmark := AddSettingsCheck('Fetch data before add to bookmarks', 'FetchAllBeforeAddBookmark', 'Not work in bulk mode.');
+  CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars', 'ShowScrollBars');
+  CheckSetShowNavigateBackButton := AddSettingsCheck('Show navigate back button', 'ShowNavigateBackButton');
   EditSetDefUseragent         := AddSettingsEdit('Default Useragent string');
   EditSetDefDownloadPath      := AddSettingsEdit('Default downloads path');
   EditSetMaxDownloadThreads   := AddSettingsEdit('Max download threads count', '', EDIT_STYLE_INT);
@@ -2714,8 +2715,8 @@ begin
   EditSetPlayParams           := AddSettingsEdit('Player params', FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.');
   {$ENDIF}
   EditSetDefBackupPath        := AddSettingsEdit('Default backup import \ export path');
-  CheckSetDevMode             := AddSettingsCheck('Developer mode');
-  CheckSetAutoCheckUpdates    := AddSettingsCheck('Auto check updates');
+  CheckSetDevMode             := AddSettingsCheck('Developer mode', 'DevMode');
+  CheckSetAutoCheckUpdates    := AddSettingsCheck('Auto check updates', 'AutoCheckUpdates');
 
   CheckMenuSetOnItemTap := TNBoxCheckMenu.Create(MainLayout);
   with CheckMenuSetOnItemTap do begin
@@ -4507,17 +4508,10 @@ var
 begin
   NewSet := TNsfwBoxSettings.Create;
   with NewSet do begin
-    StyleName        := Settings.StyleName;
-    ItemInteractions := Settings.ItemInteractions;
+    Assign(FSettings);
     DefaultUseragent := EditSetDefUseragent.Edit.Edit.Text;
-    AllowCookies     := CheckSetAllowCookies.IsChecked;
     DefDownloadPath  := EditSetDefDownloadPath.Edit.Edit.Text;
     FilenameLogurls  := EditSetFilenameLogUrls.Edit.Edit.Text;
-    {$IFDEF MSWINDOWS}
-    ContentPlayApp    := EditSetPlayApp.Edit.Edit.Text;
-    ContentPlayParams := EditSetPlayParams.Edit.Edit.Text;
-    UseNewAppTitlebar   := CheckSetUseNewAppTitlebar.IsChecked;
-    {$ENDIF}
     DefaultBackupPath := EditSetDefBackupPath.Edit.Edit.Text;
 
     if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
@@ -4541,33 +4535,6 @@ begin
       MaxDownloadThreads := 2;
 
     DownloadManager.ThreadsCount := MaxDownloadThreads;
-
-    Fullscreen           := CheckSetFullscreen.IsChecked;
-    ShowCaptions         := CheckSetShowCaptions.IsChecked;
-    ShowBrowserStatusBar := CheckSetShowBrowserStatus.IsChecked;
-    ShowImageViewerStatusBar := CheckSetShowImageViewerStatus.IsChecked;
-    AutoStartBrowse      := CheckSetAutoStartBrowse.IsChecked;
-    AutoCloseItemMenu    := CheckSetAutoCloseItemMenu.IsChecked;
-    FetchAllBeforeAddBookmark := CheckSetFetchAllBeforeAddBookmark.IsChecked;
-    AllowDuplicateTabs   := CheckSetAllowDuplicateTabs.IsChecked;
-    DevMode              := CheckSetDevMode.IsChecked;
-    AutoSaveSession      := CheckSetAutoSaveSession.IsChecked;
-    SaveSearchHistory    := CheckSetSaveSearchHistory.IsChecked;
-    SaveDownloadHistory  := CheckSetSaveDownloadHistory.IsChecked;
-    SaveTapHistory       := CheckSetSaveTapHistory.IsChecked;
-    SaveClosedTabHistory := CheckSetSaveTabHistory.IsChecked;
-    AutoCheckUpdates     := CheckSetAutoCheckUpdates.IsChecked;
-    ShowScrollbars       := CheckSetShowScrollBars.IsChecked;
-    ShowNavigateBackButton := CheckSetShowNavigateBackButton.IsChecked;
-    BrowseNextPageByScrollDown := CheckSetBrowseNextPageByScrollDown.IsChecked;
-    PlayExterWhenCantInter := CheckSetPlayExterWhenCantInter.IsChecked;
-
-    ImageCacheSave       := CheckSetImageCacheSave.IsChecked;
-    ImageCacheLoad       := CheckSetImageCacheLoad.IsChecked;
-    AutoAcceptAllCertificates := CheckSetAutoAcceptAllCertificates.IsChecked;
-    EnableAllContent     := CheckSetEnableAllContent.IsChecked;
-    YDWSyncLoadFromFile := CheckSetYDWSyncLoadFromFile.IsChecked;
-
     IWUContentManager.EnableSaveToCache := ImageCacheSave;
     IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
 
@@ -4710,34 +4677,25 @@ begin
   CheckSetFullscreen.IsChecked          := settings.Fullscreen;
 
   if Form1.AppFullscreen <> FSettings.Fullscreen then
-    Form1.AppFullScreen                   := FSettings.Fullscreen;
+    Form1.AppFullScreen := FSettings.Fullscreen;
 
-  CheckSetAllowCookies.IsChecked        := Settings.AllowCookies;
-  CheckSetShowCaptions.IsChecked        := Settings.ShowCaptions;
-  CheckSetShowBrowserStatus.IsChecked   := Settings.ShowBrowserStatusBar;
-  CheckSetShowImageViewerStatus.IsChecked := Settings.ShowImageViewerStatusBar;
-  CheckSetAllowDuplicateTabs.IsChecked  := Settings.AllowDuplicateTabs;
-  CheckSetAutoStartBrowse.IsChecked     := Settings.AutoStartBrowse;
-  CheckSetAutoCloseItemMenu.IsChecked   := Settings.AutoCloseItemMenu;
-  CheckSetFetchAllBeforeAddBookmark.IsChecked := Settings.FetchAllBeforeAddBookmark;
+  var LControls := Form1.MenuSettings.Content.Controls;
+  var LSettingsCheck: TNBoxSettingsCheck;
+  for I := 0 to LControls.Count - 1 do
+  begin
+    if LControls[I] is TNBoxSettingsCheck then
+    begin { update every checkbox }
+      LSettingsCheck := TNBoxSettingsCheck(LControls[I]);
+      LSettingsCheck.Check.IsChecked := Settings.Attributes[LSettingsCheck.TagString];
+    end;
+  end;
+
   EditSetMaxDownloadThreads.Edit.Edit.Text := Settings.MaxDownloadThreads.ToString;
   DownloadManager.ThreadsCount        := Settings.MaxDownloadThreads;
-  CheckSetDevMode.IsChecked             := Settings.DevMode;
-  CheckSetAutoCheckUpdates.IsChecked    := Settings.AutoCheckUpdates;
-  CheckSetShowScrollBars.IsChecked      := Settings.ShowScrollbars;
-  CheckSetShowNavigateBackButton.IsChecked := Settings.ShowNavigateBackButton;
-  CheckSetBrowseNextPageByScrollDown.IsChecked := Settings.BrowseNextPageByScrollDown;
-  CheckSetImageCacheSave.IsChecked      := Settings.ImageCacheSave;
-  CheckSetImageCacheLoad.IsChecked      := Settings.ImageCacheLoad;
-  CheckSetAutoAcceptAllCertificates.IsChecked := Settings.AutoAcceptAllCertificates;
-  CheckSetEnableAllContent.IsChecked    := Settings.EnableAllContent;
-  CheckSetYDWSyncLoadFromFile.IsChecked := Settings.YDWSyncLoadFromFile;
-  CheckSetPlayExterWhenCantInter.IsChecked := Settings.PlayExterWhenCantInter;
 
   {$IFDEF MSWINDOWS}
   EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
   EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
-  CheckSetUseNewAppTitlebar.IsChecked   := Settings.UseNewAppTitlebar;
   {$ENDIF}
   EditSetDefBackupPath.Edit.Edit.Text   := Settings.DefaultBackupPath;
 
@@ -4750,12 +4708,6 @@ begin
     LBtn := Menu.GetControlByValue(PROVIDERS.Bookmarks.id);
     if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
   end;
-
-  CheckSetAutoSaveSession.IsChecked     := Settings.AutoSaveSession;
-  CheckSetSaveSearchHistory.IsChecked   := Settings.SaveSearchHistory;
-  CheckSetSaveDownloadHistory.IsChecked := Settings.SaveDownloadHistory;
-  CheckSetSaveTapHistory.IsChecked      := Settings.SaveTapHistory;
-  CheckSetSaveTabHistory.IsChecked      := Settings.SaveClosedTabHistory;
 
   for I := 0 to MenuTestButtons.Count - 1 do
     MenuTestButtons[I].Visible := Settings.DevMode;
@@ -4776,7 +4728,13 @@ begin
 end;
 
 procedure TForm1.SettingsCheckOnTap(Sender: TObject; const Point: TPointF);
+var
+  LSettingsCheck: TNBoxSettingsCheck;
+  LAttrName: string;
 begin
+  LSettingsCheck := TNBoxSettingsCheck(TControl(Sender).Parent);
+  LAttrName := LSettingsCheck.TagString;
+  Settings.Attributes[LAttrName] := LSettingsCheck.Check.IsChecked;
   SaveSettingsChanges;
 end;
 
