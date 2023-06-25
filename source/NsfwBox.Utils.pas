@@ -15,6 +15,12 @@ type
       class function ReadNativeIntArray(const ASource: ISuperObject; AKeyName: string): TArray<NativeInt>; static;
   end;
 
+  TArrayHelper = Class
+    public
+      ///<summary>Returns new array with values by given indexes.</summary>
+      class function PickValues<T>(const Ar: TArray<T>; AIndexes: TArray<integer>): TArray<T>; static;
+  End;
+
   function GetFirstStr(Ar: TArray<string>): string;
   function StrIn(const Ar: TArray<string>; AStr: string; AIgnoreCase: boolean = True): boolean;
   function BytesCountToSizeStr(ABytesCount: int64): string;
@@ -148,6 +154,27 @@ begin
       Result[I] := Ar.I[I];
   end else
     Result := Nil;
+end;
+
+{ TArrayHelper }
+
+class function TArrayHelper.PickValues<T>(const Ar: TArray<T>;
+  AIndexes: TArray<integer>): TArray<T>;
+var
+  I, Len, Pos: integer;
+begin
+  Result := [];
+  Len := Length(Ar);
+  if Len = 0 then Exit;
+  for I := Low(AIndexes) to High(AIndexes) do
+  begin
+    if (Len > AIndexes[I]) and (AIndexes[I] >= 0) then
+    begin
+      Pos := Length(Result);
+      SetLength(Result, Pos + 1);
+      Result[Pos] := Ar[AIndexes[I]];
+    end;
+  end;
 end;
 
 end.
