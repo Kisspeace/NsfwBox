@@ -33,7 +33,9 @@ uses
   NsfwBox.Provider.Pseudo, NsfwBox.Provider.NsfwXxx, NsfwBox.Provider.R34App,
   NsfwBox.Provider.R34JsonApi, NsfwBox.Provider.Bookmarks,
   NsfwBox.Provider.CoomerParty, NsfwBox.Provider.NineHentaiToApi, NsfwBox.Consts,
-  NsfwBox.Provider.Randomizer,
+  NsfwBox.Provider.Randomizer, NsfwBox.Provider.BooruScraper,
+  NsfwBox.Provider.Fapello, NsfwBox.Provider.GivemepornClub,
+  NsfwBox.Provider.Motherless,
   NsfwBox.Graphics.Browser, NsfwBox.Styling, NsfwBox.Graphics.Rectangle,
   NsfwBox.DownloadManager, NsfwBox.Bookmarks, NsfwBox.Helper,
   NsfwBox.UpdateChecker, NsfwBox.MessageForDeveloper, Unit2,
@@ -440,7 +442,7 @@ type
     function AddMenuBtn: TRectButton;
     function AddMenuSearchBtn(AText: string; AImageName: string = ''; AOnTap: TTapEvent = nil): TRectButton;
     function AddItemMenuBtn(ACaption: string; AAction: TNBoxItemInteraction; AImageName: string = ''; ATag: string = ''): TRectButton;
-    function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false): TNBoxBrowser.TNBoxTab;
+    function AddBrowser(ARequest: INBoxSearchRequest = nil; AAutoStartBrowse: boolean = false; AAbortIfReqExists: boolean = False): TNBoxBrowser.TNBoxTab;
     procedure DeleteBrowser(ABrowser: TNBoxBrowser; ADeleteFromSession: boolean = True);
     procedure DeleteAllBrowsers(ADeleteFromSession: boolean = True);
     { -> Properies ---------------- }
@@ -610,12 +612,101 @@ begin
   end;
 end;
 
-function TForm1.AddBrowser(ARequest: INBoxSearchRequest; AAutoStartBrowse: boolean): TNBoxBrowser.TNBoxTab;
+function TForm1.AddBrowser(ARequest: INBoxSearchRequest;
+  AAutoStartBrowse, AAbortIfReqExists: boolean): TNBoxBrowser.TNBoxTab;
 var
   LBrowser: TNBoxBrowser;
   LTab: TNBoxBrowser.TNBoxTab;
+
+  function IsSameRequestAlreadyExists(AReq: INBoxSearchRequest): boolean;
+  var
+    I: integer;
+    LReqStrIsEmpty: boolean;
+  begin
+    for I := 0 to Browsers.Count - 1 do
+    begin
+      var LReq: INBoxSearchRequest := Browsers[I].Request;
+
+      if not Assigned(LReq) or (LReq.Origin <> AReq.Origin) then
+        Continue;
+
+      LReqStrIsEmpty := AReq.Request.IsEmpty;
+
+      if (AReq is TNBoxSearchReqNsfwXxx) and (not LReqStrIsEmpty) then
+      begin
+        var R1, R2: TNBoxSearchReqNsfwXxx;
+        R1 := AReq as TNBoxSearchReqNsfwXxx;
+        R2 := LReq as TNBoxSearchReqNsfwXxx;
+        if (R1.SearchType = R2.SearchType) and (R1.Request = R2.Request) then
+          Exit(True);
+      end
+
+      else if (AReq is TNBoxSearchReqBooru) and (not LReqStrIsEmpty) then
+      begin
+        if LReq.Request = AReq.Request then Exit(True);
+      end
+
+      else if (AReq is TNBoxSearchReqCoomerParty) then
+      begin
+        var R1, R2: TNBoxSearchReqCoomerParty;
+        R1 := AReq as TNBoxSearchReqCoomerParty;
+        R2 := LReq as TNBoxSearchReqCoomerParty;
+        if (R1.Site = R2.Site)
+        and (R1.UserId = R2.UserId) and (R1.Service = R2.Service)
+        and (R1.Request = R2.Request) then
+          Exit(True);
+      end
+
+      else if (AReq is TNBoxSearchReqFapello) and (not LReqStrIsEmpty) then
+      begin
+        var R1, R2: TNBoxSearchReqFapello;
+        R1 := AReq as TNBoxSearchReqFapello;
+        R2 := LReq as TNBoxSearchReqFapello;
+        if (R1.RequestKind = R2.RequestKind) and (R1.Request = R2.Request) then
+          Exit(True);
+      end
+
+      else if (AReq is TNBoxSearchReqGmpClub) and (not LReqStrIsEmpty) then
+      begin
+        var R1, R2: TNBoxSearchReqGmpClub;
+        R1 := AReq as TNBoxSearchReqGmpClub;
+        R2 := LReq as TNBoxSearchReqGmpClub;
+        if (R1.SearchType = R2.SearchType) and (R1.Request = R2.Request) then
+          Exit(True);
+      end
+
+      else if (AReq is TNBoxSearchReqMotherless) and (not LReqStrIsEmpty) then
+      begin
+        var R1, R2: TNBoxSearchReqMotherless;
+        R1 := AReq as TNBoxSearchReqMotherless;
+        R2 := LReq as TNBoxSearchReqMotherless;
+        if (R1.Request = R2.Request)
+        and (R1.ContentType = R2.ContentType)
+        and (R1.MediaSize = R2.MediaSize)
+        and (R1.UploadDate = R2.UploadDate)
+        and (R1.Sort = R2.Sort) then
+          Exit(True);
+      end;
+
+//      else if (AReq is TNBoxSearchReq9Hentaito) and (not LReqStrIsEmpty) then
+//      begin
+//        var R1, R2: TNBoxSearchReq9Hentaito;
+//        R1 := AReq as TNBoxSearchReq9Hentaito;
+//        R2 := LReq as TNBoxSearchReq9Hentaito;
+//      end;
+
+      FreeInterfaced(LReq);
+    end;
+    Result := False;
+  end;
+
 begin
   try
+    { Exit if browser with same request is already exist. }
+    if AAbortIfReqExists and Assigned(ARequest)
+    and IsSameRequestAlreadyExists(ARequest) then
+      Exit(Nil);
+
     LBrowser := Form1.CreateDefBrowser(BrowserLayout);
     Browsers.Add(LBrowser);
     with LBrowser do
@@ -2104,7 +2195,8 @@ begin
       if not AItem.HasPost then exit;
       LTmpReq := CreateRelatedReq(LPost);
       if Assigned(LTmpReq) then
-        AddBrowser(LTmpReq, Settings.AutoStartBrowse);
+        AddBrowser(LTmpReq, Settings.AutoStartBrowse,
+          not Settings.AllowDuplicateTabs);
     end;
 
     ACTION_OPEN_AUTHOR:
@@ -2122,7 +2214,8 @@ begin
         begin
           LTmpReq := CreateArtistReq(LPost, LArtists[I]);
           if Assigned(LTmpReq) then
-            AddBrowser(LTmpReq, Settings.AutoStartBrowse);
+            AddBrowser(LTmpReq, Settings.AutoStartBrowse,
+              not Settings.AllowDuplicateTabs);
         end;
 
       end;
@@ -2691,10 +2784,7 @@ begin
   CheckSetImageCacheSave      := AddSettingsCheck('Cache thumbnails', 'ImageCacheSave');
   CheckSetImageCacheLoad      := AddSettingsCheck('Load thumbnails from cache', 'ImageCacheLoad');
   CheckSetYDWSyncLoadFromFile := AddSettingsCheck('YDW full sync load images from file', 'YDWSyncLoadFromFile');
-
-  CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow duplicate tabs', 'AllowDuplicateTabs');
-  CheckSetAllowDuplicateTabs.Visible := false; // FIXME
-
+  CheckSetAllowDuplicateTabs  := AddSettingsCheck('Allow open duplicate tabs', 'AllowDuplicateTabs');
   CheckSetPlayExterWhenCantInter := AddSettingsCheck('Play file externally on fail', 'PlayExterWhenCantInter',
     'The file will be played externally when the application cannot play it on its own.');
   CheckSetBrowseNextPageByScrollDown := AddSettingsCheck('Browse next page by scrolling down', 'BrowseNextPageByScrollDown');
