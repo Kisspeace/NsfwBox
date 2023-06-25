@@ -37,6 +37,11 @@ type
   TInt64Ar = TArray<Int64>;
   TBookmarksOrderList = TThreadList<Int64>;
 
+  TDownloadAllMode = (
+    damAllVersions,
+    damHighResVersion,
+    damMediumResVersion);
+
   { Application settings (Thread safe) }
   TNsfwBoxSettings = class
     private
@@ -82,6 +87,7 @@ type
         FContentPlayApp: string;
         FContentPlayParams: string;
       {$ENDIF}
+      FDownloadAllMode: TDownloadAllMode;
       FBookmarksOrder: TBookmarksOrderList;
     private
       procedure SetF<T>(var AVariable: T; const ANewValue: T);
@@ -160,6 +166,8 @@ type
       procedure SetStyleName(const Value: string);
       procedure SetThreadsCount(const Value: integer);
       procedure SetYDWSyncLoadFromFile(const Value: boolean);
+      function GetDownloadAllMode: TDownloadAllMode;
+      procedure SetDownloadAllMode(const Value: TDownloadAllMode);
       {$IFDEF MSWINDOWS}
         function GetUseNewAppTitlebar: boolean;
         procedure SetUseNewAppTitlebar(const Value: boolean);
@@ -207,6 +215,7 @@ type
       property ShowImageViewerStatusBar: boolean read GetShowImageViewerStatusBar write SetShowImageViewerStatusBar;
       property PlayExterWhenCantInter: boolean read GetPlayExterWhenCantInter write SetPlayExterWhenCantInter;
       property DefaultBackupPath: string read GetDefaultBackupPath write SetDefaultBackupPath;
+      property DownloadAllMode: TDownloadAllMode read GetDownloadAllMode write SetDownloadAllMode;
       {$IFDEF MSWINDOWS}
        property UseNewAppTitlebar: boolean read GetUseNewAppTitlebar write SetUseNewAppTitlebar;
        property ContentPlayApp: string read GetContentPlayApp write SetContentPlayApp;
@@ -307,6 +316,7 @@ begin
   FAutoAcceptAllCertificates := False;
   FYDWSyncLoadFromFile := False;
   FBookmarksOrder := TBookmarksOrderList.Create;
+  FDownloadAllMode := TDownloadAllMode.damHighResVersion;
 end;
 
 destructor TNsfwBoxSettings.Destroy;
@@ -435,6 +445,11 @@ end;
 function TNsfwBoxSettings.GetDevMode: boolean;
 begin
   GetF<boolean>(FDevMode, Result);
+end;
+
+function TNsfwBoxSettings.GetDownloadAllMode: TDownloadAllMode;
+begin
+  GetF<TDownloadAllMode>(FDownloadAllMode, Result);
 end;
 
 function TNsfwBoxSettings.GetEnableAllContent: boolean;
@@ -654,6 +669,11 @@ end;
 procedure TNsfwBoxSettings.SetDevMode(const Value: boolean);
 begin
   SetF<boolean>(FDevMode, Value);
+end;
+
+procedure TNsfwBoxSettings.SetDownloadAllMode(const Value: TDownloadAllMode);
+begin
+  SetF<TDownloadAllMode>(FDownloadAllMode, Value);
 end;
 
 procedure TNsfwBoxSettings.SetEnableAllContent(const Value: boolean);
