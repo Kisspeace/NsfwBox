@@ -7,9 +7,9 @@ SET download_path=%work_dir%\"script-temp"
 cd %work_dir%
 MKDIR %download_path%
 
-CALL :curl7z "https://sqlite.org/2023/sqlite-android-3410200.aar" "android"
-CALL :curl7z "https://sqlite.org/2023/sqlite-dll-win32-x86-3410200.zip" "win32"
-CALL :curl7z "https://sqlite.org/2023/sqlite-dll-win64-x64-3410200.zip" "win64"
+CALL :curl7z "https://sqlite.org/2023/sqlite-android-3420000.aar" "android"
+CALL :curl7z "https://sqlite.org/2023/sqlite-dll-win32-x86-3420000.zip" "win32"
+CALL :curl7z "https://sqlite.org/2023/sqlite-dll-win64-x64-3420000.zip" "win64"
 
 
 RD /S /Q %download_path%
