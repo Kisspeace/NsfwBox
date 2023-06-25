@@ -252,14 +252,15 @@ type
     BtnSetChangeOnItemTap,
     BtnSetChangeTheme,
     BtnSetSave,
-    BtnSetManageBackups
+    BtnSetManageBackups,
+    BtnSetChangeDownloadAllMode
     : TRectButton;
-
-    MenuChangeTheme: TNBoxSelectMenuStr;
 
     { Settings }
     CheckMenuSetOnItemTap: TNBoxCheckMenu;
     BtnSetSaveOnItemTap: TRectButton;
+    MenuChangeTheme: TNBoxSelectMenuStr;
+    MenuChangeDownloadAllMode: TNBoxSelectMenuInt;
 
     MenuItemTags: TNBoxSelectMenuTag;
     MenuItemTagsOrigin: integer;
@@ -330,12 +331,14 @@ type
     procedure BtnSetViewLogOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetSaveOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetChangeOnItemTapOnTap(Sender: TObject; const Point: TPointF);
+    procedure BtnSetChangeDownloadAllModeOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetSaveOnItemTapOnTap(Sender: TObject; const Point: TPointF);
     procedure SettingsCheckOnTap(Sender: TObject; const Point: TPointF);
     procedure CardOnTap(Sender: TObject; const Point: TPointF);
     procedure IconOnResize(Sender: TObject);
     procedure BookmarksControlOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuChangeThemeOnSelected(Sender: TObject);
+    procedure MenuChangeDownloadAllModeOnSelected(Sender: TObject);
     { -> Search Menu do list buttons }
     procedure BtnSearchAddBookmarkOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSearchSetDefaultOnTap(Sender: TObject; const Point: TPointF);
@@ -1427,6 +1430,12 @@ end;
 procedure TForm1.BtnSetAnonMsgOnTap(Sender: TObject; const Point: TPointF);
 begin
   ChangeInterface(MenuAnonMessage);
+end;
+
+procedure TForm1.BtnSetChangeDownloadAllModeOnTap(Sender: TObject;
+  const Point: TPointF);
+begin
+  ChangeInterface(MenuChangeDownloadAllMode);
 end;
 
 procedure TForm1.BtnSetChangeOnItemTapOnTap(Sender: TObject;
@@ -2854,6 +2863,22 @@ begin
 
   end;
 
+  BtnSetChangeDownloadAllMode := AddSettingsButton('Change download all mode', ICON_DOWNLOADS);
+  BtnSetChangeDownloadAllMode.OnTap := BtnSetChangeDownloadAllModeOnTap;
+
+  MenuChangeDownloadAllMode := TNBoxSelectMenuInt.Create(MainLayout);
+  with MenuChangeDownloadAllMode do
+  begin
+    Parent := MainLayout;
+    Align := TAlignLayout.Client;
+    Menu.OnSelected := MenuChangeDownloadAllModeOnSelected;
+
+    var LIconFilename := AppStyle.GetImagePath(ICON_DOWNLOAD);
+    AddBtn('Download all available files', Ord(TDownloadAllMode.damAllVersions), LIconFilename);
+    AddBtn('Prefer high resolution files', Ord(TDownloadAllMode.damHighResVersion), LIconFilename);
+    AddBtn('Prefer medium or low resolution files', Ord(TDownloadAllMode.damMediumResVersion), LIconFilename);
+  end;
+
   MenuChangeTheme := TNBoxSelectMenuStr.Create(MainLayout);
   with MenuChangeTheme do begin
     Parent := MainLayout;
@@ -4194,6 +4219,13 @@ end;
 
 procedure TForm1.MenuBtnSettingsOnTap(Sender: TObject; const Point: TPointF);
 begin
+  ChangeInterface(MenuSettings);
+end;
+
+procedure TForm1.MenuChangeDownloadAllModeOnSelected(Sender: TObject);
+begin
+  FSettings.DownloadAllMode := TDownloadAllMode(MenuChangeDownloadAllMode.Selected);
+  SaveSettings;
   ChangeInterface(MenuSettings);
 end;
 
