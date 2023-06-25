@@ -5,7 +5,8 @@ unit NsfwBox.Provider.NsfwXxx;
 interface
 uses
   System.SysUtils, System.Classes, XSuperObject,
-  NsfwBox.Interfaces, NsfwBox.Consts, NsfwXxx.Types, NsfwBox.Utils;
+  NsfwBox.Interfaces, NsfwBox.Consts, NsfwXxx.Types, NsfwBox.Utils,
+  NsfwBox.Settings, NsfwBox.Logging;
 
 type
 
@@ -27,6 +28,7 @@ type
     public
       procedure Assign(ASource: INBoxItem); override;
       function Clone: INBoxItem; override;
+      function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; override;
       { new }
       property Item: TNsfwXxxitem read Fitem write Fitem;
       property Page: TNsfwXxxPostPage read Fpage write Fpage;
@@ -123,6 +125,29 @@ end;
 function TNBoxNsfwXxxItem.GetContentFetched: boolean;
 begin
   Result := (length(self.ContentUrls) > 0);
+end;
+
+function TNBoxNsfwXxxItem.GetContentUrls(
+  ASelectFilesMode: TDownloadAllMode): TArray<string>;
+begin
+  if (Length(Page.Items) > 0)
+  and (FItem.ItemType = TNsfwItemType.Video) then
+  begin
+    case ASelectFilesMode of
+      damAllVersions: Result := ContentUrls;
+
+      damHighResVersion: { Pick url for high res video file. }
+        Result := TArrayHelper.PickValues<string>(FPage.Items[0].Thumbnails, [0]);
+
+      damMediumResVersion: { Pick url for medium/low res video file. }
+      begin                { when not exist - return firts url (high res). }
+        Result := TArrayHelper.PickValues<string>(FPage.Items[0].Thumbnails, [1]);
+        if Length(Result) = 0 then
+          Result := ContentUrls;
+      end;
+    end;
+  end else
+    Result := ContentUrls;
 end;
 
 function TNBoxNsfwXxxItem.GetContentUrls: TArray<string>;

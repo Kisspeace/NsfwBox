@@ -7,7 +7,7 @@ interface
 uses
   System.SysUtils, Classes, System.Generics.Collections, XSuperObject,
   BooruScraper.Interfaces, Ninehentaito.APITypes, CoomerParty.Types,
-  Fapello.Types, System.SyncObjs;
+  Fapello.Types, System.SyncObjs, NsfwBox.Settings;
 
 type
 {*
@@ -157,7 +157,7 @@ type
     ['{8AB3F5DB-4DD1-4CD7-BD1C-EE6D35F98270}']
     //--Setters and Getters--//
     //procedure SetContentUrls(const Value: TArray<string>);
-    function GetContentUrls: TArray<string>;
+    function GetContentUrls: TArray<string>; overload;
     //procedure SetThumbnailUrl(const Value: string);
     function GetThumbnailUrl: string;
     procedure Assign(ASource: INBoxItem);
@@ -165,6 +165,7 @@ type
     //--Public methods--//
     function ContentUrlCount: integer;
     function ContentUrl: string;
+    function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; overload;
     //--Properties--//
     property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
     property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
@@ -190,7 +191,7 @@ type
     protected
       FOrigin: Integer;
       //procedure SetContentUrls(const Value: TArray<string>);  virtual; abstract;
-      function GetContentUrls: TArray<string>;                virtual; abstract;
+      function GetContentUrls: TArray<string>;                overload; virtual; abstract;
       //procedure SetThumbnailUrl(const Value: string);         virtual; abstract;
       function GetThumbnailUrl: string;                       virtual; abstract;
       function GetOrigin: integer;                            virtual;
@@ -198,11 +199,12 @@ type
     public
       function ContentUrlCount: integer;                      virtual;
       function ContentUrl: string;                            virtual;
+      function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; overload; virtual;
       procedure Assign(ASource: INBoxItem);                   virtual; abstract;
       function Clone: INBoxItem;                              virtual; abstract;
       [DISABLE] property Origin: integer Read GetOrigin write SetOrigin;
       [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
-      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
+      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls;// write SetContentUrls;
       constructor Create; virtual;
       destructor Destroy; override;
   end;
@@ -341,6 +343,12 @@ end;
 function TNBoxItemBase.ContentUrlCount: integer;
 begin
   Result := Length(ContentUrls);
+end;
+
+function TNBoxItemBase.GetContentUrls(
+  ASelectFilesMode: TDownloadAllMode): TArray<string>;
+begin
+  Result := ContentUrls;
 end;
 
 constructor TNBoxItemBase.Create;

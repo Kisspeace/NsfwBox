@@ -6,7 +6,8 @@ interface
 uses
   System.SysUtils, System.Classes, XSuperObject,
   BooruScraper.Interfaces, BooruScraper.BaseTypes,
-  NsfwBox.Interfaces, NsfwBox.Consts, NsfwBox.Utils;
+  NsfwBox.Interfaces, NsfwBox.Consts, NsfwBox.Utils,
+  NsfwBox.Settings;
 
 type
 
@@ -55,6 +56,7 @@ type
       function IsAuthorsFetched: boolean;
       function Clone: INBoxItem; override;
       procedure Assign(ASource: INBoxItem); override;
+      function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; override;
       { new }
       [DISABLE] property Full: IBooruPost read GetFull write SetFull; { Cant be written correctly by XSuperJson }
       { properties }
@@ -125,6 +127,26 @@ end;
 function TNBoxBooruItemBase.GetContentFetched: boolean;
 begin
   Result := (not ((Full.ContentUrl.IsEmpty) and (Full.SampleUrl.IsEmpty)));
+end;
+
+function TNBoxBooruItemBase.GetContentUrls(
+  ASelectFilesMode: TDownloadAllMode): TArray<string>;
+begin
+  if ContentFetched then
+  begin
+    case ASelectFilesMode of
+      damAllVersions: Result := ContentUrls;
+      damHighResVersion: Result := [FFull.ContentUrl];
+
+      damMediumResVersion:
+      begin
+        Result := [FFull.SampleUrl];
+        if Length(Result) = 0 then
+          Result := ContentUrls;
+      end;
+    end;
+  end else
+    Result := [];
 end;
 
 function TNBoxBooruItemBase.GetContentUrls: TArray<string>;

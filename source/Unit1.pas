@@ -431,7 +431,7 @@ type
     function CreateDefScraper: TNBoxScraper;
     function NewMenu: TVertScrollBox;
     { -> Download ----------------- }
-    function AddDownload(AItem: INBoxItem; ADontFetch: boolean = False): TNBoxTab; overload;
+    function AddDownload(AItem: INBoxItem; ADontFetch: boolean = False; ASelectFilesMode: TDownloadAllMode = damAllVersions): TNBoxTab; overload;
     function AddDownload(AUrl, AFullFilename: string): TNBoxTab; overload;
     { ----------------------------- }
     function AddSettingsCheck(ACaption, AAttrName: string; AText: string = ''): TNBoxSettingsCheck;
@@ -754,7 +754,8 @@ begin
   end;
 end;
 
-function TForm1.AddDownload(AItem: INBoxItem; ADontFetch: boolean): TNBoxTab;
+function TForm1.AddDownload(AItem: INBoxItem; ADontFetch: boolean;
+  ASelectFilesMode: TDownloadAllMode): TNBoxTab;
 var
   LFull, LUrl: string;
   I: integer;
@@ -775,7 +776,7 @@ begin
   if Settings.SaveDownloadHistory then
     HistoryDb.DownloadGroup.Add(AItem);
 
-  LUrlsAr := AItem.ContentUrls;
+  LUrlsAr := AItem.GetContentUrls(ASelectFilesMode);
   for I := 0 to High(LUrlsAr) do
   begin
     LUrl := LUrlsAr[I];
@@ -2142,7 +2143,7 @@ begin
     ACTION_DOWNLOAD_ALL:
     begin
       if not AItem.HasPost then exit;
-      AddDownload(LPost);
+      AddDownload(LPost, False, Settings.DownloadAllMode);
     end;
 
     ACTION_PLAY_INTERNALY:

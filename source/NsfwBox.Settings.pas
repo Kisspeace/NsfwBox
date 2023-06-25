@@ -5,8 +5,7 @@ unit NsfwBox.Settings;
 interface
 uses
   Classes, System.SysUtils, XSuperObject, system.Generics.Collections,
-  NsfwBox.UpdateChecker, NsfwBox.FileSystem,
-  NsfwBox.Logging, NsfwBox.Utils, System.Rtti;
+  NsfwBox.UpdateChecker, NsfwBox.Logging, NsfwBox.Utils, System.Rtti;
 
 Const
 
@@ -233,7 +232,8 @@ type
   end;
 
 implementation
-
+uses
+  NsfwBox.FileSystem;
 { TNsfwBoxSettings }
 
 procedure TNsfwBoxSettings.Assign(ASource: TNsfwBoxSettings);
