@@ -21,7 +21,6 @@ type
       constructor Create; override;
   end;
 
-
 implementation
 
 { TNBoxSearchReqRandomizer }

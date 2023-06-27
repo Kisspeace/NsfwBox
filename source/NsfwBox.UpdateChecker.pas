@@ -23,7 +23,6 @@ type
   TGithubAsset = record
     [ALIAS('id')] Id: Uint64;
     [ALIAS('name')] Name: string;
-    //[ALIAS('uploader')] Uploader: TGithubUser;
     [ALIAS('size')] Size: int64;
     [ALIAS('download_count')] DownloadCount: integer;
     [ALIAS('created_at')] CreatedAt: TDateTime;

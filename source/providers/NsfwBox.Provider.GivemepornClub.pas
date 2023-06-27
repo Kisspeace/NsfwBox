@@ -16,33 +16,27 @@ type
     private
       FPage: TGmpclubFullPage;
       FItem: TGmpclubItem;
-      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetTagsFetched: boolean;
       function GetContentFetched: boolean;
       function GetUidInt: int64;
-      //procedure SetUIdInt(const Value: int64);
-      //procedure SetCaption(const Value: String);
       function GetCaption: string;
-      //procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
-      //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      //--New--//
+      { new }
       property Item: TGmpclubItem read FItem write FItem;
       property Page: TGmpclubFullPage read Fpage write Fpage;
-      //--Properties--//
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
-      [DISABLE] property Caption: string read GetCaption; // write SetCaption;
+      [DISABLE] property UIdInt: int64 read GetUidInt;
+      [DISABLE] property Caption: string read GetCaption;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
-      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       [DISABLE] property TagsFetched: boolean read GetTagsFetched;
       constructor Create; override;
   end;
@@ -130,32 +124,6 @@ function TNBoxGmpClubItem.GetUidInt: int64;
 begin
   Result := FItem.Id;
 end;
-
-//procedure TNBoxGmpClubItem.SetCaption(const Value: String);
-//begin
-//  FItem.Title := Value;
-//end;
-
-//procedure TNBoxGmpClubItem.SetContentUrls(const Value: TArray<string>);
-//begin
-//  if ( Length(Value) > 0 ) then
-//    FPage.ContentUrl := Value[0];
-//end;
-
-//procedure TNBoxGmpClubItem.SetTags(const Value: TArray<string>);
-//begin
-//  FPage.Tags := Value;
-//end;
-
-//procedure TNBoxGmpClubItem.SetThumbnailUrl(const Value: string);
-//begin
-//  FItem.ThumbnailUrl := Value;
-//end;
-
-//procedure TNBoxGmpClubItem.SetUIdInt(const Value: int64);
-//begin
-//  FItem.Id := Value;
-//end;
 
 { TNBoxSearchReqXxx }
 

@@ -26,7 +26,6 @@ type
   TNBox9HentaitoItem = class(TNBoxItemBase, IUIdAsInt, IHasTags, IHasCaption)
     private
       FItem: T9HentaiBook;
-      //FCurrentPage: integer; // default = -1 display cover image
       function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetCaption: string;
@@ -36,9 +35,8 @@ type
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      //--New--//
+      { new }
       property Item: T9HentaiBook read FItem write FItem;
-      //--Properties--//
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;

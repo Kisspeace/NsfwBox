@@ -19,9 +19,7 @@ uses
   DbHelper in 'source\DbHelper.pas',
   NsfwBox.Helper in 'source\NsfwBox.Helper.pas',
   NetHttpClient.Downloader in 'source\NetHttpClient.Downloader.pas',
-  FMX.Scroller in 'source\FMX.Scroller.pas',
   NsfwBox.FileSystem in 'source\NsfwBox.FileSystem.pas',
-  FMX.Color in 'source\FMX.Color.pas',
   SimpleClipboard in 'source\SimpleClipboard.pas',
   NsfwBox.UpdateChecker in 'source\NsfwBox.UpdateChecker.pas',
   NsfwBox.MessageForDeveloper in 'source\NsfwBox.MessageForDeveloper.pas',
@@ -49,7 +47,8 @@ uses
   NsfwBox.GarbageCollector in 'source\NsfwBox.GarbageCollector.pas',
   NsfwBox.Provider.BepisDb in 'source\providers\NsfwBox.Provider.BepisDb.pas',
   NsfwBox.DataExportImport in 'source\NsfwBox.DataExportImport.pas',
-  NsfwBox.Cache in 'source\NsfwBox.Cache.pas';
+  NsfwBox.Cache in 'source\NsfwBox.Cache.pas',
+  FMX.Color in 'source\FMX.Color.pas';
 
 {$R *.res}
 

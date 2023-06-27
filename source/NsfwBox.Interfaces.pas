@@ -10,31 +10,21 @@ uses
   Fapello.Types, System.SyncObjs, NsfwBox.Settings;
 
 type
-{*
-  IBeautyTemplate = interface
-
-    //--Setters and Getters--//
-
-    //--Properties--//
-
-  end;
-*}
 
   IHasOrigin = interface
     ['{59DFFA49-9CB7-49D0-BAF0-6230CEA2F3D5}']
-    //--Setters and Getters--//
+    { private \ protected }
     function GetOrigin: integer;
-    //--Properties--//
+    { public }
     property Origin: integer read GetOrigin;
   end;
 
   IUIdAsInt = interface
     ['{2258085A-60A0-4FB0-B68F-C4D3F44285B1}']
-    //--Setters and Getters--//
-    //procedure SetUidInt(const value: int64);
+    { private \ protected }
     function GetUidInt: int64;
-    //--Properties--//
-    property UIdInt: int64 read GetUIdInt; // write SetUIdInt;
+    { public }
+    property UIdInt: int64 read GetUIdInt;
   end;
 
   IUIdAsStr = interface
@@ -73,11 +63,10 @@ type
 
   IHasTags = interface
     ['{598FEFF0-4DAD-425D-9480-4B78EA3B98FE}']
-    //--Setters and Getters--//
-    // procedure SetTags(const Value: TArray<string>);
+    { private \ protected }
     function GetTags: TNBoxItemTagAr;
-    //--Properties--//
-    property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
+    { public }
+    property Tags: TNBoxItemTagAr read GetTags;
   end;
 
   INBoxItemArtist = interface
@@ -124,26 +113,25 @@ type
 
   IHasCaption = interface
     ['{75A5AF4D-D3F4-4919-A742-37684522013C}']
-    //--Setters and Getters--//
-    //procedure SetCaption(const Value: String);
+    { private \ protected }
     function GetCaption: string;
-    //--Properties--//
-    property Caption: string read GetCaption; // write SetCaption;
+    { public }
+    property Caption: string read GetCaption;
   end;
 
   IFetchableContent = interface
     ['{F3D17945-B4EB-471D-8ACA-3BB30EE25C35}']
-    //--Setters and Getters--//
+    { private \ protected }
     function GetContentFetched: boolean;
-    //--Properties--//
+    { public }
     property ContentFetched: boolean read GetContentFetched;
   end;
 
   IFetchableTags = interface
     ['{E90EDD2F-348D-4765-9F8F-C6748AF555BF}']
-    //--Setters and Getters--//
+    { private \ protected }
     function GetTagsFetched: boolean;
-    //--Properties--//
+    { public }
     property TagsFetched: boolean read GetTagsFetched;
   end;
 
@@ -155,18 +143,15 @@ type
 
   INBoxItem = interface(IHasOrigin)
     ['{8AB3F5DB-4DD1-4CD7-BD1C-EE6D35F98270}']
-    //--Setters and Getters--//
-    //procedure SetContentUrls(const Value: TArray<string>);
+    { private \ protected }
     function GetContentUrls: TArray<string>; overload;
-    //procedure SetThumbnailUrl(const Value: string);
     function GetThumbnailUrl: string;
     procedure Assign(ASource: INBoxItem);
     function Clone: INBoxItem;
-    //--Public methods--//
+    { public }
     function ContentUrlCount: integer;
     function ContentUrl: string;
     function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; overload;
-    //--Properties--//
     property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
     property ContentUrls: TArray<string> read GetContentUrls; // write SetContentUrls;
   end;
@@ -190,21 +175,19 @@ type
   TNBoxItemBase = class(TNoRefCountObject, INBoxItem, IHasOrigin)
     protected
       FOrigin: Integer;
-      //procedure SetContentUrls(const Value: TArray<string>);  virtual; abstract;
-      function GetContentUrls: TArray<string>;                overload; virtual; abstract;
-      //procedure SetThumbnailUrl(const Value: string);         virtual; abstract;
-      function GetThumbnailUrl: string;                       virtual; abstract;
-      function GetOrigin: integer;                            virtual;
-      procedure SetOrigin(const Value: integer);              virtual;
+      function GetContentUrls: TArray<string>; overload; virtual; abstract;
+      function GetThumbnailUrl: string; virtual; abstract;
+      function GetOrigin: integer; virtual;
+      procedure SetOrigin(const Value: integer); virtual;
     public
-      function ContentUrlCount: integer;                      virtual;
-      function ContentUrl: string;                            virtual;
+      function ContentUrlCount: integer; virtual;
+      function ContentUrl: string; virtual;
       function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; overload; virtual;
-      procedure Assign(ASource: INBoxItem);                   virtual; abstract;
-      function Clone: INBoxItem;                              virtual; abstract;
+      procedure Assign(ASource: INBoxItem); virtual; abstract;
+      function Clone: INBoxItem; virtual; abstract;
       [DISABLE] property Origin: integer Read GetOrigin write SetOrigin;
-      [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl; // write SetThumbnailUrl;
-      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls;// write SetContentUrls;
+      [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl;
+      [DISABLE] property ContentUrls: TArray<string> read GetContentUrls;
       constructor Create; virtual;
       destructor Destroy; override;
   end;
@@ -213,13 +196,13 @@ type
 
   INBoxSearchRequest = interface(IHasOrigin)
     ['{E4BFD2A5-6D0C-450C-A2F8-F43EE36EB998}']
-    //--Setters and Getters--//
+    { private \ protected }
     function GetRequest: string;
     procedure SetRequest(const Value: string);
     function GetPageId: integer;
     procedure SetPageId(const Value: integer);
     function Clone: INBoxSearchRequest;
-    //--Properties--//
+    { public }
     property Request: string read GetRequest write SetRequest;
     property PageId: integer read GetPageId write SetPageId;
   end;
@@ -228,7 +211,6 @@ type
     protected
       FRequest: string;
       FPageId: integer;
-      //--Setters and Getters--//
       function GetOrigin: integer;               virtual; abstract;
       function GetRequest: string;               virtual;
       procedure SetRequest(const Value: string); virtual;
@@ -237,7 +219,6 @@ type
       procedure SetOrigin(const Value: integer); virtual;
     public
       function Clone: INBoxSearchRequest;        virtual; abstract;
-      //--Properties--//
       property Origin: integer read GetOrigin write SetOrigin;
       [DISABLE] property Request: string read GetRequest write SetRequest;
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
@@ -370,7 +351,7 @@ end;
 
 procedure TNBoxItemBase.SetOrigin(const Value: integer);
 begin
-  //FOrigin := Value;
+
 end;
 
 

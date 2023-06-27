@@ -111,9 +111,6 @@ end;
 
 function TNBoxNsfwXxxItem.GetArtists: TNBoxItemArtisAr;
 begin
-//  if ContentFetched then
-//    Result := [TNBoxItemArtistBase.Create(FPage.Items[0].Username, FPage.Items[0].UserAvatarUrl)]
-//  else
   Result := [TNBoxItemArtistBase.Create(FItem.Username, FItem.UserAvatarUrl)];
 end;
 

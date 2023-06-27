@@ -74,11 +74,6 @@ begin
   Align := TAlignLayout.MostTop;
   Size.Height := DEF_HEIGHT;
   DoMyJobWithMe(Self);
-//  Self.OnMouseDown := DoOnMouseDown;
-//  Self.OnMouseMove := DoOnMouseMove;
-//  Self.OnMouseLeave := DoOnMouseLeave;
-//  Self.OnMouseUp := DoOnMouseUp;
-//  Self.OnDblClick := DoOnDblClick;
 
   BtnTitle := Unit1.Form1.CreateDefButton(Self);
   with BtnTitle do begin

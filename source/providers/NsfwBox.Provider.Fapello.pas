@@ -41,12 +41,11 @@ type
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      //--New--//
+      { new }
       property Kind: TFapelloItemKind read FKind write FKind;
       property FeedItem: TFapelloFeedItem read FFeedItem write FFeedItem;
       property ThumbItem: TFapelloThumb read FThumbItem write FThumbItem;
       property Full: TFapelloContentPage read FFull write FFull;
-      //--Properties--//
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;

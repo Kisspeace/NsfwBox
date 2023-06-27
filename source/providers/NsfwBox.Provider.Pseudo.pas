@@ -9,14 +9,11 @@ uses
 
 type
 
-  // This item used to test graphic interface on dev mode
-
   TNBoxPseudoItem = class(TNBoxItemBase, INBoxItem, IHasCaption)
     private
       FUrls: TArray<string>;
       FThumb: string;
     protected
-      //--Setters and Getters--//
       procedure SetContentUrls(const Value: TArray<string>);
       function GetContentUrls: TArray<string>;               override;
       procedure SetThumbnailUrl(const Value: string);
@@ -25,7 +22,6 @@ type
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      //--Properties--//
       property Origin;
       [DISABLE] property ThumbnailUrl: string read GetThumbnailUrl write SetThumbnailUrl;
       [DISABLE] property ContentUrls: TArray<string> read GetContentUrls write SetContentUrls;
@@ -37,11 +33,9 @@ type
 
   TNBoxSearchReqPseudo = class(TNBoxSearchRequestBase)
     protected
-      //--Setters and Getters--//
       function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
-      //--Properties--//
       property Origin: integer read GetOrigin;
       property Request;
       property PageId;

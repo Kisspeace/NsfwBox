@@ -163,7 +163,6 @@ begin
 
   Rect := TAlRectangle.Create(self);
   with Rect do begin
-    //Fill.Color := getcolor(0, 0, 0, 180);
     Align := talignlayout.MostBottom;
     Stroke.Kind := tbrushkind.None;
     Parent := self;

@@ -16,7 +16,6 @@ uses
   NsfwBox.Consts,
   classes, sysutils, NsfwXxx.Types;
 
-
   function CreateItemByOrigin(AOrigin: integer): INBoxItem;
   function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
   function CreateRelatedReq(APost: INBoxItem): INBoxSearchRequest;

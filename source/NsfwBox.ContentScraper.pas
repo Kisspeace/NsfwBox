@@ -156,6 +156,7 @@ begin
       Client.Free;
     end;
   end
+
   else if (APost is TNBoxGmpClubItem) then
   begin
     var
@@ -171,6 +172,7 @@ begin
       Client.Free;
     end;
   end
+
   else if (APost is TNBoxCoomerPartyItem) then
   begin
     var
@@ -187,6 +189,7 @@ begin
       Client.Free;
     end;
   end
+
   else if (APost is TNBoxMotherlessItem) then
   begin
     var
@@ -206,6 +209,7 @@ begin
       LClient.Free;
     end;
   end
+
   else if (APost is TNBoxFapelloItem) then
   begin
     var
@@ -223,13 +227,11 @@ begin
       LClient.Free;
     end;
   end
+
   else if (APost is TNBoxBooruItemBase) then
   begin
-
-    var
-    LItem := (APost as TNBoxBooruItemBase);
-    var
-      LClient: IBooruClient;
+    var LItem := (APost as TNBoxBooruItemBase);
+    var LClient: IBooruClient;
 
     case APost.Origin of
       PVR_GELBOORU: LClient := BooruScraper.NewClientGelbooru;
@@ -458,8 +460,7 @@ begin
     Result := (length(Content) > 0);
     for i := 0 to high(Content) do
     begin
-      var
-        Item: TNBox9HentaitoItem;
+      var Item: TNBox9HentaitoItem;
       Item := TNBox9HentaitoItem.Create(false);
       Item.Item := Content[i];
       AList.Add(Item);
@@ -483,27 +484,19 @@ begin
     SyncWebClientSet(Client.WebClient, ORIGIN_GIVEMEPORNCLUB);
     case ASearchType of
       TGmpClubSearchType.Empty:
-        begin
           Content := Client.GetItems(APageNum);
-        end;
       TGmpClubSearchType.Random:
-        begin
           Content := Client.GetRandomItems;
-        end;
       TGmpClubSearchType.Tag:
-        begin
           Content := Client.GetItemsByTag(AReqParam, APageNum);
-        end;
       TGmpClubSearchType.Category:
-        begin
           Content := Client.GetItemsByCategory(AReqParam, APageNum);
-        end;
     end;
+
     Result := (length(Content) > 0);
     for i := 0 to high(Content) do
     begin
-      var
-        Item: TNBoxGmpClubItem;
+      var Item: TNBoxGmpClubItem;
       Item := TNBoxGmpClubItem.Create;
       Item.Item := Content[i];
       AList.Add(Item);
@@ -529,12 +522,11 @@ begin
     LContent := LClient.Search(ARequest, APage, AMediaType, Asort, ASize,
       AUploadDate);
     Result := (length(LContent) > 0);
+
     for i := 0 to High(LContent) do
     begin
-      var
-      Item := TNBoxMotherlessItem.Create;
-      var
-      LTmp := Item.Page;
+      var Item := TNBoxMotherlessItem.Create;
+      var LTmp := Item.Page;
       LTmp.Item := LContent[i];
       Item.Page := LTmp;
       AList.Add(Item);
@@ -594,8 +586,7 @@ begin
 
   for i := 0 to high(LContent) do
   begin
-    var
-    LItem := TNBoxBooruItemBase.Create(AProviderId);
+    var LItem := TNBoxBooruItemBase.Create(AProviderId);
     LItem.Full.Assign(LContent[I]);
     AList.Add(LItem);
   end;
@@ -618,18 +609,16 @@ begin
     begin
       // Search by recent posts
       Content := Client.GetRecentPostsByPageNum(ARequest, APageNum);
-    end
-    else
-    begin
+    end else begin
       // Search by artist posts
       Content := Client.GetArtistPostsByPageNum(ARequest, AUserId, AService,
         APageNum);
     end;
+
     Result := (length(Content.Posts) > 0);
     for i := 0 to High(Content.Posts) do
     begin
-      var
-        Item: TNBoxCoomerPartyItem;
+      var Item: TNBoxCoomerPartyItem;
       Item := TNBoxCoomerPartyItem.Create;
       Item.Site := Client.Host;
       Item.UIdInt := Content.Posts[i].Id;
@@ -653,37 +642,33 @@ begin
     SyncWebClientSet(Client.Client, Providers.Fapello.Id);
     case ASearchType of
       FlFeed:
+      begin
+        var LContent := Client.GetFeedItems(APageNum);
+        Result := (length(LContent) > 0);
+        for i := 0 to High(LContent) do
         begin
-          var
-          LContent := Client.GetFeedItems(APageNum);
-          Result := (length(LContent) > 0);
-          for i := 0 to High(LContent) do
-          begin
-            var
-            LItem := TNBoxFapelloItem.Create;
-            LItem.Kind := FlFeed;
-            LItem.FeedItem := LContent[i];
-            AList.Add(LItem);
-          end;
+          var LItem := TNBoxFapelloItem.Create;
+          LItem.Kind := FlFeed;
+          LItem.FeedItem := LContent[i];
+          AList.Add(LItem);
         end;
+      end;
+
       FlThumb:
+      begin
+        var LContent := Client.GetAuthorContent(ARequest, APageNum);
+        Result := (length(LContent) > 0);
+        for i := 0 to High(LContent) do
         begin
-          var
-          LContent := Client.GetAuthorContent(ARequest, APageNum);
-          Result := (length(LContent) > 0);
-          for i := 0 to High(LContent) do
-          begin
-            var
-            LItem := TNBoxFapelloItem.Create;
-            var
-            LFeedItem := TFapelloFeedItem.New;
-            LFeedItem.Author.Username := ARequest;
-            LItem.Kind := FlThumb;
-            LItem.FeedItem := LFeedItem;
-            LItem.ThumbItem := LContent[i];
-            AList.Add(LItem);
-          end;
+          var LItem := TNBoxFapelloItem.Create;
+          var LFeedItem := TFapelloFeedItem.New;
+          LFeedItem.Author.Username := ARequest;
+          LItem.Kind := FlThumb;
+          LItem.FeedItem := LFeedItem;
+          LItem.ThumbItem := LContent[i];
+          AList.Add(LItem);
         end;
+      end;
     end;
   finally
     Client.Free;
@@ -702,8 +687,8 @@ begin
   begin
     if Files[i].Attr = faDirectory then
       continue;
-    var
-      Item: TNBoxPseudoItem;
+
+    var Item: TNBoxPseudoItem;
     Item := TNBoxPseudoItem.Create;
     Item.ThumbnailUrl := IoUtils.TPath.Combine(TPath.GetDirectoryName(ARequest),
       Files[i].Name);
@@ -726,10 +711,10 @@ begin
     SyncWebClientSet(Client.WebClient, ORIGIN_R34JSONAPI);
     Content := Client.GetPosts(ATags, APageId, ALimit);
     Result := (length(Content) > 0);
+
     for i := 0 to length(Content) - 1 do
     begin
-      var
-        Item: TNBoxR34JsonApiItem;
+      var Item: TNBoxR34JsonApiItem;
       Item := TNBoxR34JsonApiItem.Create;
       Item.Item := Content[i];
       AList.Add(Item);
@@ -757,22 +742,26 @@ begin
   begin
     LRequest.Pageid := RandomRange(1, 50);
   end
+
   else if (LRequest.Origin in [Providers.R34App.Id, Providers.rule34xxx.Id,
     Providers.gelbooru.Id, Providers.rule34PahealNet.Id, Providers.XBooru.Id])
   then
   begin
     LRequest.Pageid := RandomRange(0, 1000);
   end
+
   else if (LRequest is TNBoxSearchReqGmpClub) then
   begin
     TNBoxSearchReqGmpClub(LRequest).SearchType := TGmpClubSearchType.Random
   end
+
   else if (LRequest is TNBoxSearchReqCoomerParty) then
   begin
     TNBoxSearchReqCoomerParty(LRequest).Pageid := RandomRange(0, 173628);
     TNBoxSearchReqCoomerParty(LRequest).Site :=
       CoomerParty.Scraper.URL_COOMER_PARTY;
   end
+
   else if (LRequest is TNBoxSearchReqMotherless) then
   begin
     LRequest.Pageid := RandomRange(0, 1500);
@@ -781,6 +770,7 @@ begin
     TNBoxSearchReqMotherless(LRequest).Sort :=
       TMotherLessSort(RandomRange(0, 8));
   end
+
   else if (LRequest is TNBoxSearchReq9Hentaito) then
   begin
     LRequest.Pageid := RandomRange(0, 5119);

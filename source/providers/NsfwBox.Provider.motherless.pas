@@ -180,7 +180,7 @@ begin
   Result := FPage.Item.Id;
 end;
 
-{ TNBoxSearchReqNsfwXxx }
+{ TNBoxSearchReqMotherless }
 
 function TNBoxSearchReqMotherless.Clone: INBoxSearchRequest;
 begin

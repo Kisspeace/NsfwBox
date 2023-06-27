@@ -123,9 +123,6 @@ end;
 
 { TJsonHelper }
 
-
-{ TJsonHelper }
-
 class function TJsonHelper.ReadIntArray(const ASource: ISuperObject;
   AKeyName: string): TArray<Int64>;
 var

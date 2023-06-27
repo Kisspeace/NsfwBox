@@ -13,26 +13,20 @@ type
     IHasTags, IHasArtists)
     protected
       FItem: TR34AppItem;
-      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TNBoxItemTagAr;
       function GetTagsCount: integer;
       function GetUidInt: int64;
-      //procedure SetUIdInt(const Value: int64);
       function GetCaption: string;
-      //procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
-      //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
       function GetArtists: TNBoxItemArtisAr;
     public
-      //--New--//
       property Item: TR34Appitem read FItem write FItem;
-      //--Properties--//
       property Origin;
-      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
-      [DISABLE] property ThumbnailUrl read GetThumbnailUrl; // write SetThumbnailUrl;
+      [DISABLE] property UIdInt: int64 read GetUidInt;
+      [DISABLE] property ThumbnailUrl read GetThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       [DISABLE] property TagsCount: integer read GetTagsCount;
       [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       procedure Assign(ASource: INBoxItem);                  override;
@@ -55,7 +49,8 @@ type
 
 implementation
 uses unit1;
-{ TNBoxR34XxxItem }
+
+{ TNBoxR34AppItem }
 
 procedure TNBoxR34AppItem.Assign(ASource: INBoxItem);
 begin
@@ -117,30 +112,7 @@ begin
   Result := Item.id;
 end;
 
-//procedure TNBoxR34AppItem.SetContentUrls(const Value: TArray<string>);
-//begin
-//  if length(Value) > 0 then
-//    Fitem.high_res_file.url := Value[0]
-//  else
-//    Fitem.high_res_file.url := '';
-//end;
-//
-//procedure TNBoxR34AppItem.SetTags(const Value: TArray<string>);
-//begin
-//  FItem.tags := Value;
-//end;
-//
-//procedure TNBoxR34AppItem.SetThumbnailUrl(const Value: string);
-//begin
-//  FItem.preview_file.url := Value;
-//end;
-//
-//procedure TNBoxR34AppItem.SetUIdInt(const Value: int64);
-//begin
-//  FItem.id := Value;
-//end;
-
-{ TNBoxSearchReqR34Xxx }
+{ TNBoxSearchReqR34App }
 
 function TNBoxSearchReqR34App.Clone: INBoxSearchRequest;
 begin

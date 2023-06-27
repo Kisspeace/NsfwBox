@@ -40,16 +40,15 @@ type
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      //--New--//
+      { new }
       property Item: TPartyPostPage read FItem write FItem;
       property Site: String read FSite write FSite;
-      //--Properties--//
       property Origin;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
       [DISABLE] property Artists: TNBoxItemArtisAr read GetArtists;
       property UIdInt: int64 read GetUidInt write FId;
-      [DISABLE] property Caption: string read GetCaption; // write SetCaption;
+      [DISABLE] property Caption: string read GetCaption;
       [DISABLE] property ContentFetched: boolean read GetContentFetched;
       constructor Create; override;
   end;

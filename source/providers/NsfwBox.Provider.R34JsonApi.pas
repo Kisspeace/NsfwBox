@@ -12,25 +12,20 @@ type
   TNBoxR34JsonApiItem = class(TNBoxItemBase, IUIdAsInt, IHasTags)
     protected
       FItem: TR34Item;
-      //procedure SetTags(const Value: TArray<string>);
       function GetTags: TNBoxItemTagAr;
       function GetUidInt: int64;
-      //procedure SetUIdInt(const Value: int64);
-      //procedure SetContentUrls(const Value: TArray<string>); override;
       function GetContentUrls: TArray<string>;               override;
-      //procedure SetThumbnailUrl(const Value: string);        override;
       function GetThumbnailUrl: string;                      override;
     public
       procedure Assign(ASource: INBoxItem);                  override;
       function Clone: INBoxItem;                             override;
-      //--New--//
+      { new }
       property Item: TR34item read FItem write FItem;
-      //--Properties--//
       property Origin;
-      [DISABLE] property UIdInt: int64 read GetUidInt; // write SetUidInt;
+      [DISABLE] property UIdInt: int64 read GetUidInt;
       [DISABLE] property ThumbnailUrl;
       [DISABLE] property ContentUrls;
-      [DISABLE] property Tags: TNBoxItemTagAr read GetTags; // write SetTags;
+      [DISABLE] property Tags: TNBoxItemTagAr read GetTags;
       constructor Create; override;
   end;
 
@@ -46,7 +41,7 @@ type
 
 implementation
 
-{ TNBoxR34XxxItem }
+{ TNBoxR34JsonApiItem }
 
 procedure TNBoxR34JsonApiItem.Assign(ASource: INBoxItem);
 begin
@@ -89,30 +84,7 @@ begin
   TryStrToInt64(Fitem.id, Result);
 end;
 
-//procedure TNBoxR34JsonApiItem.SetContentUrls(const Value: TArray<string>);
-//begin
-//  if length(Value) > 0 then
-//    Fitem.file_url := Value[0]
-//  else
-//    Fitem.file_url := '';
-//end;
-//
-//procedure TNBoxR34JsonApiItem.SetTags(const Value: TArray<string>);
-//begin
-//  FItem.tags := Value;
-//end;
-//
-//procedure TNBoxR34JsonApiItem.SetThumbnailUrl(const Value: string);
-//begin
-//  FItem.preview_url := Value;
-//end;
-
-//procedure TNBoxR34JsonApiItem.SetUIdInt(const Value: int64);
-//begin
-//  FItem.id := Value.ToString;
-//end;
-
-{ TNBoxSearchReqR34Xxx }
+{ TNBoxSearchReqR34JsonApi }
 
 function TNBoxSearchReqR34JsonApi.Clone: INBoxSearchRequest;
 begin

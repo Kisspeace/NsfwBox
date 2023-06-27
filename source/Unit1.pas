@@ -390,7 +390,7 @@ type
     procedure GotoDownloadsMenu;
     procedure GotoItemTagsMenu(ATags: TNBoxItemTagAr; AOrigin: integer);
     procedure GotoBookmarksMenu(ABookmarksDb: TNBoxBookmarksDb);
-    function GotoImageViewer(AImageUrl: string; AQuietFail: boolean = False): boolean; { FALS when cant show image by given URL }
+    function GotoImageViewer(AImageUrl: string; AQuietFail: boolean = False): boolean; { FALSE when cant show image by given URL }
     { -> Browsers ----------------- }
     procedure OnBrowserViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: Boolean);
     procedure OnBrowserSetWebClient(Sender: TObject; AWebClient: TNetHttpClient; AOrigin: integer);
@@ -2492,7 +2492,6 @@ begin
         Settings.DefaultBackupPath := TNBoxPath.GetDefaultBackupPath;
       SaveSettings;
     end;
-
   end;
 
   LoadStyle;
