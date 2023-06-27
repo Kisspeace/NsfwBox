@@ -1506,6 +1506,7 @@ var
   LBrowser: TNBoxBrowser;
   NewCount: integer;
   LReq: INBoxSearchRequest;
+  IsCurrentBrowser: boolean;
 begin
   LBrowser := ((Sender as TControl).Owner.Owner as TNBoxBrowser);
 
@@ -1520,14 +1521,19 @@ begin
   end;
 
   NewCount := Browsers.Count - 1;
+  IsCurrentBrowser := (CurrentBrowser = LBrowser);
 
-  if (CurrentBrowser = LBrowser) and (NewCount > 0) then
+  if IsCurrentBrowser and (NewCount > 0) then
   begin
     if (CurrentBrowser = Browsers.Last) then
       CurrentBrowser := Browsers.First
     else
       CurrentBrowser := Browsers.Last;
   end;
+
+  { Hide item menu }
+  if MenuItem.Visible and IsCurrentBrowser then
+    ChangeInterface(BrowserLayout);
 
   DeleteBrowser(LBrowser);
 end;
@@ -1569,6 +1575,10 @@ var
   end;
 
 begin
+  { Set CurrentItem to nil every time when user leave MenuItem }
+  if MenuItem.Visible and (ALayout <> MenuItem) then
+    CurrentItem := Nil;
+
   { Need to free bitmap on image viewer }
   if MenuImageViewer.Visible then
     Form1.ClearControlBitmap(ImageViewer);
