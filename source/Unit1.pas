@@ -1659,14 +1659,16 @@ begin
         BtnOpenAuthor.Visible  := Supports(Post, IHasArtists);
         BtnOpenRelated.Visible := ( Post is TNBoxNsfwXxxItem );
         BtnBrowse.Visible      := false;
+
       end else if CurrentItem.Bookmark.IsRequest then begin
         _SetVisible(ButtonsItemMenu, false);
         BtnBrowse.Visible      := true;
       end;
       BtnAddBookmark.Visible := true;
       BtnDeleteBookmark.Visible := CurrentItem.HasBookmark;
-
     end else begin
+      BtnOpenAuthor.Text.Text := 'Open artists';
+      BtnDownloadAll.Text.Text := 'Download content';
       _ChangeMenuMode(ButtonsItemMenu, DoWithAllItems);
     end;
     _ResetPos(ButtonsItemMenu);
@@ -3477,6 +3479,7 @@ const
 var
   I, Last: integer;
   LHasArtists: IHasArtists;
+  LFilesCount: integer;
 begin
   CurrentItem := AItem;
   if not Assigned(CurrentItem) then
@@ -3486,25 +3489,34 @@ begin
   ChangeInterface(MenuItem);
 
   BtnOpenAuthor.Text.Text := 'Open artists';
+  BtnDownloadAll.Text.Text := 'Download content';
 
-  if CurrentItem.HasPost
-  and Supports(CurrentItem.Post, IHasArtists, LHasArtists) then
+  if CurrentItem.HasPost then
   begin
-    var LArtists: TNBoxItemArtisAr := LHasArtists.Artists;
-    var LNames: string := '';
-    if Length(LArtists) > 0 then
+    if Supports(CurrentItem.Post, IHasArtists, LHasArtists) then
     begin
-      Last := Min(MAX_STRS_DISPLAY - 1, High(LArtists));
-      for I := 0 to Last do
+      var LArtists: TNBoxItemArtisAr := LHasArtists.Artists;
+      var LNames: string := '';
+      if Length(LArtists) > 0 then
       begin
-        LNames := LNames + LArtists[I].DisplayName;
-        if I <> Last then
-          LNames := LNames + ', ';
+        Last := Min(MAX_STRS_DISPLAY - 1, High(LArtists));
+        for I := 0 to Last do
+        begin
+          LNames := LNames + LArtists[I].DisplayName;
+          if I <> Last then
+            LNames := LNames + ', ';
+        end;
+        BtnOpenAuthor.Text.Text := BtnOpenAuthor.Text.Text + ': '
+          + '<font color="' + COLOR_TAG_ARTIST + '">'
+          + LNames + '</font>';
       end;
-      BtnOpenAuthor.Text.Text := BtnOpenAuthor.Text.Text + ': '
-        + '<font color="' + COLOR_TAG_ARTIST + '">'
-        + LNames + '</font>';
     end;
+
+    LFilesCount := CurrentItem.Post.ContentUrlCount;
+    if LFilesCount > 0 then
+      BtnDownloadAll.Text.Text := BtnDownloadAll.Text.Text + ' : '
+        + '<font color="' + COLOR_TAG_TOTAL_COUNT + '">'
+        + LFilesCount.ToString + '</font>';
   end;
 end;
 
