@@ -1937,6 +1937,7 @@ begin
   with Result do
   begin
     Edit.Margins.Top := 7;
+    Check.Check.Visible := False;
     case AStyle of
       EDIT_STYLE_INT: begin
         with Edit.Edit do
