@@ -21,7 +21,7 @@ uses
   system.NetEncoding, System.Net.URLClient, System.StartUpCopy,
   FMX.VirtualKeyboard, Fmx.Platform, SimpleClipboard,
   DbHelper, System.Generics.Collections, BooruScraper.Interfaces,
-  NinehentaiTo.APITypes, System.SyncObjs,
+  NinehentaiTo.APITypes, System.SyncObjs, System.Math,
   { Alcinoe ---------- }
   Alcinoe.FMX.Graphics, Alcinoe.FMX.Objects,
   { Kastri ----------- }
@@ -854,6 +854,7 @@ begin
     Tag := Ord(AAction);
     OnTap := BtnItemMenuOnTap;
     Result.TagString := ATag;
+    Text.TextIsHtml := True;
     ButtonsItemMenu.Add(Result);
   end;
 end;
@@ -3461,6 +3462,11 @@ begin
 end;
 
 procedure TForm1.GotoItemMenu(AItem: TNBoxCardBase);
+const
+  MAX_STRS_DISPLAY = 3;
+var
+  I, Last: integer;
+  LHasArtists: IHasArtists;
 begin
   CurrentItem := AItem;
   if not Assigned(CurrentItem) then
@@ -3468,6 +3474,28 @@ begin
 
   DoWithAllItems := false;
   ChangeInterface(MenuItem);
+
+  BtnOpenAuthor.Text.Text := 'Open artists';
+
+  if CurrentItem.HasPost
+  and Supports(CurrentItem.Post, IHasArtists, LHasArtists) then
+  begin
+    var LArtists: TNBoxItemArtisAr := LHasArtists.Artists;
+    var LNames: string := '';
+    if Length(LArtists) > 0 then
+    begin
+      Last := Min(MAX_STRS_DISPLAY - 1, High(LArtists));
+      for I := 0 to Last do
+      begin
+        LNames := LNames + LArtists[I].DisplayName;
+        if I <> Last then
+          LNames := LNames + ', ';
+      end;
+      BtnOpenAuthor.Text.Text := BtnOpenAuthor.Text.Text + ': '
+        + '<font color="' + COLOR_TAG_ARTIST + '">'
+        + LNames + '</font>';
+    end;
+  end;
 end;
 
 function ItemTagToCaption(ATag: INBoxItemTag): string;
