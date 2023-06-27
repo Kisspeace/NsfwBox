@@ -1714,12 +1714,15 @@ begin
 end;
 
 procedure TForm1.ContentFetcherOnFetched(Sender: TObject; var AItem: INBoxItem);
+var
+  IsCurrentItemForWait: boolean;
 begin
   try
     FetchedItemsCache.Save(AItem, True);
     FLock.BeginWrite;
     try
-      if AItem = FCurrentItemForWaitFetch then
+      IsCurrentItemForWait := (AItem = FCurrentItemForWaitFetch);
+      if IsCurrentItemForWait then
       begin
         FCurrentItemForWaitFetch := Nil;
         FCurrentItemForWaitFetchEvent.SetEvent;
@@ -1727,7 +1730,23 @@ begin
     finally
       FLock.EndWrite;
     end;
-    FreeInterfaced(AItem); { FIXME: Access violation! }
+
+    { Updating MenuItem }
+    var LItem: INBoxItem := AItem;
+    if IsCurrentItemForWait then
+      TThread.Synchronize(Nil,
+      procedure
+      begin
+        if MenuItem.Visible and Assigned(CurrentItem)
+        and CurrentItem.HasPost and SameId(CurrentItem.Post, LItem) then
+        begin
+          CurrentItem.Post.Assign(LItem);
+          GotoItemMenu(CurrentItem);
+        end;
+      end);
+    LItem := Nil;
+
+    FreeInterfaced(AItem);
   except
     On E: Exception do
       Log('ContentFetcherOnFetched', E);
