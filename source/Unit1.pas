@@ -1826,6 +1826,8 @@ begin
 
       BTN_STYLE_DEF2: begin
         AppStyle.CheckButtonSettings.Apply(Result);
+        Result.Check.Align := TAlignLayout.MostLeft;
+        Result.Padding.Left := 10;
       end;
     End;
 
