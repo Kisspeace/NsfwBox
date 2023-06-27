@@ -22,6 +22,7 @@ uses
   function CreateArtistReq(APost: INBoxItem; AArtist: INBoxItemArtist): INBoxSearchRequest;
   function CreateTagReq(AOrigin: integer; ATag: INBoxItemTag): INBoxSearchRequest;
   function OriginToStr(AOrigin: integer): string;
+  function SameId(AItem1, AItem2: INBoxItem): boolean;
 
 implementation
 
@@ -151,6 +152,21 @@ begin
     Result := LProvider.TitleName
   else
     Result := '';
+end;
+
+function SameId(AItem1, AItem2: INBoxItem): boolean;
+var
+  LUIdStr: IUidAsStr;
+  LUIdInt: IUidAsInt;
+begin
+  if TObject(AItem1).ClassType = TObject(AItem2).ClassType then
+  begin
+    if Supports(AItem1, IUidAsInt, LUidInt) then
+      Exit(LUIdInt.UIdInt = (AItem2 as IUIdAsInt).UIdInt)
+    else if Supports(AItem1, IUIdAsStr, LUIdStr) then
+      Exit(LUIdStr.UIdStr = (AItem2 as IUIdAsStr).UIdStr)
+  end else
+    Exit(False);
 end;
 
 end.
