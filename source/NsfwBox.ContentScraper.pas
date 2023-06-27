@@ -786,12 +786,8 @@ end;
 procedure TNBoxScraper.SyncWebClientSet(AClient: TNetHttpClient;
   AOrigin: integer);
 begin
-  if Not Assigned(Self.OnWebClientSet) then Exit;
-  TThread.Synchronize(TThread.Current,
-  procedure
-  begin
+  if Assigned(Self.OnWebClientSet) then
     OnWebClientSet(Self, AClient, AOrigin);
-  end);
 end;
 
 function TNBoxScraper.TryFetchAuthors(APost: INBoxItem): boolean;
