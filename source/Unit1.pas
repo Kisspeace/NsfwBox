@@ -2547,6 +2547,7 @@ begin
   FetchedItemsCache := TFetchedItemsCache.Create(Self);
   FetchedItemsCache.StoragePath := TNBoxPath.GetFetchedItemsCachePath;
   ContentFetcher := TNBoxFetchManager.Create;
+  ContentFetcher.OnWebClientSet := Self.OnBrowserSetWebClient;
   ContentFetcher.OnFetched := ContentFetcherOnFetched;
 
   DummyLoadingImage := FMX.Graphics.TBitmap.Create;
