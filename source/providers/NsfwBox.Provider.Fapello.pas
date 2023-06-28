@@ -7,7 +7,8 @@ interface
 uses
   System.SysUtils, System.Classes, XSuperObject,
   Fapello.Types, Fapello.Scraper,
-  NsfwBox.Interfaces, NsfwBox.Consts, NsfwBox.Utils;
+  NsfwBox.Interfaces, NsfwBox.Consts, NsfwBox.Utils,
+  NsfwBox.Logging;
 
 type
 
@@ -39,8 +40,8 @@ type
       function GetArtists: TNBoxItemArtisAr;
       function GetContentFetched: boolean;
     public
-      procedure Assign(ASource: INBoxItem);                  override;
-      function Clone: INBoxItem;                             override;
+      procedure Assign(ASource: INBoxItem);  override;
+      function Clone: INBoxItem; override;
       { new }
       property Kind: TFapelloItemKind read FKind write FKind;
       property FeedItem: TFapelloFeedItem read FFeedItem write FFeedItem;
@@ -58,9 +59,9 @@ type
     private
       FRequestKind: TFapelloItemKind;
     protected
-      function GetOrigin: integer;                        override;
+      function GetOrigin: integer; override;
     public
-      function Clone: INBoxSearchRequest;                 override;
+      function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
       property PageId;
@@ -74,10 +75,7 @@ implementation
 
 procedure TNBoxFapelloItem.Assign(ASource: INBoxItem);
 begin
-  inherited;
-  if (not (ASource is TNBoxFapelloItem) ) then
-    exit;
-
+  if not (ASource is Self.ClassType) then Exit;
   with ( ASource as TNBoxFapelloItem ) do begin
     Self.FKind := Kind;
     Self.FFeedItem := FeedItem;
@@ -104,7 +102,7 @@ end;
 
 function TNBoxFapelloItem.GetArtists: TNBoxItemArtisAr;
 begin
-  if ContentFetched then
+  if ContentFetched and (Kind = FlThumb) then
     Result := [TNBoxItemArtistFapello.Create(FFull.Author)]
   else
     Result := [TNBoxItemArtistFapello.Create(FFeedItem.Author)];
@@ -112,7 +110,10 @@ end;
 
 function TNBoxFapelloItem.GetContentFetched: boolean;
 begin
-  Result := Length(FFull.Thumbnails) > 0;
+  if Kind = FlThumb then
+    Result := Length(FFull.Thumbnails) > 0
+  else 
+    Result := TRUE; { Nothing to fetch for feed item. }
 end;
 
 function TNBoxFapelloItem.GetContentUrls: TArray<string>;

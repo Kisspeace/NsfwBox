@@ -68,8 +68,8 @@ type
 
     function GetContentMotherless(AList: INBoxHasOriginList; ARequest: string;
       APage: integer; AMediaType: TMotherlessMediaType; Asort: TMotherLessSort;
-
       ASize: TMotherlessMediaSize; AUploadDate: TMotherLessUploadDate): boolean;
+
     function GetContentFapello(AList: INBoxHasOriginList; ARequest: string;
       APageNum: integer; ASearchType: TFapelloItemKind): boolean;
 
@@ -143,10 +143,8 @@ procedure TNBoxScraper.FetchContentUrls(APost: INBoxItem);
 begin
   if (APost is TNBoxNsfwXxxItem) then
   begin
-    var
-      Client: TNsfwXxxScraper;
-    var
-      Item: TNBoxNsfwXxxItem;
+    var Client: TNsfwXxxScraper;
+    var Item: TNBoxNsfwXxxItem;
     Item := (APost as TNBoxNsfwXxxItem);
     Client := TNsfwXxxScraper.Create;
     SyncWebClientSet(Client.WebClient, APost.Origin);
@@ -159,10 +157,8 @@ begin
 
   else if (APost is TNBoxGmpClubItem) then
   begin
-    var
-      Client: TGmpClubScraper;
-    var
-      Item: TNBoxGmpClubItem;
+    var Client: TGmpClubScraper;
+    var Item: TNBoxGmpClubItem;
     Item := (APost as TNBoxGmpClubItem);
     Client := TGmpClubScraper.Create;
     SyncWebClientSet(Client.WebClient, APost.Origin);
@@ -175,10 +171,8 @@ begin
 
   else if (APost is TNBoxCoomerPartyItem) then
   begin
-    var
-      Client: TCoomerPartyScraper;
-    var
-      Item: TNBoxCoomerPartyItem;
+    var Client: TCoomerPartyScraper;
+    var Item: TNBoxCoomerPartyItem;
     Item := (APost as TNBoxCoomerPartyItem);
     Client := TCoomerPartyScraper.Create;
     Client.Host := Item.Site;
@@ -192,17 +186,13 @@ begin
 
   else if (APost is TNBoxMotherlessItem) then
   begin
-    var
-    LClient := TMotherlessScraper.Create;
-    var
-    LItem := (APost as TNBoxMotherlessItem);
+    var LClient := TMotherlessScraper.Create;
+    var LItem := (APost as TNBoxMotherlessItem);
     SyncWebClientSet(LClient.WebClient, APost.Origin);
     try
-      var
-        LPage: TMotherlessPostPage;
+      var LPage: TMotherlessPostPage;
       LPage := LClient.FetchFullPost(LItem.Page.Item.GetPageUrl);
-      var
-      LTmpItem := LItem.Page.Item;
+      var LTmpItem := LItem.Page.Item;
       LPage.Item := LTmpItem;
       LItem.Page := LPage;
     finally
@@ -212,16 +202,13 @@ begin
 
   else if (APost is TNBoxFapelloItem) then
   begin
-    var
-    LItem := (APost As TNBoxFapelloItem);
-    if LItem.Kind = FlFeed then
-      Exit;
-    var
-    LClient := TFapelloScraper.Create;
+    var LItem := (APost As TNBoxFapelloItem);
+    if LItem.Kind = FlFeed then Exit;
+
+    var LClient := TFapelloScraper.Create;
     SyncWebClientSet(LClient.Client, APost.Origin);
     try
-      var
-      LFull := LClient.GetFullContent(LItem.ThumbItem);
+      var LFull := LClient.GetFullContent(LItem.ThumbItem);
       LItem.Full := LFull;
     finally
       LClient.Free;
@@ -252,8 +239,7 @@ begin
     if Assigned(LClient) then
     begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.Origin);
-      var
-      LFull := LClient.GetPost(LItem.Full);
+      var LFull := LClient.GetPost(LItem.Full);
       LItem.MergeFull(LFull);
     end;
   end;

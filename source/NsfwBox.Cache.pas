@@ -6,7 +6,7 @@ uses
   System.Variants, System.Threading, System.IOUtils,
   System.Hash, System.Generics.Collections,
   YDW.Threading, NsfwBox.Logging, NsfwBox.Interfaces,
-  NsfwBox.Bookmarks, NsfwBox.Utils;
+  NsfwBox.Bookmarks, NsfwBox.Utils, NsfwBox.Provider.Fapello;
 
 type
 
@@ -135,7 +135,13 @@ begin
   if Supports(AKey, IUIdAsInt, LId) then
     Result := Result + '-id' + LId.UIdInt.ToString
   else if Supports(AKey, IUIdAsStr, LIdS) then
-    Result := Result + '-id' + LIdS.UIdStr;
+    Result := Result + '-id' + LIdS.UIdStr
+  else if (AKey is TNBoxFapelloItem) then
+  begin
+    var LKey: TNBoxFapelloItem := (AKey as TNBoxFapelloItem);
+    Result := Result + '-id'
+      + System.Hash.THashMD5.GetHashString(LKey.ThumbItem.FullPageUrl);
+  end;
 
   Result := TPath.ChangeExtension(Result, FILE_EXT);
   Result := TPath.Combine(FStoragePath, Result);

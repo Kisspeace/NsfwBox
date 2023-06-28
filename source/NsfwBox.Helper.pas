@@ -165,6 +165,12 @@ begin
       Exit(LUIdInt.UIdInt = (AItem2 as IUIdAsInt).UIdInt)
     else if Supports(AItem1, IUIdAsStr, LUIdStr) then
       Exit(LUIdStr.UIdStr = (AItem2 as IUIdAsStr).UIdStr)
+    else if (AItem1 is TNBoxFapelloItem) then
+    begin
+      var LItem1: TNBoxFapelloItem := (AItem1 as TNBoxFapelloItem);
+      var LItem2: TNBoxFapelloItem := (AItem2 as TNBoxFapelloItem);
+      Exit(LItem1.ThumbItem.FullPageUrl = LItem2.ThumbItem.FullPageUrl);
+    end;
   end else
     Exit(False);
 end;
