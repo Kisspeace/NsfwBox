@@ -234,6 +234,7 @@ begin
       PVR_BLEACHBOORU: LClient := BooruScraper.NewClientBleachbooru(True);
       PVR_ILLUSIONCARDS: LClient := BooruScraper.NewClientIllusioncards;
       PVR_HGOONBOORU: LClient := BooruScraper.NewClientHgoon;
+      PVR_E621: LClient := BooruScraper.NewClientE621;
     end;
 
     if Assigned(LClient) then
@@ -425,6 +426,12 @@ begin
       var LReq := (ARequest as TNBoxSearchReqBepisDb);
       LClient.SearchOptions := LReq.SearchOpt;
       Result := GetContentBooruScraper(LClient,
+        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
+    end;
+
+    PVR_E621:
+    begin
+      Result := GetContentBooruScraper(BooruScraper.NewClientE621,
         ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 

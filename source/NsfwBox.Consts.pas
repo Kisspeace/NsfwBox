@@ -33,6 +33,7 @@ const
   PVR_ILLUSIONCARDS     = 19;
   PVR_BEPISDB           = 20;
   PVR_HGOONBOORU        = 21;
+  PVR_E621              = 22;
 
 type
 
@@ -86,7 +87,8 @@ type
       FBleachbooru,
       FIllusioncards,
       FBepisDb,
-      FHgoonBooru
+      FHgoonBooru,
+      FE621
       : TNBoxProviderInfo;
     private
       function GetItem(I: Integer): TNBoxProviderInfo;
@@ -118,6 +120,7 @@ type
       property IllusionCards: TNBoxProviderInfo read FIllusioncards;
       property BepisDb: TNBoxProviderInfo read FBepisDb;
       property HGoonBooru: TNBoxProviderInfo read FHgoonBooru;
+      property E621: TNBoxProviderInfo read FE621;
       { ------------------------- }
       property Randomizer: TNBoxProviderInfo read FRandomizer;
       property Pseudo: TNBoxProviderInfo read FPseudo;
@@ -196,6 +199,7 @@ begin
   FIllusioncards := Add(PVR_ILLUSIONCARDS, 'illusioncards.booru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FBepisDb     := Add(PVR_BEPISDB, 'db.bepis.moe', 0, TNBoxSearchReqBepisDb, TNBoxBooruItemBase);
   FHGoonBooru  := Add(PVR_HGOONBOORU, 'hgoon.booru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
+  FE621        := Add(PVR_E621, 'e621.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
 
   FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
   FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);

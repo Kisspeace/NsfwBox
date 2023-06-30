@@ -241,9 +241,10 @@ end;
 
 function TNBoxGUIStyle.GetImagePath(AOrigin: integer): string;
 begin
-  if (AOrigin = PVR_BLEACHBOORU) then
-    AOrigin := PVR_DANBOORU;
-
+  case AOrigin of
+    PVR_BLEACHBOORU: AOrigin := PVR_DANBOORU;
+    PVR_E621: Exit('https://raw.githubusercontent.com/e621ng/e621ng/master/public/favicon-32x32.png');
+  end;
   Result := GetImagePath(ICON_ORIGIN_PREFIX + AOrigin.ToString + '.png');
 end;
 
