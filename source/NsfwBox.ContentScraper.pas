@@ -45,6 +45,7 @@ type
     FOnWebClientSet: TWebClientSetEvent;
     procedure SyncWebClientSet(AClient: TNetHttpClient; AOrigin: integer);
     procedure UploadItems(A: TNsfwXXXItemList; AList: INBoxHasOriginList);
+    function BooruClientById(AProviderId: integer): IBooruClient;
 
     function GetContentPseudo(AList: INBoxHasOriginList;
       ARequest: string): boolean;
@@ -120,6 +121,26 @@ implementation
 uses unit1;
 
 { TNBoxScraper }
+function TNBoxScraper.BooruClientById(AProviderId: integer): IBooruClient;
+begin
+  case AProviderId of
+    PVR_GELBOORU: Result := BooruScraper.NewClientGelbooru;
+    PVR_REALBOORU: Result := BooruScraper.NewClientRealbooru;
+    PVR_RULE34XXX: Result := BooruScraper.NewClientRule34xxx;
+    PVR_RULE34US: Result := BooruScraper.NewClientRule34us;
+    PVR_RULE34PAHEALNET: Result := BooruScraper.NewClientRule34PahealNet;
+    PVR_XBOORU: Result := BooruScraper.NewClientXbooru;
+    PVR_HYPNOHUBNET: Result := BooruScraper.NewClientHypnohubnet;
+    PVR_TBIB: Result := BooruScraper.NewClientTbib;
+    PVR_DANBOORU: Result := BooruScraper.NewClientDonmaiUs(True);
+    PVR_ALLTHEFALLEN: Result := BooruScraper.NewClientAllTheFallen(True);
+    PVR_BLEACHBOORU: Result := BooruScraper.NewClientBleachbooru(True);
+    PVR_ILLUSIONCARDS: Result := BooruScraper.NewClientIllusioncards;
+    PVR_HGOONBOORU: Result := BooruScraper.NewClientHgoon;
+    PVR_E621: Result := BooruScraper.NewClientE621;
+  end;
+end;
+
 constructor TNBoxScraper.Create;
 begin
   FOnWebClientSet := Nil;
@@ -220,23 +241,7 @@ begin
     var LItem := (APost as TNBoxBooruItemBase);
     var LClient: IBooruClient;
 
-    case APost.Origin of
-      PVR_GELBOORU: LClient := BooruScraper.NewClientGelbooru;
-      PVR_REALBOORU: LClient := BooruScraper.NewClientRealbooru;
-      PVR_RULE34XXX: LClient := BooruScraper.NewClientRule34xxx;
-      PVR_RULE34US: LClient := BooruScraper.NewClientRule34us;
-      PVR_RULE34PAHEALNET: LClient := BooruScraper.NewClientRule34PahealNet;
-      PVR_XBOORU: LClient := BooruScraper.NewClientXbooru;
-      PVR_HYPNOHUBNET: LClient := BooruScraper.NewClientHypnohubnet;
-      PVR_TBIB: LClient := BooruScraper.NewClientTbib;
-      PVR_DANBOORU: LClient := BooruScraper.NewClientDonmaiUs(True);
-      PVR_ALLTHEFALLEN: LClient := BooruScraper.NewClientAllTheFallen(True);
-      PVR_BLEACHBOORU: LClient := BooruScraper.NewClientBleachbooru(True);
-      PVR_ILLUSIONCARDS: LClient := BooruScraper.NewClientIllusioncards;
-      PVR_HGOONBOORU: LClient := BooruScraper.NewClientHgoon;
-      PVR_E621: LClient := BooruScraper.NewClientE621;
-    end;
-
+    LClient := BooruClientById(APost.Origin);
     if Assigned(LClient) then
     begin
       SyncWebClientSet(TBooruClientBase(LClient).Client, APost.Origin);
@@ -342,84 +347,6 @@ begin
       end;
     end;
 
-    PVR_GELBOORU:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientGelbooru,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_RULE34XXX:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientRule34xxx,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_REALBOORU:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientRealbooru,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_RULE34US:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientRule34us,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_RULE34PAHEALNET:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientRule34PahealNet,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_XBOORU:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientXbooru,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_HYPNOHUBNET:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientHypnohubnet,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_TBIB:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientTbib,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_DANBOORU:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientDonmaiUs(True),
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_ALLTHEFALLEN:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientAllTheFallen(True),
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_BLEACHBOORU:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientBleachbooru(True),
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_ILLUSIONCARDS:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientIllusioncards,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
-    PVR_HGOONBOORU:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientHgoon,
-        ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
-    end;
-
     PVR_BEPISDB:
     begin
       var LClient := BooruScraper.NewClientBepisDb As IBepisDbClient;
@@ -429,12 +356,10 @@ begin
         ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
 
-    PVR_E621:
-    begin
-      Result := GetContentBooruScraper(BooruScraper.NewClientE621,
+    else begin
+      Result := GetContentBooruScraper(BooruClientById(ARequest.Origin),
         ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
-
   end;
 end;
 
