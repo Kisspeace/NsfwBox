@@ -2138,14 +2138,20 @@ var
       end;
 
       if not LWaitItemAssigned then
-        LWaitItemAssigned := (FCurrentItemForWaitFetchEvent.WaitFor(1) = wrSignaled);
+        LWaitItemAssigned := (FCurrentItemForWaitFetchEvent.WaitFor(2) = wrSignaled);
 
       if LWaitItemAssigned then
       begin
-        if (FCurrentItemForWaitFetchEvent.WaitFor(3000) = wrSignaled) then
+        if (FCurrentItemForWaitFetchEvent.WaitFor(4000) = wrSignaled) then
           FetchedItemsCache.UpdateWithCached(LPost)
-        else
-          Showmessage('Waiting too long.');
+        else begin
+          {$IFDEF ANDROID}
+          ToastMessage('Waiting too long.', True);
+          {$ELSE}
+//          Showmessage('Waiting too long.');
+          {$ENDIF}
+          Exit;
+        end;
       end else
         {$IFDEF ANDROID}
         Form1.ToastMessage('Looks like nothing to fetch.', True);
