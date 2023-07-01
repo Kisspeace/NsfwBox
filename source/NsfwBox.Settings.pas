@@ -89,6 +89,7 @@ type
       {$ENDIF}
       FDownloadAllMode: TDownloadAllMode;
       FBookmarksOrder: TBookmarksOrderList;
+      FMaxTabsAtStartup: integer;
     private
       procedure SetF<T>(var AVariable: T; const ANewValue: T);
       procedure GetF<T>(var AVariable: T; out AOut: T);
@@ -178,6 +179,8 @@ type
       {$ENDIF}
       function GetAttribute(AName: string): variant;
       procedure SetAttribute(AName: string; const Value: variant);
+      function GetMaxTabsAtStartup: integer;
+      procedure SetMaxTabsAtStartup(const Value: integer);
     public
       property SemVer: TSemVer read GetSemVer write SetSemVer;
       property DefaultUseragent: string read GetDefaultUseragent write SetDefaultUseragent;
@@ -216,6 +219,7 @@ type
       property PlayExterWhenCantInter: boolean read GetPlayExterWhenCantInter write SetPlayExterWhenCantInter;
       property DefaultBackupPath: string read GetDefaultBackupPath write SetDefaultBackupPath;
       property DownloadAllMode: TDownloadAllMode read GetDownloadAllMode write SetDownloadAllMode;
+      property MaxTabsAtStartup: integer read GetMaxTabsAtStartup write SetMaxTabsAtStartup;
       {$IFDEF MSWINDOWS}
        property UseNewAppTitlebar: boolean read GetUseNewAppTitlebar write SetUseNewAppTitlebar;
        property ContentPlayApp: string read GetContentPlayApp write SetContentPlayApp;
@@ -318,6 +322,7 @@ begin
   FYDWSyncLoadFromFile := False;
   FBookmarksOrder := TBookmarksOrderList.Create;
   FDownloadAllMode := TDownloadAllMode.damHighResVersion;
+  FMaxTabsAtStartup := 100;
 end;
 
 destructor TNsfwBoxSettings.Destroy;
@@ -511,6 +516,11 @@ end;
 function TNsfwBoxSettings.GetMaxDownloadThreads: integer;
 begin
   GetF<integer>(FMaxDownloadThreads, Result);
+end;
+
+function TNsfwBoxSettings.GetMaxTabsAtStartup: integer;
+begin
+  GetF<integer>(FMaxTabsAtStartup, Result);
 end;
 
 function TNsfwBoxSettings.GetPlayExterWhenCantInter: boolean;
@@ -750,6 +760,11 @@ end;
 procedure TNsfwBoxSettings.SetMaxDownloadThreads(const Value: integer);
 begin
   SetF<integer>(FMaxDownloadThreads, Value);
+end;
+
+procedure TNsfwBoxSettings.SetMaxTabsAtStartup(const Value: integer);
+begin
+  SetF<integer>(FMaxTabsAtStartup, Value);
 end;
 
 procedure TNsfwBoxSettings.SetPlayExterWhenCantInter(const Value: boolean);

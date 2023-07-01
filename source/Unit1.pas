@@ -2518,6 +2518,8 @@ begin
 
       if (Settings.SemVer < TSemVer.Create(3, 0, 0)) then
         Settings.DefaultBackupPath := TNBoxPath.GetDefaultBackupPath;
+      if (Settings.SemVer < TSemVer.Create(3, 2, 0)) then
+        Settings.MaxTabsAtStartup := 100;
       SaveSettings;
     end;
   end;
@@ -2826,6 +2828,7 @@ begin
   CheckSetAutoAcceptAllCertificates := AddSettingsCheck('Accept all SSL\TLS certificates', 'AutoAcceptAllCertificates'); { issues on ANDROID }
   CheckSetEnableAllContent    := AddSettingsCheck('Enable all content (Gelbooru)', 'EnableAllContent');
   CheckSetAutoSaveSession     := AddSettingsCheck('Auto save session', 'AutoSaveSession');
+  AddSettingsEdit('Max tabs count at startup', 'MaxTabsAtStartup', '', EDIT_STYLE_INT);
   CheckSetSaveSearchHistory   := AddSettingsCheck('Save search history', 'SaveSearchHistory');
   CheckSetSaveDownloadHistory := AddSettingsCheck('Save download history', 'SaveDownloadHistory');
   CheckSetSaveTapHistory      := AddSettingsCheck('Save tap history', 'SaveTapHistory');
@@ -4146,9 +4149,13 @@ var
   LBookmarks: TBookmarkAr;
   LBookmark: TNBoxBookmark;
   I: integer;
+  LPage: integer;
+  LTab: TNBoxTab;
+  LHitLimit: boolean;
 begin
-  Result := false;
-  NowLoadingSession := true;
+  Result := False;
+  LHitLimit := False;
+  NowLoadingSession := True;
   try
     try
       Groups := Session.GetBookmarksGroups;
@@ -4156,43 +4163,55 @@ begin
         exit;
 
       Group := Groups[0];
-      LBookmarks := Group.GetPage;
-      for I := High(LBookmarks) Downto Low(LBookmarks) do
-      begin
-        LBookmark := LBookmarks[I];
+      LPage := Group.GetMaxPage;
+      if LPage = 0 then Exit;
+      repeat
+        LBookmarks := Group.GetPage(LPage);
+        if (not Result) and (Length(LBookmarks) > 0) then
+          Result := True;
 
-        if not ( LBookmark.BookmarkType = SearchRequest ) then
-          continue;
+        for I := High(LBookmarks) downto Low(LBookmarks) do
+        begin
+          if Tabs.Count >= Settings.MaxTabsAtStartup then
+          begin
+            LHitLimit := True;
+            Break;
+          end;
 
-        try
+          LBookmark := LBookmarks[I];
+          if not (LBookmark.BookmarkType = SearchRequest) then
+            continue;
+
           var LReq := LBookmark.AsRequest;
-          AddBrowser(LReq);
+          LTab := AddBrowser(LReq);
           Browsers.Last.Tag := LBookmark.Id;
-          LReq := Nil;
-        except
-          On E: Exception do Log('LoadSession addBrowser', E);
-        end;
 
-        try
+          LReq := Nil;
           LBookmarks[I] := Nil;
           LBookmark.FreeObj;
           FreeAndNil(LBookmark);
-        except
-          On E: Exception do Log('LoadSession free item', E);
         end;
+        Dec(LPage);
+      until (LPage <= 0) or (LHitLimit);
 
+      { Free garbage }
+      if LHitLimit then
+      begin
+        For I := I downto Low(LBookmarks) do
+        begin
+          LBookmarks[I].FreeObj;
+          FreeAndNil(LBookmarks[I]);
+        end;
       end;
 
-      if Length(LBookmarks) > 0 then
-        Result := true;
     except
       On E: Exception do begin
         Log('LoadSession', E);
-        Result := false;
+        Result := False;
       end;
     end;
   finally
-    NowLoadingSession := false;
+    NowLoadingSession := False;
   end;
 end;
 
