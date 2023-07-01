@@ -438,7 +438,7 @@ type
     function AddDownload(AUrl, AFullFilename: string): TNBoxTab; overload;
     { ----------------------------- }
     function AddSettingsCheck(ACaption, AAttrName: string; AText: string = ''): TNBoxSettingsCheck;
-    function AddSettingsEdit(ACaption: string; AText: string = ''; AStyle: integer = 0): TNBoxSettingsEdit;
+    function AddSettingsEdit(ACaption, AAttrName: string; AText: string = ''; AStyle: integer = 0): TNBoxSettingsEdit;
     function AddSettingsButtonC(AText: string; AImageName: string; AImageClass: TControlClass): TRectButton;
     function AddSettingsButton(AText: string; AImageName: string = ''): TRectButton;
     function AddBMarksDoListButton(AText: string; AImageName: string = ''; AOnTap: TTapEvent = nil; ATag: string = ''): TRectButton;
@@ -930,13 +930,14 @@ begin
   Result.TagString := AAttrName;
 end;
 
-function TForm1.AddSettingsEdit(ACaption, AText: string; AStyle: integer): TNBoxSettingsEdit;
+function TForm1.AddSettingsEdit(ACaption, AAttrName, AText: string; AStyle: integer): TNBoxSettingsEdit;
 begin
   Result := CreateDefSettingsEdit(MenuSettings, AStyle);
   _SetDefSettingsCheck(Result, ACaption, AText);
   with Result do begin
     Edit.Edit.TextPrompt := ACaption;
     Height := Height * 1.8;
+    TagString := AAttrName;
   end;
 end;
 
@@ -2844,18 +2845,18 @@ begin
   CheckSetFetchAllBeforeAddBookmark := AddSettingsCheck('Fetch data before add to bookmarks', 'FetchAllBeforeAddBookmark', 'Not work in bulk mode.');
   CheckSetShowScrollBars      := AddSettingsCheck('Show scrollbars', 'ShowScrollBars');
   CheckSetShowNavigateBackButton := AddSettingsCheck('Show navigate back button', 'ShowNavigateBackButton');
-  EditSetDefUseragent         := AddSettingsEdit('Default Useragent string');
-  EditSetDefDownloadPath      := AddSettingsEdit('Default downloads path');
-  EditSetMaxDownloadThreads   := AddSettingsEdit('Max download threads count', '', EDIT_STYLE_INT);
-  EditSetThreadsCount         := AddSettingsEdit('Threads count', '', EDIT_STYLE_INT);
-  EditSetLayoutsCount         := AddSettingsEdit('Content layouts count', '', EDIT_STYLE_INT);
-  EditSetItemIndent           := AddSettingsEdit('Items indent', '', EDIT_STYLE_INT);
-  EditSetFilenameLogUrls      := AddSettingsEdit('Urls log filename');
+  EditSetDefUseragent         := AddSettingsEdit('Default Useragent string', 'DefaultUseragent');
+  EditSetDefDownloadPath      := AddSettingsEdit('Default downloads path', 'DefDownloadPath');
+  EditSetMaxDownloadThreads   := AddSettingsEdit('Max download threads count', 'MaxDownloadThreads', '', EDIT_STYLE_INT);
+  EditSetThreadsCount         := AddSettingsEdit('Threads count', 'ThreadsCount', '', EDIT_STYLE_INT);
+  EditSetLayoutsCount         := AddSettingsEdit('Content layouts count', 'ContentLayoutsCount', '', EDIT_STYLE_INT);
+  EditSetItemIndent           := AddSettingsEdit('Items indent', 'ItemIndent', '', EDIT_STYLE_INT);
+  EditSetFilenameLogUrls      := AddSettingsEdit('Urls log filename', 'FilenameLogUrls');
   {$IFDEF MSWINDOWS}
-  EditSetPlayApp              := AddSettingsEdit('Player application path');
-  EditSetPlayParams           := AddSettingsEdit('Player params', FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.');
+  EditSetPlayApp              := AddSettingsEdit('Player application path', 'ContentPlayApp');
+  EditSetPlayParams           := AddSettingsEdit('Player params', 'ContentPlayParams', FORMAT_VAR_CONTENT_URL + ' - being replaced with URL.');
   {$ENDIF}
-  EditSetDefBackupPath        := AddSettingsEdit('Default backup import \ export path');
+  EditSetDefBackupPath        := AddSettingsEdit('Default backup import \ export path', 'DefaultBackupPath');
   CheckSetDevMode             := AddSettingsCheck('Developer mode', 'DevMode');
   CheckSetAutoCheckUpdates    := AddSettingsCheck('Auto check updates', 'AutoCheckUpdates');
 
@@ -4706,40 +4707,37 @@ end;
 procedure TForm1.SaveSettingsChanges;
 var
   NewSet: TNsfwBoxSettings;
-  tmp: integer;
+  I: integer;
+
+  function ValidateInt(ASetEdit: TNBoxSettingsEdit; ADefaultValue: integer): Integer;
+  begin
+    if not TryStrToInt(ASetEdit.Edit.Edit.Text, Result) then
+      ASetEdit.Edit.Edit.Text := ADefaultValue.ToString;
+  end;
+
 begin
   NewSet := TNsfwBoxSettings.Create;
   with NewSet do begin
     Assign(FSettings);
-    DefaultUseragent := EditSetDefUseragent.Edit.Edit.Text;
-    DefDownloadPath  := EditSetDefDownloadPath.Edit.Edit.Text;
-    FilenameLogurls  := EditSetFilenameLogUrls.Edit.Edit.Text;
-    DefaultBackupPath := EditSetDefBackupPath.Edit.Edit.Text;
 
-    if trystrtoint(self.EditSetThreadsCount.Edit.Edit.Text, tmp) then
-      ThreadsCount := tmp
-    else
-      ThreadsCount := 6;
+    ValidateInt(EditSetThreadsCount, 6);
+    ValidateInt(EditSetLayoutsCount, 2);
+    ValidateInt(EditSetItemIndent, 2);
+    ValidateInt(EditSetMaxDownloadThreads, 2);
 
-    if tryStrtoint(Self.EditSetLayoutsCount.Edit.Edit.Text, tmp) then
-      ContentLayoutsCount := tmp
-    else
-      ContentLayoutsCount := 2;
-
-    if tryStrToInt(Self.EditSetItemIndent.Edit.Edit.Text, tmp) then
-      ItemIndent := tmp
-    else
-      ItemIndent := 2;
-
-    if tryStrtoint(Self.EditSetMaxDownloadThreads.Edit.Edit.Text, tmp) then
-      MaxDownloadThreads := tmp
-    else
-      MaxDownloadThreads := 2;
+    var LControls := Form1.MenuSettings.Content.Controls;
+    for I := 0 to LControls.Count - 1 do
+    begin
+      if LControls[I] is TNBoxSettingsEdit then
+      begin { update edit }
+        var LControl: TNBoxSettingsEdit := LControls[I] as TNBoxSettingsEdit;
+        NewSet.Attributes[LControl.TagString] := LControl.Edit.Edit.Text;
+      end;
+    end;
 
     DownloadManager.ThreadsCount := MaxDownloadThreads;
     IWUContentManager.EnableSaveToCache := ImageCacheSave;
     IWUContentManager.EnableLoadFromCache := ImageCacheLoad;
-
     BrowsersIWUContentManager.EnableSaveToCache := ImageCacheSave;
     BrowsersIWUContentManager.EnableLoadFromCache := ImageCacheLoad;
 
@@ -4868,13 +4866,7 @@ begin
   if not FFormCreated then Exit;
 
   BrowsersIWUContentManager.ThreadsCount := Settings.ThreadsCount;
-  EditSetDefUseragent.Edit.Edit.Text    := Settings.DefaultUseragent;
-  EditSetDefDownloadPath.Edit.Edit.Text := Settings.DefDownloadPath;
-  EditSetThreadsCount.Edit.Edit.Text    := Settings.ThreadsCount.ToString;
-  EditSetLayoutsCount.Edit.Edit.Text    := Settings.ContentLayoutsCount.ToString;
-  EditSetItemIndent.Edit.Edit.Text      := Settings.ItemIndent.ToString;
-  EditSetFilenameLogUrls.Edit.Edit.Text := Settings.FilenameLogUrls;
-  CheckSetFullscreen.IsChecked          := settings.Fullscreen;
+  DownloadManager.ThreadsCount  := Settings.MaxDownloadThreads;
 
   if AppFullscreen <> FSettings.Fullscreen then
     AppFullScreen := FSettings.Fullscreen;
@@ -4883,23 +4875,23 @@ begin
   var LSettingsCheck: TNBoxSettingsCheck;
   for I := 0 to LControls.Count - 1 do
   begin
-    if LControls[I] is TNBoxSettingsCheck then
-    begin { update every checkbox }
-      LSettingsCheck := TNBoxSettingsCheck(LControls[I]);
+    var LControl := LControls[I];
+    if LControl is TNBoxSettingsEdit then
+    begin { update edit }
+      with LControl as TNBoxSettingsEdit do
+        Edit.Edit.Text := VarToStr(Settings.Attributes[LControl.TagString]);
+    end
+
+    else if LControl is TNBoxSettingsCheck then
+    begin { update checkbox }
+      LSettingsCheck := TNBoxSettingsCheck(LControl);
       LSettingsCheck.Check.IsChecked := Settings.Attributes[LSettingsCheck.TagString];
     end;
   end;
 
-  EditSetMaxDownloadThreads.Edit.Edit.Text := Settings.MaxDownloadThreads.ToString;
-  DownloadManager.ThreadsCount        := Settings.MaxDownloadThreads;
-
-  {$IFDEF MSWINDOWS}
-  EditSetPlayParams.Edit.Edit.Text      := Settings.ContentPlayParams;
-  EditSetPlayApp.Edit.Edit.Text         := Settings.ContentPlayApp;
-  {$ENDIF}
-  EditSetDefBackupPath.Edit.Edit.Text   := Settings.DefaultBackupPath;
-
   if Settings.DevMode then NsfwBox.Tests.Init;
+  for I := 0 to MenuTestButtons.Count - 1 do
+    MenuTestButtons[I].Visible := Settings.DevMode;
 
   With SearchMenu.OriginSetMenu do
   begin
@@ -4908,9 +4900,6 @@ begin
     LBtn := Menu.GetControlByValue(PROVIDERS.Bookmarks.id);
     if Assigned(LBtn) then LBtn.Visible := Settings.DevMode;
   end;
-
-  for I := 0 to MenuTestButtons.Count - 1 do
-    MenuTestButtons[I].Visible := Settings.DevMode;
 
   for I := 0 to Browsers.Count - 1 do
   begin

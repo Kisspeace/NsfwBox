@@ -5,7 +5,8 @@ unit NsfwBox.Settings;
 interface
 uses
   Classes, System.SysUtils, XSuperObject, system.Generics.Collections,
-  NsfwBox.UpdateChecker, NsfwBox.Logging, NsfwBox.Utils, System.Rtti;
+  NsfwBox.UpdateChecker, NsfwBox.Logging, NsfwBox.Utils, System.Rtti,
+  System.Variants;
 
 Const
 
@@ -602,6 +603,7 @@ var
   Context: TRttiContext;
   Instance: TRttiInstanceType;
   LProperty: TRttiProperty;
+  LValue: TValue;
 begin
   Context := TRttiContext.Create;
   try
@@ -609,7 +611,20 @@ begin
     LProperty := Instance.GetProperty(AName);
     if Assigned(LProperty) then
     begin
-      LProperty.SetValue(Self, TValue.FromVariant(Value));
+      case LProperty.PropertyType.TypeKind of
+        tkInteger:
+        begin
+          LValue := TValue.From<Integer>(StrToInt(VarToStr(Value)))
+        end;
+
+        tkFloat:
+        begin
+          LValue := TValue.From<Extended>(StrToFloat(VarToStr(Value)))
+        end;
+
+        else LValue := TValue.FromVariant(Value);
+      end;
+      LProperty.SetValue(Self, LValue);
     end;
   finally
     Context.Free;
