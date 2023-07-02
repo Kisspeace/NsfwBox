@@ -334,7 +334,6 @@ type
     procedure BtnSetChangeDownloadAllModeOnTap(Sender: TObject; const Point: TPointF);
     procedure BtnSetSaveOnItemTapOnTap(Sender: TObject; const Point: TPointF);
     procedure SettingsCheckOnTap(Sender: TObject; const Point: TPointF);
-    procedure CardOnTap(Sender: TObject; const Point: TPointF);
     procedure IconOnResize(Sender: TObject);
     procedure BookmarksControlOnTap(Sender: TObject; const Point: TPointF);
     procedure MenuChangeThemeOnSelected(Sender: TObject);
@@ -404,6 +403,8 @@ type
     procedure OnNewItem(Sender: TObject; var AItem: TNBoxCardBase);
     procedure OnSimpleCardResize(Sender: TObject);
     procedure OnCardAutoLook(Sender: TObject);
+    procedure CardOnTap(Sender: TObject; const Point: TPointF);
+    procedure CardOnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     { ----------------------------- }
     procedure SaveSettings;
     procedure SaveSettingsChanges;
@@ -4054,6 +4055,7 @@ begin
   with AItem do begin
     OnTap := CardOnTap;
     OnAutoLook := OnCardAutoLook;
+    OnMouseDown := CardOnMouseDown;
     AppStyle.ItemCard.Apply(AItem);
 
     if AItem is TNBoxCardSimple then
@@ -4108,21 +4110,37 @@ begin
   end;
 end;
 
+procedure DefaultAfterClick(ACard: TNBoxCardBase);
+begin
+  if ACard.HasPost then
+  begin
+    Form1.CurrentItemForWaitFetch := Form1.FetchContent(ACard.Post);
+    if Form1.Settings.SaveTapHistory then
+      HistoryDb.TapGroup.Add(ACard.Post);
+  end;
+end;
+
+procedure TForm1.CardOnMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single);
+var
+  LItem: TNBoxCardBase;
+begin
+  if Button = TMouseButton.mbRight then
+  begin
+    LItem := Sender as TNBoxCardBase;
+    DefaultAfterClick(LItem);
+    ExecItemInteraction(LItem, ACTION_OPEN_MENU);
+  end;
+end;
+
 procedure TForm1.CardOnTap(Sender: TObject; const Point: TPointF);
 var
   I: integer;
   Item: TNBoxCardBase;
   Interactions: TArray<NativeInt>;
 begin
-  Item := ( Sender as TNBoxCardBase );
-
-  if Item.HasPost then
-  begin
-    CurrentItemForWaitFetch := FetchContent(Item.Post);
-    if Settings.SaveTapHistory then
-      HistoryDb.TapGroup.Add(Item.Post);
-  end;
-
+  Item := (Sender as TNBoxCardBase);
+  DefaultAfterClick(Item);
   Interactions := Settings.ItemInteractions;
   for I := 0 to High(Interactions) do
   begin
