@@ -49,6 +49,7 @@ Developed on RAD Studio 11 Alexandria.
 * <img src="assets/themes/default/content-origin-21.png" width="24" align="left">[hgoon.booru.org](https://hgoon.booru.org)
 * <img src="assets/themes/default/content-origin-19.png" width="24" align="left">[illusioncards.booru.org](https://illusioncards.booru.org)
 * <img src="assets/themes/default/content-origin-20.png" width="24" align="left">[db.bepis.moe](https://db.bepis.moe/)
+* <img src="https://github.com/e621ng/e621ng/blob/master/public/favicon-32x32.png" width="24" align="left">[e621.net](https://e621.net)
 <!-- * <img src="assets/themes/default/" width="24" align="left">[]() -->
 
 <details>
@@ -76,6 +77,6 @@ Developed on RAD Studio 11 Alexandria.
    
 
 ### Download last release:
-[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox.v3.1.0.apk)  
-[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins32.v3.1.0.exe)  
-[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins64.v3.1.0.exe)  
+[![download](https://img.shields.io/badge/Android_(64--bit)-1A2541?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox.v3.2.0.apk)  
+[![download](https://img.shields.io/badge/Windows_(32--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins32.v3.2.0.exe)  
+[![download](https://img.shields.io/badge/Windows_(64--bit)-1A2541?style=for-the-badge&logo=windows)](https://github.com/Kisspeace/NsfwBox/releases/latest/download/Kisspeace.NsfwBox-ins64.v3.2.0.exe)  
