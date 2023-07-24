@@ -216,10 +216,10 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=3.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=3.3.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.3.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -227,9 +227,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=3.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=3.3.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.3.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
-        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -239,14 +239,14 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
-        <VerInfo_Build>13</VerInfo_Build>
+        <VerInfo_Build>15</VerInfo_Build>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <AUP_READ_PHONE_STATE>false</AUP_READ_PHONE_STATE>
         <AUP_CAMERA>false</AUP_CAMERA>
         <AUP_CALL_PHONE>false</AUP_CALL_PHONE>
         <AUP_ACCESS_FINE_LOCATION>false</AUP_ACCESS_FINE_LOCATION>
         <AUP_ACCESS_COARSE_LOCATION>false</AUP_ACCESS_COARSE_LOCATION>
-        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=13;versionName=3.1.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=15;versionName=3.3.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <Android_LauncherIcon36>assets\android-icons\nsfwbox36.png</Android_LauncherIcon36>
         <Android_LauncherIcon48>assets\android-icons\nsfwbox48.png</Android_LauncherIcon48>
         <Android_LauncherIcon72>assets\android-icons\nsfwbox72.png</Android_LauncherIcon72>
@@ -255,7 +255,7 @@
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
-        <VerInfo_Build>14</VerInfo_Build>
+        <VerInfo_Build>15</VerInfo_Build>
         <AUP_READ_PHONE_STATE>false</AUP_READ_PHONE_STATE>
         <AUP_CALL_PHONE>false</AUP_CALL_PHONE>
         <AUP_CAMERA>false</AUP_CAMERA>
@@ -268,7 +268,7 @@
         <Android_LauncherIcon144>assets\android-icons\nsfwbox144.png</Android_LauncherIcon144>
         <Android_LauncherIcon192>assets\android-icons\nsfwbox192.png</Android_LauncherIcon192>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
-        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=14;versionName=3.2.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=delphi.Kisspeace.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=15;versionName=3.3.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <Android_SplashTileMode>disabled</Android_SplashTileMode>
     </PropertyGroup>
@@ -277,12 +277,12 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=Kisspeace.$(MSBuildProjectName);FileVersion=3.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=Kisspeace.$(MSBuildProjectName);FileVersion=3.3.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.3.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -292,8 +292,8 @@
         <Icon_MainIcon>assets\Kisspeace-NsfwBox-icon.ico</Icon_MainIcon>
         <DCC_Define>YDW_DEBUG;$(DCC_Define)</DCC_Define>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
-        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=3.2.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.2.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=https://github.com/Kisspeace;FileDescription=$(MSBuildProjectName);FileVersion=3.3.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=NsfwBox.exe;ProgramID=delphi.Kisspeace.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.3.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -374,21 +374,20 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>video.png</RemoteName>
+                <DeployFile LocalName="assets\android-icons\nsfwbox96.png" Configuration="Release" Class="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteName>ic_launcher.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\content-origin-3.png" Configuration="Debug" Class="File">
+                <DeployFile LocalName="assets\themes\default\content-origin-3.png" Configuration="Release" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>content-origin-3.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\content-origin-3.png" Configuration="Release" Class="File">
+                <DeployFile LocalName="assets\themes\default\content-origin-3.png" Configuration="Debug" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>content-origin-3.png</RemoteName>
@@ -447,13 +446,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\content-origin-4.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>content-origin-4.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640">
                     <Platform Name="Android64">
                         <Enabled>false</Enabled>
@@ -465,6 +457,13 @@
                     <Platform Name="Android64">
                         <Enabled>false</Enabled>
                         <RemoteName>splash_image.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\themes\default\content-origin-4.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>content-origin-4.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1646,16 +1645,17 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Release" Class="File">
+                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Debug" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>video.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\android-icons\nsfwbox96.png" Configuration="Release" Class="Android_LauncherIcon96">
-                    <Platform Name="Android">
-                        <RemoteName>ic_launcher.png</RemoteName>
+                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>video.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -2462,8 +2462,8 @@
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
