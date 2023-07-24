@@ -1583,7 +1583,10 @@ begin
 
   { Need to free bitmap on image viewer }
   if MenuImageViewer.Visible then
+  begin
+    ImageViewer.AbortLoading;
     Form1.ClearControlBitmap(ImageViewer);
+  end;
 
   { Clear lines from log memo when user go away }
   if MenuLog.Visible then
