@@ -268,7 +268,7 @@ begin
 
   case ARequest.Origin of
 
-    ORIGIN_NSFWXXX:
+    PVR_NSFWXXX:
     begin
       with (ARequest As TNBoxSearchReqNsfwXxx) do
       begin
@@ -277,13 +277,13 @@ begin
       end;
     end;
 
-    ORIGIN_R34JSONAPI:
+    PVR_R34JSONAPI:
     begin
       Result := GetContentR34JsonApi(AList, ARequest.Request,
         ARequest.Pageid);
     end;
 
-    ORIGIN_GIVEMEPORNCLUB:
+    PVR_GIVEMEPORNCLUB:
     begin
       with (ARequest As TNBoxSearchReqGmpClub) do
       begin
@@ -291,7 +291,7 @@ begin
       end;
     end;
 
-    ORIGIN_9HENTAITO:
+    PVR_9HENTAITO:
     begin
       with (ARequest As TNBoxSearchReq9Hentaito) do
       begin
@@ -299,7 +299,7 @@ begin
       end;
     end;
 
-    ORIGIN_COOMERPARTY:
+    PVR_COOMERPARTY:
     begin
       with (ARequest As TNBoxSearchReqCoomerParty) do
       begin
@@ -308,7 +308,7 @@ begin
       end;
     end;
 
-    ORIGIN_MOTHERLESS:
+    PVR_MOTHERLESS:
     begin
       with (ARequest As TNBoxSearchReqMotherless) do
       begin
@@ -317,12 +317,12 @@ begin
       end;
     end;
 
-    ORIGIN_PSEUDO:
+    PVR_PSEUDO:
     begin
       Result := GetContentPseudo(AList, ARequest.Request);
     end;
 
-    ORIGIN_BOOKMARKS:
+    PVR_BOOKMARKS:
     begin
       with (ARequest As TNBoxSearchReqBookmarks) do
       begin
@@ -331,7 +331,7 @@ begin
       end;
     end;
 
-    ORIGIN_RANDOMIZER:
+    PVR_RANDOMIZER:
     begin
       with (ARequest as TNBoxSearchReqRandomizer) do
       begin
@@ -373,7 +373,7 @@ begin
   Result := false;
   Client := T9HentaiClient.Create;
   try
-    SyncWebClientSet(Client.WebClient, ORIGIN_9HENTAITO);
+    SyncWebClientSet(Client.WebClient, PVR_9HENTAITO);
     Content := Client.GetBook(ASearch);
     Result := (length(Content) > 0);
     for i := 0 to high(Content) do
@@ -399,7 +399,7 @@ begin
   Result := false;
   Client := TGmpClubScraper.Create;
   try
-    SyncWebClientSet(Client.WebClient, ORIGIN_GIVEMEPORNCLUB);
+    SyncWebClientSet(Client.WebClient, PVR_GIVEMEPORNCLUB);
     case ASearchType of
       TGmpClubSearchType.Empty:
           Content := Client.GetItems(APageNum);
@@ -436,7 +436,7 @@ begin
   Result := false;
   LClient := TMotherlessScraper.Create;
   try
-    SyncWebClientSet(LClient.WebClient, ORIGIN_MOTHERLESS);
+    SyncWebClientSet(LClient.WebClient, PVR_MOTHERLESS);
     LContent := LClient.Search(ARequest, APage, AMediaType, Asort, ASize,
       AUploadDate);
     Result := (length(LContent) > 0);
@@ -522,7 +522,7 @@ begin
   Client := TCoomerPartyScraper.Create;
   Client.Host := ASite;
   try
-    SyncWebClientSet(Client.Client, ORIGIN_COOMERPARTY);
+    SyncWebClientSet(Client.Client, PVR_COOMERPARTY);
     if (Trim(AUserId).IsEmpty or Trim(AService).IsEmpty) then
     begin
       // Search by recent posts
@@ -626,7 +626,7 @@ begin
   Client := TR34Client.Create;
   Content := nil;
   try
-    SyncWebClientSet(Client.WebClient, ORIGIN_R34JSONAPI);
+    SyncWebClientSet(Client.WebClient, PVR_R34JSONAPI);
     Content := Client.GetPosts(ATags, APageId, ALimit);
     Result := (length(Content) > 0);
 
@@ -746,7 +746,7 @@ begin
   Client.Host := TNsfwXxxSiteToUrl(ASite);
   Content := TNsfwXXXItemList.Create;
   try
-    SyncWebClientSet(Client.WebClient, ORIGIN_NSFWXXX);
+    SyncWebClientSet(Client.WebClient, PVR_NSFWXXX);
     Result := Client.GetItems(Content, AReqParam, ASearchType, APageNum, Asort,
       ATypes, AOrientations);
     UploadItems(Content, AList);

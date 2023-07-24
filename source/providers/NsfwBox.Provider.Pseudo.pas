@@ -66,7 +66,7 @@ end;
 constructor TNBoxPseudoItem.Create;
 begin
   Inherited;
-  FOrigin := ORIGIN_PSEUDO;
+  FOrigin := PVR_PSEUDO;
 end;
 
 function TNBoxPseudoItem.GetCaption: string;

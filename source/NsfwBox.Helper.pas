@@ -127,16 +127,16 @@ begin
   Result := CreateReqByOrigin(AOrigin);
   case AOrigin of
 
-    ORIGIN_NSFWXXX:
+    PVR_NSFWXXX:
       ( Result as TNBoxSearchReqNsfwXxx ).SearchType := TNsfwUrlType.Category;
 
-    ORIGIN_GIVEMEPORNCLUB:
+    PVR_GIVEMEPORNCLUB:
       ( Result as TNBoxSearchReqGmpClub ).SearchType := TGmpClubSearchType.Tag; 
 
   end;
 
   if Supports(ATag, INBoxItemTag9HentaiTo, L9HentaiTag) 
-  and (Result.Origin = ORIGIN_9HENTAITO) then begin
+  and (Result.Origin = PVR_9HENTAITO) then begin
     ( Result as TNBoxSearchReq9HentaiTo ).SearchRec.AddIncludedTag(L9HentaiTag.Tag)
   end else 
     Result.Request := ATag.Value;

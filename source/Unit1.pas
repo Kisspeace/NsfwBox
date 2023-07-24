@@ -2438,7 +2438,7 @@ var
   LFiles: TSearchRecAr;
   LPartialFilename: string;
 begin
-  LPartialFilename := Self.GetHashedDownloadFullFilename(AUrl, ORIGIN_PSEUDO, False);
+  LPartialFilename := Self.GetHashedDownloadFullFilename(AUrl, PVR_PSEUDO, False);
   LFiles := GetFiles(LPartialFilename + '*', faNormal);
   if Length(LFiles) > 0 then
     Result := TPath.Combine(Settings.DefDownloadPath, LFiles[0].name)
@@ -3729,7 +3729,7 @@ begin
       AClient.OnValidateServerCertificate := Form1.NetHttpOnValidateCertAutoAccept;
 
     case AOrigin of
-      ORIGIN_9HENTAITO:
+      PVR_9HENTAITO:
       begin
         CustomHeaders['Accept'] := 'application/json, text/plain, */*';
         CustomHeaders['Content-Type'] := 'application/json;charset=utf-8';

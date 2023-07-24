@@ -131,7 +131,7 @@ begin
 
     DefaultExt := '.mp4';
 
-    if AOrigin = ORIGIN_NSFWXXX then begin
+    if AOrigin = PVR_NSFWXXX then begin
       FileExt := trim(MidN(AFilename, '?format=', '&'));
       if Not FileExt.IsEmpty then
         FileExt := '.' + FileExt;

@@ -512,7 +512,7 @@ begin
 
   case O of
 
-    ORIGIN_NSFWXXX: begin
+    PVR_NSFWXXX: begin
       with Result as TNBoxSearchReqNsfwXxx do begin
         var LTypes: TNsfwItemTypes := [];
         var LOris: TNsfwOris := [];
@@ -543,19 +543,19 @@ begin
       end;
     end;
 
-    ORIGIN_R34APP: begin
+    PVR_R34APP: begin
       With ( Result as TNBoxSearchReqR34App ) do begin
         Booru := TR34AppFreeBooru(Self.R34AppBooruChangeMenu.Selected);
       end;
     end;
 
-    ORIGIN_GIVEMEPORNCLUB: begin
+    PVR_GIVEMEPORNCLUB: begin
       with ( Result as TNBoxSearchReqGmpClub ) do begin
         SearchType := TGmpClubSearchType(GmpClubSearchTypeMenu.Selected);
       end;
     end;
 
-    ORIGIN_COOMERPARTY: begin
+    PVR_COOMERPARTY: begin
       with ( Result as TNBoxSearchReqCoomerParty ) do begin
         Site := Self.EditCoomerPartyHost.Edit.Text;
         Service := Self.EditCoomerPartyService.Edit.Text;
@@ -563,7 +563,7 @@ begin
       end;
     end;
 
-    ORIGIN_MOTHERLESS: begin
+    PVR_MOTHERLESS: begin
       with ( Result as TNBoxSearchReqMotherless ) do begin
         ContentType := TMotherlessMediaType(MotherlessMediaChangeMenu.Selected);
         Sort := TMotherlessSort(MotherlessSortChangeMenu.Selected);
@@ -572,20 +572,20 @@ begin
       end;
     end;
 
-    ORIGIN_BOOKMARKS: begin
+    PVR_BOOKMARKS: begin
       with ( Result as TNBoxSearchReqBookmarks ) do begin
         Path := self.EditBookmarksPath.Edit.Text;
       end;
     end;
 
-    ORIGIN_RANDOMIZER: begin
+    PVR_RANDOMIZER: begin
       with ( Result as TNBoxSearchReqRandomizer ) do begin
         Providers := [];
-        if BtnRandNsfwXxx.IsChecked then Providers := Providers + [ORIGIN_NSFWXXX];
-        if BtnRandGmpClub.IsChecked then Providers := Providers + [ORIGIN_GIVEMEPORNCLUB];
-        if BtnRandCoomerParty.IsChecked then Providers := Providers + [ORIGIN_COOMERPARTY];
-        if BtnRand9Hentaito.IsChecked then Providers := Providers + [ORIGIN_9HENTAITO];
-        if BtnRandMotherless.IsChecked then Providers := Providers + [ORIGIN_MOTHERLESS];
+        if BtnRandNsfwXxx.IsChecked then Providers := Providers + [PVR_NSFWXXX];
+        if BtnRandGmpClub.IsChecked then Providers := Providers + [PVR_GIVEMEPORNCLUB];
+        if BtnRandCoomerParty.IsChecked then Providers := Providers + [PVR_COOMERPARTY];
+        if BtnRand9Hentaito.IsChecked then Providers := Providers + [PVR_9HENTAITO];
+        if BtnRandMotherless.IsChecked then Providers := Providers + [PVR_MOTHERLESS];
         if BtnRandGelbooru.IsChecked then Providers := Providers + [PVR_GELBOORU];
         if BtnRandRule34xxx.IsChecked then Providers := Providers + [PVR_RULE34XXX];
         if BtnRandRule34PahealNet.IsChecked then Providers := Providers + [PVR_RULE34PAHEALNET];
@@ -659,7 +659,7 @@ begin
   begin
     AddBtn('By date (descending)', Ord(TBepisDbSearchOpt.TOrderBy.OrderDateDescending), Form1.AppStyle.GetImagePath(ICON_HISTORY));
     AddBtn('By date (ascending)', Ord(TBepisDbSearchOpt.TOrderBy.OrderDateAscending), Form1.AppStyle.GetImagePath(ICON_HISTORY));
-    AddBtn('By popularity', Ord(TBepisDbSearchOpt.TOrderBy.OrderPopularity), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
+    AddBtn('By popularity', Ord(TBepisDbSearchOpt.TOrderBy.OrderPopularity), Form1.AppStyle.GetImagePath(PVR_BOOKMARKS));
     Menu.SelectFirst;
   end;
 
@@ -787,7 +787,7 @@ begin
     Addbtn('Default navigate', Ord(TGmpclubSearchType.Empty), FDefIconPath);
     Addbtn('Search by tag', Ord(TGmpclubSearchType.Tag), FDefIconPath);
     Addbtn('Search by category', Ord(TGmpclubSearchType.Category), FDefIconPath);
-    Addbtn('Random content', Ord(TGmpclubSearchType.Random), Form1.AppStyle.GetImagePath(ORIGIN_RANDOMIZER));
+    Addbtn('Random content', Ord(TGmpclubSearchType.Random), Form1.AppStyle.GetImagePath(PVR_RANDOMIZER));
     Menu.SelectFirst;
   end;
 end;
@@ -851,7 +851,7 @@ begin
   with NewSelectMenu(NsfwXxxSortMenu, NsfwXxxMenu, BtnChangeSort) do
   begin
     Addbtn('Newest', Ord(Newest), Form1.AppStyle.GetImagePath(ICON_HISTORY));
-    Addbtn('Popular', Ord(Popular), Form1.AppStyle.GetImagePath(ORIGIN_BOOKMARKS));
+    Addbtn('Popular', Ord(Popular), Form1.AppStyle.GetImagePath(PVR_BOOKMARKS));
     Addbtn('Recommended', Ord(Recommended), FDefIconPath);
     Menu.SelectFirst;
   end;
@@ -914,11 +914,11 @@ end;
 procedure TNBoxSearchMenu.InitRandomizerMenu;
 begin
   if Assigned(BtnRandNsfwXxx) then Exit;
-  BtnRandNsfwXxx := NewBtnCheck(OriginToStr(ORIGIN_NSFWXXX), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_NSFWXXX));
-  BtnRandGmpClub := NewBtnCheck(OriginToStr(ORIGIN_GIVEMEPORNCLUB), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_GIVEMEPORNCLUB));
-  BtnRandCoomerParty := NewBtnCheck(OriginToStr(ORIGIN_COOMERPARTY), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_COOMERPARTY));
-  BtnRandMotherless := NewBtnCheck(OriginToStr(ORIGIN_MOTHERLESS), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_MOTHERLESS));
-  BtnRand9Hentaito := NewBtnCheck(OriginToStr(ORIGIN_9HENTAITO), RandomizerMenu, Form1.AppStyle.GetImagePath(ORIGIN_9HENTAITO));
+  BtnRandNsfwXxx := NewBtnCheck(OriginToStr(PVR_NSFWXXX), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_NSFWXXX));
+  BtnRandGmpClub := NewBtnCheck(OriginToStr(PVR_GIVEMEPORNCLUB), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_GIVEMEPORNCLUB));
+  BtnRandCoomerParty := NewBtnCheck(OriginToStr(PVR_COOMERPARTY), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_COOMERPARTY));
+  BtnRandMotherless := NewBtnCheck(OriginToStr(PVR_MOTHERLESS), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_MOTHERLESS));
+  BtnRand9Hentaito := NewBtnCheck(OriginToStr(PVR_9HENTAITO), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_9HENTAITO));
   BtnRandRule34xxx := NewBtnCheck(OriginToStr(PVR_RULE34XXX), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_RULE34XXX));
   BtnRandGelbooru := NewBtnCheck(OriginToStr(PVR_GELBOORU), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_GELBOORU));
   BtnRandRule34PahealNet := NewBtnCheck(OriginToStr(PVR_RULE34PAHEALNET), RandomizerMenu, Form1.AppStyle.GetImagePath(PVR_RULE34PAHEALNET));
@@ -980,14 +980,14 @@ begin
   EditPageId.Edit.Text := LProvider.FisrtPageId.ToString;
 
   case LProvider.Id of
-    ORIGIN_NSFWXXX: InitNsfwXxxMenu;
-    ORIGIN_COOMERPARTY: InitCoomerPartyMenu;
-    ORIGIN_MOTHERLESS: InitMotherlessMenu;
-    ORIGIN_GIVEMEPORNCLUB: InitGmpClubMenu;
+    PVR_NSFWXXX: InitNsfwXxxMenu;
+    PVR_COOMERPARTY: InitCoomerPartyMenu;
+    PVR_MOTHERLESS: InitMotherlessMenu;
+    PVR_GIVEMEPORNCLUB: InitGmpClubMenu;
     PVR_FAPELLO: InitFapelloMenu;
     PVR_BEPISDB: InitBepisDbMenu;
-    ORIGIN_RANDOMIZER: InitRandomizerMenu;
-    ORIGIN_R34APP: InitR34AppMenu;
+    PVR_RANDOMIZER: InitRandomizerMenu;
+    PVR_R34APP: InitR34AppMenu;
   end;
 
   self.HideMenus;
@@ -1094,12 +1094,12 @@ begin
   end else if ( Value is TNBoxSearchReqRandomizer ) then begin
 
     with ( Value as TNBoxSearchReqRandomizer ) do begin
-      BtnRandNsfwXxx.IsChecked := _IN(Providers, ORIGIN_NSFWXXX);
+      BtnRandNsfwXxx.IsChecked := _IN(Providers, PVR_NSFWXXX);
 //      BtnRandR34App.IsChecked := _IN(Providers, ORIGIN_R34APP);
-      BtnRandGmpClub.IsChecked := _IN(Providers, ORIGIN_GIVEMEPORNCLUB);
-      BtnRandCoomerParty.IsChecked := _IN(Providers, ORIGIN_COOMERPARTY);
-      BtnRand9Hentaito.IsChecked := _IN(Providers, ORIGIN_9HENTAITO);
-      BtnRandMotherless.IsChecked := _IN(Providers, ORIGIN_MOTHERLESS);
+      BtnRandGmpClub.IsChecked := _IN(Providers, PVR_GIVEMEPORNCLUB);
+      BtnRandCoomerParty.IsChecked := _IN(Providers, PVR_COOMERPARTY);
+      BtnRand9Hentaito.IsChecked := _IN(Providers, PVR_9HENTAITO);
+      BtnRandMotherless.IsChecked := _IN(Providers, PVR_MOTHERLESS);
       BtnRandRule34xxx.IsChecked := _IN(Providers, PVR_RULE34XXX);
       BtnRandGelbooru.IsChecked := _IN(Providers, PVR_GELBOORU);
     end;

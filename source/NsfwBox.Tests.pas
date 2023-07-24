@@ -152,7 +152,7 @@ begin
   WaitSomeTime;
 
   if IsLuck(20) then begin
-    form1.SearchMenu.OriginSetMenu.Selected := ORIGIN_COOMERPARTY;
+    form1.SearchMenu.OriginSetMenu.Selected := PVR_COOMERPARTY;
   end else if IsLuck(20) then begin
     form1.SearchMenu.OriginSetMenu.Selected := PROVIDERS.GMPClub.Id;
   end else if IsLuck(20) then begin

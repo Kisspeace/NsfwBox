@@ -8,17 +8,18 @@ uses
   NsfwBox.Interfaces;
 
 const
-  ORIGIN_RANDOMIZER     = -3;
-  ORIGIN_PSEUDO         = -2;
-  ORIGIN_BOOKMARKS      = -1;
-  ORIGIN_NSFWXXX        = 0;
-  ORIGIN_R34JSONAPI     = 1;
-  ORIGIN_R34APP         = 2;
-  ORIGIN_GIVEMEPORNCLUB = 3;
-  ORIGIN_9HENTAITO      = 4;
-  ORIGIN_COOMERPARTY    = 5;
-  ORIGIN_MOTHERLESS     = 6;
-  PVR_FAPELLO           = 7; { PVR = provider }
+  { PVR = provider }
+  PVR_RANDOMIZER     = -3;
+  PVR_PSEUDO         = -2;
+  PVR_BOOKMARKS      = -1;
+  PVR_NSFWXXX        = 0;
+  PVR_R34JSONAPI     = 1;
+  PVR_R34APP         = 2;
+  PVR_GIVEMEPORNCLUB = 3;
+  PVR_9HENTAITO      = 4;
+  PVR_COOMERPARTY    = 5;
+  PVR_MOTHERLESS     = 6;
+  PVR_FAPELLO           = 7;
   PVR_RULE34XXX         = 8;
   PVR_GELBOORU          = 9;
   PVR_REALBOORU         = 10;
@@ -176,14 +177,14 @@ constructor TNBoxProviders.Create;
 
 begin
   FItems := TObjectList<TNBoxProviderInfo>.Create;
-  FBookmarks   := Add(ORIGIN_BOOKMARKS, 'Bookmarks', 1, TNBoxSearchReqBookmarks, nil, False, False);
-  FPseudo      := Add(ORIGIN_PSEUDO, 'Files', 1, TNBoxSearchReqPseudo, TNBoxPseudoItem, False, False);
+  FBookmarks   := Add(PVR_BOOKMARKS, 'Bookmarks', 1, TNBoxSearchReqBookmarks, nil, False, False);
+  FPseudo      := Add(PVR_PSEUDO, 'Files', 1, TNBoxSearchReqPseudo, TNBoxPseudoItem, False, False);
 
-  FNsfwXxx     := Add(ORIGIN_NSFWXXX, 'nsfw.xxx', 1, TNBoxSearchReqNsfwXxx, TNBoxNsfwXxxItem);
-  FCoomerParty := Add(ORIGIN_COOMERPARTY, 'coomer.party \ kemono.party', 1, TNBoxSearchReqCoomerParty, TNBoxCoomerPartyItem);
-  FGMPClub     := Add(ORIGIN_GIVEMEPORNCLUB, 'givemeporn.club', 1, TNBoxSearchReqGmpClub, TNBoxGmpClubItem);
-  FMotherless  := Add(ORIGIN_MOTHERLESS, 'motherless.com', 1, TNBoxSearchReqMotherless, TNBoxMotherlessItem);
-  F9HentaiTo   := Add(ORIGIN_9HENTAITO, '9hentai.to', 0, TNBoxSearchReq9Hentaito, TNBox9HentaitoItem);
+  FNsfwXxx     := Add(PVR_NSFWXXX, 'nsfw.xxx', 1, TNBoxSearchReqNsfwXxx, TNBoxNsfwXxxItem);
+  FCoomerParty := Add(PVR_COOMERPARTY, 'coomer.party \ kemono.party', 1, TNBoxSearchReqCoomerParty, TNBoxCoomerPartyItem);
+  FGMPClub     := Add(PVR_GIVEMEPORNCLUB, 'givemeporn.club', 1, TNBoxSearchReqGmpClub, TNBoxGmpClubItem);
+  FMotherless  := Add(PVR_MOTHERLESS, 'motherless.com', 1, TNBoxSearchReqMotherless, TNBoxMotherlessItem);
+  F9HentaiTo   := Add(PVR_9HENTAITO, '9hentai.to', 0, TNBoxSearchReq9Hentaito, TNBox9HentaitoItem);
   FFapello     := Add(PVR_FAPELLO, 'Fapello.com', 1, TNBoxSearchReqFapello, TNBoxFapelloItem);
   FRule34xxx   := Add(PVR_RULE34XXX, 'Rule34.xxx', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FGelbooru    := Add(PVR_GELBOORU, 'Gelbooru.com', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
@@ -201,9 +202,9 @@ begin
   FHGoonBooru  := Add(PVR_HGOONBOORU, 'hgoon.booru.org', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
   FE621        := Add(PVR_E621, 'e621.net', 0, TNBoxSearchReqBooru, TNBoxBooruItemBase);
 
-  FR34JsonApi  := Add(ORIGIN_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
-  FR34App      := Add(ORIGIN_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);
-  FRandomizer  := Add(ORIGIN_RANDOMIZER, 'Randomizer', 0, TNBoxSearchReqRandomizer, nil, True, True);
+  FR34JsonApi  := Add(PVR_R34JSONAPI, 'r34 JSON API', 0, TNBoxSearchReqR34JsonApi, TNBoxR34JsonApiItem);
+  FR34App      := Add(PVR_R34APP, 'r34.app', 0, TNBoxSearchReqR34App, TNBoxR34AppItem);
+  FRandomizer  := Add(PVR_RANDOMIZER, 'Randomizer', 0, TNBoxSearchReqRandomizer, nil, True, True);
 end;
 
 destructor TNBoxProviders.Destroy;
