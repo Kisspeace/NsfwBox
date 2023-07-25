@@ -467,13 +467,6 @@ var
   Form1: TForm1;
   APP_VERSION: TSemVer; // Current application version
 
-  LOG_FILENAME         : string = 'log.txt';
-  YDW_LOG_FILENAME     : string = 'you-did-well-debug-log.txt';
-  SETTINGS_FILENAME    : string = 'settings.json';
-  BOOKMARKSDB_FILENAME : string = 'bookmarks.sqlite';
-  SESSION_FILENAME     : string = 'session.sqlite';
-  HISTORY_FILENAME     : string = 'history.sqlite';
-
   IWUContentManager: TIWUContentManager;
   BrowsersIWUContentManager: TIWUContentManager;
   IWUCacheManager: TIWUCacheManager;

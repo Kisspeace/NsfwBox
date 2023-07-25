@@ -69,6 +69,15 @@ type
     property Tags: TNBoxItemTagAr read GetTags;
   end;
 
+  IChangeableHost = Interface
+    ['{052BA67F-FC58-4423-ABFD-F538ACE94517}']
+    { private \ protected }
+    procedure SetServiceHost(const Value: string);
+    function GetServiceHost: string;
+    { public }
+    property ServiceHost: string read GetServiceHost write SetServiceHost;
+  End;
+
   INBoxItemArtist = interface
     ['{076240E9-6DFD-4567-9FBC-0BE73E74A419}']
     { privite \ protected }
@@ -149,6 +158,7 @@ type
     procedure Assign(ASource: INBoxItem);
     function Clone: INBoxItem;
     { public }
+    procedure SetProviderId(const AProviderId: integer);
     function ContentUrlCount: integer;
     function ContentUrl: string;
     function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; overload;
@@ -178,8 +188,9 @@ type
       function GetContentUrls: TArray<string>; overload; virtual; abstract;
       function GetThumbnailUrl: string; virtual; abstract;
       function GetOrigin: integer; virtual;
-      procedure SetOrigin(const Value: integer); virtual;
+      procedure SetOrigin(const Value: integer); { for XSuperObject }
     public
+      procedure SetProviderId(const AProviderId: integer);
       function ContentUrlCount: integer; virtual;
       function ContentUrl: string; virtual;
       function GetContentUrls(ASelectFilesMode: TDownloadAllMode): TArray<string>; overload; virtual;
@@ -203,26 +214,29 @@ type
     procedure SetPageId(const Value: integer);
     function Clone: INBoxSearchRequest;
     { public }
+    procedure SetProviderId(const AProviderId: integer);
     property Request: string read GetRequest write SetRequest;
     property PageId: integer read GetPageId write SetPageId;
   end;
 
   TNBoxSearchRequestBase = class(TNoRefCountObject, INBoxSearchRequest, IHasOrigin)
     protected
+      FOrigin: integer;
       FRequest: string;
       FPageId: integer;
-      function GetOrigin: integer;               virtual; abstract;
+      function GetOrigin: integer;
       function GetRequest: string;               virtual;
       procedure SetRequest(const Value: string); virtual;
       function GetPageId: integer;               virtual;
       procedure SetPageId(const Value: integer); virtual;
       procedure SetOrigin(const Value: integer); virtual;
     public
+      procedure SetProviderId(const AProviderId: integer);
       function Clone: INBoxSearchRequest;        virtual; abstract;
       property Origin: integer read GetOrigin write SetOrigin;
       [DISABLE] property Request: string read GetRequest write SetRequest;
       [DISABLE] property PageId: integer read GetPageId write SetPageId;
-      constructor Create; virtual;
+      constructor Create; overload; virtual;
       Destructor Destroy; override;
   end;
 
@@ -286,6 +300,11 @@ begin
   inherited;
 end;
 
+function TNBoxSearchRequestBase.GetOrigin: integer;
+begin
+  Result := FOrigin;
+end;
+
 function TNBoxSearchRequestBase.GetPageId: integer;
 begin
   Result := FPageId;
@@ -304,6 +323,11 @@ end;
 procedure TNBoxSearchRequestBase.SetPageId(const Value: integer);
 begin
   FPageId := Value;
+end;
+
+procedure TNBoxSearchRequestBase.SetProviderId(const AProviderId: integer);
+begin
+  FOrigin := AProviderId;
 end;
 
 procedure TNBoxSearchRequestBase.SetRequest(const Value: string);
@@ -354,6 +378,10 @@ begin
 
 end;
 
+procedure TNBoxItemBase.SetProviderId(const AProviderId: integer);
+begin
+  FOrigin := AProviderId;
+end;
 
 { TNBoxItemTagBase }
 

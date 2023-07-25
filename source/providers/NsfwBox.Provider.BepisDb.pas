@@ -15,7 +15,6 @@ type
    TNBoxSearchReqBepisDb = class(TNBoxSearchRequestBase)
     protected
       FSearchOpt: TBepisDbSearchOpt;
-      function GetOrigin: integer; override;
       function GetRequest: string;               override;
       procedure SetRequest(const Value: string); override;
     public
@@ -44,13 +43,9 @@ end;
 constructor TNBoxSearchReqBepisDb.Create;
 begin
   inherited;
+  FOrigin := PVR_BEPISDB;
   FPageId := PROVIDERS.BepisDb.FisrtPageId;
   FSearchOpt := TBepisDbSearchOpt.Create;
-end;
-
-function TNBoxSearchReqBepisDb.GetOrigin: integer;
-begin
-  Result := PVR_BEPISDB;
 end;
 
 function TNBoxSearchReqBepisDb.GetRequest: string;

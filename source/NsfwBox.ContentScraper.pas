@@ -53,7 +53,7 @@ type
     function GetContentNsfwXxx(AList: INBoxHasOriginList; AReqParam: string;
       ASearchType: TNsfwUrlType; APageNum: integer; Asort: TnsfwSort;
       ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
-      ASite: TNsfwXxxSite): boolean;
+      AServiceHost: string): boolean;
 
     function GetContentR34JsonApi(AList: INBoxHasOriginList; ATags: string = '';
       APageId: integer = 1; ALimit: integer = 20): boolean;
@@ -77,7 +77,16 @@ type
     function GetContentBooruScraper(ABooruClient: IBooruClient;
       AProviderId: integer;
       AList: INBoxHasOriginList; ARequest: string;
-      APageNum: integer): boolean;
+      APageNum: integer;
+      AHost: string = ''): boolean; overload;
+
+    function GetContentBooruScraper(
+      ABooruClientClass: TBooruClientBaseClass;
+      AParserClass: TBooruParserClass;
+      AHost: string;
+      AProviderId: integer;
+      AList: INBoxHasOriginList; ARequest: string;
+      APageNum: integer): boolean; overload;
 
     function GetContentBookmarks(AList: INBoxHasOriginList; ADbPath: string;
       ABookmarksListId: int64; APageId: integer = 1): boolean;
@@ -117,11 +126,12 @@ type
   End;
 
 implementation
-
-uses unit1;
+uses Unit1;
 
 { TNBoxScraper }
 function TNBoxScraper.BooruClientById(AProviderId: integer): IBooruClient;
+var
+  LCustomProvider: TNBoxProviderInfoCustomBooruScraper;
 begin
   case AProviderId of
     PVR_GELBOORU: Result := BooruScraper.NewClientGelbooru;
@@ -138,6 +148,12 @@ begin
     PVR_ILLUSIONCARDS: Result := BooruScraper.NewClientIllusioncards;
     PVR_HGOONBOORU: Result := BooruScraper.NewClientHgoon;
     PVR_E621: Result := BooruScraper.NewClientE621;
+    else begin
+      LCustomProvider := PROVIDERS[AProviderId] as TNBoxProviderInfoCustomBooruScraper;
+      Result := BooruScraper.NewClient(
+        GetClientTypeById(LCustomProvider.ClientType),
+        GetParserTypeById(LCustomProvider.ParserType), LCustomProvider.Host);
+    end;
   end;
 end;
 
@@ -161,13 +177,26 @@ begin
 end;
 
 procedure TNBoxScraper.FetchContentUrls(APost: INBoxItem);
+var
+  LProvider: TNBoxProviderInfo;
+  LCustomProvider: TNBoxProviderInfoCustom;
+  LServiceHost: string;
 begin
+  LProvider := PROVIDERS.ById(APost.Origin);
+  if LProvider.IsCustom then
+  begin
+    LCustomProvider := LProvider as TNBoxProviderInfoCustom;
+    LServiceHost := LCustomProvider.Host;
+  end else LServiceHost := '';
+
   if (APost is TNBoxNsfwXxxItem) then
   begin
     var Client: TNsfwXxxScraper;
     var Item: TNBoxNsfwXxxItem;
     Item := (APost as TNBoxNsfwXxxItem);
     Client := TNsfwXxxScraper.Create;
+    if not LServiceHost.IsEmpty  then
+      Client.Host := LServiceHost;
     SyncWebClientSet(Client.WebClient, APost.Origin);
     try
       Item.Page := Client.GetPage(Item.Item.PostUrl);
@@ -266,14 +295,14 @@ begin
   if not TryStrToInt64(ARequest.Request, RequestAsInt) then
     RequestAsInt := 1;
 
-  case ARequest.Origin of
+  case GetOriginId(ARequest) of
 
     PVR_NSFWXXX:
     begin
       with (ARequest As TNBoxSearchReqNsfwXxx) do
       begin
         Result := GetContentNsfwXxx(AList, Request, SearchType, Pageid,
-          SortType, Types, Oris, Site);
+          SortType, Types, Oris, ServiceHost);
       end;
     end;
 
@@ -355,6 +384,16 @@ begin
       Result := GetContentBooruScraper(LClient,
         ARequest.Origin, AList, ARequest.Request, ARequest.PageId);
     end;
+
+    PVR_BOORUSCRAPER:
+    begin
+      var LReq := ARequest as TNBoxSearchReqBooru;
+      Result := GetContentBooruScraper(
+        GetClientTypeById(LReq.ClientType),
+        GetParserTypeById(LReq.ParserType),
+        LReq.ServiceHost, LReq.Origin, AList,
+        LReq.Request, LReq.PageId);
+    end
 
     else begin
       Result := GetContentBooruScraper(BooruClientById(ARequest.Origin),
@@ -483,18 +522,34 @@ begin
   end;
 end;
 
-function TNBoxScraper.GetContentBooruScraper(ABooruClient: IBooruClient;
+function TNBoxScraper.GetContentBooruScraper(
+  ABooruClientClass: TBooruClientBaseClass;
+  AParserClass: TBooruParserClass;
+  AHost: string;
   AProviderId: integer; AList: INBoxHasOriginList;
   ARequest: string; APageNum: integer): boolean;
+var
+  LClient: IBooruClient;
+begin
+  LClient := BooruScraper.NewClient(ABooruClientClass, AParserClass, AHost);
+  Result := Self.GetContentBooruScraper(LClient, AProviderId,
+    AList, ARequest, APageNum);
+end;
+
+function TNBoxScraper.GetContentBooruScraper(ABooruClient: IBooruClient;
+  AProviderId: integer; AList: INBoxHasOriginList;
+  ARequest: string; APageNum: integer; AHost: string): boolean;
 var
   i: integer;
   LContent: TBooruThumbAr;
   LContentSwitch: IEnableAllContent;
 begin
   Result := false;
-
   if Supports(ABooruClient, IEnableAllContent, LContentSwitch) then
     LContentSwitch.EnableAllContent := Form1.Settings.EnableAllContent;
+//  log(ABooruClient.Host + QuotedStr(Ahost));
+  if not AHost.IsEmpty then
+    ABooruClient.Host := AHost;
 
   with TBooruClientBase(ABooruClient) do
     SyncWebClientSet(Client, AProviderId);
@@ -736,14 +791,14 @@ end;
 function TNBoxScraper.GetContentNsfwXxx(AList: INBoxHasOriginList;
   AReqParam: string; ASearchType: TNsfwUrlType; APageNum: integer;
   Asort: TnsfwSort; ATypes: TNsfwItemTypes; AOrientations: TNsfwOris;
-  ASite: TNsfwXxxSite): boolean;
+  AServiceHost: string): boolean;
 var
   Client: TNsfwXxxScraper;
   Content: TNsfwXXXItemList;
 begin
   Result := false;
   Client := TNsfwXxxScraper.Create;
-  Client.Host := TNsfwXxxSiteToUrl(ASite);
+  Client.Host := AServiceHost;
   Content := TNsfwXXXItemList.Create;
   try
     SyncWebClientSet(Client.WebClient, PVR_NSFWXXX);

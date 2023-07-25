@@ -3,7 +3,8 @@
 interface
 uses
   Classes, Types, System.Generics.Collections,
-  NsfwBox.Logging, System.Zip, SysUtils, DateUtils, System.IOUtils;
+  NsfwBox.Logging, System.Zip, SysUtils, DateUtils,
+  System.IOUtils, NsfwBox.Consts;
 
 type
 

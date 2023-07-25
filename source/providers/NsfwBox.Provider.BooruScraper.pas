@@ -7,7 +7,7 @@ uses
   System.SysUtils, System.Classes, XSuperObject,
   BooruScraper.Interfaces, BooruScraper.BaseTypes,
   NsfwBox.Interfaces, NsfwBox.Consts, NsfwBox.Utils,
-  NsfwBox.Settings;
+  NsfwBox.Settings, System.Generics.Collections;
 
 type
 
@@ -72,15 +72,21 @@ type
 
   TNBoxBooruItemBaseClass = Class of TNBoxBooruItemBase;
 
-  TNBoxSearchReqBooru = class(TNBoxSearchRequestBase)
+  TNBoxSearchReqBooru = class(TNBoxSearchRequestBase, IChangeableHost)
     protected
-      FOrigin: integer;
-      function GetOrigin: integer; override;
+      FServiceHost: string;
+      FClientType: TBooruScraperClientType;
+      FParserType: TBooruScraperParserType;
+      procedure SetServiceHost(const Value: string);
+      function GetServiceHost: string;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
       property PageId;
+      property ServiceHost: string read GetServiceHost write SetServiceHost;
+      property ClientType: TBooruScraperClientType read FClientType write FClientType;
+      property ParserType: TBooruScraperParserType read FParserType write FParserType;
       constructor Create(AOrigin: integer);
   end;
 
@@ -224,22 +230,32 @@ var
   LRes: TNBoxSearchReqBooru;
 begin
   LRes := TNBoxSearchReqBooru.Create(FOrigin);
-  LRes.FOrigin := FOrigin;
   LRes.PageId := self.FPageId;
   LRes.Request := Self.FRequest;
+  LRes.FServiceHost := Self.FServiceHost;
+  LRes.FClientType := Self.FClientType;
+  LRes.FParserType := Self.FParserType;
   Result := LRes;
 end;
 
 constructor TNBoxSearchReqBooru.Create(AOrigin: integer);
 begin
   Inherited Create;
-  Self.FOrigin := AOrigin;
-  Self.FPageId := PROVIDERS.ById(AOrigin).FisrtPageId;
+  FServicehost := '';
+  FClientType := TBooruScraperClientType.bsTGelbooruLikeClient;
+  FParserType := TBooruScraperParserType.bsTRule34xxxParser;
+  FOrigin := AOrigin;
+  Self.FPageId := BooruScraper.Interfaces.BOORU_FIRSTPAGE;
 end;
 
-function TNBoxSearchReqBooru.GetOrigin: integer;
+function TNBoxSearchReqBooru.GetServiceHost: string;
 begin
-  Result := FOrigin;
+  Result := FServiceHost;
+end;
+
+procedure TNBoxSearchReqBooru.SetServiceHost(const Value: string);
+begin
+  FServiceHost := Value;
 end;
 
 { TNBoxItemTagBooru }

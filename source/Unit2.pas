@@ -157,6 +157,7 @@ type
       FDefIconPath: string;
       FSelectMenus: TTNBoxSelectMenuList;
       FProviderMenus: TNBoxSearchSubMenuBaseList;
+      FOriginChanging: boolean;
       procedure OnOriginChanged(Sender: TObject);
       procedure OnCoomerPartyHostChanged(Sender: TObject);
       procedure OnCoomerPartyServiceChanged(Sender: TObject);
@@ -189,7 +190,6 @@ type
       OriginSetMenu,
       NsfwXxxSortMenu,
       NsfwXxxSearchTypeMenu,
-      NsfwXxxHostChangeMenu,
       R34AppBooruChangeMenu,
       GmpClubSearchTypeMenu,
       MotherlessSortChangeMenu,
@@ -429,6 +429,7 @@ var
 
 begin
   inherited;
+  FOriginChanging := False;
   FSelectMenus := TTNBoxSelectMenuList.Create;
   FProviderMenus := TNBoxSearchSubMenuBaseList.Create;
   M := TRectF.Create(10, 10, 10, 0);
@@ -441,7 +442,7 @@ begin
     Align := TAlignlayout.Client;
     for I := 0 to PROVIDERS.Count - 1 do
     begin
-      var LProvider := PROVIDERS[I];
+      var LProvider := PROVIDERS.Items[I];
       if (LProvider <> PROVIDERS.R34App) then
         AddBtn(LProvider.TitleName, LProvider.Id, Form1.AppStyle.GetImagePath(LProvider.Id));
     end;
@@ -539,7 +540,6 @@ begin
         Types := LTypes;
         SortType := TNsfwSort(NsfwXxxSortMenu.Selected);
         SearchType := TNsfwUrlType(NsfwXxxSearchTypeMenu.Selected);
-        Site := TNsfwXxxSite(NsfwXxxHostChangeMenu.Selected);
       end;
     end;
 
@@ -865,14 +865,6 @@ begin
     Menu.SelectFirst;
   end;
 
-  with NewSelectMenu(NsfwXxxHostChangeMenu, NsfwXxxMenu, BtnChangeSite) do
-  begin
-    Addbtn('nsfw.xxx', Ord(TNsfwXxxSite.NsfwXxx), FDefIconPath);
-    Addbtn('pornpic.xxx', Ord(TNsfwXxxSite.PornpicXxx), FDefIconPath);
-    Addbtn('hdporn.pics', Ord(TNsfwXxxSite.HdpornPics), FDefIconPath);
-    Menu.SelectFirst;
-  end;
-
   CheckGrid := TColumnsLayout.Create(NsfwXxxMenu);
   with CheckGrid do begin
     Parent := NsfwXxxMenu;
@@ -973,13 +965,19 @@ procedure TNBoxSearchMenu.OnOriginChanged(Sender: TObject);
 var
   I: integer;
   LProvider: TNBoxProviderInfo;
+  LOriginProvider: TNBoxProviderInfo;
 begin
+  if FOriginChanging then Exit;
   LProvider := PROVIDERS.ById(OriginSetMenu.Selected);
-  BtnChangeOrigin.Image.ImageURL := form1.AppStyle.GetImagePath(LProvider.Id);
+  if LProvider.IsCustom then
+    LOriginProvider := (LProvider as TNBoxProviderInfoCustom).ParentProvider
+  else LOriginProvider := LProvider;
+
+  BtnChangeOrigin.Image.ImageURL := Form1.AppStyle.GetImagePath(LProvider.Id);
   BtnChangeOrigin.Text.Text := '( ' + LProvider.TitleName + ' ) Change provider';
   EditPageId.Edit.Text := LProvider.FisrtPageId.ToString;
 
-  case LProvider.Id of
+  case LOriginProvider.Id of
     PVR_NSFWXXX: InitNsfwXxxMenu;
     PVR_COOMERPARTY: InitCoomerPartyMenu;
     PVR_MOTHERLESS: InitMotherlessMenu;
@@ -995,9 +993,17 @@ begin
   self.HideOriginMenus;
 
   for I := 0 to FProviderMenus.Count - 1 do
-  if OriginSetMenu.Selected = FProviderMenus[I].Tag then begin
+  if LOriginProvider.Id = FProviderMenus[I].Tag then begin
     FProviderMenus[I].Visible := True;
     Break;
+  end;
+
+  FOriginChanging := True;
+  try
+    { Reset to defaults (Set ServiceHost also) }
+    Request := LProvider.CreateBaseRequest;
+  finally
+    FOriginChanging := False;
   end;
 end;
 
@@ -1044,7 +1050,7 @@ begin
     with ( Value as TNBoxSearchReqNsfwXxx ) do begin
       NsfwXxxSortMenu.Selected := Ord(SortType);
       NsfwXxxSearchTypeMenu.Selected := Ord(SearchType);
-      NsfwXxxHostChangeMenu.Selected := Ord(Site);
+//      NsfwXxxHostChangeMenu.Selected := Ord(Site);
       CheckImage.IsChecked := ( Image in Types);
       CheckVideo.IsChecked := ( Video in Types);
       CheckGay.IsChecked   := ( Gay in Oris );

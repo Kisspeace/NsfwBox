@@ -12,13 +12,13 @@ type
   TNBoxSearchReqBookmarks = class(TNBoxSearchRequestBase)
     protected
       FPath: string;
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
       property Path: string read FPath write FPath;
       property PageId;
+      constructor Create; override;
   end;
 
 implementation
@@ -35,9 +35,10 @@ begin
   end;
 end;
 
-function TNBoxSearchReqBookmarks.GetOrigin: integer;
+constructor TNBoxSearchReqBookmarks.Create;
 begin
-  Result := PROVIDERS.Bookmarks.Id;
+  inherited;
+  FOrigin := PVR_BOOKMARKS;
 end;
 
 end.

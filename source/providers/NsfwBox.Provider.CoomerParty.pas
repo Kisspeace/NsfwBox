@@ -53,19 +53,20 @@ type
       constructor Create; override;
   end;
 
-  TNBoxSearchReqCoomerParty = class(TNBoxSearchRequestBase)
+  TNBoxSearchReqCoomerParty = class(TNBoxSearchRequestBase, IChangeableHost)
     private
       FUserId: string;
       FService: string;
       FSite: String;
-    protected
-      function GetOrigin: integer;                        override;
+      procedure SetServiceHost(const Value: string);
+      function GetServiceHost: string;
     public
       function Clone: INBoxSearchRequest;                 override;
+      [DISABLE] property ServiceHost: string read GetServiceHost write SetServiceHost;
       property Origin;
       property Request;
       property PageId;
-      property Site: String read FSite write FSite;
+      property Site: String read GetServiceHost write SetServiceHost;
       property UserId: string read FUserId write FUserId;
       property Service: string read FService write FService;
       constructor Create; override;
@@ -180,13 +181,20 @@ end;
 constructor TNBoxSearchReqCoomerParty.Create;
 begin
   inherited;
+  FSite := 'https://coomer.su';
+  FOrigin := PVR_COOMERPARTY;
   FUserId := '';
   FService := '';
 end;
 
-function TNBoxSearchReqCoomerParty.GetOrigin: integer;
+function TNBoxSearchReqCoomerParty.GetServiceHost: string;
 begin
-  Result := PROVIDERS.CoomerParty.Id;
+  Result := FSite;
+end;
+
+procedure TNBoxSearchReqCoomerParty.SetServiceHost(const Value: string);
+begin
+  FSite := Value;
 end;
 
 { TNBoxArtistCoomerParty }

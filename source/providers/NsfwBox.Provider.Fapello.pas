@@ -58,8 +58,6 @@ type
   TNBoxSearchReqFapello = class(TNBoxSearchRequestBase)
     private
       FRequestKind: TFapelloItemKind;
-    protected
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
@@ -144,13 +142,9 @@ end;
 constructor TNBoxSearchReqFapello.Create;
 begin
   inherited;
+  FOrigin := PVR_FAPELLO;
   PageId := PROVIDERS.Fapello.FisrtPageId;
   FRequestKind := FlFeed;
-end;
-
-function TNBoxSearchReqFapello.GetOrigin: integer;
-begin
-  Result := PROVIDERS.Fapello.Id;
 end;
 
 { TNBoxItemArtistFapello }

@@ -38,7 +38,6 @@ type
       FMediaSize: TMotherlessMediaSize;
       FUploadDate: TMotherLessUploadDate;
       FSort: TMotherLessSort;
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
@@ -124,7 +123,7 @@ constructor TNBoxMotherlessItem.Create;
 begin
   Inherited;
   FPage := TMotherlessPostPage.Create('');
-  FOrigin := PROVIDERS.Motherless.Id;
+  FOrigin := PVR_MOTHERLESS;
 end;
 
 function TNBoxMotherlessItem.GetArtists: TNBoxItemArtisAr;
@@ -198,15 +197,11 @@ end;
 constructor TNBoxSearchReqMotherless.Create;
 begin
   inherited;
+  FOrigin := PVR_MOTHERLESS;
   FContentType := MediaImage;
   Self.FMediaSize := SizeAll;
   Self.FUploadDate := DateAll;
   Self.FSort := TMotherlessSort.SortRecent;
-end;
-
-function TNBoxSearchReqMotherless.GetOrigin: integer;
-begin
-  Result := PROVIDERS.Motherless.Id;
 end;
 
 end.

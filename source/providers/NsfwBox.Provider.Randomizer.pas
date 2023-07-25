@@ -12,8 +12,6 @@ type
   TNBoxSearchReqRandomizer = class(TNBoxSearchRequestBase)
     private
       FProviders: TArray<Integer>;
-    protected
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Providers: TArray<Integer> read FProviders write FProviders;
@@ -36,6 +34,7 @@ end;
 constructor TNBoxSearchReqRandomizer.Create;
 begin
   inherited;
+  FOrigin := PVR_RANDOMIZER;
   Providers := [
     NsfwBox.Consts.PROVIDERS.NsfwXxx.Id,
     NsfwBox.Consts.PROVIDERS.GMPClub.Id,
@@ -46,11 +45,6 @@ begin
     NsfwBox.Consts.PROVIDERS.Rule34xxx.Id,
     NsfwBox.Consts.PROVIDERS.Gelbooru.Id
   ];
-end;
-
-function TNBoxSearchReqRandomizer.GetOrigin: integer;
-begin
-  Result := NsfwBox.Consts.PROVIDERS.Randomizer.Id;
 end;
 
 end.

@@ -54,7 +54,6 @@ type
       FSearchRec: T9HentaiBookSearchRec;
       //FIncludedTags: T9HentaiTagAr;
       //FExcludedTags: T9HentaiTagAr;
-      function GetOrigin: integer; override;
       procedure SetRequest(const value: string); override;
       function GetRequest: string;               override;
       procedure SetPageId(const value: integer); override;
@@ -105,7 +104,7 @@ end;
 constructor TNBox9HentaitoItem.Create(AWithItem: boolean);
 begin
   Inherited Create;
-  FOrigin := PROVIDERS.NineHentaiTo.Id;
+  FOrigin := PVR_9HENTAITO;
   if AWithItem then
     FItem := T9HentaiBook.Create
   else
@@ -168,11 +167,7 @@ constructor TNBoxSearchReq9Hentaito.Create;
 begin
   Inherited;
   FSearchRec := T9HentaiBookSearchRec.New;
-end;
-
-function TNBoxSearchReq9Hentaito.GetOrigin: integer;
-begin
-  Result := PROVIDERS.NineHentaiTo.Id;
+  FOrigin := PVR_9HENTAITO;
 end;
 
 function TNBoxSearchReq9Hentaito.GetPageId: integer;

@@ -32,13 +32,12 @@ type
   end;
 
   TNBoxSearchReqPseudo = class(TNBoxSearchRequestBase)
-    protected
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin: integer read GetOrigin;
       property Request;
       property PageId;
+      constructor Create; override;
   end;
 
 implementation
@@ -105,9 +104,11 @@ begin
   end;
 end;
 
-function TNBoxSearchReqPseudo.GetOrigin: integer;
+constructor TNBoxSearchReqPseudo.Create;
 begin
-  Result := PROVIDERS.Pseudo.Id;
+  inherited;
+  FOrigin := PVR_PSEUDO;
 end;
+
 
 end.

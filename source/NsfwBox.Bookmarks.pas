@@ -36,6 +36,7 @@ type
       property Tablename: string read FTableName write FTableName;
       property Obj: TObject read FObj write SetObj;
       property Time: TDateTime read GetTime write FTime;
+      ///<summary>From v3.3.0 contains id of the custom provider.</summary>
       property About: string read FAbout write FAbout;
       property Origin: integer read GetOrigin write FOrigin;
       property BookmarkType: TNBoxBookmarkType read FBookmarkType;
@@ -329,7 +330,6 @@ begin
     Result := nil;
 end;
 
-
 constructor TNBoxBookmark.Create;
 begin
   Inherited;
@@ -372,16 +372,20 @@ var
   LHasOrigin: IHasOrigin;
 begin
   FObj := Value;
-  if Assigned(Obj) then begin
-
-    supports(Obj, IHasOrigin, LHasOrigin);
-    Origin := LHasOrigin.Origin;
-
-    if Supports(Obj, INboxItem) then
-      FBookmarkType := Content
-    else
+  if Assigned(FObj) then
+  begin
+    if Supports(FObj, IHasOrigin, LHasOrigin) then
+      About := LHasOrigin.Origin.ToString; { provider id }
+    if Supports(FObj, INboxItem) then
+    begin
+      FBookmarkType := Content;
+      { we need to set provider type id }
+      Origin := GetOriginId(Self.AsItem);
+    end else begin
       FBookmarkType := SearchRequest;
-
+      { we need to set provider type id }
+      Origin := GetOriginId(Self.AsRequest);
+    end;
   end;
 end;
 
@@ -423,7 +427,7 @@ begin
           Items[Pos + 0].AsInt64 := AGroupId; // group_id
           Items[Pos + 1].AsInteger := AValues[I].Origin; // origin
           Items[Pos + 2].AsInteger := ord(AValues[I].FBookmarkType); // type
-          Items[Pos + 3].AsString := AValues[I].About; // about
+          Items[Pos + 3].AsString := AValues[I].About; // Provider id
           Items[Pos + 4].AsString := ToJsonStr(AValues[I].Obj); // object
         end;
         inc(Iter);
@@ -614,6 +618,8 @@ var
   LBookmark: TNBoxBookmark;
   LBookmarkType: TNBoxBookmarkType;
   LJson: string;
+  LAbout: string;
+  LTrueProviderId: integer;
   Tmp: TObject;
 begin
   try
@@ -638,6 +644,7 @@ begin
           Origin := Query.FieldByName('origin').AsInteger;
           LBookmarkType := TNBoxBookmarkType(Query.FieldByName('type').AsInteger);
           LJson := Query.FieldByName('object').AsString;
+          LAbout := Query.FieldByName('about').AsString;
 
           case LBookmarkType of
 
@@ -647,6 +654,8 @@ begin
                 Post := CreateItemByOrigin(Origin);
                 tmp := (Post as TObject);
                 SafeAssignFromJSON(Tmp, LJson);
+                if TryStrToInt(LAbout, LTrueProviderId) then
+                  Post.SetProviderId(LTrueProviderId);
                 LBookmark.Obj := tmp;
               except
                 On E: exception do begin
@@ -661,6 +670,8 @@ begin
               Req := CreateReqByOrigin(Origin);
               tmp := (Req as TObject);
               SafeAssignFromJSON(Tmp, LJson);
+              if TryStrToInt(LAbout, LTrueProviderId) then
+                Req.SetProviderId(LTrueProviderId);
               LBookmark.Obj := tmp;
             end;
 

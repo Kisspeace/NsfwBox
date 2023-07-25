@@ -21,7 +21,7 @@ var
   LogFile: TLogFile;
 
 implementation
-uses unit1;
+uses NsfwBox.Consts;
 
 procedure Log(AText: string; AExcept: Exception);
 begin
@@ -84,7 +84,7 @@ begin
   try
     LStrings := TStringList.Create;
     try
-      LStrings.LoadFromFile(Unit1.LOG_FILENAME);
+      LStrings.LoadFromFile(LOG_FILENAME);
       if LStrings.Count < 1 then Exit('');
       for I := 0 to LStrings.Count - 1 do
       begin

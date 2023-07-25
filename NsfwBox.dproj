@@ -344,6 +344,7 @@
         <DCCReference Include="source\NsfwBox.DataExportImport.pas"/>
         <DCCReference Include="source\NsfwBox.Cache.pas"/>
         <DCCReference Include="source\FMX.Color.pas"/>
+        <DCCReference Include="source\NsfwBox.Providers.DataBase.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -374,9 +375,10 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="assets\android-icons\nsfwbox96.png" Configuration="Release" Class="Android_LauncherIcon96">
-                    <Platform Name="Android">
-                        <RemoteName>ic_launcher.png</RemoteName>
+                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>video.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -446,13 +448,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Debug" Class="Android_SplashImage640">
                     <Platform Name="Android64">
                         <Enabled>false</Enabled>
@@ -464,6 +459,13 @@
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>content-origin-4.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640">
+                    <Platform Name="Android64">
+                        <Enabled>false</Enabled>
+                        <RemoteName>splash_image.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1631,13 +1633,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Release" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>downloads.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Debug" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
@@ -1645,14 +1640,20 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android64">
-                        <RemoteDir>assets\internal\themes\default</RemoteDir>
-                        <RemoteName>video.png</RemoteName>
+                <DeployFile LocalName="assets\android-icons\nsfwbox96.png" Configuration="Release" Class="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteName>ic_launcher.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Release" Class="File">
+                <DeployFile LocalName="assets\themes\default\downloads.png" Configuration="Release" Class="File">
+                    <Platform Name="Android64">
+                        <RemoteDir>assets\internal\themes\default</RemoteDir>
+                        <RemoteName>downloads.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="assets\themes\default\video.png" Configuration="Debug" Class="File">
                     <Platform Name="Android64">
                         <RemoteDir>assets\internal\themes\default</RemoteDir>
                         <RemoteName>video.png</RemoteName>
@@ -2460,8 +2461,8 @@
                 </DeployClass>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>

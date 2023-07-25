@@ -240,10 +240,23 @@ begin
 end;
 
 function TNBoxGUIStyle.GetImagePath(AOrigin: integer): string;
+var
+  LProvider: TNBoxProviderInfo;
+  LCustomProvider: TNBoxProviderInfoCustom;
 begin
   case AOrigin of
     PVR_BLEACHBOORU: AOrigin := PVR_DANBOORU;
     PVR_E621: Exit('https://raw.githubusercontent.com/e621ng/e621ng/master/public/favicon-32x32.png');
+    else begin
+      LProvider := PROVIDERS[AOrigin];
+      if Assigned(LProvider) and LProvider.IsCustom
+      and not LProvider.IsPredefined then
+      begin
+        LCustomProvider := LProvider as TNBoxProviderInfoCustom;
+        Result := LCustomProvider.Host + '/favicon.ico'; { FIXME }
+        Exit;
+      end;
+    end;
   end;
   Result := GetImagePath(ICON_ORIGIN_PREFIX + AOrigin.ToString + '.png');
 end;

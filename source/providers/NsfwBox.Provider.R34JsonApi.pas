@@ -30,13 +30,12 @@ type
   end;
 
   TNBoxSearchReqR34JsonApi = class(TNBoxSearchRequestBase)
-    private
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
-      property Request: string read FRequest write SetRequest;
-      property PageId: integer read FPageId write SetPageId;
+      property Request;
+      property PageId;
+      constructor Create; override;
   end;
 
 implementation
@@ -61,7 +60,7 @@ end;
 constructor TNBoxR34JsonApiItem.Create;
 begin
   Inherited;
-  FOrigin := PROVIDERS.R34JsonApi.Id;
+  FOrigin := PVR_R34JSONAPI;
 end;
 
 function TNBoxR34JsonApiItem.GetContentUrls: TArray<string>;
@@ -95,9 +94,14 @@ begin
   end;
 end;
 
-function TNBoxSearchReqR34JsonApi.GetOrigin: integer;
+constructor TNBoxSearchReqR34JsonApi.Create;
 begin
-  Result := PROVIDERS.R34JsonApi.Id;
+  inherited;
+  FOrigin := PVR_R34JSONAPI;
 end;
 
 end.
+
+
+
+

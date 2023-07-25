@@ -45,19 +45,21 @@ type
       constructor Create; override;
   end;
 
-  TNBoxSearchReqNsfwXxx = class(TNBoxSearchRequestBase)
+  TNBoxSearchReqNsfwXxx = class(TNBoxSearchRequestBase, IChangeableHost)
     protected
+      FServiceHost: string;
       FSearchtype: TNsfwUrlType;
       FSortType: TNsfwSort;
       FOris: TNsfwOris;
       FTypes: TNsfwItemTypes;
-      FSite: TNsfwXxxSite;
-      function GetOrigin: integer; override;
+      function GetServiceHost: string;
+      procedure SetServiceHost(const Value: string);
       procedure SetSearchType(const value: TNsfwUrlType);
       procedure SetSortType(const value: TNsfwSort);
       procedure SetOris(const value: TNsfwOris);
       procedure SetTypes(const value: TNsfwItemTypes);
     public
+      [DISABLE] property ServiceHost: string read GetServiceHost write SetServiceHost;
       function Clone: INBoxSearchRequest; override;
       property Origin;
       property Request;
@@ -66,7 +68,7 @@ type
       property SortType: TNsfwSort read FSortType write SetSortType;
       property Oris: TNsfwOris read FOris write SetOris;
       property Types: TNsfwItemTypes read FTypes write SetTypes;
-      property Site: TNsfwXxxSite read FSite write FSite;
+//      property Site: TNsfwXxxSite read FSite write FSite;
       constructor Create; override;
   end;
 
@@ -189,23 +191,25 @@ begin
     SortType := Self.FSortType;
     Oris := Self.FOris;
     Types := Self.FTypes;
-    Site := Self.FSite;
+    ServiceHost := Self.FServiceHost;
+//    Site := Self.FSite;
   end;
 end;
 
 constructor TNBoxSearchReqNsfwXxx.Create;
 begin
   inherited;
+  FServiceHost := TNsfwXxxSiteToUrl(TNsfwXxxSite.NsfwXxx);
+  Forigin := PVR_NSFWXXX;
   FSearchtype := TNsfwUrlType.Default;
   FSortType := TNsfwSort.Newest;
   FOris := [Straight, Gay, Shemale, Cartoons, Bizarre];
   FTypes := [Image, video, Gallery];
-  FSite := TNsfwXxxSite.NsfwXxx;
 end;
 
-function TNBoxSearchReqNsfwXxx.GetOrigin: integer;
+function TNBoxSearchReqNsfwXxx.GetServiceHost: string;
 begin
-  Result := PROVIDERS.NsfwXxx.Id;
+  Result := FServiceHost;
 end;
 
 procedure TNBoxSearchReqNsfwXxx.SetOris(const value: TNsfwOris);
@@ -216,6 +220,11 @@ end;
 procedure TNBoxSearchReqNsfwXxx.SetSearchType(const value: TNsfwUrlType);
 begin
   FSearchType := value;
+end;
+
+procedure TNBoxSearchReqNsfwXxx.SetServiceHost(const Value: string);
+begin
+  FServiceHost := Value;
 end;
 
 procedure TNBoxSearchReqNsfwXxx.SetSortType(const value: TNsfwSort);

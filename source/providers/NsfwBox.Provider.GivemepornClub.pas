@@ -44,7 +44,6 @@ type
   TNBoxSearchReqGmpClub = class(TNBoxSearchRequestBase)
     protected
       FSearchtype: TGmpClubSearchType;
-      function GetOrigin: integer;                        override;
       procedure SetSearchType(const value: TGmpClubSearchType);
     public
       function Clone: INBoxSearchRequest;                 override;
@@ -80,7 +79,7 @@ begin
   inherited;
   Item := TGmpclubItem.New;
   Page := TGmpclubFullPage.New;
-  FOrigin := PROVIDERS.GMPClub.Id;
+  FOrigin := PVR_GIVEMEPORNCLUB;
 end;
 
 function TNBoxGmpClubItem.GetCaption: string;
@@ -140,12 +139,8 @@ end;
 constructor TNBoxSearchReqGmpClub.Create;
 begin
   inherited;
+  FOrigin := PVR_GIVEMEPORNCLUB;
   FSearchtype := TGmpClubSearchType.Empty;
-end;
-
-function TNBoxSearchReqGmpClub.GetOrigin: integer;
-begin
-  Result := PROVIDERS.GMPClub.Id;
 end;
 
 procedure TNBoxSearchReqGmpClub.SetSearchType(const value: TGmpClubSearchType);

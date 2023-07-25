@@ -13,6 +13,7 @@ uses
   NsfwBox.Provider.motherless,
   NsfwBox.Provider.Fapello,
   NsfwBox.Provider.BooruScraper,
+  NsfwBox.Provider.BepisDb,
   NsfwBox.Consts,
   classes, sysutils, NsfwXxx.Types;
 
@@ -24,19 +25,49 @@ uses
   function OriginToStr(AOrigin: integer): string;
   function SameId(AItem1, AItem2: INBoxItem): boolean;
 
+  ///<summary>Returns parent provider id instead of custom provider id</summary>
+  function GetOriginId(const AObj: INBoxSearchRequest): integer; overload;
+  ///<summary>Returns parent provider id instead of custom provider id</summary>
+  function GetOriginId(const AObj: INBoxItem): integer; overload;
+
 implementation
 
+function GetOriginId(const AObj: INBoxSearchRequest): integer;
+begin
+  if AObj is TNBoxSearchReqNsfwXxx then Result := PVR_NSFWXXX
+  else if AObj is TNBoxSearchReqCoomerParty then Result := PVR_COOMERPARTY
+  else if AObj is TNBoxSearchReqBepisDb then Result := PVR_BEPISDB
+  else if AObj is TNBoxSearchReqBooru then Result := PVR_BOORUSCRAPER { FIXME }
+  else if AObj is TNBoxSearchReqFapello then Result := PVR_FAPELLO
+  else if AObj is TNBoxSearchReqMotherless then Result := PVR_MOTHERLESS
+  else if AObj is TNBoxSearchReq9Hentaito then Result := PVR_9HENTAITO
+  else if AObj is TNBoxSearchReqGmpClub then Result := PVR_GIVEMEPORNCLUB
+  else if AObj is TNBoxSearchReqBookmarks then Result := PVR_BOOKMARKS
+  else if AObj is TNBoxSearchReqPseudo then Result := PVR_PSEUDO
+  else if AObj is TNBoxSearchReqR34App then Result := PVR_R34APP
+  else if AObj is TNBoxSearchReqR34JsonApi then Result := PVR_R34JSONAPI
+  else if AObj is TNBoxSearchReqRandomizer then Result := PVR_RANDOMIZER;
+//  else if AObj is  then Result :=
+end;
+
+function GetOriginId(const AObj: INBoxItem): integer;
+begin
+  if AObj is TNBoxNsfwXxxItem then Result := PVR_NSFWXXX
+  else if AObj is TNBoxCoomerPartyItem then Result := PVR_COOMERPARTY
+  else if AObj is TNBoxBooruItemBase then Result := PVR_BOORUSCRAPER { FIXME }
+  else if AObj is TNBoxFapelloItem then Result := PVR_FAPELLO
+  else if AObj is TNBoxMotherlessItem then Result := PVR_MOTHERLESS
+  else if AObj is TNBox9HentaitoItem then Result := PVR_9HENTAITO
+  else if AObj is TNBoxGmpClubItem then Result := PVR_GIVEMEPORNCLUB
+  else if AObj is TNBoxPseudoItem then Result := PVR_PSEUDO
+  else if AObj is TNBoxR34AppItem then Result := PVR_R34APP
+  else if AObj is TNBoxR34JsonApiItem then Result := PVR_R34JSONAPI
+end;
+
 function CreateItemByOrigin(AOrigin: integer): INBoxItem;
-var
-  LItemClass: TNBoxItemBaseClass;
 begin
   try
-    LItemClass := PROVIDERS.ById(AOrigin).ItemClass;
-
-    if (LItemClass = TNBoxBooruItemBase) then
-      Result := TNBoxBooruItemBase.Create(AOrigin)
-    else
-      Result := LItemClass.Create;
+    Result := PROVIDERS.ById(AOrigin).CreateBaseItem;
   except
     On E: Exception do
       Log('CreateItemByOrigin(' + AOrigin.ToString + ')', E);
@@ -44,16 +75,9 @@ begin
 end;
 
 function CreateReqByOrigin(AOrigin: integer): INBoxSearchRequest;
-var
-  LRequestClass: TNBoxSearchRequestBaseClass;
 begin
   try
-    LRequestClass := PROVIDERS.ById(AOrigin).RequestClass;
-
-    if (LRequestClass = TNBoxSearchReqBooru) then
-      Result := TNBoxSearchReqBooru.Create(AOrigin)
-    else
-      Result := LRequestClass.Create;
+    Result := PROVIDERS.ById(AOrigin).CreateBaseRequest;
   except
     On E: Exception do
       Log('CreateReqByOrigin(' + AOrigin.ToString + ')', E);

@@ -37,7 +37,6 @@ type
   TNBoxSearchReqR34App = class(TNBoxSearchRequestBase)
     protected
       FBooru: TR34AppFreeBooru;
-      function GetOrigin: integer; override;
     public
       function Clone: INBoxSearchRequest; override;
       property Origin;
@@ -127,13 +126,9 @@ end;
 constructor TNBoxSearchReqR34App.Create;
 begin
   inherited;
+  FOrigin := PVR_R34APP;
   FPageId := 0;
   FBooru := TR34AppFreeBooru.rule34xxx;
-end;
-
-function TNBoxSearchReqR34App.GetOrigin: integer;
-begin
-  Result := PROVIDERS.R34App.Id;
 end;
 
 
