@@ -52,6 +52,7 @@ type
       FSortType: TNsfwSort;
       FOris: TNsfwOris;
       FTypes: TNsfwItemTypes;
+    protected
       function GetServiceHost: string;
       procedure SetServiceHost(const Value: string);
       procedure SetSearchType(const value: TNsfwUrlType);
@@ -191,6 +192,7 @@ begin
     SortType := Self.FSortType;
     Oris := Self.FOris;
     Types := Self.FTypes;
+    Origin := Self.Origin;
     ServiceHost := Self.FServiceHost;
 //    Site := Self.FSite;
   end;

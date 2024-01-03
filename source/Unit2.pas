@@ -511,7 +511,7 @@ begin
   O := OriginSetMenu.Selected;
   Result := CreateReqByOrigin(O);
 
-  case O of
+  case PROVIDERS.ById(O).RootProviderId of
 
     PVR_NSFWXXX: begin
       with Result as TNBoxSearchReqNsfwXxx do begin

@@ -73,12 +73,16 @@ type
       FVisibleByDefault: boolean;
       FRequestClass: TNBoxSearchRequestBaseClass;
       FItemClass: TNBoxItemBaseClass;
+    protected
+      function GetRootProviderId: Integer; virtual;
+      procedure SetBaseRequest(const AReq: INBoxSearchRequest); virtual;
     public
       function CreateBaseRequest: INBoxSearchRequest; virtual;
       function CreateBaseItem: INBoxItem;
       function IsCustom: boolean;
       function IsPredefined: boolean;
       property Id: Integer read FId;
+      property RootProviderId: Integer read GetRootProviderId;
       property TitleName: string read FTitleName write FTitleName;
       property RequestClass: TNBoxSearchRequestBaseClass read FRequestClass;
       property ItemClass: TNBoxItemBaseClass read FItemClass;
@@ -91,8 +95,10 @@ type
     private
       FHost: string;
       FParentProvider: TNBoxProviderInfo;
+    protected
+      function GetRootProviderId: Integer; override;
+      procedure SetBaseRequest(const AReq: INBoxSearchRequest); override;
     public
-      function CreateBaseRequest: INBoxSearchRequest; override;
       function GetAdditionalJsonData: string; virtual;
       procedure SetAdditionalData(AJsonData: string); virtual;
       property ParentProvider: TNBoxProviderInfo read FParentProvider;
@@ -128,8 +134,9 @@ type
     private
       FClientType: TBooruScraperClientType;
       FParserType: TBooruScraperParserType;
+    protected
+      procedure SetBaseRequest(const AReq: INBoxSearchRequest); override;
     public
-      function CreateBaseRequest: INBoxSearchRequest; override;
       function GetAdditionalJsonData: string; override;
       procedure SetAdditionalData(AJsonData: string); override;
       property ClientType: TBooruScraperClientType read FClientType write FClientType;
@@ -417,6 +424,12 @@ begin
   else
     Result := FRequestClass.Create;
   Result.SetProviderId(FId);
+  SetBaseRequest(Result);
+end;
+
+function TNBoxProviderInfo.GetRootProviderId: Integer;
+begin
+  Result := FId;
 end;
 
 function TNBoxProviderInfo.IsCustom: boolean;
@@ -428,6 +441,11 @@ end;
 function TNBoxProviderInfo.IsPredefined: boolean;
 begin
   Result := FId < CUSTOM_PVR_ID_MIN;
+end;
+
+procedure TNBoxProviderInfo.SetBaseRequest(const AReq: INBoxSearchRequest);
+begin
+  { Empty. }
 end;
 
 { TNBoxProviderInfoCustom }
@@ -442,18 +460,14 @@ begin
   FParentProvider := AParent;
 end;
 
-function TNBoxProviderInfoCustom.CreateBaseRequest: INBoxSearchRequest;
-var
-  LChangeableHost: IChangeableHost;
-begin
-  Result := Inherited;
-  if Supports(Result, IChangeableHost, LChangeableHost) then
-    LChangeableHost.ServiceHost := Fhost;
-end;
-
 function TNBoxProviderInfoCustom.GetAdditionalJsonData: string;
 begin
   Result := '{}';
+end;
+
+function TNBoxProviderInfoCustom.GetRootProviderId: Integer;
+begin
+  Result := ParentProvider.RootProviderId;
 end;
 
 procedure TNBoxProviderInfoCustom.SetAdditionalData(AJsonData: string);
@@ -461,18 +475,18 @@ begin
   { Do nothing. }
 end;
 
-{ TNBoxProviderInfoCustomBooruScraper }
-
-function TNBoxProviderInfoCustomBooruScraper.CreateBaseRequest: INBoxSearchRequest;
+procedure TNBoxProviderInfoCustom.SetBaseRequest(
+  const AReq: INBoxSearchRequest);
+var
+  LChangeableHost: IChangeableHost;
 begin
-  Result := Inherited;
-  with Result as TNBoxSearchReqBooru do
-  begin
-    ClientType := Self.ClientType;
-    ParserType := Self.ParserType;
-  end;
+  Inherited SetBaseRequest(AReq);
+  if Supports(AReq, IChangeableHost, LChangeableHost) then
+    LChangeableHost.ServiceHost := Fhost;
 end;
 
+{ TNBoxProviderInfoCustomBooruScraper }
+
 function TNBoxProviderInfoCustomBooruScraper.GetAdditionalJsonData: string;
 var
   LJson: TJsonObject;
@@ -498,6 +512,17 @@ begin
     ParserType := TBooruScraperParserType(LJson.GetValue<integer>('ParserType'));
   finally
     LJson.Free;
+  end;
+end;
+
+procedure TNBoxProviderInfoCustomBooruScraper.SetBaseRequest(
+  const AReq: INBoxSearchRequest);
+begin
+  inherited SetBaseRequest(AReq);
+  with AReq as TNBoxSearchReqBooru do
+  begin
+    ClientType := Self.ClientType;
+    ParserType := Self.ParserType;
   end;
 end;
 
